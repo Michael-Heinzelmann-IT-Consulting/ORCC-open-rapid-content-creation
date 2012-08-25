@@ -1,8 +1,12 @@
+save project (changed properties, background, in. out etc.)
+resize/crop background image (drag), effects (xor)
 scroll and step audio/video
-resize/crop background image (drag&drop)
+show current reference value for threshold properties
 macro recording e.g. property xyz changed at frame n
 help and user guide
+sound volume control
 Trailer
+MIDI input support
 Multiple canvas editing panes plus mixing
 pre-run for advanced canvas algorithms
 export single frame as .jpg
