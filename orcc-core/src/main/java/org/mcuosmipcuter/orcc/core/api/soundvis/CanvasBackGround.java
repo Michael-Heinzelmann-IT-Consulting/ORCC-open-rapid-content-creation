@@ -16,8 +16,8 @@
 package org.mcuosmipcuter.orcc.core.api.soundvis;
 
 /**
- * Facade for a canvas background that can be implemented in different ways,
- * like image, solid color etc. If the canvas needs the background be drawn
+ * Facade for a canvas background that can draw the background in different ways,
+ * like image, solid color etc. If the canvas wants the background be drawn externally
  * it should call this facade {@link #drawBackGround()} method.
  * Canvas that take full responsibility for the background can just ignore
  * this interface.

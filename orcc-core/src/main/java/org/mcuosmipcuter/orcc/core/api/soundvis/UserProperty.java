@@ -22,7 +22,7 @@ import java.lang.annotation.Target;
 
 /**
  * User property annotation to be used by canvas developers to inform soundvis
- * that the annotated property is read/writable for the user, it will use reflection
+ * that the annotated property is read/writable for the user, soundvis will use reflection
  * to access the property, so getter/setter are not required.<br/>
  * Supported base types: boolean, java.awt.Color, int, String<br/>
  * Consult the latest editor documentation whether other types are supported 

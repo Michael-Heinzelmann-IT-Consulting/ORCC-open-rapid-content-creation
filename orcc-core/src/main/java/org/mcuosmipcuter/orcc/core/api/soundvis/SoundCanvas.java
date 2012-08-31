@@ -20,7 +20,7 @@ import java.awt.Graphics2D;
 import javax.sound.sampled.AudioFormat;
 
 /**
- * Interface to be implemented by graphic programmers to draw the video.
+ * Interface to be implemented by canvas programmers to draw the video.
  * Implementations need to provide an empty no args constructor, everything
  * else is entirely up to the implementation, except the constructor all is
  * optional, an empty implementation will just create an empty video channel.

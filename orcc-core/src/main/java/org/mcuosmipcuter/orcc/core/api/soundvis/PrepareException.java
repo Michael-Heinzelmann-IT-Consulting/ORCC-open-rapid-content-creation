@@ -24,7 +24,8 @@ public class PrepareException extends Exception {
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * @param msg
+	 * Constructs the exception with the given message
+	 * @param msg exception message
 	 */
 	public PrepareException(String msg) {
 		super(msg);
