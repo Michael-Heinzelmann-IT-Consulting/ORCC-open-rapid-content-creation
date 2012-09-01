@@ -32,23 +32,23 @@ public @interface LimitedIntProperty {
 	
 	/**
 	 * maximum value for the integer property
-	 * @return
+	 * @return the allowed maximum
 	 */
 	int maximum() default Integer.MAX_VALUE;
 	/**
 	 * minimum value for the integer property
-	 * @return
+	 * @return the allowed minimum
 	 */
 	int minimum() default Integer.MIN_VALUE;
 	/**
 	 * Step size to increment decrement the value 
 	 * from the initial value (assignment in code)
-	 * @return
+	 * @return the step size to use (default 1)
 	 */
 	int stepSize() default 1;
 	/**
 	 * Describe here why we need the limitation
-	 * @return
+	 * @return the description
 	 */
-	String description() default "";
+	String description();
 }
