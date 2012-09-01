@@ -47,7 +47,8 @@ import javax.sound.sampled.AudioFormat;
 public interface SoundCanvas {
 	/**
 	 * Audio callback: we have received a new sample that contained the given amplitudes
-	 * @param amplitudes amplitudes per audio channel - beware the values are unsigned!
+	 * @param amplitudes amplitudes per audio channel - the values come as decoded, usually
+	 * signed with o as center, maximum - minimum equal to the audio sample size (e.g. 2^16)
 	 */
 	public void nextSample(int[] amplitudes);
 	/**
