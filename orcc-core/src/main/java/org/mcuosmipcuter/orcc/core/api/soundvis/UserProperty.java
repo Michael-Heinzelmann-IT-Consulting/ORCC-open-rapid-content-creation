@@ -34,7 +34,7 @@ public @interface UserProperty {
 	
 	/**
 	 * Describe to the user the meaning of the property and how it is intended to be used
-	 * @return
+	 * @return the description of the property
 	 */
 	String description();
 }
