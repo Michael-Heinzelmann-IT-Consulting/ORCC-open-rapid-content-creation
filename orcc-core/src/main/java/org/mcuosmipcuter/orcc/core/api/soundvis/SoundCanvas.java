@@ -17,26 +17,24 @@ package org.mcuosmipcuter.orcc.core.api.soundvis;
 
 import java.awt.Graphics2D;
 
-import javax.sound.sampled.AudioFormat;
-
 /**
  * Interface to be implemented by canvas programmers to draw the video.
  * Implementations need to provide an empty no args constructor, everything
  * else is entirely up to the implementation, except the constructor all is
  * optional, an empty implementation will just create an empty video channel.
  * 
- * ther are 3 frequencies of method calls:
+ * there are 3 frequencies of method calls:
  * 
  * <ol>
  * <li>
- * {@link #prepare(AudioFormat, Graphics2D, CanvasBackGround)} 
+ * {@link #prepare(AudioInputInfo, VideoOutputInfo, Graphics2D, CanvasBackGround)}
  * is only called once before the first frame
  * </li>
  * <li>
- * {@link #newFrame(long)} is called per video frame ( e.g 24, 25, 30 times per second)
+ * {@link #newFrame(long)} is called per video frame ( e.g 24, 25, 30 times per second)}
  * </li>
  * <li>
- * {@link #nextSample(int[])} is called per audio sample (typically 44100 times per second)
+ * {@link #nextSample(int[])} is called per audio sample (typically 44100 times per second)}
  * </li>
  * </ol>
  * The code that is executed inside each of the methods will therefore have more or less
@@ -60,11 +58,12 @@ public interface SoundCanvas {
 	/**
 	 * Prepare method called before any audio and video callback methods are called.
 	 * 
-	 * @param audioFormat
-	 * @param graphics
-	 * @param canvasBackGround
-	 * @throws PrepareException
+	 * @param audioInputInfo info about the given audio input
+	 * @param videoOutputInfo info about the configured video output
+	 * @param graphics graphics to draw on, in most cases you want to store the reference in your instance
+	 * @param canvasBackGround call back for external background drawing
+	 * @throws PrepareException to be thrown if this canvas refuses working with the given parameters
 	 */
-	public void prepare(AudioFormat audioFormat, Graphics2D graphics, CanvasBackGround canvasBackGround) throws PrepareException;
+	public void prepare(AudioInputInfo audioInputInfo, VideoOutputInfo videoOutputInfo, Graphics2D graphics, CanvasBackGround canvasBackGround) throws PrepareException;
 }
 
