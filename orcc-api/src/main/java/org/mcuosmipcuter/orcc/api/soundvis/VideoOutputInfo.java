@@ -13,25 +13,39 @@
 *  See the License for the specific language governing permissions and
 *  limitations under the License.
 */
-package org.mcuosmipcuter.orcc.soundvis;
+package org.mcuosmipcuter.orcc.api.soundvis;
 
-import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
-import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 
 /**
- * Intermediate interface for controller components
+ * Provides information about the video output
  * @author Michael Heinzelmann
  */
-public interface Mixin {
+public interface VideoOutputInfo {
+	
 	/**
-	 * Start the processing with the given parameters
-	 * @param audioInputInfo audio input
-	 * @param videoOutputInfo the output to produce
+	 * The frame rate of the video
+	 * @return the number of frames per second
 	 */
-	public void start(AudioInputInfo audioInputInfo, VideoOutputInfo videoOutputInfo);
+	public int getFramesPerSecond() ;
 	/**
-	 * Process a new frame
-	 * @param frameCount current the frame number
+	 * The video dimension width
+	 * @return the video width
 	 */
-	void newFrame(long frameCount);
+	public int getWidth() ;
+	/**
+	 * The video dimension height
+	 * @return the video height
+	 */
+	public int getHeight();
+	/**
+	 * Videos title as provided by the user
+	 * @return the title
+	 */
+	public String getTitle();
+	/**
+	 * Videos water mark text
+	 * @return the water mark string
+	 */
+	public String getWaterMarkText();
+
 }
