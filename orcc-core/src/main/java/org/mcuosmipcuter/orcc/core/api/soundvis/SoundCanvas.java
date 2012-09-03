@@ -31,10 +31,10 @@ import java.awt.Graphics2D;
  * is only called once before the first frame
  * </li>
  * <li>
- * {@link #newFrame(long)} is called per video frame ( e.g 24, 25, 30 times per second)}
+ * {@link #newFrame(long)} is called per video frame ( e.g 24, 25, 30 times per second)
  * </li>
  * <li>
- * {@link #nextSample(int[])} is called per audio sample (typically 44100 times per second)}
+ * {@link #nextSample(int[])} is called per audio sample (typically 44100 times per second)
  * </li>
  * </ol>
  * The code that is executed inside each of the methods will therefore have more or less
@@ -45,8 +45,8 @@ import java.awt.Graphics2D;
 public interface SoundCanvas {
 	/**
 	 * Audio callback: we have received a new sample that contained the given amplitudes
-	 * @param amplitudes amplitudes per audio channel - the values come as decoded, usually
-	 * signed with o as center, maximum - minimum equal to the audio sample size (e.g. 2^16)
+	 * @param amplitudes amplitudes per audio channel - the values come as unsigned integers
+	 * with 0 as minimum and the maximum equal to the audio sample size (e.g. 2^16)
 	 */
 	public void nextSample(int[] amplitudes);
 	/**
