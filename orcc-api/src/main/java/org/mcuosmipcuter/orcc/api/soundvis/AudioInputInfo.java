@@ -13,25 +13,28 @@
 *  See the License for the specific language governing permissions and
 *  limitations under the License.
 */
-package org.mcuosmipcuter.orcc.soundvis;
+package org.mcuosmipcuter.orcc.api.soundvis;
 
-import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
-import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
 
 /**
- * Intermediate interface for controller components
+ * Provides information about the audio input
  * @author Michael Heinzelmann
  */
-public interface Mixin {
+public interface AudioInputInfo {
 	/**
-	 * Start the processing with the given parameters
-	 * @param audioInputInfo audio input
-	 * @param videoOutputInfo the output to produce
+	 * Info about the format of the audio
+	 * @see {@link AudioFormat}
+	 * @return the format
 	 */
-	public void start(AudioInputInfo audioInputInfo, VideoOutputInfo videoOutputInfo);
+	public AudioFormat getAudioFormat();
+
 	/**
-	 * Process a new frame
-	 * @param frameCount current the frame number
+	 * Info about the length of the audio expressed in samples,
+	 * this is also the number of times {@link SoundCanvas#nextSample(int[])} will be called.
+	 * @see {@link AudioInputStream#getFrameLength()}
+	 * @return length in audio frames (samples)
 	 */
-	void newFrame(long frameCount);
+	public long getFrameLength();
 }

@@ -13,25 +13,19 @@
 *  See the License for the specific language governing permissions and
 *  limitations under the License.
 */
-package org.mcuosmipcuter.orcc.soundvis;
-
-import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
-import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
+package org.mcuosmipcuter.orcc.api.soundvis;
 
 /**
- * Intermediate interface for controller components
+ * Facade for a canvas background that can draw the background in different ways,
+ * like image, solid color etc. If the canvas wants the background be drawn externally
+ * it should call this facade {@link #drawBackGround()} method.
+ * Canvas that take full responsibility for the background can just ignore
+ * this interface.
  * @author Michael Heinzelmann
  */
-public interface Mixin {
+public interface CanvasBackGround {
 	/**
-	 * Start the processing with the given parameters
-	 * @param audioInputInfo audio input
-	 * @param videoOutputInfo the output to produce
+	 * Draws the background in a specific way that is determined by the user
 	 */
-	public void start(AudioInputInfo audioInputInfo, VideoOutputInfo videoOutputInfo);
-	/**
-	 * Process a new frame
-	 * @param frameCount current the frame number
-	 */
-	void newFrame(long frameCount);
+	public void drawBackGround();
 }
