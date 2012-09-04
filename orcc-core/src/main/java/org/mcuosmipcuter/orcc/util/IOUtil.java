@@ -34,7 +34,7 @@ public class IOUtil {
 	 * checks for null and catches exception and prints stack trace
 	 * @param closeable
 	 */
-	public static void closeInFinally(Closeable closeable) {
+	public static void safeClose(Closeable closeable) {
 		try {
 			if(closeable != null) {
 				closeable.close();

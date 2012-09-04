@@ -22,7 +22,7 @@ import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
  * Intermediate interface for controller components
  * @author Michael Heinzelmann
  */
-public interface Mixin {
+public interface Mixin extends DecodingCallback {
 	/**
 	 * Start the processing with the given parameters
 	 * @param audioInputInfo audio input

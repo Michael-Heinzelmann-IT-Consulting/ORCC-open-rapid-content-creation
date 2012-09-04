@@ -63,6 +63,7 @@
     <module>orcc-gui</module>
     <module>orcc-core</module>
     <module>orcc-api</module>
+    <module>orcc-ert</module>
   </modules>
   
 </project>

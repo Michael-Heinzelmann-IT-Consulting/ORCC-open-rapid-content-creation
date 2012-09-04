@@ -13,18 +13,34 @@
 *  See the License for the specific language governing permissions and
 *  limitations under the License.
 */
-package org.mcuosmipcuter.orcc.soundvis;
+package org.mcuosmipcuter.orcc.soundvis.model;
 
-import java.awt.image.BufferedImage;
+import javax.sound.sampled.AudioFormat;
+
+import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
 
 /**
- * Inteface for implementations that render graphics and can provide an image per frame.
+ * Bean implementation of {@link AudioInputInfo}
  * @author Michael Heinzelmann
  */
-public interface Renderer extends Mixin {
-	/**
-	 * This image will be used in the display / output possibly with further addition.
-	 * @return the image
-	 */
-	public BufferedImage getFrameImage();
+public class AudioInputInfoImpl implements AudioInputInfo {
+	
+	private final AudioFormat audioFormat;
+	private final long frameLength;
+	
+	public AudioInputInfoImpl(AudioFormat audioFormat, long frameLength) {
+		this.audioFormat = audioFormat;
+		this.frameLength = frameLength;
+	}
+
+	@Override
+	public AudioFormat getAudioFormat() {
+		return audioFormat;
+	}
+
+	@Override
+	public long getFrameLength() {
+		return frameLength;
+	}
+
 }

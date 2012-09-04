@@ -15,16 +15,42 @@
 */
 package org.mcuosmipcuter.orcc.soundvis;
 
-import java.awt.image.BufferedImage;
+import java.io.Closeable;
+
+import javax.sound.sampled.AudioInputStream;
+
+import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
 
 /**
- * Inteface for implementations that render graphics and can provide an image per frame.
+ * Abstraction of an audio input
  * @author Michael Heinzelmann
  */
-public interface Renderer extends Mixin {
+public interface AudioInput extends Closeable {
+	
+	enum Type {
+		FILE, STREAM
+	}
+
 	/**
-	 * This image will be used in the display / output possibly with further addition.
-	 * @return the image
+	 * Get the name e.g. file name
+	 * @return input name
 	 */
-	public BufferedImage getFrameImage();
+	public String getName();
+	
+	/**
+	 * @return get the type
+	 */
+	public Type getType();
+	
+	/**
+	 * Open input and return stream, when done reading close with {@link #close()}
+	 * @return the stream for reading
+	 */
+	public AudioInputStream open();
+	
+	/**
+	 * Returns the audio info object belonging to this audio input
+	 * @return the info
+	 */
+	public AudioInputInfo getAudioInputInfo();
 }
