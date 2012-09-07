@@ -66,5 +66,14 @@ public interface SoundCanvas {
 	 * @param canvasBackGround call back for external background drawing
 	 */
 	public void prepare(AudioInputInfo audioInputInfo, VideoOutputInfo videoOutputInfo, Graphics2D graphics, CanvasBackGround canvasBackGround);
+
+	/**
+	 * Display a preview of this canvas, ideally screen shot like, or at least show
+	 * a textual description what the canvas does
+	 * @param width the width of the preview area
+	 * @param height the height of the preview area
+	 * @param graphics the graphics of the preview area
+	 */
+	public void preView(int width, int height, Graphics2D graphics);
 }
 
