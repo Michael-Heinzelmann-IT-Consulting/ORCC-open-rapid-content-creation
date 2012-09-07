@@ -69,7 +69,8 @@ public class PropertyPanelFactory {
 			final IntegerPropertyPanel i;
 			if(field.isAnnotationPresent(LimitedIntProperty.class)) {
 				LimitedIntProperty l = field.getAnnotation(LimitedIntProperty.class);
-				int value = getValue(field, soundCanvas);
+				Integer integer = getValue(field, soundCanvas);
+				int value = integer != null ? integer.intValue() : 0;
 				i = new IntegerPropertyPanel(soundCanvas, value, l.minimum(), l.maximum(), l.stepSize());
 			}
 			else {
