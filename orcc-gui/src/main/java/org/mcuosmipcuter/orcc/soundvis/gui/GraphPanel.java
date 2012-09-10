@@ -54,7 +54,7 @@ public class GraphPanel extends JPanel implements Renderer, CanvasBackGround {
 	 * Type of background to use
 	 * @author Michael Heinzelmann
 	 */
-	public enum BGImageType {
+	public enum BGType {
 		/**
 		 * Solid color back ground 
 		 */
@@ -69,7 +69,7 @@ public class GraphPanel extends JPanel implements Renderer, CanvasBackGround {
 		NONE
 	}
 
-	private BGImageType bgImageType = BGImageType.COLOR;
+	private BGType bgType = BGType.COLOR;
 	private static final long serialVersionUID = 1L;
 	private Mixin mixin;
 	private SoundCanvas soundCanvas; // canvas to work with
@@ -103,7 +103,7 @@ public class GraphPanel extends JPanel implements Renderer, CanvasBackGround {
 			@Override
 			public void mouseDragged(MouseEvent e) {
 				
-				if(bgImage != null && bgImageType == BGImageType.IMAGE) {
+				if(bgImage != null && bgType == BGType.IMAGE) {
 					bgX += e.getX() - xMoveStart;
 					bgY += e.getY() - yMoveStart;
 					graphics.setColor(Color.GRAY);
@@ -122,7 +122,7 @@ public class GraphPanel extends JPanel implements Renderer, CanvasBackGround {
 			Cursor cursor;
 			@Override
 			public void mousePressed(MouseEvent e) {
-				if(bgImage != null && bgImageType == BGImageType.IMAGE) {
+				if(bgImage != null && bgType == BGType.IMAGE) {
 				xMoveStart = e.getX();
 				yMoveStart = e.getY();
 				cursor = getCursor();
@@ -164,10 +164,10 @@ public class GraphPanel extends JPanel implements Renderer, CanvasBackGround {
 	
 	@Override
 	public void drawBackGround() {
-		if(bgImageType == BGImageType.IMAGE && bgImage != null) {
+		if(bgType == BGType.IMAGE && bgImage != null) {
 			graphics.drawImage(bgImage, bgX, bgY, Color.BLACK, null);
 		}
-		else if(bgImageType == BGImageType.COLOR) {
+		else if(bgType == BGType.COLOR) {
 			graphics.setColor(bgColor);
 			graphics.fillRect(0, 0, videoOutputInfo.getWidth(), videoOutputInfo.getHeight());
 		}
@@ -290,12 +290,12 @@ public class GraphPanel extends JPanel implements Renderer, CanvasBackGround {
 		this.useWaterMark = useWaterMark;
 	}
 
-	public synchronized BGImageType getBgImageType() {
-		return bgImageType;
+	public synchronized BGType getBgImageType() {
+		return bgType;
 	}
 
-	public synchronized void setBgImageType(BGImageType bgImageType) {
-		this.bgImageType = bgImageType;
+	public synchronized void setBgImageType(BGType bgImageType) {
+		this.bgType = bgImageType;
 		drawBackGround();
 		repaint();
 	}

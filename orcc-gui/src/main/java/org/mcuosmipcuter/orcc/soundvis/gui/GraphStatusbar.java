@@ -44,7 +44,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.mcuosmipcuter.orcc.soundvis.Context;
-import org.mcuosmipcuter.orcc.soundvis.gui.GraphPanel.BGImageType;
+import org.mcuosmipcuter.orcc.soundvis.gui.GraphPanel.BGType;
 import org.mcuosmipcuter.orcc.soundvis.gui.listeners.FileDialogActionListener;
 
 
@@ -68,7 +68,7 @@ public class GraphStatusbar extends JPanel {
 		optionColor.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				if(optionColor.isSelected()) {
-					graphicPanel.setBgImageType(BGImageType.COLOR);
+					graphicPanel.setBgImageType(BGType.COLOR);
 				}
 			}
 		});
@@ -81,7 +81,7 @@ public class GraphStatusbar extends JPanel {
 				if(newColor != null) {
 					bgColorButton.setBackground(newColor);
 					graphicPanel.setBgColor(newColor);
-					graphicPanel.setBgImageType(BGImageType.COLOR);
+					graphicPanel.setBgImageType(BGType.COLOR);
 					optionColor.setSelected(true);
 				}
 			}});
@@ -90,7 +90,7 @@ public class GraphStatusbar extends JPanel {
 		optionImage.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				if(optionImage.isSelected()) {
-					graphicPanel.setBgImageType(BGImageType.IMAGE);
+					graphicPanel.setBgImageType(BGType.IMAGE);
 				}
 			}
 		});
@@ -102,7 +102,7 @@ public class GraphStatusbar extends JPanel {
 				try {
 					BufferedImage bgImage = ImageIO.read(file);
 					graphicPanel.setBgImage(bgImage);
-					graphicPanel.setBgImageType(BGImageType.IMAGE);
+					graphicPanel.setBgImageType(BGType.IMAGE);
 					optionImage.setSelected(true);
 				} catch (IOException ex) {
 					throw new RuntimeException(ex);
@@ -116,15 +116,15 @@ public class GraphStatusbar extends JPanel {
 		optionNone.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				if(optionNone.isSelected()) {
-					graphicPanel.setBgImageType(BGImageType.NONE);
+					graphicPanel.setBgImageType(BGType.NONE);
 				}
 			}
 		});
 		add(optionNone);
-		if(graphicPanel.getBgImageType() == BGImageType.COLOR) {
+		if(graphicPanel.getBgImageType() == BGType.COLOR) {
 			optionColor.setSelected(true);
 		}
-		else if(graphicPanel.getBgImageType() == BGImageType.IMAGE) {
+		else if(graphicPanel.getBgImageType() == BGType.IMAGE) {
 			optionImage.setSelected(true);
 		}
 		else {
