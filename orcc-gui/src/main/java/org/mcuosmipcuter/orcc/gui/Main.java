@@ -136,11 +136,10 @@ public class Main {
 			}
 			
 			final JMenu exportMenu = new JMenu("Export");
+			final JMenuItem exportStart = new JMenuItem("start");
+			final JMenuItem exportStop = new JMenuItem("stop");
 			mb.add(exportMenu);
 			{
-				JMenuItem exportStart = new JMenuItem("start");
-				final JMenuItem exportStop = new JMenuItem("stop");
-				
 				CallBack exportVideo = new CallBack() {
 					public void fileSelected(File file) {
 						Context.setExportFileName(file.getAbsolutePath());
@@ -192,7 +191,9 @@ public class Main {
 				public void contextChanged(PropertyName propertyName) {
 					if(PropertyName.AppState.equals(propertyName)) {
 						configMenu.setEnabled(Context.getAppState() == AppState.READY);
-						exportMenu.setEnabled(Context.getAppState() == AppState.READY);
+						exportMenu.setEnabled(Context.getAppState() == AppState.READY || Context.getAppState() == AppState.EXPORTING);
+						exportStart.setEnabled(Context.getAppState() != AppState.EXPORTING);
+						exportStop.setEnabled(Context.getAppState() == AppState.EXPORTING);
 					}
 				}
 			});

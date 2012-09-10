@@ -73,15 +73,21 @@ public class ExportThread extends Thread implements PlayPauseStop {
 	public void run()  {
 
 		status = Status.RUNNING;
-		AudioInput audioInput = Context.getAudioInput();
-		format = audioInput.getAudioInputInfo().getAudioFormat();
-		String inputAudioFilename = audioInput.getName();
-		samplesPerFrame = (int)format.getSampleRate() / framesPerSecond;
-		renderer.start(audioInput.getAudioInputInfo(), Context.getVideoOutputInfo());
+		Context.setAppState(AppState.EXPORTING);
+		
+		IMediaWriter writer = null;
 		IStreamCoder audioCoder = null;
 		IContainer container = null;
-		final IMediaWriter writer = ToolFactory.makeWriter(Context.getExportFileName()); // output
 		try {
+			AudioInput audioInput = Context.getAudioInput();
+			format = audioInput.getAudioInputInfo().getAudioFormat();
+			String inputAudioFilename = audioInput.getName();
+			samplesPerFrame = (int)format.getSampleRate() / framesPerSecond;
+			renderer.start(audioInput.getAudioInputInfo(), Context.getVideoOutputInfo());
+
+			
+			writer = ToolFactory.makeWriter(Context.getExportFileName()); // output
+		
 			ICodec codec = ICodec.findEncodingCodec(ICodec.ID.CODEC_ID_PCM_S16BE);
 
 
@@ -163,16 +169,16 @@ public class ExportThread extends Thread implements PlayPauseStop {
 		finally {
 			status = Status.DONE;
 			Context.setAppState(AppState.READY);
-			writer.flush();
-			writer.close();
-
+			
+			if(writer != null) {
+				writer.flush();
+				writer.close();
+			}
 			if (audioCoder != null) {
 				audioCoder.close();
-				audioCoder = null;
 			}
 			if (container !=null) {
 				container.close();
-				container = null;
 			}
 			IOUtil.log("done export.");
 		}
