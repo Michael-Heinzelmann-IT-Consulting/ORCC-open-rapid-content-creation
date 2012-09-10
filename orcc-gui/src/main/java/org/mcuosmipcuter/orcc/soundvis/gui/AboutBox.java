@@ -17,7 +17,10 @@
 */
 package org.mcuosmipcuter.orcc.soundvis.gui;
 
+import java.io.BufferedReader;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.CharBuffer;
 
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
@@ -37,13 +40,17 @@ public class AboutBox {
 	 */
 	public static void showModal() {
 		InputStream is = Main.class.getResourceAsStream("/license.txt");
+		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(is));
 		try {
-			byte[] bytes = new byte[is.available()];
-			is.read(bytes);
-			String text = new String(bytes);
+			StringBuilder stringBuilder = new StringBuilder();
+			String line;
+			while((line = bufferedReader.readLine()) != null){
+				stringBuilder.append(line);
+				stringBuilder.append("\n");
+			}
 			JTextArea ta = new JTextArea(20, 50);
 			JScrollPane sp = new JScrollPane(ta);
-			ta.setText(text);
+			ta.setText(stringBuilder.toString());
 			ta.setCaretPosition(0);
 			Object[] array = {sp}; 
 			JOptionPane.showMessageDialog(null, array, 
@@ -54,7 +61,7 @@ public class AboutBox {
 			ex.printStackTrace();
 		}
 		finally {
-			IOUtil.safeClose(is);
+			IOUtil.safeClose(bufferedReader);
 		}
 	}
 }
