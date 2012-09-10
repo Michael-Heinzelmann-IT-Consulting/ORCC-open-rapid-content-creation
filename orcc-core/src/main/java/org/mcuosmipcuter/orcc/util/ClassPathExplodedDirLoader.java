@@ -48,7 +48,9 @@ public class ClassPathExplodedDirLoader  {
 					String pathB = new String(path +  fileSeparator + top + fileSeparator);
 					String packAge = new String(top + ".");
 					File t = new File(f.getAbsolutePath() + fileSeparator + top);
-					recurse(t.list(), pathB, fileSeparator, packAge, resultSet, targetClass);
+					if(t.isDirectory()) {
+						recurse(t.list(), pathB, fileSeparator, packAge, resultSet, targetClass);
+					}
 				}
 			}
 		}
