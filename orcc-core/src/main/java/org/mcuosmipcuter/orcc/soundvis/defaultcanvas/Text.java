@@ -147,7 +147,9 @@ public class Text implements SoundCanvas {
 	public void preView(int width, int height, Graphics2D graphics) {
 		String text = "draws text onto the background\n" +
 				"long text is autoscrolled";
+		graphics.setXORMode(Color.BLACK);
 		TextHelper.writeText(text, graphics, 24f, Color.WHITE, width, height / 2);
+		graphics.setPaintMode();
 	}
 
 }

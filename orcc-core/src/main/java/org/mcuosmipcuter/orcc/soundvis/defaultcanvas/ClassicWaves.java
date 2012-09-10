@@ -105,8 +105,9 @@ public class ClassicWaves implements SoundCanvas {
 	@Override
 	public void preView(int width, int height, Graphics2D graphics) {
 		String text = "draws the classic analyzer wave forms";
+		graphics.setXORMode(Color.BLACK);
 		TextHelper.writeText(text, graphics, 24f, Color.WHITE, width, height / 2);
-		
+		graphics.setPaintMode();
 	}
 
 
