@@ -81,6 +81,8 @@ public class GraphStatusbar extends JPanel {
 				if(newColor != null) {
 					bgColorButton.setBackground(newColor);
 					graphicPanel.setBgColor(newColor);
+					graphicPanel.setBgImageType(BGImageType.COLOR);
+					optionColor.setSelected(true);
 				}
 			}});
 		add(bgColorButton);
@@ -100,6 +102,8 @@ public class GraphStatusbar extends JPanel {
 				try {
 					BufferedImage bgImage = ImageIO.read(file);
 					graphicPanel.setBgImage(bgImage);
+					graphicPanel.setBgImageType(BGImageType.IMAGE);
+					optionImage.setSelected(true);
 				} catch (IOException ex) {
 					throw new RuntimeException(ex);
 				}

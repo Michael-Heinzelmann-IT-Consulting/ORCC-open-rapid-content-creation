@@ -96,13 +96,14 @@ public class GraphPanel extends JPanel implements Renderer, CanvasBackGround {
 		
 		setBackground(Color.LIGHT_GRAY);
 		drawDefaultBackGround();
+		bgImage = frameImage;
 		
 		addMouseMotionListener(new MouseAdapter() {
 			
 			@Override
 			public void mouseDragged(MouseEvent e) {
 				
-				if(bgImage != null) {
+				if(bgImage != null && bgImageType == BGImageType.IMAGE) {
 					bgX += e.getX() - xMoveStart;
 					bgY += e.getY() - yMoveStart;
 					graphics.setColor(Color.GRAY);
@@ -121,7 +122,7 @@ public class GraphPanel extends JPanel implements Renderer, CanvasBackGround {
 			Cursor cursor;
 			@Override
 			public void mousePressed(MouseEvent e) {
-				if(bgImage != null) {
+				if(bgImage != null && bgImageType == BGImageType.IMAGE) {
 				xMoveStart = e.getX();
 				yMoveStart = e.getY();
 				cursor = getCursor();
@@ -146,6 +147,7 @@ public class GraphPanel extends JPanel implements Renderer, CanvasBackGround {
 				}
 			}
 		});
+		videoOutputInfo = Context.getVideoOutputInfo();
 	}
 	
 	// our 'logo'
@@ -177,6 +179,7 @@ public class GraphPanel extends JPanel implements Renderer, CanvasBackGround {
 	 */
 	public void preView() {
 		drawDefaultBackGround();
+		drawBackGround();
 		VideoOutputInfo voi = Context.getVideoOutputInfo();
 		Context.getSoundCanvas().preView(voi.getWidth(), voi.getHeight(), graphics);
 		repaint();
@@ -293,6 +296,8 @@ public class GraphPanel extends JPanel implements Renderer, CanvasBackGround {
 
 	public synchronized void setBgImageType(BGImageType bgImageType) {
 		this.bgImageType = bgImageType;
+		drawBackGround();
+		repaint();
 	}
 
 	public synchronized BufferedImage getBgImage() {
@@ -301,7 +306,7 @@ public class GraphPanel extends JPanel implements Renderer, CanvasBackGround {
 
 	public synchronized void setBgImage(BufferedImage bgImage) {
 		this.bgImage = bgImage;
-		graphics.drawImage(bgImage, bgX, bgY, Color.BLACK, null);
+		drawBackGround();
 		repaint();
 	}
 
@@ -311,6 +316,8 @@ public class GraphPanel extends JPanel implements Renderer, CanvasBackGround {
 
 	public synchronized void setBgColor(Color bgGroundColor) {
 		this.bgColor = bgGroundColor;
+		drawBackGround();
+		repaint();
 	}
 
 }
