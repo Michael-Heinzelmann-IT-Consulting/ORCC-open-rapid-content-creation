@@ -262,7 +262,7 @@ public class Main {
 			Context.addListener(new Listener() {
 				public void contextChanged(PropertyName propertyName) {
 					if(PropertyName.SoundCanvas.equals(propertyName)||
-							PropertyName.VideoOutputInfo.equals(propertyName)) { 
+							PropertyName.VideoDimension.equals(propertyName)) { 
 						String title = Context.getVideoOutputInfo().getWidth() 
 								+ "x" + Context.getVideoOutputInfo().getHeight() + "p  @"
 								+ Context.getVideoOutputInfo().getFramesPerSecond() + "fps | " +

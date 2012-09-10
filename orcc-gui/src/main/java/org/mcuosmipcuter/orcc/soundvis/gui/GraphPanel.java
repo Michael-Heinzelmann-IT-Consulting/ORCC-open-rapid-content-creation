@@ -36,6 +36,8 @@ import org.mcuosmipcuter.orcc.api.soundvis.CanvasBackGround;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.soundvis.Context;
+import org.mcuosmipcuter.orcc.soundvis.Context.Listener;
+import org.mcuosmipcuter.orcc.soundvis.Context.PropertyName;
 import org.mcuosmipcuter.orcc.soundvis.Mixin;
 import org.mcuosmipcuter.orcc.soundvis.Renderer;
 
@@ -135,6 +137,14 @@ public class GraphPanel extends JPanel implements Renderer, CanvasBackGround {
 				}
 			}
 			
+		});
+		Context.addListener(new Listener() {
+			@Override
+			public void contextChanged(PropertyName propertyName) {
+				if(PropertyName.Watermark.equals(propertyName)) {
+					GraphPanel.this.watermarkText = Context.getVideoOutputInfo().getWaterMarkText();
+				}
+			}
 		});
 	}
 	
