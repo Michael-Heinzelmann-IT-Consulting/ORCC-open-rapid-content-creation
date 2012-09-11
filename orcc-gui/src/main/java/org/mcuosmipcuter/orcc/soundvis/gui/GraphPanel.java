@@ -172,7 +172,9 @@ public class GraphPanel extends JPanel implements Renderer, CanvasBackGround {
 			graphics.fillRect(0, 0, videoOutputInfo.getWidth(), videoOutputInfo.getHeight());
 		}
 		// else nothing, canvas is responsible for the background
-		
+		if(useWaterMark) {
+			drawWatermark(graphics);
+		}
 	}
 	/**
 	 * Displays the preview for the canvas set in the context 
@@ -229,10 +231,7 @@ public class GraphPanel extends JPanel implements Renderer, CanvasBackGround {
 	public void newFrame(long frameCount) {
 		
 		soundCanvas.newFrame(frameCount);
-		if(useWaterMark) {
-			//watermark.newFrame(frameCount);
-			drawWatermark(graphics);
-		}
+
 		this.repaint();
 		
 		if(mixin != null) {
@@ -248,7 +247,7 @@ public class GraphPanel extends JPanel implements Renderer, CanvasBackGround {
 		if(watermarkText == null || watermarkText.length() == 0) {
 			return;
 		}
-		 float fontSize = 32f;
+		float fontSize = 32f;
 		Font f = g.getFont().deriveFont(fontSize);
 		g.setFont(f);
 		int l = g.getFontMetrics().getLeading();
