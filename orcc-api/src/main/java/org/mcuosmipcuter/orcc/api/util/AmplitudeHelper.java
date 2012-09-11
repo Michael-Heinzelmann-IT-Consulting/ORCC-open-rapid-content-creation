@@ -22,26 +22,47 @@ import javax.sound.sampled.AudioFormat;
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
 
 /**
+ * Helps with amplitude tasks, stateful
  * @author Michael Heinzelmann
- *
  */
 public class AmplitudeHelper {
 	
 	private final AudioFormat audioFormat;
 	private final long amplitudeRange;
 	
+	/**
+	 * New helper using the given info
+	 * @param audioInputInfo the info to use
+	 */
 	public AmplitudeHelper(AudioInputInfo audioInputInfo) {
 		this.audioFormat = audioInputInfo.getAudioFormat();
 		int sampleSizeBits = audioFormat.getSampleSizeInBits();
 		amplitudeRange = (long)Math.pow(2, sampleSizeBits);
 	}
 
+	/**
+	 * Gets the decimal amplitude range ( 2^sample-bits )
+	 * @return the range
+	 */
 	public long getAmplitudeRange() {
 		return  amplitudeRange;
 	}
+	/**
+	 * Return signed mono on 1 channel or left + right / 2 on 2 channels, channels in excess of 2 are ignored 
+	 * @param amplitudes input amplitudes
+	 * @return the mono
+	 */
 	public int getSignedMono(int[] amplitudes) {
 		final int value = amplitudes.length == 2 ? (amplitudes[0] + amplitudes[1]) / 2 : amplitudes[0];
 		return value - (int)amplitudeRange / 2 ;
+	}
+	/**
+	 * Same as {@link #getSignedMono(int[])} but unsigned
+	 * @param amplitudes
+	 * @return the mono
+	 */
+	public int getUnSignedMono(int[] amplitudes) {
+		return amplitudes.length == 2 ? (amplitudes[0] + amplitudes[1]) / 2 : amplitudes[0];
 	}
 
 }
