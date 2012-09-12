@@ -35,7 +35,7 @@ import org.mcuosmipcuter.orcc.api.util.TextHelper;
  * @author Michael Heinzelmann
  *
  */
-public class RotatingAmpliutes implements SoundCanvas {
+public class RotatingAmplitudes implements SoundCanvas {
 	
 	@UserProperty(description="degrees per frame speed")
 	private int degreesPerFrame = 30;

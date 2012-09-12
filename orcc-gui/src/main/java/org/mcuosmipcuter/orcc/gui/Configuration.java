@@ -89,7 +89,10 @@ public abstract class Configuration {
 		else {
 			// TODO use user preferences from persistent storage
 			Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.ClassicWaves");
+			Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.Pulsating");
+			Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.RotatingAmplitudes");
 			Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.Text");
+			Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.XOR");
 		}
 		stage = 2;
 	}
