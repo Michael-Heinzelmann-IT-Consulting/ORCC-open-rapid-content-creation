@@ -24,16 +24,44 @@
     <artifactId>orcc</artifactId>
     <version>1.0.1-SNAPSHOT</version>
   </parent>
-  <groupId>org.mcuosmipcuter.orcc.core</groupId>
-  <artifactId>orcc-core</artifactId>
+  <groupId>org.mcuosmipcuter.orcc.dist</groupId>
+  <artifactId>orcc-dist</artifactId>
   <version>1.0.1-SNAPSHOT</version>
-  <name>orcc-core</name>
-  <packaging>jar</packaging>
+  <name>orcc-dist</name>
+  <packaging>pom</packaging>
+
+
   <dependencies>
     <dependency>
-      <groupId>org.mcuosmipcuter.orcc.api</groupId>
-      <artifactId>orcc-api</artifactId>
+      <groupId>org.mcuosmipcuter.orcc.gui</groupId>
+      <artifactId>orcc-gui</artifactId>
       <version>1.0.1-SNAPSHOT</version>
     </dependency>
   </dependencies>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+    <plugin>
+      <artifactId>maven-assembly-plugin</artifactId>
+      <executions>
+        <execution>
+          <id>distro-assembly</id>
+          <phase>package</phase>
+          <goals>
+            <goal>single</goal>
+          </goals>
+          <configuration>
+            <descriptors>
+              <descriptor>src/assembly/distribution-play-only.xml</descriptor>
+              <descriptor>src/assembly/distribution-full.xml</descriptor>
+            </descriptors>
+          </configuration>
+        </execution>
+      </executions>
+    </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+
 </project>
