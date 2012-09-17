@@ -81,7 +81,7 @@ public abstract class Configuration {
 		
 		if(usrMode.startsWith("dev")) {
 			Set<String> canvasClssNames = new TreeSet<String>();
-			ClassPathExplodedDirLoader.loadClassNamesInto(canvasClssNames, SoundCanvas.class); // dev canvas from exploaded
+			ClassPathExplodedDirLoader.loadClassNamesInto(canvasClssNames, SoundCanvas.class); // dev canvas from exploded
 			for(String canvasClassName : canvasClssNames) {
 				Context.addCanvasClassName(canvasClassName);
 			}
@@ -107,7 +107,7 @@ public abstract class Configuration {
 			// default canvas
 			if(args.length > 4) {
 				try {
-					Context.setCanvas(args[4]);
+					Context.addCanvas(args[4]);
 				} catch (Exception ex) {
 					throw new RuntimeException(ex);
 				} 
@@ -122,7 +122,7 @@ public abstract class Configuration {
 		}
 		else {
 			try {
-				Context.setCanvas("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.ClassicWaves");
+				Context.addCanvas("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.ClassicWaves");
 			} catch (Exception ex) {
 				throw new RuntimeException(ex);
 			} 

@@ -26,7 +26,10 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.lang.Thread.UncaughtExceptionHandler;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.JDesktopPane;
@@ -36,22 +39,32 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JTable;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.TableColumnModelEvent;
+import javax.swing.event.TableColumnModelListener;
+import javax.swing.table.DefaultTableModel;
 
+import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.soundvis.Context;
 import org.mcuosmipcuter.orcc.soundvis.Context.AppState;
 import org.mcuosmipcuter.orcc.soundvis.Context.Listener;
 import org.mcuosmipcuter.orcc.soundvis.Context.PropertyName;
 import org.mcuosmipcuter.orcc.soundvis.PlayPauseStop;
 import org.mcuosmipcuter.orcc.soundvis.PlayPauseStopHolder;
+import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
 import org.mcuosmipcuter.orcc.soundvis.gui.AboutBox;
 import org.mcuosmipcuter.orcc.soundvis.gui.CanvasClassMenu;
-import org.mcuosmipcuter.orcc.soundvis.gui.CanvasPropertyPanel;
 import org.mcuosmipcuter.orcc.soundvis.gui.GraphPanel;
 import org.mcuosmipcuter.orcc.soundvis.gui.GraphStatusbar;
 import org.mcuosmipcuter.orcc.soundvis.gui.InfoPanel;
 import org.mcuosmipcuter.orcc.soundvis.gui.PlayBackPanel;
+import org.mcuosmipcuter.orcc.soundvis.gui.PropertyTableCellRendererEditor;
+import org.mcuosmipcuter.orcc.soundvis.gui.PropertyTableHeaderRenderer;
 import org.mcuosmipcuter.orcc.soundvis.gui.ResolutionMenu;
 import org.mcuosmipcuter.orcc.soundvis.gui.listeners.FileDialogActionListener;
 import org.mcuosmipcuter.orcc.soundvis.gui.listeners.FileDialogActionListener.CallBack;
@@ -68,8 +81,9 @@ public class Main {
 	final static JTabbedPane tabbedPane = new JTabbedPane();
 	private static Map<Component, Integer> tabsMap = new HashMap<Component, Integer>();
 	
-	static int infoW = 320;
-	static int infoH = 400;
+	static final int infoW = 320;
+	static final int infoH = 400;
+	static final int minCells = 4;
 	
 	/**
 	 * @param args
@@ -172,18 +186,9 @@ public class Main {
 			mb.add(configMenu);
 			{
 				configMenu.add(new ResolutionMenu("video size", 1920, 1080));
-				final CanvasClassMenu classes = new CanvasClassMenu("canvas type");
+				final CanvasClassMenu classes = new CanvasClassMenu("add canvas");
 				configMenu.addSeparator();
 				configMenu.add(classes);
-				Context.addListener(new Listener() {
-					public void contextChanged(PropertyName propertyName) {
-						if(PropertyName.SoundCanvas.equals(propertyName)) {
-							classes.setClassName(Context.getSoundCanvas().getClass().getName());
-						}
-					}
-				});
-
-
 			}
 			
 			// context listener for menu enabling
@@ -211,7 +216,7 @@ public class Main {
 			}
 		}
 		
-		JDesktopPane deskTop = new JDesktopPane();	
+		final JDesktopPane deskTop = new JDesktopPane();	
 		deskTop.setVisible(true);
 		
 		appendTab(deskTop, "soundvis");
@@ -235,18 +240,77 @@ public class Main {
 			infoFrame.setSize(infoW, infoH);
 			infoFrame.setVisible(true);
 		}
+
 		{
-			final JInternalFrame propertiesFrame = new JInternalFrame("Properties", true, false, true, true);
-			deskTop.add(propertiesFrame);
+			final JInternalFrame propertiesFrame = new JInternalFrame("Properties", false, false, false, true);
+			final JTable propTable = new JTable();
+			PropertyTableCellRendererEditor ptcr = new PropertyTableCellRendererEditor();
+			propTable.setDefaultRenderer(Object.class, ptcr);
+			propTable.setRowHeight(infoH);
+			propTable.setRowMargin(1);
+			
+			propTable.setDefaultEditor(Object.class, ptcr);
+			
+			propTable.getTableHeader().setDefaultRenderer(new PropertyTableHeaderRenderer());
+			propTable.getColumnModel().addColumnModelListener(new TableColumnModelListener() {
+				@Override
+				public void columnSelectionChanged(ListSelectionEvent arg0) {
+				}			
+				@Override
+				public void columnRemoved(TableColumnModelEvent arg0) {
+				}
+				@Override
+				public void columnMoved(TableColumnModelEvent arg0) {
+					List<SoundCanvasWrapper> currentList = new ArrayList<SoundCanvasWrapper>();
+					for(int i = 0; i < propTable.getModel().getColumnCount(); i++) {
+						SoundCanvasWrapper s = (SoundCanvasWrapper)propTable.getValueAt(0, i);
+						if(s != null) {
+							currentList.add(s);
+						}
+					}
+					Context.reorderCanvasList(currentList);
+				}
+				@Override
+				public void columnMarginChanged(ChangeEvent arg0) {
+				}
+				@Override
+				public void columnAdded(TableColumnModelEvent arg0) {
+				}
+			});
+			JScrollPane scrollPane = new JScrollPane(propTable);
+			propertiesFrame.add(scrollPane);
 			{
-				CanvasPropertyPanel canvasPropertyPanel = new CanvasPropertyPanel();
-				propertiesFrame.add(canvasPropertyPanel);
-				Context.addListener(canvasPropertyPanel);		
+				Context.addListener(new Listener() {	
+					@Override
+					public void contextChanged(PropertyName propertyName) {
+						if(PropertyName.SoundCanvasAdded.equals(propertyName) || PropertyName.SoundCanvasRemoved.equals(propertyName)) {
+							int size = Context.getSoundCanvasList().size() > minCells ? Context.getSoundCanvasList().size() : minCells;
+							Object[] canvasData = new SoundCanvas[size];
+							Object[] canvasHeader = new Object[size];
+							Iterator<SoundCanvasWrapper> iter = Context.getSoundCanvasList().iterator();
+							for(int i = 0; i < canvasData.length; i++ ){
+								SoundCanvasWrapper val = iter.hasNext() ? iter.next() : null;
+								canvasData[i] = val;
+								canvasHeader[i] = val != null ? val : "";
+							}
+							Object[][] tableData = new Object[][] {canvasData};
+							propTable.setModel(new DefaultTableModel(tableData, canvasHeader));
+						}
+						if(PropertyName.AppState.equals(propertyName)) {
+							propTable.getTableHeader().setReorderingAllowed(Context.getAppState() == AppState.READY || Context.getAppState() == AppState.PAUSED);
+							propTable.repaint();
+							propTable.getTableHeader().repaint();
+						}
+					}
+				});
+
 			}
 			propertiesFrame.setLocation(0, infoH);
 			propertiesFrame.setVisible(true);
-			propertiesFrame.setSize(infoW, frame.getSize().height - infoH - 100);
-		}
+			propertiesFrame.setSize(infoW * 4, frame.getSize().height - infoH - 100);
+			deskTop.add(propertiesFrame);
+		}	
+
 		{
 			final JInternalFrame graphicFrame = new JInternalFrame("Graph", true, false, true, true);
 			deskTop.add(graphicFrame);
@@ -262,18 +326,19 @@ public class Main {
 			
 			Context.addListener(new Listener() {
 				public void contextChanged(PropertyName propertyName) {
-					if(PropertyName.SoundCanvas.equals(propertyName)||
+					if(PropertyName.SoundCanvasAdded.equals(propertyName)||
+							PropertyName.SoundCanvasRemoved.equals(propertyName)||
 							PropertyName.VideoDimension.equals(propertyName)) { 
 						String title = Context.getVideoOutputInfo().getWidth() 
 								+ "x" + Context.getVideoOutputInfo().getHeight() + "p  @"
 								+ Context.getVideoOutputInfo().getFramesPerSecond() + "fps | " +
-								Context.getSoundCanvas().getClass().getName();
+								Context.getSoundCanvasList();
 						graphicFrame.setTitle(title);
 						graphicPanel.preView();
 					}
 				}
 			});
-			graphicFrame.setSize(frame.getSize().width - infoW - 20, frame.getSize().height - 100);
+			graphicFrame.setSize(frame.getSize().width - infoW - 20, infoH);
 
 		}
 		
@@ -292,7 +357,6 @@ public class Main {
 			int res = JOptionPane.showOptionDialog(null, "Confirm exit in state " 
 		+ Context.getAppState(), "Do you want to exit in state " + Context.getAppState() + " ?", 
 		JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[] {"ok", "cancel"}, "cancel");
-					//JOptionPane.showConfirmDialog(null, "Confirm exit in state " + Context.getAppState(), "Confirm exit", JOptionPane.OK_CANCEL_OPTION);
 			if(res != JOptionPane.OK_OPTION) {
 				return;
 			}

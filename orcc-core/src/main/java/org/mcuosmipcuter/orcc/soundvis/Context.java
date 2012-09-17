@@ -25,6 +25,7 @@ import java.util.TreeSet;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.soundvis.model.AudioFileInputImpl;
+import org.mcuosmipcuter.orcc.soundvis.model.SoundCanvasWrapperImpl;
 import org.mcuosmipcuter.orcc.soundvis.model.VideoOutputInfoImpl;
 
 /**
@@ -37,7 +38,7 @@ public abstract class Context {
 	 * @author Michael Heinzelmann
 	 */
 	public enum PropertyName {
-		AudioInputInfo, VideoDimension, Watermark, SoundCanvas, ExportFileName, CanvasClassNames, AppState
+		AudioInputInfo, VideoDimension, Watermark, SoundCanvasAdded, SoundCanvasRemoved, SoundCanvasList, ExportFileName, CanvasClassNames, AppState
 	}
 	/**
 	 * Enumeration of application states
@@ -85,7 +86,7 @@ public abstract class Context {
 	
 	// static fields
 	private static AppState appState = AppState.READY;
-	private static SoundCanvas soundCanvas;
+	private static List<SoundCanvasWrapper> soundCanvasList = new ArrayList<SoundCanvasWrapper>();
 	private static SortedSet<String> canvasClassNames = new TreeSet<String>();
 	private static String exportFileName;
 	private static AudioInput audioInputInfo;
@@ -121,17 +122,27 @@ public abstract class Context {
 		notifyListeners(PropertyName.Watermark);
 	}
 	/**
-	 * Sets the canvas to work with from the given class name string.
+	 * Adds a canvas to work with from the given class name string.
 	 * @param canvasClassName fully qualified name of the {@link SoundCanvas} instance to use
 	 * @throws InstantiationException
 	 * @throws IllegalAccessException
 	 * @throws ClassNotFoundException
 	 */
-	public static synchronized  void setCanvas(String canvasClassName) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
-		soundCanvas = (SoundCanvas) Class.forName(canvasClassName).newInstance();
-		notifyListeners(PropertyName.SoundCanvas);
+	public static synchronized  void addCanvas(String canvasClassName) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
+		SoundCanvas soundCanvas = (SoundCanvas) Class.forName(canvasClassName).newInstance();
+		SoundCanvasWrapper soundCanvasWrapper = new SoundCanvasWrapperImpl(soundCanvas);
+		soundCanvasList.add(soundCanvasWrapper);
+		notifyListeners(PropertyName.SoundCanvasAdded);
 	}
-
+	public static synchronized void removeCanvas(SoundCanvasWrapper soundCanvas) {
+		soundCanvasList.remove(soundCanvas);
+		notifyListeners(PropertyName.SoundCanvasRemoved);
+	}
+	public static synchronized void reorderCanvasList(List<SoundCanvasWrapper> newList) {
+		soundCanvasList.clear();
+		soundCanvasList.addAll(newList); // TODO when wrapper is implemented do a reorder
+		notifyListeners(PropertyName.SoundCanvasList);
+	}
 	/**
 	 * Sets the audio from a file
 	 * @param audioFileName full path to the file
@@ -174,8 +185,8 @@ public abstract class Context {
 	 * Gets the current {@link SoundCanvas} instance
 	 * @return the instance or null if none is set
 	 */
-	public static synchronized SoundCanvas getSoundCanvas() {
-		return soundCanvas;
+	public static synchronized List<SoundCanvasWrapper> getSoundCanvasList() {
+		return soundCanvasList;
 	}
 	/**
 	 * Returns the application state

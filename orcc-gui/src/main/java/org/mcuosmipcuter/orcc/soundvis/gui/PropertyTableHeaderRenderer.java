@@ -17,45 +17,33 @@
 */
 package org.mcuosmipcuter.orcc.soundvis.gui;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Font;
 
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-
-import org.mcuosmipcuter.orcc.soundvis.Context;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTable;
+import javax.swing.border.LineBorder;
+import javax.swing.table.TableCellRenderer;
 
 /**
- * Specialized menu to show the canvas class names
  * @author Michael Heinzelmann
+ *
  */
-public class CanvasClassMenu extends JMenu {
+public class PropertyTableHeaderRenderer  implements TableCellRenderer {
 
-	private static final long serialVersionUID = 1L;
+	@Override
+	public Component getTableCellRendererComponent(final JTable table, Object value,
+			boolean isSelected, boolean hasFocus, int row, final int column) {
 
-
-	/**
-	 * Same constructor as for standard menus
-	 * @param title menu title
-	 */
-	public CanvasClassMenu(String title) {
-		super(title);
-
-		for(final String className : Context.getCanvasClassNames()) {
-			final JMenuItem item = new JMenuItem(className);
-			item.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent arg0) {
-					try {
-						Context.addCanvas(className);
-					} catch (Exception ex) {
-						throw new RuntimeException(ex);
-					}
-				}
-			});
-
-			add(item);
-		}
+		JLabel label = new JLabel(String.valueOf(value));
+		label.setFont(label.getFont().deriveFont(Font.BOLD, 18f));
+		label.setForeground(table.getTableHeader().getReorderingAllowed() ? Color.BLACK : Color.DARK_GRAY);
+		JPanel p = new JPanel();
+		p.setBorder(new LineBorder(Color.WHITE, 5));
+		p.add(label);
+		return p;
 	}
 
 }
-

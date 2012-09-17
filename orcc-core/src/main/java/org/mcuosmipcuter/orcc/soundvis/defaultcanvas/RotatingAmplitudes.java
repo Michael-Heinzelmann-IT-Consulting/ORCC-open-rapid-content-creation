@@ -45,6 +45,10 @@ public class RotatingAmplitudes implements SoundCanvas {
 	private boolean xor = false;
 	@UserProperty(description="frames to keep")
 	int size = 360;
+	@UserProperty(description="x distance from center")
+	int shiftX = 0;
+	@UserProperty(description="y distance from center")
+	int shiftY = 0;
 	
 	private int centerX;
 	private int centerY;
@@ -76,8 +80,8 @@ public class RotatingAmplitudes implements SoundCanvas {
 		int modul =  samplesPerFrame / degreesPerFrame;
 		
 		if(sampleCount % modul == 0) {
-			int x = centerX  + (int)(max/2 * Math.cos(degrees * (Math.PI / 180)));
-			int y = centerY  + (int)(max/2 * Math.sin(degrees * (Math.PI / 180)));
+			int x = centerX + shiftX + (int)(max/2 * Math.cos(degrees * (Math.PI / 180)));
+			int y = centerY + shiftY + (int)(max/2 * Math.sin(degrees * (Math.PI / 180)));
 			
 			if(deque.size() == size) {
 				deque.removeFirst();
@@ -113,7 +117,7 @@ public class RotatingAmplitudes implements SoundCanvas {
 		}
 		graphics2D.setColor(foreGround);
 		for(Point p : deque) {
-			graphics2D.drawLine(centerX, centerY, p.x, p.y);
+			graphics2D.drawLine(centerX + shiftX, centerY + shiftY, p.x, p.y);
 		}
 		if(xor) {
 			graphics2D.setPaintMode();

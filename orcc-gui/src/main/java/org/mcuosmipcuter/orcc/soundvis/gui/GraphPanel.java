@@ -28,6 +28,7 @@ import java.awt.RadialGradientPaint;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.util.List;
 
 import javax.swing.JPanel;
 
@@ -40,6 +41,7 @@ import org.mcuosmipcuter.orcc.soundvis.Context.Listener;
 import org.mcuosmipcuter.orcc.soundvis.Context.PropertyName;
 import org.mcuosmipcuter.orcc.soundvis.Mixin;
 import org.mcuosmipcuter.orcc.soundvis.Renderer;
+import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
 
 
 /**
@@ -72,7 +74,7 @@ public class GraphPanel extends JPanel implements Renderer, CanvasBackGround {
 	private BGType bgType = BGType.COLOR;
 	private static final long serialVersionUID = 1L;
 	private Mixin mixin;
-	private SoundCanvas soundCanvas; // canvas to work with
+	private List<SoundCanvasWrapper> soundCanvasList; // canvas list to work with
 	
 	private BufferedImage frameImage;
 	private Graphics2D graphics;
@@ -88,6 +90,9 @@ public class GraphPanel extends JPanel implements Renderer, CanvasBackGround {
 	private int bgY;
 	private int xMoveStart;
 	private int yMoveStart;
+	
+	long frameCount;
+	long frameBgDrawn;
 	
 	/**
 	 * Constructor, adds the mouse drag handling for the back ground image
@@ -164,6 +169,9 @@ public class GraphPanel extends JPanel implements Renderer, CanvasBackGround {
 	
 	@Override
 	public void drawBackGround() {
+		if(frameCount == frameBgDrawn) {
+			return;
+		}
 		if(bgType == BGType.IMAGE && bgImage != null) {
 			graphics.drawImage(bgImage, bgX, bgY, Color.BLACK, null);
 		}
@@ -175,6 +183,7 @@ public class GraphPanel extends JPanel implements Renderer, CanvasBackGround {
 		if(useWaterMark) {
 			drawWatermark(graphics);
 		}
+		frameBgDrawn = frameCount;
 	}
 	/**
 	 * Displays the preview for the canvas set in the context 
@@ -183,7 +192,9 @@ public class GraphPanel extends JPanel implements Renderer, CanvasBackGround {
 		drawDefaultBackGround();
 		drawBackGround();
 		VideoOutputInfo voi = Context.getVideoOutputInfo();
-		Context.getSoundCanvas().preView(voi.getWidth(), voi.getHeight(), graphics);
+		for(SoundCanvasWrapper s : Context.getSoundCanvasList()) {
+			s.preView(voi.getWidth(), voi.getHeight(), graphics);
+		}
 		repaint();
 	}
 
@@ -195,10 +206,10 @@ public class GraphPanel extends JPanel implements Renderer, CanvasBackGround {
 		this.videoOutputInfo = videoOutputInfo;
 		frameImage = new BufferedImage(videoOutputInfo.getWidth(), videoOutputInfo.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
 		graphics = frameImage.createGraphics();
-		soundCanvas = Context.getSoundCanvas();
-
-		soundCanvas.prepare(audioInputInfo, videoOutputInfo, graphics, this);
-
+		soundCanvasList = Context.getSoundCanvasList();
+		for(SoundCanvas soundCanvas : soundCanvasList) {
+			soundCanvas.prepare(audioInputInfo, videoOutputInfo, graphics, this);
+		}
 		watermarkText = videoOutputInfo.getWaterMarkText();
 		mixin.start(audioInputInfo, videoOutputInfo);
 	}
@@ -220,7 +231,9 @@ public class GraphPanel extends JPanel implements Renderer, CanvasBackGround {
 
 	@Override
 	public boolean nextSample(int[] amplitudes, byte[] rawData) {
-		soundCanvas.nextSample(amplitudes);
+		for(SoundCanvas soundCanvas : soundCanvasList) {
+			soundCanvas.nextSample(amplitudes);
+		}
 		if(mixin != null) {
 			mixin.nextSample(amplitudes, rawData);
 		}
@@ -229,15 +242,15 @@ public class GraphPanel extends JPanel implements Renderer, CanvasBackGround {
 
 	@Override
 	public void newFrame(long frameCount) {
-		
-		soundCanvas.newFrame(frameCount);
-
+		for(SoundCanvas soundCanvas : soundCanvasList) {
+			soundCanvas.newFrame(frameCount);
+		}
 		this.repaint();
 		
 		if(mixin != null) {
 			mixin.newFrame(frameCount);
 		}
-
+		this.frameCount = frameCount;
 	}
 	/**
 	 * Draws the automatic watermark using black and white XOR
@@ -267,10 +280,6 @@ public class GraphPanel extends JPanel implements Renderer, CanvasBackGround {
 
 	public void setMixin(Mixin mixin) {
 		this.mixin = mixin;
-	}
-
-	public SoundCanvas getSoundCanvas() {
-		return soundCanvas;
 	}
 
 	public synchronized float getZoomFactor() {

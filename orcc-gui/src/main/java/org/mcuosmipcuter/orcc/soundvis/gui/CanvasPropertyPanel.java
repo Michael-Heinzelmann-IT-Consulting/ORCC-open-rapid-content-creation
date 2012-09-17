@@ -17,15 +17,21 @@
 */
 package org.mcuosmipcuter.orcc.soundvis.gui;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Set;
 
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.border.LineBorder;
 
+import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.soundvis.Context;
-import org.mcuosmipcuter.orcc.soundvis.Context.PropertyName;
+import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
 import org.mcuosmipcuter.orcc.soundvis.gui.widgets.properties.PropertyPanel;
 import org.mcuosmipcuter.orcc.soundvis.gui.widgets.properties.PropertyPanelFactory;
 
@@ -34,29 +40,52 @@ import org.mcuosmipcuter.orcc.soundvis.gui.widgets.properties.PropertyPanelFacto
  * Panel to display the canvas properties editors, it updates itself by being a {@link Context.Listener}
  * @author Michael Heinzelmann
  */
-public class CanvasPropertyPanel extends JPanel implements Context.Listener {
+public class CanvasPropertyPanel extends JPanel {
 	
 	private static final long serialVersionUID = 1L;
+	
+	final JButton closeButton = new JButton("x");
 	/**
 	 * Sets up a grid layout
 	 */
-	public CanvasPropertyPanel() {
+	public CanvasPropertyPanel(final SoundCanvasWrapper soundCanvasWrapper) {
 		setBorder(new LineBorder(Color.WHITE, 5));
 		GridLayout gl = new GridLayout(10, 1, 5, 4);		
 		setLayout(gl);
+		
+
+		closeButton.addActionListener(new ActionListener() {	
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Context.removeCanvas(soundCanvasWrapper);
+			}
+		});
+		
+		JPanel commandPanel = new JPanel();
+		commandPanel.setLayout(new GridLayout(1, 2, 0, 0));
+		final JCheckBox showCheckBox = new JCheckBox("visible", soundCanvasWrapper.isVisible());
+		showCheckBox.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				soundCanvasWrapper.setVisible(showCheckBox.isSelected());
+			}
+		});
+		
+		commandPanel.add(showCheckBox);
+		commandPanel.add(closeButton);
+		JPanel headerPanel = new JPanel();
+		headerPanel.setLayout(new BorderLayout());
+		headerPanel.add(commandPanel, BorderLayout.EAST);
+		add(headerPanel);
+		SoundCanvas soundCanvas = soundCanvasWrapper.getSoundCanvas();
+		Set<PropertyPanel<?>> props = PropertyPanelFactory.getCanvasPanels(soundCanvas);
+
+		for(final PropertyPanel<?> p : props) {
+			add(p);
+		}
 	}
 	
-	@Override
-	public void contextChanged(PropertyName propertyName) {
-		if(PropertyName.SoundCanvas.equals(propertyName)) {
-			removeAll();
-			Set<PropertyPanel<?>> props = PropertyPanelFactory.getCanvasPanels(Context.getSoundCanvas());
-
-			for(final PropertyPanel<?> p : props) {
-				add(p);
-			}
-			revalidate();
-			repaint();
-		}
+	public void setCloseEnabled(boolean enabled) {
+		closeButton.setEnabled(enabled);
 	}
 }

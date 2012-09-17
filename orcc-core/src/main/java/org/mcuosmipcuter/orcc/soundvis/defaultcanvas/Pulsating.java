@@ -22,6 +22,7 @@ import java.awt.Graphics2D;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
 import org.mcuosmipcuter.orcc.api.soundvis.CanvasBackGround;
+import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
@@ -35,6 +36,7 @@ public class Pulsating implements SoundCanvas {
 	
 	@UserProperty(description="foreground color")
 	private Color foreGround = Color.BLACK;
+	@LimitedIntProperty(description="alpha is limited from 0 to 255", minimum=0, maximum=255)
 	@UserProperty(description="alpha of the foreground color")
 	int alpha = 255;
 	
