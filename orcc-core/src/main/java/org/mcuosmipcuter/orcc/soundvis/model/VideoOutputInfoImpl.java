@@ -28,7 +28,6 @@ public class VideoOutputInfoImpl implements VideoOutputInfo {
 	private int width;
 	private int height;
 	private String title;
-	private String waterMarkText;
 	
 	public VideoOutputInfoImpl(int framesPerSecond, int width, int height) {
 		this.framesPerSecond = framesPerSecond;
@@ -55,12 +54,7 @@ public class VideoOutputInfoImpl implements VideoOutputInfo {
 	public String getTitle() {
 		return title;
 	}
-
-	@Override
-	public String getWaterMarkText() {
-		return waterMarkText;
-	}
-
+	
 	public void setFramesPerSecond(int framesPerSecond) {
 		this.framesPerSecond = framesPerSecond;
 	}
@@ -75,10 +69,6 @@ public class VideoOutputInfoImpl implements VideoOutputInfo {
 
 	public void setTitle(String title) {
 		this.title = title;
-	}
-
-	public void setWaterMarkText(String waterMarkText) {
-		this.waterMarkText = waterMarkText;
 	}
 
 }

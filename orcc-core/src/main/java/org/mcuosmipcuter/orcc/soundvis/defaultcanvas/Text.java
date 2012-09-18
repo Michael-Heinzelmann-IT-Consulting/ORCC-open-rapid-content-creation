@@ -21,6 +21,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.util.Calendar;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
 import org.mcuosmipcuter.orcc.api.soundvis.CanvasBackGround;
@@ -35,8 +36,12 @@ import org.mcuosmipcuter.orcc.api.util.TextHelper;
  *
  */
 public class Text implements SoundCanvas {
+	
+	private int year = Calendar.getInstance().get(Calendar.YEAR);
+	private String user = System.getProperty("user.name");
+	
 	@UserProperty(description="the text to display")
-	private String text = "ORCC rapid content creation for entertainment, education and media production";
+	private String text = "ORCC rapid content creation for entertainment, education and media production\n" + year + " " + user + " graphics by soundvis";
 	@UserProperty(description="font size for text")
 	@LimitedIntProperty(description="font size limitation", minimum=4)
 	private int fontSize = 36;
@@ -140,7 +145,7 @@ public class Text implements SoundCanvas {
 			int distanceToScroll = d.height - videoOutputInfo.getHeight() + topMargin;
 			scrollIncrement = distanceToScroll / framesInVideo;
 		}
-		System.err.println(scrollIncrement);
+
 	}
 
 	@Override

@@ -19,7 +19,6 @@ package org.mcuosmipcuter.orcc.soundvis.gui;
 
 import java.awt.Color;
 import java.awt.Cursor;
-import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.MultipleGradientPaint.CycleMethod;
@@ -37,8 +36,6 @@ import org.mcuosmipcuter.orcc.api.soundvis.CanvasBackGround;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.soundvis.Context;
-import org.mcuosmipcuter.orcc.soundvis.Context.Listener;
-import org.mcuosmipcuter.orcc.soundvis.Context.PropertyName;
 import org.mcuosmipcuter.orcc.soundvis.Mixin;
 import org.mcuosmipcuter.orcc.soundvis.Renderer;
 import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
@@ -81,8 +78,6 @@ public class GraphPanel extends JPanel implements Renderer, CanvasBackGround {
 	private VideoOutputInfo videoOutputInfo;
 	
 	private float zoomFactor = 0.5f;
-	private boolean useWaterMark;
-	private String watermarkText;
 	
 	private BufferedImage bgImage;
 	private Color bgColor = Color.WHITE;
@@ -144,14 +139,6 @@ public class GraphPanel extends JPanel implements Renderer, CanvasBackGround {
 			}
 			
 		});
-		Context.addListener(new Listener() {
-			@Override
-			public void contextChanged(PropertyName propertyName) {
-				if(PropertyName.Watermark.equals(propertyName)) {
-					GraphPanel.this.watermarkText = Context.getVideoOutputInfo().getWaterMarkText();
-				}
-			}
-		});
 		videoOutputInfo = Context.getVideoOutputInfo();
 	}
 	
@@ -180,9 +167,7 @@ public class GraphPanel extends JPanel implements Renderer, CanvasBackGround {
 			graphics.fillRect(0, 0, videoOutputInfo.getWidth(), videoOutputInfo.getHeight());
 		}
 		// else nothing, canvas is responsible for the background
-		if(useWaterMark) {
-			drawWatermark(graphics);
-		}
+
 		frameBgDrawn = frameCount;
 	}
 	/**
@@ -210,7 +195,6 @@ public class GraphPanel extends JPanel implements Renderer, CanvasBackGround {
 		for(SoundCanvas soundCanvas : soundCanvasList) {
 			soundCanvas.prepare(audioInputInfo, videoOutputInfo, graphics, this);
 		}
-		watermarkText = videoOutputInfo.getWaterMarkText();
 		mixin.start(audioInputInfo, videoOutputInfo);
 	}
 
@@ -252,27 +236,6 @@ public class GraphPanel extends JPanel implements Renderer, CanvasBackGround {
 		}
 		this.frameCount = frameCount;
 	}
-	/**
-	 * Draws the automatic watermark using black and white XOR
-	 * @param g the graphics to draw on
-	 */
-	public void drawWatermark(Graphics2D g) {
-		if(watermarkText == null || watermarkText.length() == 0) {
-			return;
-		}
-		float fontSize = 32f;
-		Font f = g.getFont().deriveFont(fontSize);
-		g.setFont(f);
-		int l = g.getFontMetrics().getLeading();
-		int d = g.getFontMetrics().getDescent();
-		g.setXORMode(Color.BLACK);
-		g.setColor(Color.WHITE);
-		int len = g.getFontMetrics().stringWidth(watermarkText);
-		int width = Context.getVideoOutputInfo().getWidth();
-		int height = Context.getVideoOutputInfo().getHeight();
-		g.drawString(watermarkText, (width - len) / 2, height - l - d);
-		g.setPaintMode();
-	}
 
 	public BufferedImage getFrameImage() {
 		return frameImage;
@@ -288,14 +251,6 @@ public class GraphPanel extends JPanel implements Renderer, CanvasBackGround {
 
 	public synchronized void setZoomFactor(float zoomFactor) {
 		this.zoomFactor = zoomFactor;
-	}
-
-	public synchronized boolean isUseWaterMark() {
-		return useWaterMark;
-	}
-
-	public synchronized void setUseWaterMark(boolean useWaterMark) {
-		this.useWaterMark = useWaterMark;
 	}
 
 	public synchronized BGType getBgImageType() {

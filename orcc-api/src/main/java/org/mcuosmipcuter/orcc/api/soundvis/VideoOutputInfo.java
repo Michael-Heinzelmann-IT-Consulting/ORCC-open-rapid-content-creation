@@ -44,10 +44,5 @@ public interface VideoOutputInfo {
 	 * @return the title
 	 */
 	public String getTitle();
-	/**
-	 * Videos water mark text
-	 * @return the water mark string
-	 */
-	public String getWaterMarkText();
 
 }

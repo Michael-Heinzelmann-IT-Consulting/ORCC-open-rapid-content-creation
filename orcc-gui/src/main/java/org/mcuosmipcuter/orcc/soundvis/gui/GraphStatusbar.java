@@ -21,29 +21,23 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.Calendar;
 
 import javax.imageio.ImageIO;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JColorChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JSpinner;
-import javax.swing.JTextField;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.mcuosmipcuter.orcc.soundvis.Context;
 import org.mcuosmipcuter.orcc.soundvis.gui.GraphPanel.BGType;
 import org.mcuosmipcuter.orcc.soundvis.gui.listeners.FileDialogActionListener;
 
@@ -57,7 +51,7 @@ public class GraphStatusbar extends JPanel {
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * Sets up background, watermark and zoom components
+	 * Sets up background and zoom components
 	 * @param graphicPanel the panel to work for
 	 */
 	public GraphStatusbar(final GraphPanel graphicPanel) {
@@ -132,31 +126,7 @@ public class GraphStatusbar extends JPanel {
 		}
 		bgGroup.add(optionColor);
 		bgGroup.add(optionImage);
-		bgGroup.add(optionNone);
-		
-		int year = Calendar.getInstance().get(Calendar.YEAR);
-		String user = System.getProperty("user.name");
-		String text = year + " " + user + " graphics by soundvis";
-		final JTextField watermarkText = new JTextField(text);
-
-		watermarkText.addFocusListener(new FocusListener() {
-			@Override
-			public void focusLost(FocusEvent arg0) {
-				Context.setWaterMarkText(watermarkText.getText());
-			}
-			@Override
-			public void focusGained(FocusEvent arg0) {
-			}
-		});
-		Context.setWaterMarkText(watermarkText.getText()); // initial
-
-		final JCheckBox useWaterMark = new JCheckBox();
-		useWaterMark.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent arg0) {
-				graphicPanel.setUseWaterMark(useWaterMark.isSelected());
-				Context.setWaterMarkText(watermarkText.getText());
-			}
-		});
+		bgGroup.add(optionNone);	
 	
 		SpinnerModel sm = new SpinnerNumberModel(50, 25, 100, 25);
 		final JSpinner zoom = new JSpinner(sm);
@@ -168,9 +138,7 @@ public class GraphStatusbar extends JPanel {
 				graphicPanel.repaint();
 			}
 		});
-		add(useWaterMark);
-		add(new JLabel("watermark:"));
-		add(watermarkText);
+
 		add(new JLabel("zoom %"), BorderLayout.CENTER);
 		add(zoom);
 	}

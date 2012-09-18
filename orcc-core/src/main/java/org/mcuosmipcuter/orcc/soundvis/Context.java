@@ -38,7 +38,7 @@ public abstract class Context {
 	 * @author Michael Heinzelmann
 	 */
 	public enum PropertyName {
-		AudioInputInfo, VideoDimension, Watermark, SoundCanvasAdded, SoundCanvasRemoved, SoundCanvasList, ExportFileName, CanvasClassNames, AppState
+		AudioInputInfo, VideoDimension, SoundCanvasAdded, SoundCanvasRemoved, SoundCanvasList, ExportFileName, CanvasClassNames, AppState
 	}
 	/**
 	 * Enumeration of application states
@@ -113,14 +113,7 @@ public abstract class Context {
 		videoOutputInfo.setHeight(height);
 		notifyListeners(PropertyName.VideoDimension);
 	}
-	/**
-	 * Optional water mark text to merge into the video
-	 * @param waterMarkText the text to set
-	 */
-	public static synchronized void setWaterMarkText(String waterMarkText) {
-		videoOutputInfo.setWaterMarkText(waterMarkText);
-		notifyListeners(PropertyName.Watermark);
-	}
+
 	/**
 	 * Adds a canvas to work with from the given class name string.
 	 * @param canvasClassName fully qualified name of the {@link SoundCanvas} instance to use
