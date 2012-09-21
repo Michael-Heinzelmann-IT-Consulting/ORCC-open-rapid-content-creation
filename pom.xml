@@ -21,7 +21,7 @@
   <groupId>org.mcuosmipcuter.orcc</groupId>
   <artifactId>orcc</artifactId>
   <packaging>pom</packaging>
-  <version>1.0.1-SNAPSHOT</version>
+  <version>1.0.2-SNAPSHOT</version>
   <name>orcc</name>
   <url>https://github.com/Michael-Heinzelmann-IT-Consulting/ORCC-open-rapid-content-creation</url>
 
