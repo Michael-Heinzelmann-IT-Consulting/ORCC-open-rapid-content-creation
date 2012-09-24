@@ -22,11 +22,11 @@
   <parent>
     <groupId>org.mcuosmipcuter.orcc</groupId>
     <artifactId>orcc</artifactId>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>1.0.3-SNAPSHOT</version>
   </parent>
   <groupId>org.mcuosmipcuter.orcc.ert</groupId>
   <artifactId>orcc-ert</artifactId>
-  <version>1.0.2-SNAPSHOT</version>
+  <version>1.0.3-SNAPSHOT</version>
   <name>orcc-ert</name>
   <packaging>jar</packaging>
 
@@ -41,7 +41,7 @@
     <dependency>
       <groupId>org.mcuosmipcuter.orcc.core</groupId>
       <artifactId>orcc-core</artifactId>
-      <version>1.0.2-SNAPSHOT</version>
+      <version>1.0.3-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>xuggle</groupId>
