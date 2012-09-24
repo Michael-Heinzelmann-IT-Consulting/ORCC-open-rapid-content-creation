@@ -47,7 +47,7 @@ public class InfoPanel extends JPanel implements Listener {
 	
 	private JLabel sampleRateLabel = new JLabel();
 	private JLabel frameSizeLabel = new JLabel();
-	private JLabel frameRateLabel = new JLabel();
+	private JLabel frameLengthLabel = new JLabel();
 	private JLabel channelsLabel = new JLabel();
 	private JLabel resolutionLabel = new JLabel();
 	private TimeLabel timeLengthLabel = new TimeLabel();
@@ -62,11 +62,11 @@ public class InfoPanel extends JPanel implements Listener {
 		JPanel labelPanel = new JPanel();
 		labelPanel.setBackground(Color.GRAY);
 		labelPanel.setBorder(new LineBorder(Color.GRAY, 5));
-		labelPanel.setLayout(new GridLayout(14, 1, 1, 1));
+		labelPanel.setLayout(new GridLayout(8, 1, 1, 1));
 		JPanel valuePanel = new JPanel();
 		valuePanel.setBackground(Color.LIGHT_GRAY);
 		valuePanel.setBorder(new LineBorder(Color.LIGHT_GRAY, 5));
-		valuePanel.setLayout(new GridLayout(14, 1, 1, 1));
+		valuePanel.setLayout(new GridLayout(8, 1, 1, 1));
 		
 		labelPanel.add(new JLabel("audio in:"));
 		valuePanel.add(audioFileLabel);
@@ -76,8 +76,8 @@ public class InfoPanel extends JPanel implements Listener {
 		valuePanel.add(sampleRateLabel);
 		labelPanel.add(new JLabel("frame size:"));
 		valuePanel.add(frameSizeLabel);
-		labelPanel.add(new JLabel("frame rate:"));
-		valuePanel.add(frameRateLabel);
+		labelPanel.add(new JLabel("total samples:"));
+		valuePanel.add(frameLengthLabel);
 		labelPanel.add(new JLabel("channels:"));
 		valuePanel.add(channelsLabel);
 		labelPanel.add(new JLabel("resolution:"));
@@ -88,6 +88,7 @@ public class InfoPanel extends JPanel implements Listener {
 		setLayout(new BorderLayout(0, 0));
 		add(labelPanel, BorderLayout.WEST);
 		add(valuePanel);
+		
 	}
 
 	@Override
@@ -103,7 +104,7 @@ public class InfoPanel extends JPanel implements Listener {
 			final AudioFormat audioFormat = audioInput.getAudioInputInfo().getAudioFormat();
 			sampleRateLabel.setText(String.valueOf(audioFormat.getSampleRate()));
 			frameSizeLabel.setText(String.valueOf(audioFormat.getFrameSize()));
-			frameRateLabel.setText(String.valueOf(audioFormat.getFrameRate()));
+			frameLengthLabel.setText(String.valueOf(audioInput.getAudioInputInfo().getFrameLength()));
 			channelsLabel.setText(String.valueOf(audioFormat.getChannels()));
 			resolutionLabel.setText(String.valueOf((Math.pow(2, audioFormat.getSampleSizeInBits()))));
 			timeLengthLabel.update(audioInput.getAudioInputInfo().getFrameLength(), audioFormat.getSampleRate());
@@ -114,7 +115,6 @@ public class InfoPanel extends JPanel implements Listener {
 		if(PropertyName.ExportFileName.equals(propertyName)) {
 			exportFileLabel.setText(Context.getExportFileName());
 		}
-
 
 	}
 	

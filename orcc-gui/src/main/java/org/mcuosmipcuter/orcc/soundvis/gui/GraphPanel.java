@@ -214,12 +214,12 @@ public class GraphPanel extends JPanel implements Renderer, CanvasBackGround {
 	}
 
 	@Override
-	public boolean nextSample(int[] amplitudes, byte[] rawData) {
+	public boolean nextSample(int[] amplitudes, byte[] rawData, long sampleCount) {
 		for(SoundCanvas soundCanvas : soundCanvasList) {
 			soundCanvas.nextSample(amplitudes);
 		}
 		if(mixin != null) {
-			mixin.nextSample(amplitudes, rawData);
+			mixin.nextSample(amplitudes, rawData, sampleCount);
 		}
 		return true;
 	}
@@ -229,11 +229,14 @@ public class GraphPanel extends JPanel implements Renderer, CanvasBackGround {
 		for(SoundCanvas soundCanvas : soundCanvasList) {
 			soundCanvas.newFrame(frameCount);
 		}
-		this.repaint();
+		if(frameCount > Context.getSongPositionPointer()) {
+			this.repaint();
+		}
 		
 		if(mixin != null) {
 			mixin.newFrame(frameCount);
 		}
+		
 		this.frameCount = frameCount;
 	}
 

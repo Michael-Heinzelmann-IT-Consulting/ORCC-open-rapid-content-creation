@@ -75,10 +75,10 @@ public class ByteArrayLinearDecoder {
 
 		byte[] barr = new byte[chunkSize];
 		boolean keepReading = true;
-
+		long sampleCount = 0;
 		while(keepReading && ais.read(barr, 0, chunkSize) != -1) {
 			int[] amplitudes = ByteArrayLinearDecoder.decodeLinear(barr, channels, words, isBigEndian);
-			keepReading = decodingCallback.nextSample(amplitudes, barr);
+			keepReading = decodingCallback.nextSample(amplitudes, barr, ++sampleCount);
 		}
 	}
 	

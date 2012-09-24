@@ -93,7 +93,7 @@ public class Text implements SoundCanvas {
 			graphics2d.drawString(line, leftMargin, top);
 			top += strHeight;
 		}
-		topPos -= scrollIncrement;
+		topPos = topMargin - scrollIncrement * frameCount;
 	}
 	
 	private Dimension getTextDimesion(String[] lines) {
@@ -122,7 +122,7 @@ public class Text implements SoundCanvas {
 		this.canvasBackGround = canvasBackGround;
 		this.graphics2d = graphics;
 		this.videoOutputInfo = videoOutputInfo;
-		topPos = topMargin;
+		//topPos = topMargin;
 		
 		double framesInVideo = (audioInputInfo.getFrameLength() / audioInputInfo.getAudioFormat().getSampleRate() * videoOutputInfo.getFramesPerSecond());
 		

@@ -61,12 +61,13 @@ public class TestByteArrayLinearDecoder extends TestCase{
 							int sample;
 							int wavePos;
 							@Override
-							public boolean nextSample(int[] amplitudes, byte[] rawData) {
-								
+							public boolean nextSample(int[] amplitudes, byte[] rawData, long sampleCount) {
+								sample++;
 								for(int i = 0; i < amplitudes.length; i++) {
 									System.err.println(sample + " chan " + i + ": " + amplitudes[i] + " " + msg);
 									int expected = wavePos == 0  ? getMin(sampleSize) : (wavePos == 1 ? getCenter(sampleSize) : getMax(sampleSize));
 									assertEquals(msg, expected, amplitudes[i]);
+									assertEquals(sample, sampleCount);
 								}
 								if(wavePos < 2) {
 									wavePos++;
@@ -74,7 +75,6 @@ public class TestByteArrayLinearDecoder extends TestCase{
 								else {
 									wavePos = 0;
 								}
-								sample++;
 								return true;
 							}
 						});

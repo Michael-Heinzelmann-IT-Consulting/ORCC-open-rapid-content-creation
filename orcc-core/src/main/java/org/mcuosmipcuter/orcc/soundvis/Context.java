@@ -27,6 +27,7 @@ import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.soundvis.model.AudioFileInputImpl;
 import org.mcuosmipcuter.orcc.soundvis.model.SoundCanvasWrapperImpl;
 import org.mcuosmipcuter.orcc.soundvis.model.VideoOutputInfoImpl;
+import org.mcuosmipcuter.orcc.soundvis.threads.SubSampleThread.SuperSampleData;
 
 /**
  * Static context object for the soundvis application = playing audio and generating saving video
@@ -38,7 +39,7 @@ public abstract class Context {
 	 * @author Michael Heinzelmann
 	 */
 	public enum PropertyName {
-		AudioInputInfo, VideoDimension, SoundCanvasAdded, SoundCanvasRemoved, SoundCanvasList, ExportFileName, CanvasClassNames, AppState
+		AudioInputInfo, VideoDimension, SoundCanvasAdded, SoundCanvasRemoved, SoundCanvasList, ExportFileName, CanvasClassNames, AppState, SongPositionPointer, VideoFrameRate
 	}
 	/**
 	 * Enumeration of application states
@@ -89,11 +90,12 @@ public abstract class Context {
 	private static List<SoundCanvasWrapper> soundCanvasList = new ArrayList<SoundCanvasWrapper>();
 	private static SortedSet<String> canvasClassNames = new TreeSet<String>();
 	private static String exportFileName;
-	private static AudioInput audioInputInfo;
+	private static AudioInput audioInput;
 	private static VideoOutputInfoImpl videoOutputInfo = new VideoOutputInfoImpl(25, 1920, 1080);
+	private static long songPositionPointer;
 	
 	public static AudioInput getAudioInput() {
-		return audioInputInfo;
+		return audioInput;
 	}
 
 	public static synchronized VideoOutputInfo getVideoOutputInfo() {
@@ -141,8 +143,9 @@ public abstract class Context {
 	 * @param audioFileName full path to the file
 	 */
 	public static synchronized void setAudioFromFile(String audioFileName) {
-		audioInputInfo = new AudioFileInputImpl(audioFileName);
+		audioInput = new AudioFileInputImpl(audioFileName);
 		notifyListeners(PropertyName.AudioInputInfo);
+
 	}
 	/**
 	 * Full path to the video export file
@@ -195,6 +198,13 @@ public abstract class Context {
 	public static synchronized void setAppState(AppState appState) {
 		Context.appState = appState;
 		notifyListeners(PropertyName.AppState);
+	}
+	public static long getSongPositionPointer() {
+		return songPositionPointer; // not synchronized
+	}
+	public static synchronized void setSongPositionPointer(long songPositionPointer) {
+		Context.songPositionPointer = songPositionPointer;
+		notifyListeners(PropertyName.SongPositionPointer);
 	}
 	
 	

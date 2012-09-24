@@ -81,9 +81,10 @@ public class Main {
 	final static JTabbedPane tabbedPane = new JTabbedPane();
 	private static Map<Component, Integer> tabsMap = new HashMap<Component, Integer>();
 	
-	static final int infoW = 320;
-	static final int infoH = 400;
-	static final int minCells = 4;
+	static final int infoW = 460;
+	static final int infoH = 200;
+	static final int playBackH = 180;
+	static final int minCells = 3;
 	
 	/**
 	 * @param args
@@ -226,28 +227,36 @@ public class Main {
 		
 		IOUtil.log("frame size: " + frame.getSize());
 		{
+			JInternalFrame playBackFrame = new JInternalFrame("File Info", true, false, true, true);
+			deskTop.add(playBackFrame);
+			{
+				PlayBackPanel playBackPanel = new PlayBackPanel(graphicPanel);
+				playBackFrame.getContentPane().add(playBackPanel, BorderLayout.SOUTH);
+				graphicPanel.setMixin(playBackPanel);
+			}
+			playBackFrame.setSize(frame.getSize().width - 20, playBackH);
+			playBackFrame.setVisible(true);
+		}
+		{
 			JInternalFrame infoFrame = new JInternalFrame("File Info", true, false, true, true);
 			deskTop.add(infoFrame);
 			{
 				InfoPanel infoPanel = new InfoPanel();
 				infoFrame.getContentPane().add(infoPanel);
 				Context.addListener(infoPanel);
-				
-				PlayBackPanel playBackPanel = new PlayBackPanel(graphicPanel);
-				infoFrame.getContentPane().add(playBackPanel, BorderLayout.SOUTH);
-				graphicPanel.setMixin(playBackPanel);
 			}
+			infoFrame.setLocation(0, playBackH);
 			infoFrame.setSize(infoW, infoH);
 			infoFrame.setVisible(true);
 		}
 
 		{
-			final JInternalFrame propertiesFrame = new JInternalFrame("Properties", false, false, false, true);
+			final JInternalFrame propertiesFrame = new JInternalFrame("Layers", true, false, false, true);
 			final JTable propTable = new JTable();
 			PropertyTableCellRendererEditor ptcr = new PropertyTableCellRendererEditor();
 			propTable.setDefaultRenderer(Object.class, ptcr);
-			propTable.setRowHeight(infoH);
-			propTable.setRowMargin(1);
+			propTable.setRowHeight(400);
+			propTable.setRowMargin(4);
 			
 			propTable.setDefaultEditor(Object.class, ptcr);
 			
@@ -305,9 +314,9 @@ public class Main {
 				});
 
 			}
-			propertiesFrame.setLocation(0, infoH);
+			propertiesFrame.setLocation(0, playBackH + infoH);
 			propertiesFrame.setVisible(true);
-			propertiesFrame.setSize(infoW * 4, frame.getSize().height - infoH - 100);
+			propertiesFrame.setSize(infoW, 400);
 			deskTop.add(propertiesFrame);
 		}	
 
@@ -321,7 +330,8 @@ public class Main {
 				GraphStatusbar graphStatusbar = new GraphStatusbar(graphicPanel);		
 				graphicFrame.getContentPane().add(graphStatusbar, BorderLayout.SOUTH);
 			}
-			graphicFrame.setLocation(infoW, 0);
+			graphicFrame.setSize(980, 620);
+			graphicFrame.setLocation(frame.getWidth() - 1000, frame.getHeight() - 705);
 			graphicFrame.setVisible(true);
 			
 			Context.addListener(new Listener() {
@@ -338,7 +348,7 @@ public class Main {
 					}
 				}
 			});
-			graphicFrame.setSize(frame.getSize().width - infoW - 20, infoH);
+
 
 		}
 		

@@ -38,12 +38,15 @@ import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
 
 
 
+/**
+ * Object for table cell rendering and editing
+ * @author Michael Heinzelmann
+ */
 public class PropertyTableCellRendererEditor extends DefaultTableCellRenderer implements TableCellEditor {
 	
 	private static final long serialVersionUID = 1L;
 
-	Map<SoundCanvas, CanvasPropertyPanel> map = new HashMap<SoundCanvas, CanvasPropertyPanel>();
-	
+	private Map<SoundCanvas, CanvasPropertyPanel> map = new HashMap<SoundCanvas, CanvasPropertyPanel>();
 	private CellEditorListener cellEditorListener;
 	
 	public PropertyTableCellRendererEditor() {
@@ -62,17 +65,15 @@ public class PropertyTableCellRendererEditor extends DefaultTableCellRenderer im
 	
 	public Component getTableCellRendererComponent(JTable table,
 			Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-		//System.err.println("renede " + value);
 		if(value == null){
 			return new JPanel();
-			//return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 		}
 		SoundCanvasWrapper soundCanvas = (SoundCanvasWrapper) value;
 		
 		CanvasPropertyPanel p = map.get(value);
 		if(p == null) {
 			System.err.println("p was null");
-			 p = new CanvasPropertyPanel(soundCanvas);
+			 p  = new CanvasPropertyPanel(soundCanvas);
 			 map.put((SoundCanvas)value, p);
 		}
 		return p;
@@ -112,7 +113,6 @@ public class PropertyTableCellRendererEditor extends DefaultTableCellRenderer im
 
 	public void addCellEditorListener(CellEditorListener arg0) {
 		System.err.println("addCellEditorListener: " + arg0);
-		//new Exception().printStackTrace();
 		this.cellEditorListener = arg0;
 	}
 
@@ -120,9 +120,9 @@ public class PropertyTableCellRendererEditor extends DefaultTableCellRenderer im
 	@Override
 	public Component getTableCellEditorComponent(JTable arg0, Object value,
 			boolean arg2, int arg3, int column) {
-		System.err.print("get e " + value + " col " + column);
+		//System.err.print("get e " + value + " col " + column);
 		CanvasPropertyPanel p = map.get(value);
-		System.err.println(" p e was " + p);
+		//System.err.println(" p e was " + p);
 		return p;
 	}
 }

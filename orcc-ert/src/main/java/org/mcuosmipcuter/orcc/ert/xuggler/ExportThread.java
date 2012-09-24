@@ -149,7 +149,8 @@ public class ExportThread extends Thread implements PlayPauseStop {
 								ibuf.get(srcPos, barr, destPos, frameSize);
 
 								int[] amplitudes = ByteArrayLinearDecoder.decodeLinear(barr, 2, 2, false); // TODO how do we know endian ?
-								renderer.nextSample(amplitudes, null);
+								sampleCount++;
+								renderer.nextSample(amplitudes, null, sampleCount);
 
 								if(sampleCount % samplesPerFrame == 0){
 									frameCount++;
@@ -157,7 +158,7 @@ public class ExportThread extends Thread implements PlayPauseStop {
 									writer.encodeVideo(0, renderer.getFrameImage(), time, TimeUnit.MILLISECONDS);
 									time += (long)(1000 / framesPerSecond);
 								}
-								sampleCount++;
+								////sampleCount++;
 							}
 
 						}

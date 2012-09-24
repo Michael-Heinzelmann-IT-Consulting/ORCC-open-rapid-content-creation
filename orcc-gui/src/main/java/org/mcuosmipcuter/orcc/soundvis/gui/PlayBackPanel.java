@@ -17,7 +17,9 @@
 */
 package org.mcuosmipcuter.orcc.soundvis.gui;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -30,6 +32,7 @@ import javax.swing.border.LineBorder;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
+import org.mcuosmipcuter.orcc.api.util.TimeAndRateHelper;
 import org.mcuosmipcuter.orcc.soundvis.Context;
 import org.mcuosmipcuter.orcc.soundvis.Mixin;
 import org.mcuosmipcuter.orcc.soundvis.PlayPauseStop;
@@ -58,7 +61,9 @@ public class PlayBackPanel extends JPanel implements Mixin{
 	private long sampleLength;
 	private float sampleRate;
 	private long sampleCount;
+	private int samplesPerFrame;
 	
+	TimeLinePanel timeLine = new TimeLinePanel();
 	
 	private FrameLabel frameCountlabel = new FrameLabel();
 	private TimeLabel timeLabel = new TimeLabel();
@@ -72,8 +77,6 @@ public class PlayBackPanel extends JPanel implements Mixin{
 	 */
 	public PlayBackPanel(final Renderer renderer) {
 		setBorder(new LineBorder(Color.WHITE, 5));
-		GridLayout gl = new GridLayout(2, 3, 5, 10);		
-		setLayout(gl);
 		jProgressBar.setMaximum(100);
 		jProgressBar.setStringPainted(true);
 		frameCountlabel.reset();
@@ -95,9 +98,10 @@ public class PlayBackPanel extends JPanel implements Mixin{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				playPause.reset();
-				frameCountlabel.reset();
-				timeLabel.reset();
-				jProgressBar.setValue(0);
+				long startFrame = Context.getSongPositionPointer();
+				frameCountlabel.update(startFrame);
+				sampleCount = startFrame * samplesPerFrame;
+				updateProgress();
 			}
 		});
 		Context.addListener(new Listener() {
@@ -116,16 +120,30 @@ public class PlayBackPanel extends JPanel implements Mixin{
 				if(PropertyName.AudioInputInfo.equals(propertyName)) {
 					playPause.setEnabled(Context.getAudioInput() != null);
 				}
+				if(PropertyName.AudioInputInfo.equals(propertyName) || PropertyName.VideoFrameRate.equals(propertyName) ) {
+					samplesPerFrame = TimeAndRateHelper.getSamplesPerFrame(Context.getAudioInput().getAudioInputInfo(), Context.getVideoOutputInfo());
+				}
 			}
 		});
+		GridLayout gl = new GridLayout(2, 3, 5, 10);		
 		
-		add(stop);
-		add(playPause);
-		add(stateLabel);
+		JPanel commands = new JPanel();
+		commands.setBorder(new LineBorder(Color.WHITE, 2));
+		commands.setLayout(gl);
+		commands.add(stop);
+		commands.add(playPause);
+		commands.add(stateLabel);
 		
-		add(frameCountlabel);
-		add(timeLabel);
-		add(jProgressBar);
+		commands.add(frameCountlabel);
+		commands.add(timeLabel);
+		commands.add(jProgressBar);
+		commands.setPreferredSize(new Dimension(240, 70));
+		
+		timeLine.setPreferredSize(new Dimension(600, 140));
+		setLayout(new BorderLayout());
+		add(commands, BorderLayout.WEST);
+		add(timeLine, BorderLayout.CENTER);
+
 	}
 
 
@@ -135,8 +153,8 @@ public class PlayBackPanel extends JPanel implements Mixin{
 		updateProgress();
 	}
 	@Override
-	public boolean nextSample(int[] amplitudes, byte[] rawData) {
-		sampleCount++;
+	public boolean nextSample(int[] amplitudes, byte[] rawData, long sampleCount) {
+		this.sampleCount = sampleCount;
 		if(sampleCount >= sampleLength) {
 			updateProgress();
 			playPause.reset();
@@ -146,15 +164,14 @@ public class PlayBackPanel extends JPanel implements Mixin{
 	@Override
 	public void start(AudioInputInfo audioInputInfo, VideoOutputInfo videoOutputInfo) {
 		sampleLength = audioInputInfo.getFrameLength();
-		jProgressBar.setValue(0);
-		sampleCount = 0;
-		timeLabel.reset();
 		sampleRate = audioInputInfo.getAudioFormat().getSampleRate();
 	}
 	private void updateProgress() {
 		double d = (double)sampleCount / (double)sampleLength;
 		jProgressBar.setValue((int)(d * 100));
 		timeLabel.update(sampleCount, sampleRate);
+		timeLine.setSamplePosition(sampleCount);
+		timeLine.repaint();
 	}
 	
 }

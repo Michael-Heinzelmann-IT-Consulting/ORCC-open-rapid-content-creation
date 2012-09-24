@@ -15,35 +15,28 @@
 *   You should have received a copy of the GNU General Public License
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package org.mcuosmipcuter.orcc.soundvis.gui;
+package org.mcuosmipcuter.orcc.api.util;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Font;
-
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTable;
-import javax.swing.border.EtchedBorder;
-import javax.swing.table.TableCellRenderer;
+import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
+import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 
 /**
- * renderer for the layers table header
+ * Helper for time and sample rate frame rate related tasks
  * @author Michael Heinzelmann
  */
-public class PropertyTableHeaderRenderer  implements TableCellRenderer {
+public class TimeAndRateHelper {
 
-	@Override
-	public Component getTableCellRendererComponent(final JTable table, Object value,
-			boolean isSelected, boolean hasFocus, int row, final int column) {
-
-		JLabel label = new JLabel(String.valueOf(value));
-		label.setFont(label.getFont().deriveFont(Font.BOLD, 12f));
-		label.setForeground(table.getTableHeader().getReorderingAllowed() ? Color.BLACK : Color.DARK_GRAY);
-		JPanel p = new JPanel();
-		p.setBorder(new EtchedBorder());
-		p.add(label);
-		return p;
+	/**
+	 * gets the number of audio samples per video frame e.g. 44100 / 25 = 1764
+	 * @param audioInputInfo input audio
+	 * @param videoOutputInfo output video
+	 * @return the samples per frame
+	 */
+	public static int getSamplesPerFrame(AudioInputInfo audioInputInfo, VideoOutputInfo videoOutputInfo) {
+		int videoFrameRate = videoOutputInfo.getFramesPerSecond();
+		int sampleRate = (int)audioInputInfo.getAudioFormat().getSampleRate(); // non integer sample rates are rare
+		int samplesPerFrame = sampleRate / videoFrameRate; // e.g. 44100 / 25 = 1764
+		return samplesPerFrame;
 	}
 
 }

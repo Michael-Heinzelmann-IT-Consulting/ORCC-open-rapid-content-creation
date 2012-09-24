@@ -49,8 +49,8 @@ public class CanvasPropertyPanel extends JPanel {
 	 * Sets up a grid layout
 	 */
 	public CanvasPropertyPanel(final SoundCanvasWrapper soundCanvasWrapper) {
-		setBorder(new LineBorder(Color.WHITE, 5));
-		GridLayout gl = new GridLayout(10, 1, 5, 4);		
+		setBorder(new LineBorder(Color.WHITE, 3));
+		GridLayout gl = new GridLayout(14, 1, 5, 4);		
 		setLayout(gl);
 		
 

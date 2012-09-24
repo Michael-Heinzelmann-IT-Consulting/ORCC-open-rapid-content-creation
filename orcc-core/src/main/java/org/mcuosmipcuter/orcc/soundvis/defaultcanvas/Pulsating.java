@@ -39,6 +39,8 @@ public class Pulsating implements SoundCanvas {
 	@LimitedIntProperty(description="alpha is limited from 0 to 255", minimum=0, maximum=255)
 	@UserProperty(description="alpha of the foreground color")
 	int alpha = 255;
+	@UserProperty(description="if reverse the low amplituses are large and high amplitudes small")
+	boolean reverse = false;
 	
 	private int centerX;
 	private int centerY;
@@ -53,7 +55,7 @@ public class Pulsating implements SoundCanvas {
 	@Override
 	public void nextSample(int[] amplitudes) {
 
-		int mono = amplitude.getUnSignedMono(amplitudes);
+		int mono = 2 * Math.abs(amplitude.getSignedMono(amplitudes));
 		if(mono > max) {
 			max = mono;
 		}
@@ -66,6 +68,9 @@ public class Pulsating implements SoundCanvas {
 		canvasBackGround.drawBackGround();
 		
 		int amp = amplitudeDivisor > 1 ? (int)(max / amplitudeDivisor) : (int)(max * amplitudeMultiplicator);
+		if(reverse) {
+			amp = centerY * 2 - amp;
+		}
 		graphics2D.setColor(new Color(foreGround.getRed(), foreGround.getGreen(), foreGround.getBlue(), alpha));		
 		graphics2D.fillOval(centerX - amp / 2, centerY - amp / 2, amp, amp);
 

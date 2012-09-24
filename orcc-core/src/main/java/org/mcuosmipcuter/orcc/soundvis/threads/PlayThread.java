@@ -43,7 +43,6 @@ public class PlayThread extends Thread implements PlayPauseStop {
 	
 	Renderer renderer;
 
-	private long sampleCount;
 	private long frameCount;
 	
 	private SourceDataLine sourceDataLine;
@@ -79,25 +78,47 @@ public class PlayThread extends Thread implements PlayPauseStop {
 			sourceDataLine.start();
 			AudioInputStream ais = audioInput.open();
 			
+			long preRun = 12; // TODO frames to pre run
+			final long frameStart = Context.getSongPositionPointer() - preRun > 0 ? Context.getSongPositionPointer() - preRun : 0;
+			
+			if( Context.getSongPositionPointer() > preRun) {	
+				long byteStart = frameStart * samplesPerFrame * chunkSize;
+				long count = 0;
+				while(count < byteStart  && ais.available() > 0) {
+					int step = count < byteStart - samplesPerFrame * chunkSize ? samplesPerFrame * chunkSize : chunkSize;
+					long skipped = ais.skip( step);
+					count += skipped;
+				}
+				if(count != byteStart) {
+					IOUtil.log("WARNING did not reach correct start pos in stream: count " + count + "  vs. " + byteStart + " ");
+				}
+				frameCount = count / (samplesPerFrame * chunkSize);
+			}
 			ByteArrayLinearDecoder.decodeLinear(ais, new DecodingCallback() {
 				
 				@Override
-				public boolean nextSample(int[] amplitudes, byte[] rawData) {
-					for(byte b : rawData) {
-						data[dataPos] = b;
-						dataPos++;
+				public boolean nextSample(int[] amplitudes, byte[] rawData, long sampleCount) {
+
+					if(frameCount >= Context.getSongPositionPointer()) {
+						for(byte b : rawData) {
+							data[dataPos] = b;
+							dataPos++;
+						}
 					}
-					boolean cont = renderer.nextSample(amplitudes, rawData);
+					boolean cont = renderer.nextSample(amplitudes, rawData, frameStart * samplesPerFrame + sampleCount);
 					
 					if(sampleCount % samplesPerFrame == 0){
 						frameCount++;
 						renderer.newFrame(frameCount);
-						sourceDataLine.write(data, 0, data.length); // blocks for the time of playing
+						if(frameCount > Context.getSongPositionPointer()) {
+							sourceDataLine.write(data, 0, data.length); // blocks for the time of playing
+						
 						data = new byte[samplesPerFrame * chunkSize];
 						dataPos = 0;
+						}
 						cont = checkState();
+						
 					}
-					sampleCount++;	
 					return cont;
 				}
 			});

@@ -28,8 +28,9 @@ public interface DecodingCallback {
 	 * Called if a new sample has been decoded
 	 * @param amplitudes decoded amplitudes
 	 * @param rawData unmodified data from input stream
-	 * @return
+	 * @param sampleCount relative sample position from start of decoding
+	 * @return true if decoding should continue
 	 */
-	public boolean nextSample(int[] amplitudes, byte[] rawData);
+	public boolean nextSample(int[] amplitudes, byte[] rawData, long sampleCount);
 
 }
