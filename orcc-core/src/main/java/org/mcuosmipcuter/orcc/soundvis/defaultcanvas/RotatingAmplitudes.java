@@ -24,7 +24,6 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
-import org.mcuosmipcuter.orcc.api.soundvis.CanvasBackGround;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
@@ -53,7 +52,6 @@ public class RotatingAmplitudes implements SoundCanvas {
 	private int centerX;
 	private int centerY;
 	Graphics2D graphics2D;
-	CanvasBackGround canvasBackGround;
 	private float amplitudeDivisor;
 	private float amplitudeMultiplicator;
 	private AmplitudeHelper amplitude;	
@@ -111,7 +109,6 @@ public class RotatingAmplitudes implements SoundCanvas {
 	@Override
 	public void newFrame(long frameCount) {
 		
-		canvasBackGround.drawBackGround();
 		if(xor) {
 			graphics2D.setXORMode(new Color(255 - foreGround.getRed(), 255 - foreGround.getGreen(), 255 - foreGround.getBlue()) );
 		}
@@ -130,15 +127,13 @@ public class RotatingAmplitudes implements SoundCanvas {
 	 */
 	@Override
 	public void prepare(AudioInputInfo audioInputInfo,
-			VideoOutputInfo videoOutputInfo, Graphics2D graphics,
-			CanvasBackGround canvasBackGround) {
+			VideoOutputInfo videoOutputInfo, Graphics2D graphics) {
 		int frameRate = videoOutputInfo.getFramesPerSecond();
 		int sampleRate = (int)audioInputInfo.getAudioFormat().getSampleRate(); // non integer sample rates are rare
 		samplesPerFrame = sampleRate / frameRate; // e.g. 44100 / 25 = 1764
 		centerX = videoOutputInfo.getWidth() / 2;
 		centerY = videoOutputInfo.getHeight() / 2;
 		this.graphics2D = graphics;
-		this.canvasBackGround = canvasBackGround;
 		
 		amplitude = new AmplitudeHelper(audioInputInfo);
 		amplitudeDivisor = (amplitude.getAmplitudeRange() / videoOutputInfo.getHeight());

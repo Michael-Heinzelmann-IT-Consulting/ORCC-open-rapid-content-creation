@@ -18,6 +18,7 @@
 package org.mcuosmipcuter.orcc.soundvis.gui.widgets.properties;
 
 import java.awt.Color;
+import java.awt.image.BufferedImage;
 import java.lang.reflect.Field;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -83,6 +84,9 @@ public class PropertyPanelFactory {
 		}
 		if(Color.class.equals(type)) {
 			return new ColorPropertyPanel(soundCanvas);
+		}
+		if(BufferedImage.class.equals(type)) {
+			return new BufferedImagePropertyPanel(soundCanvas);
 		}
 		throw new RuntimeException(type + " type not supported");
 	}

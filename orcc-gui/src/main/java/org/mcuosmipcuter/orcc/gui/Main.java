@@ -19,6 +19,7 @@ package org.mcuosmipcuter.orcc.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -48,6 +49,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.TableColumnModelEvent;
 import javax.swing.event.TableColumnModelListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
 
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.soundvis.Context;
@@ -60,12 +62,12 @@ import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
 import org.mcuosmipcuter.orcc.soundvis.gui.AboutBox;
 import org.mcuosmipcuter.orcc.soundvis.gui.CanvasClassMenu;
 import org.mcuosmipcuter.orcc.soundvis.gui.GraphPanel;
-import org.mcuosmipcuter.orcc.soundvis.gui.GraphStatusbar;
 import org.mcuosmipcuter.orcc.soundvis.gui.InfoPanel;
 import org.mcuosmipcuter.orcc.soundvis.gui.PlayBackPanel;
 import org.mcuosmipcuter.orcc.soundvis.gui.PropertyTableCellRendererEditor;
 import org.mcuosmipcuter.orcc.soundvis.gui.PropertyTableHeaderRenderer;
 import org.mcuosmipcuter.orcc.soundvis.gui.ResolutionMenu;
+import org.mcuosmipcuter.orcc.soundvis.gui.ZoomMenu;
 import org.mcuosmipcuter.orcc.soundvis.gui.listeners.FileDialogActionListener;
 import org.mcuosmipcuter.orcc.soundvis.gui.listeners.FileDialogActionListener.CallBack;
 import org.mcuosmipcuter.orcc.soundvis.gui.listeners.StopActionListener;
@@ -83,7 +85,7 @@ public class Main {
 	
 	static final int infoW = 460;
 	static final int infoH = 200;
-	static final int playBackH = 180;
+	static final int playBackH = 200;
 	static final int minCells = 3;
 	
 	/**
@@ -203,7 +205,9 @@ public class Main {
 					}
 				}
 			});
-			
+			final JMenu viewMenu = new JMenu("View");
+			mb.add(viewMenu);
+			viewMenu.add(new ZoomMenu("zoom", 0.5f, graphicPanel));
 			final JMenu helpMenu = new JMenu("Help");
 			mb.add(helpMenu);
 			{
@@ -234,6 +238,7 @@ public class Main {
 				playBackFrame.getContentPane().add(playBackPanel, BorderLayout.SOUTH);
 				graphicPanel.setMixin(playBackPanel);
 			}
+			
 			playBackFrame.setSize(frame.getSize().width - 20, playBackH);
 			playBackFrame.setVisible(true);
 		}
@@ -255,8 +260,10 @@ public class Main {
 			final JTable propTable = new JTable();
 			PropertyTableCellRendererEditor ptcr = new PropertyTableCellRendererEditor();
 			propTable.setDefaultRenderer(Object.class, ptcr);
-			propTable.setRowHeight(400);
-			propTable.setRowMargin(4);
+			propTable.setRowHeight(280);
+			//propTable.setRowMargin(4);
+		
+			propTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 			
 			propTable.setDefaultEditor(Object.class, ptcr);
 			
@@ -310,13 +317,19 @@ public class Main {
 							propTable.repaint();
 							propTable.getTableHeader().repaint();
 						}
+						int colCount = propTable.getColumnCount();
+						for(int i = 0; i < colCount; i++) {
+							TableColumn col = propTable.getColumnModel().getColumn(i);
+							col.setMinWidth(180);
+							col.setMaxWidth(240);
+						}
 					}
 				});
 
 			}
 			propertiesFrame.setLocation(0, playBackH + infoH);
 			propertiesFrame.setVisible(true);
-			propertiesFrame.setSize(infoW, 400);
+			propertiesFrame.setSize(infoW, 570 - infoH);
 			deskTop.add(propertiesFrame);
 		}	
 
@@ -326,12 +339,10 @@ public class Main {
 			{
 				graphicFrame.getContentPane().add(graphicPanel);
 			}
-			{
-				GraphStatusbar graphStatusbar = new GraphStatusbar(graphicPanel);		
-				graphicFrame.getContentPane().add(graphStatusbar, BorderLayout.SOUTH);
-			}
-			graphicFrame.setSize(980, 620);
-			graphicFrame.setLocation(frame.getWidth() - 1000, frame.getHeight() - 705);
+			graphicPanel.setPreferredSize(new Dimension(960, 540));
+			graphicFrame.pack();
+			graphicFrame.setLocation(frame.getWidth() - graphicFrame.getWidth() - 20, playBackH);
+			//graphicFrame.setSize(970, 580);
 			graphicFrame.setVisible(true);
 			
 			Context.addListener(new Listener() {

@@ -21,7 +21,6 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
-import org.mcuosmipcuter.orcc.api.soundvis.CanvasBackGround;
 import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
@@ -34,8 +33,7 @@ import org.mcuosmipcuter.orcc.api.util.TextHelper;
  *
  */
 public class XOR implements SoundCanvas {
-	
-	CanvasBackGround canvasBackGround;
+
 	private int width;
 	private int height;
 	
@@ -48,9 +46,6 @@ public class XOR implements SoundCanvas {
 	@LimitedIntProperty(minimum=-1, maximum=255, description="-1 means blue is automatic")
 	@UserProperty(description="RGB value 0-255 for blue if -1 the amplitude min-max color is used")
 	int fixedBlue = -1;
-	
-	@UserProperty(description="whether to refresh background each frame")
-	private boolean constantBgRefresh;
 	
 	@LimitedIntProperty(minimum=0, description="percentage cannot be less than 0 and more than 100")
 	@UserProperty(description="threshold when exceeded by max - min a an XOR paint is triggered")
@@ -97,13 +92,6 @@ public class XOR implements SoundCanvas {
 	@Override
 	public void newFrame(long frameCount) {
 		
-		if(constantBgRefresh) {	   
-			canvasBackGround.drawBackGround();
-		}
-		else if( frameCount == 1) {
-			//  draw background 1st frame only
-			canvasBackGround.drawBackGround();
-		}
 		int threshold = thresholdPercent * onePercentOfSampleSize;
 		if(max - min > threshold) {		
 			int r = fixedRed == -1 ? min / amplitudeDivisor : fixedRed;
@@ -119,11 +107,10 @@ public class XOR implements SoundCanvas {
 
 	
 	@Override
-	public void prepare(AudioInputInfo audioInputInfo, VideoOutputInfo videoOutputInfo, Graphics2D g, CanvasBackGround canvasBackGround) {
+	public void prepare(AudioInputInfo audioInputInfo, VideoOutputInfo videoOutputInfo, Graphics2D g) {
 		int sampleSizeBits = audioInputInfo.getAudioFormat().getSampleSizeInBits();
 		long sampleSize = (long)Math.pow(2, sampleSizeBits);
 		amplitudeDivisor = (int)(sampleSize / 256);
-		this.canvasBackGround = canvasBackGround;
 		this.sampelsPerFrame = (int)(sampleSize / videoOutputInfo.getFramesPerSecond());
 		this.onePercentOfSampleSize = (int)(sampleSize / 100);
 		this.graphics = g;

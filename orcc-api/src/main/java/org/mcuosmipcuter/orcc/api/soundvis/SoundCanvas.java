@@ -63,9 +63,8 @@ public interface SoundCanvas {
 	 * @param audioInputInfo info about the given audio input
 	 * @param videoOutputInfo info about the configured video output
 	 * @param graphics graphics to draw on, in most cases you want to store the reference in your instance
-	 * @param canvasBackGround call back for external background drawing
 	 */
-	public void prepare(AudioInputInfo audioInputInfo, VideoOutputInfo videoOutputInfo, Graphics2D graphics, CanvasBackGround canvasBackGround);
+	public void prepare(AudioInputInfo audioInputInfo, VideoOutputInfo videoOutputInfo, Graphics2D graphics);
 
 	/**
 	 * Display a preview of this canvas, ideally screen shot like, or at least show

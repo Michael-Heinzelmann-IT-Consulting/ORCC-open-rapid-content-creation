@@ -18,6 +18,7 @@
 package org.mcuosmipcuter.orcc.soundvis.gui;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.util.EventObject;
 import java.util.HashMap;
 import java.util.Map;

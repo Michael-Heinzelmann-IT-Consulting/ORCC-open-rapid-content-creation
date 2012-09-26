@@ -21,7 +21,6 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
-import org.mcuosmipcuter.orcc.api.soundvis.CanvasBackGround;
 import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
@@ -45,7 +44,6 @@ public class Pulsating implements SoundCanvas {
 	private int centerX;
 	private int centerY;
 	Graphics2D graphics2D;
-	CanvasBackGround canvasBackGround;
 	private float amplitudeDivisor;
 	private float amplitudeMultiplicator;
 	private AmplitudeHelper amplitude;
@@ -64,8 +62,6 @@ public class Pulsating implements SoundCanvas {
 
 	@Override
 	public void newFrame(long frameCount) {
-
-		canvasBackGround.drawBackGround();
 		
 		int amp = amplitudeDivisor > 1 ? (int)(max / amplitudeDivisor) : (int)(max * amplitudeMultiplicator);
 		if(reverse) {
@@ -79,12 +75,10 @@ public class Pulsating implements SoundCanvas {
 
 	@Override
 	public void prepare(AudioInputInfo audioInputInfo,
-			VideoOutputInfo videoOutputInfo, Graphics2D graphics,
-			CanvasBackGround canvasBackGround) {
+			VideoOutputInfo videoOutputInfo, Graphics2D graphics) {
 		centerX = videoOutputInfo.getWidth() / 2;
 		centerY = videoOutputInfo.getHeight() / 2;
 		this.graphics2D = graphics;
-		this.canvasBackGround = canvasBackGround;
 		
 		amplitude = new AmplitudeHelper(audioInputInfo);
 		amplitudeDivisor = (amplitude.getAmplitudeRange() / videoOutputInfo.getHeight());

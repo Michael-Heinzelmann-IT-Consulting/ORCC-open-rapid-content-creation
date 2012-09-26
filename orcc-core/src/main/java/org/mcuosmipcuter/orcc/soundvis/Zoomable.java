@@ -15,19 +15,16 @@
 *   You should have received a copy of the GNU General Public License
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package org.mcuosmipcuter.orcc.api.soundvis;
+package org.mcuosmipcuter.orcc.soundvis;
 
 /**
- * Facade for a canvas background that can draw the background in different ways,
- * like image, solid color etc. If the canvas wants the background be drawn externally
- * it should call this facade {@link #drawBackGround()} method.
- * Canvas that take full responsibility for the background can just ignore
- * this interface.
+ * Object that supports a zoom functionality
  * @author Michael Heinzelmann
  */
-public interface CanvasBackGround {
+public interface Zoomable {
 	/**
-	 * Draws the background in a specific way that is determined by the user
+	 * Sets the zoom where 1.0f means original size
+	 * @param zoomFactor float factor
 	 */
-	public void drawBackGround();
+	public void setZoomFactor(float zoomFactor);
 }

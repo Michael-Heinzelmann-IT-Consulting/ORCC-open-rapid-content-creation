@@ -19,6 +19,7 @@ package org.mcuosmipcuter.orcc.soundvis.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -50,10 +51,9 @@ public class CanvasPropertyPanel extends JPanel {
 	 */
 	public CanvasPropertyPanel(final SoundCanvasWrapper soundCanvasWrapper) {
 		setBorder(new LineBorder(Color.WHITE, 3));
-		GridLayout gl = new GridLayout(14, 1, 5, 4);		
+		GridLayout gl = new GridLayout(10, 1, 5, 4);		
 		setLayout(gl);
 		
-
 		closeButton.addActionListener(new ActionListener() {	
 			@Override
 			public void actionPerformed(ActionEvent e) {

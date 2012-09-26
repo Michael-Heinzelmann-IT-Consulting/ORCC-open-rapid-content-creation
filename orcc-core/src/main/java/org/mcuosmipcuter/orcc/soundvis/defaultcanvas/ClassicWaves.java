@@ -21,7 +21,6 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
-import org.mcuosmipcuter.orcc.api.soundvis.CanvasBackGround;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
@@ -53,13 +52,10 @@ public class ClassicWaves implements SoundCanvas {
 	private Graphics2D graphics;
 	private int counterInsideFrame;
 	private int prevAmplitude;
-	private CanvasBackGround canvasBackGround;
 
 	@Override
 	public void nextSample(int[] amplitudes) {
-		if(counterInsideFrame == leftMargin) {
-			canvasBackGround.drawBackGround();
-		}
+
 		int mono = amplitude.getSignedMono(amplitudes);
 		int amp = amplitudeDivisor > 1 ? (int)(mono / amplitudeDivisor) : (int)(mono * amplitudeMultiplicator);
 		if(factor == 1 || Math.abs(amp) > Math.abs(max)) {
@@ -83,7 +79,7 @@ public class ClassicWaves implements SoundCanvas {
 
 	@Override
 	public void prepare(AudioInputInfo audioInputInfo, VideoOutputInfo videoOutputInfo,  
-			Graphics2D graphics, CanvasBackGround canvasBackGround)  {
+			Graphics2D graphics)  {
 		int frameRate = videoOutputInfo.getFramesPerSecond();
 		int sampleRate = (int)audioInputInfo.getAudioFormat().getSampleRate(); // non integer sample rates are rare
 		int pixelLengthOfaFrame = sampleRate / frameRate; // e.g. 44100 / 25 = 1764
@@ -99,7 +95,6 @@ public class ClassicWaves implements SoundCanvas {
 			amplitudeMultiplicator = height / amplitude.getAmplitudeRange();
 		}
 		this.graphics = graphics;
-		this.canvasBackGround = canvasBackGround;
 	}
 
 	@Override

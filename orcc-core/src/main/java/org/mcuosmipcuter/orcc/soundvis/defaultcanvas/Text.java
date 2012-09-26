@@ -24,7 +24,6 @@ import java.awt.Graphics2D;
 import java.util.Calendar;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
-import org.mcuosmipcuter.orcc.api.soundvis.CanvasBackGround;
 import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
@@ -53,7 +52,6 @@ public class Text implements SoundCanvas {
 	@LimitedIntProperty(description="tab size limitation, 0 means no replacement", minimum=0)
 	private int tabReplacement = 2;
 	
-	private CanvasBackGround canvasBackGround;
 	private Graphics2D graphics2d;
 	VideoOutputInfo videoOutputInfo;
 	
@@ -75,7 +73,7 @@ public class Text implements SoundCanvas {
 	 */
 	@Override
 	public void newFrame(long frameCount) {
-		canvasBackGround.drawBackGround();
+
 		if(text == null || text.length() == 0) {
 			return;
 		}
@@ -117,9 +115,7 @@ public class Text implements SoundCanvas {
 	 */
 	@Override
 	public void prepare(AudioInputInfo audioInputInfo,
-			VideoOutputInfo videoOutputInfo, Graphics2D graphics,
-			CanvasBackGround canvasBackGround) {
-		this.canvasBackGround = canvasBackGround;
+			VideoOutputInfo videoOutputInfo, Graphics2D graphics) {
 		this.graphics2d = graphics;
 		this.videoOutputInfo = videoOutputInfo;
 		//topPos = topMargin;

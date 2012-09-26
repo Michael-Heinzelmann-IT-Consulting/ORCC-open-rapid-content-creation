@@ -15,72 +15,60 @@
 *   You should have received a copy of the GNU General Public License
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package org.mcuosmipcuter.orcc.soundvis.model;
+package org.mcuosmipcuter.orcc.soundvis.defaultcanvas;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
+import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
+import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
-import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
 
 /**
- * Implementation of a sound canvas wrapper
+ * Displays a solid color
  * @author Michael Heinzelmann
  */
-public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
+public class SolidColor implements SoundCanvas {
 	
-	final SoundCanvas soundCanvas;
-	boolean enabled = true;
+	@UserProperty(description="color of the area")
+	private Color color = Color.WHITE;
+	@LimitedIntProperty(description="alpha is limited from 0 to 255", minimum=0, maximum=255)
+	@UserProperty(description="alpha of the color")
+	int alpha = 255;
 	
-	public SoundCanvasWrapperImpl(SoundCanvas soundCanvas) {
-		this.soundCanvas = soundCanvas;
-	}
+	private int width;
+	private int height;
+	Graphics2D graphics2D;
+
 	@Override
 	public void nextSample(int[] amplitudes) {
-		if(enabled) {// TODO this causes wrong state
-			soundCanvas.nextSample(amplitudes);
-		}
+		
 	}
 
 	@Override
 	public void newFrame(long frameCount) {
-		if(enabled) {// TODO refactor to use proxy graphics
-			soundCanvas.newFrame(frameCount);
-		}
+
+		int r = color.getRed();
+		int g = color.getGreen();
+		int b = color.getBlue();
+		graphics2D.setColor(new Color(r, g, b, alpha));		
+		graphics2D.fillRect(0, 0, width, height);
+
 	}
 
 	@Override
 	public void prepare(AudioInputInfo audioInputInfo,
 			VideoOutputInfo videoOutputInfo, Graphics2D graphics) {
-		soundCanvas.prepare(audioInputInfo, videoOutputInfo, graphics);
+		width = videoOutputInfo.getWidth();
+		height = videoOutputInfo.getHeight();
+		this.graphics2D = graphics;
 	}
 
 	@Override
 	public void preView(int width, int height, Graphics2D graphics) {
-		soundCanvas.preView(width, height, graphics);
-	}
 
-	@Override
-	public String getDisplayName() {
-		return soundCanvas.getClass().getSimpleName();
-	}
-
-	@Override
-	public boolean isVisible() {
-		return enabled;
-	}
-	@Override
-	public void setVisible(boolean enabled) {
-		this.enabled = enabled;
-	}
-	@Override
-	public SoundCanvas getSoundCanvas() {
-		return soundCanvas;
-	}
-	@Override
-	public String toString() {
-		return getDisplayName();
 	}
 
 }
