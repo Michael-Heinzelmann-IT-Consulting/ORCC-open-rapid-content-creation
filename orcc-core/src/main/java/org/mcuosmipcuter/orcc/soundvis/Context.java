@@ -39,7 +39,8 @@ public abstract class Context {
 	 * @author Michael Heinzelmann
 	 */
 	public enum PropertyName {
-		AudioInputInfo, VideoDimension, SoundCanvasAdded, SoundCanvasRemoved, SoundCanvasList, ExportFileName, CanvasClassNames, AppState, SongPositionPointer, VideoFrameRate
+		AudioInputInfo, VideoDimension, SoundCanvasAdded, SoundCanvasRemoved, SoundCanvasList, ExportFileName, 
+		CanvasClassNames, AppState, SongPositionPointer, VideoFrameRate, FrameMark
 	}
 	/**
 	 * Enumeration of application states
@@ -126,6 +127,9 @@ public abstract class Context {
 	public static synchronized  void addCanvas(String canvasClassName) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
 		SoundCanvas soundCanvas = (SoundCanvas) Class.forName(canvasClassName).newInstance();
 		SoundCanvasWrapper soundCanvasWrapper = new SoundCanvasWrapperImpl(soundCanvas);
+		if(audioInput != null) {
+			soundCanvasWrapper.prepare(audioInput.getAudioInputInfo(), videoOutputInfo);
+		}
 		soundCanvasList.add(soundCanvasWrapper);
 		notifyListeners(PropertyName.SoundCanvasAdded);
 	}
@@ -134,9 +138,11 @@ public abstract class Context {
 		notifyListeners(PropertyName.SoundCanvasRemoved);
 	}
 	public static synchronized void reorderCanvasList(List<SoundCanvasWrapper> newList) {
+
 		soundCanvasList.clear();
 		soundCanvasList.addAll(newList); // TODO when wrapper is implemented do a reorder
 		notifyListeners(PropertyName.SoundCanvasList);
+
 	}
 	/**
 	 * Sets the audio from a file
@@ -182,7 +188,9 @@ public abstract class Context {
 	 * @return the instance or null if none is set
 	 */
 	public static synchronized List<SoundCanvasWrapper> getSoundCanvasList() {
+
 		return soundCanvasList;
+		
 	}
 	/**
 	 * Returns the application state
@@ -207,5 +215,12 @@ public abstract class Context {
 		notifyListeners(PropertyName.SongPositionPointer);
 	}
 	
-	
+	/**
+	 * This is just to notify listeners, frame positions can be obtained from {@link #getSoundCanvasList()}
+	 * @param framePos
+	 * @param source
+	 */
+	public static synchronized void setFrameMark(long framePos, SoundCanvasWrapper source) {
+		notifyListeners(PropertyName.FrameMark);
+	}
 }

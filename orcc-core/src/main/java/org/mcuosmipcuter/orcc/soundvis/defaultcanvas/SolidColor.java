@@ -40,7 +40,6 @@ public class SolidColor implements SoundCanvas {
 	
 	private int width;
 	private int height;
-	Graphics2D graphics2D;
 
 	@Override
 	public void nextSample(int[] amplitudes) {
@@ -48,7 +47,7 @@ public class SolidColor implements SoundCanvas {
 	}
 
 	@Override
-	public void newFrame(long frameCount) {
+	public void newFrame(long frameCount, Graphics2D graphics2D) {
 
 		int r = color.getRed();
 		int g = color.getGreen();
@@ -60,15 +59,28 @@ public class SolidColor implements SoundCanvas {
 
 	@Override
 	public void prepare(AudioInputInfo audioInputInfo,
-			VideoOutputInfo videoOutputInfo, Graphics2D graphics) {
+			VideoOutputInfo videoOutputInfo) {
 		width = videoOutputInfo.getWidth();
 		height = videoOutputInfo.getHeight();
-		this.graphics2D = graphics;
 	}
 
 	@Override
-	public void preView(int width, int height, Graphics2D graphics) {
-
+	public int getPreRunFrames() {
+		// this canvas just fills a color area, no pre run needed
+		return 0;
 	}
+
+	@Override
+	public void postFrame() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void drawCurrentIcon(int width, int height, Graphics2D graphics) {
+		graphics.setColor(color);
+		graphics.fillRect(0, 0, width, height);
+	}
+
 
 }

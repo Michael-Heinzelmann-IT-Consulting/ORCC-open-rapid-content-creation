@@ -52,7 +52,7 @@ public class XOR implements SoundCanvas {
 	int thresholdPercent = 25;
 	@LimitedIntProperty(minimum=1, description="cannot be less than 1 sample")
 	@UserProperty(description="number of frames to take samples in order to determine min and max")
-	int sampleWindow = 25;
+	int samplingFrames = 25;
 	
 	// state
 	private int min = Integer.MAX_VALUE;
@@ -77,12 +77,6 @@ public class XOR implements SoundCanvas {
 				max = amplitudes[channel];
 			}
 		}
-		int sampleSize = sampelsPerFrame * sampleWindow;
-		if(sampleCount >= sampleSize) {
-			min = Integer.MAX_VALUE;
-			max = 0;
-			sampleCount = 0;
-		}
 		sampleCount++;
 	}
 
@@ -90,7 +84,7 @@ public class XOR implements SoundCanvas {
 	 * @see com.mcuosmipcuter.soundvis.gui.api.SoundCanvas#newFrame(long, java.awt.Graphics2D)
 	 */
 	@Override
-	public void newFrame(long frameCount) {
+	public void newFrame(long frameCount, Graphics2D graphics) {
 		
 		int threshold = thresholdPercent * onePercentOfSampleSize;
 		if(max - min > threshold) {		
@@ -107,23 +101,42 @@ public class XOR implements SoundCanvas {
 
 	
 	@Override
-	public void prepare(AudioInputInfo audioInputInfo, VideoOutputInfo videoOutputInfo, Graphics2D g) {
+	public void prepare(AudioInputInfo audioInputInfo, VideoOutputInfo videoOutputInfo) {
 		int sampleSizeBits = audioInputInfo.getAudioFormat().getSampleSizeInBits();
 		long sampleSize = (long)Math.pow(2, sampleSizeBits);
 		amplitudeDivisor = (int)(sampleSize / 256);
 		this.sampelsPerFrame = (int)(sampleSize / videoOutputInfo.getFramesPerSecond());
 		this.onePercentOfSampleSize = (int)(sampleSize / 100);
-		this.graphics = g;
 		this.width = videoOutputInfo.getWidth();
 		this.height = videoOutputInfo.getHeight();
 	}
 
 	@Override
-	public void preView(int width, int height, Graphics2D graphics) {
-		String text = "draws color XOR onto the background";
-		graphics.setXORMode(Color.BLACK);
-		TextHelper.writeText(text, graphics, 24f, Color.WHITE, width, height / 2);
-		graphics.setPaintMode();
+	public int getPreRunFrames() {
+		// this number is needed to collect data
+		return samplingFrames;
 	}
+
+	@Override
+	public void postFrame() {
+		int sampleSize = sampelsPerFrame * samplingFrames;
+		if(sampleCount >= sampleSize) {
+			min = Integer.MAX_VALUE;
+			max = 0;
+			sampleCount = 0;
+		}
+	}
+
+	@Override
+	public void drawCurrentIcon(int width, int height, Graphics2D graphics) {
+		int r = fixedRed == -1 ? 255 : fixedRed;
+		int g = fixedGreen == -1 ? 255: fixedGreen;
+		int b = fixedBlue == -1 ? 255: fixedBlue;
+		Color c = new Color(r, g, b);
+		graphics.setColor(c);		
+		graphics.fillRect(0, 0, width, height);
+		TextHelper.writeText("XOR", graphics, 16f, Color.DARK_GRAY, width, height / 2);
+	}
+
 
 }

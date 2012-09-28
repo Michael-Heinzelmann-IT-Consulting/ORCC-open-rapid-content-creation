@@ -21,6 +21,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import java.util.Calendar;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
@@ -52,7 +53,6 @@ public class Text implements SoundCanvas {
 	@LimitedIntProperty(description="tab size limitation, 0 means no replacement", minimum=0)
 	private int tabReplacement = 2;
 	
-	private Graphics2D graphics2d;
 	VideoOutputInfo videoOutputInfo;
 	
 	private double topPos;
@@ -72,7 +72,7 @@ public class Text implements SoundCanvas {
 	 * @see org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas#newFrame(long)
 	 */
 	@Override
-	public void newFrame(long frameCount) {
+	public void newFrame(long frameCount, Graphics2D graphics2d) {
 
 		if(text == null || text.length() == 0) {
 			return;
@@ -94,7 +94,7 @@ public class Text implements SoundCanvas {
 		topPos = topMargin - scrollIncrement * frameCount;
 	}
 	
-	private Dimension getTextDimesion(String[] lines) {
+	private Dimension getTextDimesion(String[] lines, Graphics2D graphics2d) {
 		Font f = graphics2d.getFont().deriveFont((float)fontSize);
 		graphics2d.setFont(f);
 		int maxWidth = 0;
@@ -115,8 +115,8 @@ public class Text implements SoundCanvas {
 	 */
 	@Override
 	public void prepare(AudioInputInfo audioInputInfo,
-			VideoOutputInfo videoOutputInfo, Graphics2D graphics) {
-		this.graphics2d = graphics;
+			VideoOutputInfo videoOutputInfo) {
+
 		this.videoOutputInfo = videoOutputInfo;
 		//topPos = topMargin;
 		
@@ -131,7 +131,7 @@ public class Text implements SoundCanvas {
 			text = text.replaceAll("\t", str);
 		}
 		String[] lines = text.split("\n");
-		Dimension d = getTextDimesion(lines);
+		Dimension d = getTextDimesion(lines, new BufferedImage(1, 1, BufferedImage.TYPE_3BYTE_BGR).createGraphics());
 		maxTextWidth = d.width;
 		System.err.println(d);
 		if(d.height < videoOutputInfo.getHeight()) {
@@ -145,12 +145,23 @@ public class Text implements SoundCanvas {
 	}
 
 	@Override
-	public void preView(int width, int height, Graphics2D graphics) {
-		String text = "draws text onto the background\n" +
-				"long text is autoscrolled";
-		graphics.setXORMode(Color.BLACK);
-		TextHelper.writeText(text, graphics, 24f, Color.WHITE, width, height / 2);
-		graphics.setPaintMode();
+	public int getPreRunFrames() {
+		// we do not hold state and use the frame count provided, hence no pre run needed
+		return 0;
 	}
+
+	@Override
+	public void postFrame() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void drawCurrentIcon(int width, int height, Graphics2D graphics) {
+		graphics.setColor(textColor);
+		TextHelper.writeText(text, graphics, height, textColor, width, height / 10);
+		
+	}
+
 
 }

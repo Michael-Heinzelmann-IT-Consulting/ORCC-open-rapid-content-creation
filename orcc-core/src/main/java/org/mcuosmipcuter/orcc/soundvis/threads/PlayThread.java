@@ -25,6 +25,7 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 
+import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.soundvis.AudioInput;
 import org.mcuosmipcuter.orcc.soundvis.Context;
 import org.mcuosmipcuter.orcc.soundvis.Context.AppState;
@@ -78,7 +79,15 @@ public class PlayThread extends Thread implements PlayPauseStop {
 			sourceDataLine.start();
 			AudioInputStream ais = audioInput.open();
 			
-			long preRun = 12; // TODO frames to pre run
+			long preRun = 0;
+			for(SoundCanvas s : Context.getSoundCanvasList()) {
+				int f = s.getPreRunFrames();
+				IOUtil.log(s + " getPreRunFrames() = " + f);
+				if(f > preRun) {
+					preRun = f;
+				}
+			}
+			
 			final long frameStart = Context.getSongPositionPointer() - preRun > 0 ? Context.getSongPositionPointer() - preRun : 0;
 			
 			if( Context.getSongPositionPointer() > preRun) {	
@@ -108,16 +117,19 @@ public class PlayThread extends Thread implements PlayPauseStop {
 					boolean cont = renderer.nextSample(amplitudes, rawData, frameStart * samplesPerFrame + sampleCount);
 					
 					if(sampleCount % samplesPerFrame == 0){
+						cont = checkState();
 						frameCount++;
-						renderer.newFrame(frameCount);
+						renderer.newFrame(frameCount, cont);
 						if(frameCount > Context.getSongPositionPointer()) {
 							sourceDataLine.write(data, 0, data.length); // blocks for the time of playing
-						
-						data = new byte[samplesPerFrame * chunkSize];
-						dataPos = 0;
+							
+							data = new byte[samplesPerFrame * chunkSize];
+							dataPos = 0;
 						}
-						cont = checkState();
-						
+						//cont = checkState();
+						if(cont) {
+							//renderer.postFrame();
+						}
 					}
 					return cont;
 				}

@@ -39,6 +39,15 @@ public interface SoundCanvasWrapper extends SoundCanvas {
 	 * @param visible
 	 */
 	public void setVisible(boolean visible);
+	
+	public long getFrameFrom();
+	
+	public long getFrameTo();
+	
+	public void setFrameFrom(long frameFrom);
+	
+	public void setFrameTo(long frameTo);
+	
 	/**
 	 * Get the wrapped canvas for direct work e.g. reflection
 	 * @return the canvas that is wrapped

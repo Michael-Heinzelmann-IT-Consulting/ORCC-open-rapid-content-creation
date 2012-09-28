@@ -15,27 +15,32 @@
 *   You should have received a copy of the GNU General Public License
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package org.mcuosmipcuter.orcc.soundvis;
+package org.mcuosmipcuter.orcc.gui.table;
 
-import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
-import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
+import javax.swing.JPanel;
 
-/**
- * Intermediate interface for controller components
- * @author Michael Heinzelmann
- */
-public interface Mixin extends DecodingCallback {
-	/**
-	 * Start the processing with the given parameters
-	 * @param audioInputInfo audio input
-	 * @param videoOutputInfo the output to produce
-	 */
-	public void start(AudioInputInfo audioInputInfo, VideoOutputInfo videoOutputInfo);
-	/**
-	 * Process a new frame
-	 * @param frameCount current the frame number
-	 * @param sendPost whether to send a post immediately
-	 */
-	void newFrame(long frameCount, boolean sendPost);
+import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
+import org.mcuosmipcuter.orcc.soundvis.gui.CanvasPropertyPanel;
+
+public class Row extends JPanel {
+	
+	private static final long serialVersionUID = 1L;
+	
+	private final SoundCanvasWrapper soundCanvasWrapper;
+	private final CanvasPropertyPanel canvasPropertyPanel;
+	
+	public Row(SoundCanvasWrapper soundCanvasWrapper) {
+		this.soundCanvasWrapper = soundCanvasWrapper;
+		this.canvasPropertyPanel = new CanvasPropertyPanel(soundCanvasWrapper);
+	}
+
+	public CanvasPropertyPanel getCanvasPropertyPanel() {
+		return canvasPropertyPanel;
+	}
+
+	public SoundCanvasWrapper getSoundCanvasWrapper() {
+		return soundCanvasWrapper;
+	}
+	
 	
 }

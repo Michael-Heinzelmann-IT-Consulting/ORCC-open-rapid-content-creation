@@ -154,9 +154,10 @@ public class ExportThread extends Thread implements PlayPauseStop {
 
 								if(sampleCount % samplesPerFrame == 0){
 									frameCount++;
-									renderer.newFrame(frameCount);
+									renderer.newFrame(frameCount, true);
 									writer.encodeVideo(0, renderer.getFrameImage(), time, TimeUnit.MILLISECONDS);
 									time += (long)(1000 / framesPerSecond);
+									///renderer.postFrame();
 								}
 								////sampleCount++;
 							}

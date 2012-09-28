@@ -21,6 +21,12 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.swing.JPanel;
 
@@ -30,6 +36,7 @@ import org.mcuosmipcuter.orcc.soundvis.AudioInput;
 import org.mcuosmipcuter.orcc.soundvis.Context;
 import org.mcuosmipcuter.orcc.soundvis.Context.Listener;
 import org.mcuosmipcuter.orcc.soundvis.Context.PropertyName;
+import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
 import org.mcuosmipcuter.orcc.soundvis.threads.SubSampleThread;
 import org.mcuosmipcuter.orcc.soundvis.threads.SubSampleThread.CallBack;
 import org.mcuosmipcuter.orcc.soundvis.threads.SubSampleThread.SuperSample;
@@ -64,6 +71,10 @@ public class TimeLinePanel extends JPanel {
 	private long totalSampleLength;
 	private int videoFrameRate;
 	
+	List<SoundCanvasWrapper> currentCanvasList = new ArrayList<SoundCanvasWrapper>();
+//	private Map<Long, Set<String>> frameMarksFrom = new HashMap<Long, Set<String>>();
+//	private Map<Long, Set<String>> frameMarksTo = new HashMap<Long, Set<String>>();
+//	
 	/**
 	 * Sets a gray background and adds listeners
 	 */
@@ -135,6 +146,52 @@ public class TimeLinePanel extends JPanel {
 //				}
 			}
 		});
+		
+		Context.addListener(new Context.Listener() {
+			@Override
+			public void contextChanged(PropertyName propertyName) {
+				
+				if(Context.PropertyName.FrameMark == propertyName 
+						|| Context.PropertyName.SoundCanvasList == propertyName ||
+						Context.PropertyName.SoundCanvasAdded == propertyName || 
+						Context.PropertyName.SoundCanvasRemoved == propertyName) {
+					currentCanvasList.clear();
+					currentCanvasList.addAll(Context.getSoundCanvasList());
+					repaint();
+//					frameMarksFrom.clear();
+//					frameMarksTo.clear();
+//					List<SoundCanvasWrapper> list = Context.getSoundCanvasList();
+//					for(SoundCanvasWrapper scw : list) {
+//						if(scw.getFrameFrom() != 0) {
+//							String s = scw.getDisplayName();
+//							Set<String> set = frameMarksFrom.get(scw.getFrameFrom());
+//							if(set == null) {
+//								set = new HashSet<String>();
+//								set.add(s);
+//								frameMarksFrom.put(scw.getFrameFrom(), set);
+//							}
+//							else {
+//								set.add(s);
+//							}
+//							
+//						}
+//						if(scw.getFrameTo() != 0) {
+//							String s = scw.getDisplayName();
+//							Set<String> set = frameMarksTo.get(scw.getFrameTo());
+//							if(set == null) {
+//								set = new HashSet<String>();
+//								set.add(s);
+//								frameMarksTo.put(scw.getFrameTo(), set);
+//							}
+//							else {
+//								set.add(s);
+//							}
+//						}
+//					}
+				}
+				
+			}
+		});
 	}
 	
 	// paint a message
@@ -154,9 +211,27 @@ public class TimeLinePanel extends JPanel {
 		}
 		long pos = 0;
 		if(superSampleData != null) {
-			
+						
 			int h = getHeight();
 			int w = getWidth();
+			int y = 0;
+			int b = h ;
+			int count = 0;
+			for(SoundCanvasWrapper scw : currentCanvasList) {
+				final int from = margin + (int)(scw.getFrameFrom() * samplesPerFrame / noOfSamples);
+				final int to = scw.getFrameTo() == 0 ? w - margin : margin+  (int)(scw.getFrameTo() * samplesPerFrame / noOfSamples);
+				Color c = (count % 2 == 0) ? new Color(176, 146, 176, 128) : new Color(146, 176, 146, 128);
+				g.setColor(c);
+				g.fillRoundRect(from, y, to - from, b, 16, 16);
+				
+				//g.setColor(Color.GRAY);
+				//g.drawString(scw.getDisplayName(), from + 4, 16 + y);
+				//g.drawRoundRect(from, y, to - from, b, 24, 24);
+				//g.drawLine(from, count, to, count);
+				//y += 2;
+				count++;
+			}
+			
 			int strLength = g.getFontMetrics().stringWidth("00:00");
 			int gap = strLength;
 			int numMarkersPossible = (w - margin *2 ) / (strLength + gap);
@@ -165,12 +240,25 @@ public class TimeLinePanel extends JPanel {
 			int accumSecTimeDrawn = -1;
 			for(int i = 0; i < w - margin; i ++) {
 				int pixel = i ;
+				Long frame = new Long(pixel * noOfSamples / samplesPerFrame);
+//				Set<String> canvasNamesFrom = frameMarksFrom.get(frame);
+//				Set<String> canvasNamesTo = frameMarksTo.get(frame);
+//				if(canvasNamesFrom != null) {
+//					g.setColor(new Color(146, 146, 176));
+//					g.drawLine(margin + i, 0, margin + i, h);
+//					g.drawString(canvasNamesFrom.toString(), margin + i + 1, 15);
+//				}
+//				if(canvasNamesTo != null) {
+//					g.setColor(new Color(176, 146, 146));
+//					g.drawLine(margin + i, 0, margin + i, h);
+//					g.drawString(canvasNamesTo.toString(), margin + i - 1 - g.getFontMetrics().stringWidth(canvasNamesTo.toString()), h - 15);
+//				}
 				if(margin + i  == selectPos) {
 					g.setColor(Color.YELLOW);
 					g.drawLine(margin + i, 0, margin + i, h);
-					int frame = pixel * noOfSamples / samplesPerFrame;
 					g.drawString(String.valueOf(frame), margin + i + 1, 15);
 				}
+
 				int accumSec = pixel * noOfSamples / sampleRate ;
 				
 				if(accumSec % (timeMod) == 0 && accumSec > accumSecTimeDrawn) {
@@ -192,10 +280,12 @@ public class TimeLinePanel extends JPanel {
 			
 			int x = margin + 1;
 			g.setColor(Color.BLACK);
+			//g.setColor(new Color(0, 0, 0, 128));
 			for(SuperSample s : superSampleData.getList()) {
 				g.drawLine(x, h /2 - s.getMax() / divY, x, h / 2 - s.getMin() / divY);
 				if(samplePosition > pos && samplePosition <= pos + s.getNoOfSamples()) {
 					g.setColor(Color.WHITE);
+					//g.setColor(new Color(255, 255, 255, 128));
 					g.drawLine(x, 0, x , h);
 				}
 				x++;

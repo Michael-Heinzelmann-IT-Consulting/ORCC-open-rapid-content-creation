@@ -139,7 +139,7 @@ public class PlayBackPanel extends JPanel implements Mixin{
 		commands.add(jProgressBar);
 		commands.setPreferredSize(new Dimension(240, 70));
 		
-		timeLine.setPreferredSize(new Dimension(600, 140));
+		timeLine.setPreferredSize(new Dimension(600, 150));
 		setLayout(new BorderLayout());
 		add(commands, BorderLayout.WEST);
 		add(timeLine, BorderLayout.CENTER);
@@ -148,7 +148,7 @@ public class PlayBackPanel extends JPanel implements Mixin{
 
 
 	@Override
-	public void newFrame(long frameCount) {
+	public void newFrame(long frameCount, boolean sendPost) {
 		frameCountlabel.update(frameCount);
 		updateProgress();
 	}
@@ -173,6 +173,7 @@ public class PlayBackPanel extends JPanel implements Mixin{
 		timeLine.setSamplePosition(sampleCount);
 		timeLine.repaint();
 	}
+
 	
 }
 

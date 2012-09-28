@@ -25,7 +25,6 @@ import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.api.util.AmplitudeHelper;
-import org.mcuosmipcuter.orcc.api.util.TextHelper;
 
 
 /**
@@ -49,7 +48,6 @@ public class ClassicWaves implements SoundCanvas {
 	int max;
 	
 	// state
-	private Graphics2D graphics;
 	private int counterInsideFrame;
 	private int prevAmplitude;
 
@@ -61,9 +59,9 @@ public class ClassicWaves implements SoundCanvas {
 		if(factor == 1 || Math.abs(amp) > Math.abs(max)) {
 			max = amp;
 		}
-		graphics.setColor(foreGroundColor);
+		
 		if(samplecount % factor == 0) {
-			graphics.drawLine(counterInsideFrame, height / 2 - max , counterInsideFrame, height / 2 - prevAmplitude);
+			
 			counterInsideFrame++;
 			prevAmplitude = max;
 			max = 0;
@@ -73,13 +71,14 @@ public class ClassicWaves implements SoundCanvas {
 	}
 
 	@Override
-	public void newFrame(long frameCount) {	
+	public void newFrame(long frameCount, Graphics2D graphics) {	
 		counterInsideFrame = leftMargin;
+		graphics.setColor(foreGroundColor);
+		graphics.drawLine(counterInsideFrame, height / 2 - max , counterInsideFrame, height / 2 - prevAmplitude);
 	}
 
 	@Override
-	public void prepare(AudioInputInfo audioInputInfo, VideoOutputInfo videoOutputInfo,  
-			Graphics2D graphics)  {
+	public void prepare(AudioInputInfo audioInputInfo, VideoOutputInfo videoOutputInfo)  {
 		int frameRate = videoOutputInfo.getFramesPerSecond();
 		int sampleRate = (int)audioInputInfo.getAudioFormat().getSampleRate(); // non integer sample rates are rare
 		int pixelLengthOfaFrame = sampleRate / frameRate; // e.g. 44100 / 25 = 1764
@@ -94,16 +93,26 @@ public class ClassicWaves implements SoundCanvas {
 		if(amplitudeDivisor < 1){
 			amplitudeMultiplicator = height / amplitude.getAmplitudeRange();
 		}
-		this.graphics = graphics;
 	}
 
 	@Override
-	public void preView(int width, int height, Graphics2D graphics) {
-		String text = "draws the classic analyzer wave forms";
-		graphics.setXORMode(Color.BLACK);
-		TextHelper.writeText(text, graphics, 24f, Color.WHITE, width, height / 2);
-		graphics.setPaintMode();
+	public int getPreRunFrames() {
+		// exactly 1 frame
+		return 1;
 	}
+
+	@Override
+	public void postFrame() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void drawCurrentIcon(int width, int height, Graphics2D graphics) {
+		// TODO Auto-generated method stub
+		
+	}
+
 
 
 }

@@ -26,7 +26,6 @@ import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.api.util.AmplitudeHelper;
-import org.mcuosmipcuter.orcc.api.util.TextHelper;
 
 /**
  * Displays L and R amplitudes as colors, high values are lighter lower values darker
@@ -49,7 +48,7 @@ public class ColorsLR implements SoundCanvas {
 	
 	private int centerX;
 	private int centerY;
-	Graphics2D graphics2D;
+
 	private int amplitudeDivisor;
 	private AmplitudeHelper amplitude;
 	
@@ -78,7 +77,7 @@ public class ColorsLR implements SoundCanvas {
 	}
 
 	@Override
-	public void newFrame(long frameCount) {
+	public void newFrame(long frameCount, Graphics2D graphics2D) {
 		
 		int rgb = maxL / amplitudeDivisor;
 		int r = fixedRed == -1 ? rgb : fixedRed;
@@ -108,30 +107,46 @@ public class ColorsLR implements SoundCanvas {
 		graphics2D.setColor(new Color(r, g, b, alpha));		
 		graphics2D.fillRect(centerX, centerY, centerX, centerY);
 		
-		maxL = 0;
-		maxR = 0;
-		minL = Integer.MAX_VALUE;
-		minR = Integer.MAX_VALUE;
-
 	}
 
 	@Override
 	public void prepare(AudioInputInfo audioInputInfo,
-			VideoOutputInfo videoOutputInfo, Graphics2D graphics) {
+			VideoOutputInfo videoOutputInfo) {
 		centerX = videoOutputInfo.getWidth() / 2;
 		centerY = videoOutputInfo.getHeight() / 2;
-		this.graphics2D = graphics;
 		
 		amplitude = new AmplitudeHelper(audioInputInfo);
 		amplitudeDivisor = (int)amplitude.getAmplitudeRange() / 256;
 	}
 
 	@Override
-	public void preView(int width, int height, Graphics2D graphics) {
-		String text = "draws ...";
-		graphics.setXORMode(Color.BLACK);
-		TextHelper.writeText(text, graphics, 24f, Color.WHITE, width, height / 2);
-		graphics.setPaintMode();
+	public int getPreRunFrames() {
+		// allow 1 frame for getting data
+		return 1;
 	}
+
+	@Override
+	public void postFrame() {
+		maxL = 0;
+		maxR = 0;
+		minL = Integer.MAX_VALUE;
+		minR = Integer.MAX_VALUE;
+	}
+
+	@Override
+	public void drawCurrentIcon(int width, int height, Graphics2D graphics) {
+		int r = fixedRed == -1 ? 255 : fixedRed;
+		int g = fixedGreen == -1 ? 255: fixedGreen;
+		int b = fixedBlue == -1 ? 255: fixedBlue;
+		Color c = new Color(r, g, b);
+		graphics.setColor(Color.LIGHT_GRAY);		
+		graphics.fillRect(0, 0, width / 2, height / 2);
+		graphics.setColor(c);
+		graphics.fillRect(width / 2, 0, width / 2, height / 2);
+		graphics.fillRect(0, height / 2, width / 2, height / 2);
+		graphics.setColor(Color.DARK_GRAY);
+		graphics.fillRect(width / 2, height / 2, width / 2, height / 2);
+	}
+
 
 }

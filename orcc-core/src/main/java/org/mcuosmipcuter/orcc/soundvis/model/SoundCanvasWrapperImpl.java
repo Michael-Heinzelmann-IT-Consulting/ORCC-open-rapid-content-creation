@@ -18,10 +18,12 @@
 package org.mcuosmipcuter.orcc.soundvis.model;
 
 import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
+import org.mcuosmipcuter.orcc.soundvis.Context;
 import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
 
 /**
@@ -32,33 +34,39 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 	
 	final SoundCanvas soundCanvas;
 	boolean enabled = true;
+	long frameFrom = 0;
+	long frameTo = 0;
+	private Graphics2D devNullGraphics;
 	
 	public SoundCanvasWrapperImpl(SoundCanvas soundCanvas) {
 		this.soundCanvas = soundCanvas;
 	}
 	@Override
 	public void nextSample(int[] amplitudes) {
-		if(enabled) {// TODO this causes wrong state
-			soundCanvas.nextSample(amplitudes);
-		}
+		soundCanvas.nextSample(amplitudes);
 	}
 
 	@Override
-	public void newFrame(long frameCount) {
-		if(enabled) {// TODO refactor to use proxy graphics
-			soundCanvas.newFrame(frameCount);
+	public void newFrame(long frameCount, Graphics2D graphics2d) {
+		if(enabled && frameCount >= frameFrom && (frameCount <= frameTo || frameTo <= 0)) {
+			// draws to the real graphics
+			soundCanvas.newFrame(frameCount, graphics2d);
+		}
+		else {
+			// it's not reasonable to proxy graphics or make a wrapper with 
+			//limited number of methods, use a dummy graphics object 
+			soundCanvas.newFrame(frameCount, devNullGraphics);
 		}
 	}
 
 	@Override
 	public void prepare(AudioInputInfo audioInputInfo,
-			VideoOutputInfo videoOutputInfo, Graphics2D graphics) {
-		soundCanvas.prepare(audioInputInfo, videoOutputInfo, graphics);
-	}
-
-	@Override
-	public void preView(int width, int height, Graphics2D graphics) {
-		soundCanvas.preView(width, height, graphics);
+			VideoOutputInfo videoOutputInfo) {
+		soundCanvas.prepare(audioInputInfo, videoOutputInfo);
+		//BufferedImage bi = new BufferedImage(videoOutputInfo.getWidth(), videoOutputInfo.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
+		// TODO performance test - there seems an impact when drawing on a large image, since this image is for nothing it can be small (?)
+		BufferedImage bi = new BufferedImage(1, 1, BufferedImage.TYPE_3BYTE_BGR);
+		devNullGraphics = bi.createGraphics();
 	}
 
 	@Override
@@ -81,6 +89,36 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 	@Override
 	public String toString() {
 		return getDisplayName();
+	}
+	@Override
+	public int getPreRunFrames() {
+		return soundCanvas.getPreRunFrames();
+	}
+	@Override
+	public void postFrame() {
+		soundCanvas.postFrame();
+	}
+	@Override
+	public void drawCurrentIcon(int width, int height, Graphics2D graphics) {
+		soundCanvas.drawCurrentIcon(width, height, graphics);
+	}
+	@Override
+	public long getFrameFrom() {
+		return frameFrom;
+	}
+	@Override
+	public long getFrameTo() {
+		return frameTo;
+	}
+	@Override
+	public void setFrameFrom(long frameFrom) {
+		this.frameFrom = frameFrom;
+		Context.setFrameMark(frameFrom, this);
+	}
+	@Override
+	public void setFrameTo(long frameTo) {
+		this.frameTo = frameTo;
+		Context.setFrameMark(frameTo, this);
 	}
 
 }

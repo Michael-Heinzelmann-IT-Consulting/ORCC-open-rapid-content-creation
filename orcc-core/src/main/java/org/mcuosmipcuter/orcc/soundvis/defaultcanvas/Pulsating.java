@@ -26,7 +26,6 @@ import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.api.util.AmplitudeHelper;
-import org.mcuosmipcuter.orcc.api.util.TextHelper;
 
 /**
  * @author Michael Heinzelmann
@@ -43,7 +42,7 @@ public class Pulsating implements SoundCanvas {
 	
 	private int centerX;
 	private int centerY;
-	Graphics2D graphics2D;
+
 	private float amplitudeDivisor;
 	private float amplitudeMultiplicator;
 	private AmplitudeHelper amplitude;
@@ -61,7 +60,7 @@ public class Pulsating implements SoundCanvas {
 	}
 
 	@Override
-	public void newFrame(long frameCount) {
+	public void newFrame(long frameCount, Graphics2D graphics2D) {
 		
 		int amp = amplitudeDivisor > 1 ? (int)(max / amplitudeDivisor) : (int)(max * amplitudeMultiplicator);
 		if(reverse) {
@@ -69,17 +68,15 @@ public class Pulsating implements SoundCanvas {
 		}
 		graphics2D.setColor(new Color(foreGround.getRed(), foreGround.getGreen(), foreGround.getBlue(), alpha));		
 		graphics2D.fillOval(centerX - amp / 2, centerY - amp / 2, amp, amp);
-
-		max = 0;
+		
 	}
 
 	@Override
 	public void prepare(AudioInputInfo audioInputInfo,
-			VideoOutputInfo videoOutputInfo, Graphics2D graphics) {
+			VideoOutputInfo videoOutputInfo) {
 		centerX = videoOutputInfo.getWidth() / 2;
 		centerY = videoOutputInfo.getHeight() / 2;
-		this.graphics2D = graphics;
-		
+
 		amplitude = new AmplitudeHelper(audioInputInfo);
 		amplitudeDivisor = (amplitude.getAmplitudeRange() / videoOutputInfo.getHeight());
 		if(amplitudeDivisor < 1){
@@ -88,11 +85,22 @@ public class Pulsating implements SoundCanvas {
 	}
 
 	@Override
-	public void preView(int width, int height, Graphics2D graphics) {
-		String text = "draws a pulsating ball onto the background";
-		graphics.setXORMode(Color.BLACK);
-		TextHelper.writeText(text, graphics, 24f, Color.WHITE, width, height / 2);
-		graphics.setPaintMode();
+	public int getPreRunFrames() {
+		// we need 1 frame for sampling data
+		return 1;
 	}
+
+	@Override
+	public void postFrame() {
+		max = 0;
+	}
+
+	@Override
+	public void drawCurrentIcon(int width, int height, Graphics2D graphics) {
+		graphics.setColor(new Color(foreGround.getRed(), foreGround.getGreen(), foreGround.getBlue(), alpha));	
+		int amp = Math.min(width, height);
+		graphics.fillOval(width / 2 - amp / 2,  height / 2 - amp / 2, amp, amp);
+	}
+
 
 }

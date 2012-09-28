@@ -54,25 +54,22 @@ public interface SoundCanvas {
 	/**
 	 * Video callback: we about to display the new frame, last chance for the canvas to 
 	 * change the graphics 
-	 * @param frameCount
+	 * @param frameCount the current frame number
+	 * @param graphics graphics to draw on, avoid storing the reference in your instance
 	 */
-	public void newFrame(long frameCount);
+	public void newFrame(long frameCount, Graphics2D graphics);
 	/**
 	 * Prepare method called before any audio and video callback methods are called.
 	 * 
 	 * @param audioInputInfo info about the given audio input
 	 * @param videoOutputInfo info about the configured video output
-	 * @param graphics graphics to draw on, in most cases you want to store the reference in your instance
 	 */
-	public void prepare(AudioInputInfo audioInputInfo, VideoOutputInfo videoOutputInfo, Graphics2D graphics);
+	public void prepare(AudioInputInfo audioInputInfo, VideoOutputInfo videoOutputInfo);
 
-	/**
-	 * Display a preview of this canvas, ideally screen shot like, or at least show
-	 * a textual description what the canvas does
-	 * @param width the width of the preview area
-	 * @param height the height of the preview area
-	 * @param graphics the graphics of the preview area
-	 */
-	public void preView(int width, int height, Graphics2D graphics);
+	public int getPreRunFrames();
+	
+	public void postFrame();
+	
+	public void drawCurrentIcon(int width, int height, Graphics2D graphics);
 }
 

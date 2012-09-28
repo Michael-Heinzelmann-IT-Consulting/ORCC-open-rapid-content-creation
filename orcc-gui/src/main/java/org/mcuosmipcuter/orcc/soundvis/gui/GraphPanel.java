@@ -24,6 +24,7 @@ import java.awt.MultipleGradientPaint.CycleMethod;
 import java.awt.Point;
 import java.awt.RadialGradientPaint;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JPanel;
@@ -32,10 +33,14 @@ import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.soundvis.Context;
+import org.mcuosmipcuter.orcc.soundvis.Context.AppState;
+import org.mcuosmipcuter.orcc.soundvis.Context.Listener;
+import org.mcuosmipcuter.orcc.soundvis.Context.PropertyName;
 import org.mcuosmipcuter.orcc.soundvis.Mixin;
 import org.mcuosmipcuter.orcc.soundvis.Renderer;
 import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
 import org.mcuosmipcuter.orcc.soundvis.Zoomable;
+import org.mcuosmipcuter.orcc.util.IOUtil;
 
 
 /**
@@ -45,6 +50,29 @@ import org.mcuosmipcuter.orcc.soundvis.Zoomable;
  * @author Michael Heinzelmann
  */
 public class GraphPanel extends JPanel implements Renderer, Zoomable {
+	
+	public class RepaintThread extends Thread {
+		private boolean running = true;
+		@Override
+		public void run() {
+			while(running) {
+				try {
+					List<SoundCanvasWrapper> currentList = new ArrayList<SoundCanvasWrapper>();
+					currentList.addAll(Context.getSoundCanvasList());
+					for(SoundCanvas soundCanvas : currentList) {
+						soundCanvas.newFrame(frameCount, graphics);
+					}
+					repaint();
+					Thread.sleep(80);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			IOUtil.log("done refresh.");
+		}
+	
+	}
 
 	private static final long serialVersionUID = 1L;
 	private Mixin mixin;
@@ -65,6 +93,26 @@ public class GraphPanel extends JPanel implements Renderer, Zoomable {
 		
 		setBackground(Color.LIGHT_GRAY);
 		drawDefaultBackGround();
+		
+		Context.addListener(new Listener() {
+			RepaintThread repaintThread;
+			@Override
+			public void contextChanged(PropertyName propertyName) {
+				if(PropertyName.AppState.equals(propertyName)) {
+					AppState appState = Context.getAppState();
+					if(appState == AppState.READY || appState == AppState.PAUSED) {
+						repaintThread = new RepaintThread();
+						repaintThread.start();
+					}
+					else {
+						if(repaintThread != null) {
+							repaintThread.running = false;
+						}
+					}
+				}
+				
+			}
+		});
 	}
 	
 	// our 'logo'
@@ -96,7 +144,7 @@ public class GraphPanel extends JPanel implements Renderer, Zoomable {
 		graphics = frameImage.createGraphics();
 		soundCanvasList = Context.getSoundCanvasList();
 		for(SoundCanvas soundCanvas : soundCanvasList) {
-			soundCanvas.prepare(audioInputInfo, videoOutputInfo, graphics);
+			soundCanvas.prepare(audioInputInfo, videoOutputInfo);
 		}
 		mixin.start(audioInputInfo, videoOutputInfo);
 	}
@@ -128,16 +176,19 @@ public class GraphPanel extends JPanel implements Renderer, Zoomable {
 	}
 
 	@Override
-	public void newFrame(long frameCount) {
+	public void newFrame(long frameCount, boolean sendPost) {
 		for(SoundCanvas soundCanvas : soundCanvasList) {
-			soundCanvas.newFrame(frameCount);
+			soundCanvas.newFrame(frameCount, graphics);
+			if(sendPost) {
+				soundCanvas.postFrame();
+			}
 		}
 		if(frameCount > Context.getSongPositionPointer()) {
 			this.repaint();
 		}
 		
 		if(mixin != null) {
-			mixin.newFrame(frameCount);
+			mixin.newFrame(frameCount, sendPost);
 		}
 		
 		this.frameCount = frameCount;

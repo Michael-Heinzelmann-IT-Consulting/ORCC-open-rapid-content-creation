@@ -28,7 +28,6 @@ import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.api.util.AmplitudeHelper;
-import org.mcuosmipcuter.orcc.api.util.TextHelper;
 
 /**
  * @author Michael Heinzelmann
@@ -51,7 +50,7 @@ public class RotatingAmplitudes implements SoundCanvas {
 	
 	private int centerX;
 	private int centerY;
-	Graphics2D graphics2D;
+
 	private float amplitudeDivisor;
 	private float amplitudeMultiplicator;
 	private AmplitudeHelper amplitude;	
@@ -78,8 +77,8 @@ public class RotatingAmplitudes implements SoundCanvas {
 		int modul =  samplesPerFrame / degreesPerFrame;
 		
 		if(sampleCount % modul == 0) {
-			int x = centerX + shiftX + (int)(max/2 * Math.cos(degrees * (Math.PI / 180)));
-			int y = centerY + shiftY + (int)(max/2 * Math.sin(degrees * (Math.PI / 180)));
+			int x = centerX  + (int)(max/2 * Math.cos(degrees * (Math.PI / 180)));
+			int y = centerY + (int)(max/2 * Math.sin(degrees * (Math.PI / 180)));
 			
 			if(deque.size() == size) {
 				deque.removeFirst();
@@ -107,14 +106,14 @@ public class RotatingAmplitudes implements SoundCanvas {
 	 * @see org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas#newFrame(long)
 	 */
 	@Override
-	public void newFrame(long frameCount) {
+	public void newFrame(long frameCount, Graphics2D graphics2D) {
 		
 		if(xor) {
 			graphics2D.setXORMode(new Color(255 - foreGround.getRed(), 255 - foreGround.getGreen(), 255 - foreGround.getBlue()) );
 		}
 		graphics2D.setColor(foreGround);
 		for(Point p : deque) {
-			graphics2D.drawLine(centerX + shiftX, centerY + shiftY, p.x, p.y);
+			graphics2D.drawLine(centerX + shiftX, centerY + shiftY, p.x + shiftX, p.y + shiftY);
 		}
 		if(xor) {
 			graphics2D.setPaintMode();
@@ -127,14 +126,13 @@ public class RotatingAmplitudes implements SoundCanvas {
 	 */
 	@Override
 	public void prepare(AudioInputInfo audioInputInfo,
-			VideoOutputInfo videoOutputInfo, Graphics2D graphics) {
+			VideoOutputInfo videoOutputInfo) {
 		int frameRate = videoOutputInfo.getFramesPerSecond();
 		int sampleRate = (int)audioInputInfo.getAudioFormat().getSampleRate(); // non integer sample rates are rare
 		samplesPerFrame = sampleRate / frameRate; // e.g. 44100 / 25 = 1764
 		centerX = videoOutputInfo.getWidth() / 2;
 		centerY = videoOutputInfo.getHeight() / 2;
-		this.graphics2D = graphics;
-		
+
 		amplitude = new AmplitudeHelper(audioInputInfo);
 		amplitudeDivisor = (amplitude.getAmplitudeRange() / videoOutputInfo.getHeight());
 		if(amplitudeDivisor < 1){
@@ -144,16 +142,21 @@ public class RotatingAmplitudes implements SoundCanvas {
 		deque.clear();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas#preView(int, int, java.awt.Graphics2D)
-	 */
 	@Override
-	public void preView(int width, int height, Graphics2D graphics) {
-		String text = "draws amplitudes in a circle";
-		graphics.setXORMode(Color.BLACK);
-		TextHelper.writeText(text, graphics, 24f, Color.WHITE, width, height / 2);
-		graphics.setPaintMode();
+	public int getPreRunFrames() {
+		// depends on the amount of history we are keeping, a big size and a slow degree speed need a big pre-run
+		return size / degreesPerFrame;
+	}
 
+	@Override
+	public void postFrame() {
+		
+	}
+
+	@Override
+	public void drawCurrentIcon(int width, int height, Graphics2D graphics) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

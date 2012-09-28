@@ -59,15 +59,13 @@ public class Image implements SoundCanvas {
 	private int scaled;
 	VideoOutputInfo videoOutputInfo;
 
-	Graphics2D graphics2D;
-
 	@Override
 	public void nextSample(int[] amplitudes) {
 		
 	}
 
 	@Override
-	public void newFrame(long frameCount) {
+	public void newFrame(long frameCount, Graphics2D graphics2D) {
 		if(image != null) {	
 			final int width = scaledWidth == 0 ? videoOutputInfo.getWidth() : scaledWidth;
 			final int height = scaledHeight == 0 ? videoOutputInfo.getHeight() : scaledHeight;
@@ -95,14 +93,27 @@ public class Image implements SoundCanvas {
 
 	@Override
 	public void prepare(AudioInputInfo audioInputInfo,
-			VideoOutputInfo videoOutputInfo, Graphics2D graphics) {
+			VideoOutputInfo videoOutputInfo) {
 		this.videoOutputInfo = videoOutputInfo;
-		this.graphics2D = graphics;
 	}
 
 	@Override
-	public void preView(int width, int height, Graphics2D graphics) {
-
+	public int getPreRunFrames() {
+		// no pre-run needed this canvas just displays an image
+		return 0;
 	}
+
+	@Override
+	public void postFrame() {
+		// nothing to reset
+	}
+
+	@Override
+	public void drawCurrentIcon(int width, int height, Graphics2D graphics) {
+		if(image != null) {
+			graphics.drawImage(image.getScaledInstance(width, height, java.awt.Image.SCALE_SMOOTH), 0, 0, null, null);
+		}
+	}
+
 
 }

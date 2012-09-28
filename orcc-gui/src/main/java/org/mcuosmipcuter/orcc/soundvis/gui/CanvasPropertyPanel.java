@@ -72,7 +72,7 @@ public class CanvasPropertyPanel extends JPanel {
 		});
 		
 		commandPanel.add(showCheckBox);
-		commandPanel.add(closeButton);
+		//commandPanel.add(closeButton);
 		JPanel headerPanel = new JPanel();
 		headerPanel.setLayout(new BorderLayout());
 		headerPanel.add(commandPanel, BorderLayout.EAST);

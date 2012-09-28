@@ -40,18 +40,20 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
-import javax.swing.JTable;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.TableColumnModelEvent;
 import javax.swing.event.TableColumnModelListener;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumn;
 
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
+import org.mcuosmipcuter.orcc.gui.table.CustomTable;
 import org.mcuosmipcuter.orcc.soundvis.Context;
 import org.mcuosmipcuter.orcc.soundvis.Context.AppState;
 import org.mcuosmipcuter.orcc.soundvis.Context.Listener;
@@ -225,13 +227,14 @@ public class Main {
 		deskTop.setVisible(true);
 		
 		appendTab(deskTop, "soundvis");
-		frame.getContentPane().add(tabbedPane);
+		//frame.getContentPane().add(tabbedPane);
+		frame.getContentPane().add(deskTop);
 		frame.setExtendedState(Frame.MAXIMIZED_BOTH);
 		frame.setVisible(true);
 		
 		IOUtil.log("frame size: " + frame.getSize());
 		{
-			JInternalFrame playBackFrame = new JInternalFrame("File Info", true, false, true, true);
+			JInternalFrame playBackFrame = new JInternalFrame("Timeline", true, false, true, true);
 			deskTop.add(playBackFrame);
 			{
 				PlayBackPanel playBackPanel = new PlayBackPanel(graphicPanel);
@@ -239,7 +242,7 @@ public class Main {
 				graphicPanel.setMixin(playBackPanel);
 			}
 			
-			playBackFrame.setSize(frame.getSize().width - 20, playBackH);
+			playBackFrame.setSize(deskTop.getWidth(), playBackH);
 			playBackFrame.setVisible(true);
 		}
 		{
@@ -257,71 +260,80 @@ public class Main {
 
 		{
 			final JInternalFrame propertiesFrame = new JInternalFrame("Layers", true, false, false, true);
-			final JTable propTable = new JTable();
-			PropertyTableCellRendererEditor ptcr = new PropertyTableCellRendererEditor();
-			propTable.setDefaultRenderer(Object.class, ptcr);
-			propTable.setRowHeight(280);
+			final CustomTable propTable = new CustomTable();
+			//final JTable propTable = new JTable();
+//			PropertyTableCellRendererEditor ptcr = new PropertyTableCellRendererEditor();
+//			propTable.setDefaultRenderer(Object.class, ptcr);
+//			propTable.setRowHeight(280);
 			//propTable.setRowMargin(4);
 		
-			propTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+			//propTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 			
-			propTable.setDefaultEditor(Object.class, ptcr);
+//			propTable.setDefaultEditor(Object.class, ptcr);
+//			
+//			propTable.getTableHeader().setDefaultRenderer(new PropertyTableHeaderRenderer());
+//			propTable.getColumnModel().addColumnModelListener(new TableColumnModelListener() {
+//				@Override
+//				public void columnSelectionChanged(ListSelectionEvent arg0) {
+//				}			
+//				@Override
+//				public void columnRemoved(TableColumnModelEvent arg0) {
+//				}
+//				@Override
+//				public void columnMoved(TableColumnModelEvent arg0) {
+//					List<SoundCanvasWrapper> currentList = new ArrayList<SoundCanvasWrapper>();
+//					for(int i = 0; i < propTable.getModel().getColumnCount(); i++) {
+//						SoundCanvasWrapper s = (SoundCanvasWrapper)propTable.getValueAt(0, i);
+//						if(s != null) {
+//							currentList.add(s);
+//						}
+//					}
+//					Context.reorderCanvasList(currentList);
+//				}
+//				@Override
+//				public void columnMarginChanged(ChangeEvent arg0) {
+//				}
+//				@Override
+//				public void columnAdded(TableColumnModelEvent arg0) {
+//				}
+//			});
+//			JScrollPane scrollPane = new JScrollPane(propTable);
+//			propertiesFrame.add(scrollPane);
 			
-			propTable.getTableHeader().setDefaultRenderer(new PropertyTableHeaderRenderer());
-			propTable.getColumnModel().addColumnModelListener(new TableColumnModelListener() {
-				@Override
-				public void columnSelectionChanged(ListSelectionEvent arg0) {
-				}			
-				@Override
-				public void columnRemoved(TableColumnModelEvent arg0) {
-				}
-				@Override
-				public void columnMoved(TableColumnModelEvent arg0) {
-					List<SoundCanvasWrapper> currentList = new ArrayList<SoundCanvasWrapper>();
-					for(int i = 0; i < propTable.getModel().getColumnCount(); i++) {
-						SoundCanvasWrapper s = (SoundCanvasWrapper)propTable.getValueAt(0, i);
-						if(s != null) {
-							currentList.add(s);
-						}
-					}
-					Context.reorderCanvasList(currentList);
-				}
-				@Override
-				public void columnMarginChanged(ChangeEvent arg0) {
-				}
-				@Override
-				public void columnAdded(TableColumnModelEvent arg0) {
-				}
-			});
-			JScrollPane scrollPane = new JScrollPane(propTable);
+	        JPanel container = new JPanel();
+	        container.setOpaque(true); //content panes must be opaque
+	        container.setLayout(new BorderLayout());
+	        container.add(propTable, BorderLayout.NORTH);     
+	       // container.add(add, BorderLayout.SOUTH);
+			///propertiesFrame.add(container);
+	        JScrollPane scrollPane = new JScrollPane(container);
+	        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+	        
 			propertiesFrame.add(scrollPane);
 			{
 				Context.addListener(new Listener() {	
 					@Override
 					public void contextChanged(PropertyName propertyName) {
-						if(PropertyName.SoundCanvasAdded.equals(propertyName) || PropertyName.SoundCanvasRemoved.equals(propertyName)) {
-							int size = Context.getSoundCanvasList().size() > minCells ? Context.getSoundCanvasList().size() : minCells;
-							Object[] canvasData = new SoundCanvas[size];
-							Object[] canvasHeader = new Object[size];
-							Iterator<SoundCanvasWrapper> iter = Context.getSoundCanvasList().iterator();
-							for(int i = 0; i < canvasData.length; i++ ){
-								SoundCanvasWrapper val = iter.hasNext() ? iter.next() : null;
-								canvasData[i] = val;
-								canvasHeader[i] = val != null ? val : "";
-							}
-							Object[][] tableData = new Object[][] {canvasData};
-							propTable.setModel(new DefaultTableModel(tableData, canvasHeader));
+						if(PropertyName.SoundCanvasAdded.equals(propertyName)) {
+							List<SoundCanvasWrapper> list = Context.getSoundCanvasList();
+							
+							propTable.addLayer(list.get(list.size() - 1));
 						}
+//						if(PropertyName.SoundCanvasAdded.equals(propertyName) || PropertyName.SoundCanvasRemoved.equals(propertyName)) {
+//							int size = Context.getSoundCanvasList().size() > minCells ? Context.getSoundCanvasList().size() : minCells;
+//							Object[] canvasData = new SoundCanvas[size];
+//							Object[] canvasHeader = new Object[size];
+//							Iterator<SoundCanvasWrapper> iter = Context.getSoundCanvasList().iterator();
+//							for(int i = 0; i < canvasData.length; i++ ){
+//								SoundCanvasWrapper val = iter.hasNext() ? iter.next() : null;
+//								canvasData[i] = val;
+//								canvasHeader[i] = val != null ? val : "";
+//							}
+//							Object[][] tableData = new Object[][] {canvasData};
+//							propTable.setModel(new DefaultTableModel(tableData, canvasHeader));
+//						}
 						if(PropertyName.AppState.equals(propertyName)) {
-							propTable.getTableHeader().setReorderingAllowed(Context.getAppState() == AppState.READY || Context.getAppState() == AppState.PAUSED);
-							propTable.repaint();
-							propTable.getTableHeader().repaint();
-						}
-						int colCount = propTable.getColumnCount();
-						for(int i = 0; i < colCount; i++) {
-							TableColumn col = propTable.getColumnModel().getColumn(i);
-							col.setMinWidth(180);
-							col.setMaxWidth(240);
+							propTable.setEnabled(Context.getAppState() == AppState.READY || Context.getAppState() == AppState.PAUSED);
 						}
 					}
 				});
@@ -329,7 +341,7 @@ public class Main {
 			}
 			propertiesFrame.setLocation(0, playBackH + infoH);
 			propertiesFrame.setVisible(true);
-			propertiesFrame.setSize(infoW, 570 - infoH);
+			propertiesFrame.setSize(infoW, deskTop.getHeight() - playBackH - infoH);
 			deskTop.add(propertiesFrame);
 		}	
 
@@ -339,9 +351,11 @@ public class Main {
 			{
 				graphicFrame.getContentPane().add(graphicPanel);
 			}
-			graphicPanel.setPreferredSize(new Dimension(960, 540));
-			graphicFrame.pack();
-			graphicFrame.setLocation(frame.getWidth() - graphicFrame.getWidth() - 20, playBackH);
+//			graphicPanel.setPreferredSize(new Dimension(960, 540));
+//			graphicFrame.pack();
+//			graphicFrame.setLocation(frame.getWidth() - graphicFrame.getWidth() - 20, playBackH);
+			graphicFrame.setSize(deskTop.getWidth() - infoW, deskTop.getHeight() - playBackH);
+			graphicFrame.setLocation(infoW, playBackH);
 			//graphicFrame.setSize(970, 580);
 			graphicFrame.setVisible(true);
 			
