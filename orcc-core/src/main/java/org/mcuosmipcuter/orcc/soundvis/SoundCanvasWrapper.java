@@ -53,4 +53,8 @@ public interface SoundCanvasWrapper extends SoundCanvas {
 	 * @return the canvas that is wrapped
 	 */
 	public SoundCanvas getSoundCanvas();
+	
+	public boolean isSelected();
+	
+	public void setSelected(boolean selected);
 }

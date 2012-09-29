@@ -19,19 +19,17 @@ package org.mcuosmipcuter.orcc.soundvis.gui;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import javax.swing.JPanel;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
+import org.mcuosmipcuter.orcc.gui.table.CustomTableListener;
 import org.mcuosmipcuter.orcc.soundvis.AudioInput;
 import org.mcuosmipcuter.orcc.soundvis.Context;
 import org.mcuosmipcuter.orcc.soundvis.Context.Listener;
@@ -46,12 +44,13 @@ import org.mcuosmipcuter.orcc.soundvis.threads.SubSampleThread.SuperSampleData;
  * Panel that displays the timeline and the waveform and sets the song position pointer.
  * @author Michael Heinzelmann
  */
-public class TimeLinePanel extends JPanel {
+public class TimeLinePanel extends JPanel implements CustomTableListener {
 
 	private static final long serialVersionUID = 1L;
 
 	// fixed layout
 	private final int margin = 20;
+	private final int marginY = 24;
 	private final int displaySecondsStep = 5;
 	
 	// state
@@ -151,43 +150,12 @@ public class TimeLinePanel extends JPanel {
 			@Override
 			public void contextChanged(PropertyName propertyName) {
 				
-				if(Context.PropertyName.FrameMark == propertyName 
-						|| Context.PropertyName.SoundCanvasList == propertyName ||
-						Context.PropertyName.SoundCanvasAdded == propertyName || 
-						Context.PropertyName.SoundCanvasRemoved == propertyName) {
+				if( Context.PropertyName.SoundCanvasList == propertyName ||
+					Context.PropertyName.SoundCanvasAdded == propertyName || 
+					Context.PropertyName.SoundCanvasRemoved == propertyName) {
 					currentCanvasList.clear();
 					currentCanvasList.addAll(Context.getSoundCanvasList());
 					repaint();
-//					frameMarksFrom.clear();
-//					frameMarksTo.clear();
-//					List<SoundCanvasWrapper> list = Context.getSoundCanvasList();
-//					for(SoundCanvasWrapper scw : list) {
-//						if(scw.getFrameFrom() != 0) {
-//							String s = scw.getDisplayName();
-//							Set<String> set = frameMarksFrom.get(scw.getFrameFrom());
-//							if(set == null) {
-//								set = new HashSet<String>();
-//								set.add(s);
-//								frameMarksFrom.put(scw.getFrameFrom(), set);
-//							}
-//							else {
-//								set.add(s);
-//							}
-//							
-//						}
-//						if(scw.getFrameTo() != 0) {
-//							String s = scw.getDisplayName();
-//							Set<String> set = frameMarksTo.get(scw.getFrameTo());
-//							if(set == null) {
-//								set = new HashSet<String>();
-//								set.add(s);
-//								frameMarksTo.put(scw.getFrameTo(), set);
-//							}
-//							else {
-//								set.add(s);
-//							}
-//						}
-//					}
 				}
 				
 			}
@@ -214,22 +182,74 @@ public class TimeLinePanel extends JPanel {
 						
 			int h = getHeight();
 			int w = getWidth();
+			
+			int divY = (Math.max(Math.abs(superSampleData.getOverallMin()), Math.abs(superSampleData.getOverallMax())) * 2 / (h - marginY * 2)) + 1;
+			int x = margin + 1;
+			g.setColor(Color.BLACK);
+			//g.setColor(new Color(0, 0, 0, 128));
+			for(SuperSample s : superSampleData.getList()) {
+				g.drawLine(x, h /2 - s.getMax() / divY, x, h / 2 - s.getMin() / divY);
+				if(samplePosition > pos && samplePosition <= pos + s.getNoOfSamples()) {
+					g.setColor(Color.WHITE);
+					//g.setColor(new Color(255, 255, 255, 128));
+					g.drawLine(x, 0, x , h);
+				}
+				x++;
+				pos += s.getNoOfSamples();
+			}
+			
+			
 			int y = 0;
 			int b = h ;
 			int count = 0;
+			long [][] layers = new long[currentCanvasList.size()][3];
+			Rectangle selectedCanvas = null;
+			
 			for(SoundCanvasWrapper scw : currentCanvasList) {
-				final int from = margin + (int)(scw.getFrameFrom() * samplesPerFrame / noOfSamples);
-				final int to = scw.getFrameTo() == 0 ? w - margin : margin+  (int)(scw.getFrameTo() * samplesPerFrame / noOfSamples);
-				Color c = (count % 2 == 0) ? new Color(176, 146, 176, 128) : new Color(146, 176, 146, 128);
-				g.setColor(c);
-				g.fillRoundRect(from, y, to - from, b, 16, 16);
+				final long longFrom = scw.getFrameFrom();
+				final long longTo = scw.getFrameTo();
+				final int from = margin + (int)(longFrom * samplesPerFrame / noOfSamples);
+				final int to = longTo == 0 ? w - margin : margin+  (int)(longTo * samplesPerFrame / noOfSamples);
+				Color c = (count % 2 == 0) ? new Color(146, 166, 176, 44) : new Color(146, 176, 146, 44);
 				
-				//g.setColor(Color.GRAY);
-				//g.drawString(scw.getDisplayName(), from + 4, 16 + y);
-				//g.drawRoundRect(from, y, to - from, b, 24, 24);
-				//g.drawLine(from, count, to, count);
-				//y += 2;
+				g.setColor(c);
+				int delta = 0;
+
+				int free = count;
+				for(int i = count - 1; i >= 0; i--) {
+					if((longFrom >= layers[i][1] && layers[i][1] !=0) || (longTo != 0 && longTo <= layers[i][0])) {
+						free = i;
+					}
+					else {		
+						free = (int)layers[i][2] + 1;
+						break;
+					}
+
+				}
+				delta = free * 6;// TODO
+				g.fillRoundRect(from, y + delta, to - from, b, 16, 16);
+				layers[count][0] = longFrom;
+				layers[count][1] = longTo;
+				layers[count][2] = free;
+				g.setColor(Color.GRAY);
+				g.drawRoundRect(from, y + delta, to - from, b, 16, 16);
+				if(scw.isSelected()) {
+					selectedCanvas = new Rectangle(from, y + delta, to - from, b);
+				}
+				
+//				int len = g.getFontMetrics().stringWidth(scw.getDisplayName());
+//				int textStart = 4;
+//				if(len < (to - from)) {
+//					textStart = ((to - from) - len) / 2;
+//				}
+//				g.setColor(new Color(200, 200, 200, 128));
+				//g.drawString(scw.getDisplayName(), from + textStart, y + (free * 12) + 16);
 				count++;
+			}
+			if(selectedCanvas != null) {
+				Color c = new Color(255, 255, 255, 200);
+				g.setColor(c);
+				g.fillRoundRect(selectedCanvas.x, selectedCanvas.y, selectedCanvas.width, selectedCanvas.height, 16, 16);
 			}
 			
 			int strLength = g.getFontMetrics().stringWidth("00:00");
@@ -241,22 +261,11 @@ public class TimeLinePanel extends JPanel {
 			for(int i = 0; i < w - margin; i ++) {
 				int pixel = i ;
 				Long frame = new Long(pixel * noOfSamples / samplesPerFrame);
-//				Set<String> canvasNamesFrom = frameMarksFrom.get(frame);
-//				Set<String> canvasNamesTo = frameMarksTo.get(frame);
-//				if(canvasNamesFrom != null) {
-//					g.setColor(new Color(146, 146, 176));
-//					g.drawLine(margin + i, 0, margin + i, h);
-//					g.drawString(canvasNamesFrom.toString(), margin + i + 1, 15);
-//				}
-//				if(canvasNamesTo != null) {
-//					g.setColor(new Color(176, 146, 146));
-//					g.drawLine(margin + i, 0, margin + i, h);
-//					g.drawString(canvasNamesTo.toString(), margin + i - 1 - g.getFontMetrics().stringWidth(canvasNamesTo.toString()), h - 15);
-//				}
+
 				if(margin + i  == selectPos) {
 					g.setColor(Color.YELLOW);
 					g.drawLine(margin + i, 0, margin + i, h);
-					g.drawString(String.valueOf(frame), margin + i + 1, 15);
+					g.drawString(String.valueOf(frame), margin + i + 1, h/2);
 				}
 
 				int accumSec = pixel * noOfSamples / sampleRate ;
@@ -276,21 +285,21 @@ public class TimeLinePanel extends JPanel {
 				}
 			}
 			
-			int divY = (Math.max(Math.abs(superSampleData.getOverallMin()), Math.abs(superSampleData.getOverallMax())) * 2 / (h - margin * 2)) + 1;
+//			int divY = (Math.max(Math.abs(superSampleData.getOverallMin()), Math.abs(superSampleData.getOverallMax())) * 2 / (h - margin * 2)) + 1;
 			
-			int x = margin + 1;
-			g.setColor(Color.BLACK);
-			//g.setColor(new Color(0, 0, 0, 128));
-			for(SuperSample s : superSampleData.getList()) {
-				g.drawLine(x, h /2 - s.getMax() / divY, x, h / 2 - s.getMin() / divY);
-				if(samplePosition > pos && samplePosition <= pos + s.getNoOfSamples()) {
-					g.setColor(Color.WHITE);
-					//g.setColor(new Color(255, 255, 255, 128));
-					g.drawLine(x, 0, x , h);
-				}
-				x++;
-				pos += s.getNoOfSamples();
-			}
+//			int x = margin + 1;
+//			g.setColor(Color.BLACK);
+//			//g.setColor(new Color(0, 0, 0, 128));
+//			for(SuperSample s : superSampleData.getList()) {
+//				g.drawLine(x, h /2 - s.getMax() / divY, x, h / 2 - s.getMin() / divY);
+//				if(samplePosition > pos && samplePosition <= pos + s.getNoOfSamples()) {
+//					g.setColor(Color.WHITE);
+//					//g.setColor(new Color(255, 255, 255, 128));
+//					g.drawLine(x, 0, x , h);
+//				}
+//				x++;
+//				pos += s.getNoOfSamples();
+//			}
 		}
 	}
 	
@@ -308,6 +317,16 @@ public class TimeLinePanel extends JPanel {
 	 */
 	public void setSamplePosition(long samplePosition) {
 		this.samplePosition = samplePosition;
+	}
+
+	@Override
+	public void frameSet() {
+		repaint();
+	}
+
+	@Override
+	public void rowSelected(boolean selected) {
+		repaint();
 	}
 	
 	

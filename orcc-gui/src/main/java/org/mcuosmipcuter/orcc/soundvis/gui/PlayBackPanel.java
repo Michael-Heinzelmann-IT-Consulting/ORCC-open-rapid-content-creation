@@ -174,6 +174,11 @@ public class PlayBackPanel extends JPanel implements Mixin{
 		timeLine.repaint();
 	}
 
+
+	public synchronized TimeLinePanel getTimeLine() {
+		return timeLine;
+	}
+
 	
 }
 

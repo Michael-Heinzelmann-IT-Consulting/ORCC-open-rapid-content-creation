@@ -108,12 +108,11 @@ public class PlayThread extends Thread implements PlayPauseStop {
 				@Override
 				public boolean nextSample(int[] amplitudes, byte[] rawData, long sampleCount) {
 
-					if(frameCount >= Context.getSongPositionPointer()) {
-						for(byte b : rawData) {
-							data[dataPos] = b;
-							dataPos++;
-						}
+					for(byte b : rawData) {
+						data[dataPos] = b;
+						dataPos++;
 					}
+					
 					boolean cont = renderer.nextSample(amplitudes, rawData, frameStart * samplesPerFrame + sampleCount);
 					
 					if(sampleCount % samplesPerFrame == 0){
@@ -122,14 +121,9 @@ public class PlayThread extends Thread implements PlayPauseStop {
 						renderer.newFrame(frameCount, cont);
 						if(frameCount > Context.getSongPositionPointer()) {
 							sourceDataLine.write(data, 0, data.length); // blocks for the time of playing
-							
-							data = new byte[samplesPerFrame * chunkSize];
-							dataPos = 0;
-						}
-						//cont = checkState();
-						if(cont) {
-							//renderer.postFrame();
-						}
+						}	
+						data = new byte[samplesPerFrame * chunkSize];
+						dataPos = 0;	
 					}
 					return cont;
 				}

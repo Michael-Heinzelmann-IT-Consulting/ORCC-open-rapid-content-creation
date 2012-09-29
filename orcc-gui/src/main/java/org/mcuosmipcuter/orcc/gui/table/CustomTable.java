@@ -24,12 +24,10 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
-import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,21 +54,23 @@ public class CustomTable extends JPanel{
 
 	private static final long serialVersionUID = 1L;
 	
+	private List<CustomTableListener> tableListeners = new ArrayList<CustomTableListener>();
+	
 	public class Mover extends MouseAdapter {
 		
 		private final JComponent container;
-		private final  JComponent owner;
+		private final  Row owner;
 		private final Cursor moveCursor;
 		 
-		private  Component source;
-		private  Component target;
+		private  Row source;
+		private  Row target;
 		private Cursor cursor;
 		private final Color originalBackground;
 		
 		private Color selectColor = Color.GRAY;
-
 		
-		public Mover(JComponent container, JComponent owner, Cursor moveCursor) {
+		
+		public Mover(JComponent container, Row owner, Cursor moveCursor) {
 			this.container = container;
 			this.owner = owner;
 			this.moveCursor = moveCursor;
@@ -83,7 +83,10 @@ public class CustomTable extends JPanel{
 				return;
 			}
 			final Component oldTarget = target;
-			target = container.getComponentAt(owner.getX() + e.getX(), owner.getY() + e.getY());
+			Component c = container.getComponentAt(owner.getX() + e.getX(), owner.getY() + e.getY());
+			if(c instanceof Row) {
+				target =  (Row)c;
+			}
 			
 			if(oldTarget != null && oldTarget != target) {
 				oldTarget.setBackground(originalBackground);
@@ -99,9 +102,10 @@ public class CustomTable extends JPanel{
 
 		}
 		private void move() {
-			final Component oldTarget = target;
+			final Row oldTarget = target;
 			if(target != null && source != target) {
 				oldTarget.setBackground(originalBackground);
+				oldTarget.getSoundCanvasWrapper().setSelected(false);
 				int sourceIndex = -1;
 				int targetIndex = -1;
 				Component[] components = container.getComponents();
@@ -146,6 +150,10 @@ public class CustomTable extends JPanel{
 			cursor = container.getCursor();
 			container.setCursor(moveCursor);
 			owner.setBackground(selectColor);
+			owner.getSoundCanvasWrapper().setSelected(true);
+			for(CustomTableListener ctl : tableListeners) {
+				ctl.rowSelected(true);
+			}
 		}
 		
 		@Override
@@ -161,9 +169,16 @@ public class CustomTable extends JPanel{
 			}
 			if(target != null) {
 				target.setBackground(originalBackground);
+				target.getSoundCanvasWrapper().setSelected(false);
 			}
 			if(source != null) {
 				source.setBackground(originalBackground);
+				source.getSoundCanvasWrapper().setSelected(false);
+			}
+			if(source != null || target != null) {
+				for(CustomTableListener ctl : tableListeners) {
+					ctl.rowSelected(false);
+				}
 			}
 			target = null;
 		}
@@ -213,6 +228,9 @@ public class CustomTable extends JPanel{
 		fromFrame.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent arg0) {
 				soundCanvasWrapper.setFrameFrom((Integer)fromFrame.getValue());
+				for(CustomTableListener ctl : tableListeners) {
+					ctl.frameSet();
+				}
 			}
 		});
 		((DefaultEditor)fromFrame.getEditor()).getTextField().addMouseListener(new MouseAdapter() {
@@ -227,6 +245,9 @@ public class CustomTable extends JPanel{
 		toFrame.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent arg0) {
 				soundCanvasWrapper.setFrameTo((Integer)toFrame.getValue());
+				for(CustomTableListener ctl : tableListeners) {
+					ctl.frameSet();
+				}
 			}
 		});
 		((DefaultEditor)toFrame.getEditor()).getTextField().addMouseListener(new MouseAdapter() {
@@ -304,5 +325,12 @@ public class CustomTable extends JPanel{
 	
 	public void setEnabled(boolean enabled) {
 		this.moveEnabled = enabled;
+	}
+	
+	public void addListener(CustomTableListener customTableListener) {
+		tableListeners.add(customTableListener);
+	}
+	public void removeListener(CustomTableListener customTableListener) {
+		tableListeners.remove(customTableListener);
 	}
 }

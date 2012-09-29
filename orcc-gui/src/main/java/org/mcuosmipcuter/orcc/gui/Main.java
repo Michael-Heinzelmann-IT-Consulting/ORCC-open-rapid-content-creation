@@ -121,6 +121,7 @@ public class Main {
 		});
 		
 		final GraphPanel graphicPanel = new GraphPanel();		
+		final PlayBackPanel playBackPanel = new PlayBackPanel(graphicPanel);
 		
 		org.mcuosmipcuter.orcc.gui.Configuration.stage1(args);
 		
@@ -237,7 +238,6 @@ public class Main {
 			JInternalFrame playBackFrame = new JInternalFrame("Timeline", true, false, true, true);
 			deskTop.add(playBackFrame);
 			{
-				PlayBackPanel playBackPanel = new PlayBackPanel(graphicPanel);
 				playBackFrame.getContentPane().add(playBackPanel, BorderLayout.SOUTH);
 				graphicPanel.setMixin(playBackPanel);
 			}
@@ -261,6 +261,7 @@ public class Main {
 		{
 			final JInternalFrame propertiesFrame = new JInternalFrame("Layers", true, false, false, true);
 			final CustomTable propTable = new CustomTable();
+			propTable.addListener(playBackPanel.getTimeLine());
 			//final JTable propTable = new JTable();
 //			PropertyTableCellRendererEditor ptcr = new PropertyTableCellRendererEditor();
 //			propTable.setDefaultRenderer(Object.class, ptcr);
@@ -339,6 +340,7 @@ public class Main {
 				});
 
 			}
+			
 			propertiesFrame.setLocation(0, playBackH + infoH);
 			propertiesFrame.setVisible(true);
 			propertiesFrame.setSize(infoW, deskTop.getHeight() - playBackH - infoH);

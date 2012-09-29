@@ -54,8 +54,8 @@ public class ColorsLR implements SoundCanvas {
 	
 	int maxL;
 	int maxR;
-	int minL = Integer.MAX_VALUE;
-	int minR = Integer.MAX_VALUE;
+	int minL;
+	int minR;
 
 	@Override
 	public void nextSample(int[] amplitudes) {
@@ -116,7 +116,10 @@ public class ColorsLR implements SoundCanvas {
 		centerY = videoOutputInfo.getHeight() / 2;
 		
 		amplitude = new AmplitudeHelper(audioInputInfo);
-		amplitudeDivisor = (int)amplitude.getAmplitudeRange() / 256;
+		amplitudeDivisor = (int)amplitude.getAmplitudeRange() / 255;
+		
+		minL = (int)amplitude.getAmplitudeRange();
+		minR = (int)amplitude.getAmplitudeRange();
 	}
 
 	@Override
@@ -129,8 +132,8 @@ public class ColorsLR implements SoundCanvas {
 	public void postFrame() {
 		maxL = 0;
 		maxR = 0;
-		minL = Integer.MAX_VALUE;
-		minR = Integer.MAX_VALUE;
+		minL = (int)amplitude.getAmplitudeRange();
+		minR = (int)amplitude.getAmplitudeRange();
 	}
 
 	@Override

@@ -37,6 +37,7 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 	long frameFrom = 0;
 	long frameTo = 0;
 	private Graphics2D devNullGraphics;
+	private boolean selected;
 	
 	public SoundCanvasWrapperImpl(SoundCanvas soundCanvas) {
 		this.soundCanvas = soundCanvas;
@@ -113,12 +114,18 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 	@Override
 	public void setFrameFrom(long frameFrom) {
 		this.frameFrom = frameFrom;
-		Context.setFrameMark(frameFrom, this);
 	}
 	@Override
 	public void setFrameTo(long frameTo) {
 		this.frameTo = frameTo;
-		Context.setFrameMark(frameTo, this);
+	}
+	@Override
+	public boolean isSelected() {
+		return selected;
+	}
+	@Override
+	public void setSelected(boolean selected) {
+		this.selected = selected;
 	}
 
 }

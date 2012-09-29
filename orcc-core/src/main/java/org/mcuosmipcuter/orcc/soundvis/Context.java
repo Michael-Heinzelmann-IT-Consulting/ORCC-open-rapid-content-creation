@@ -40,7 +40,7 @@ public abstract class Context {
 	 */
 	public enum PropertyName {
 		AudioInputInfo, VideoDimension, SoundCanvasAdded, SoundCanvasRemoved, SoundCanvasList, ExportFileName, 
-		CanvasClassNames, AppState, SongPositionPointer, VideoFrameRate, FrameMark
+		CanvasClassNames, AppState, SongPositionPointer, VideoFrameRate
 	}
 	/**
 	 * Enumeration of application states
@@ -215,12 +215,4 @@ public abstract class Context {
 		notifyListeners(PropertyName.SongPositionPointer);
 	}
 	
-	/**
-	 * This is just to notify listeners, frame positions can be obtained from {@link #getSoundCanvasList()}
-	 * @param framePos
-	 * @param source
-	 */
-	public static synchronized void setFrameMark(long framePos, SoundCanvasWrapper source) {
-		notifyListeners(PropertyName.FrameMark);
-	}
 }
