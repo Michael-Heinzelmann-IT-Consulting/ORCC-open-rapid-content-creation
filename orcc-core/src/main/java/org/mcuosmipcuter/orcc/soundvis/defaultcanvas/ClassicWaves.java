@@ -37,12 +37,15 @@ public class ClassicWaves implements SoundCanvas {
 	private Color foreGroundColor = Color.BLUE;
 	@UserProperty(description="whether to draw filled bottom")
 	private boolean fillBottom = false;
+	@UserProperty(description="whether to draw horizontal lines")
+	private boolean drawHorizontal = false;
 	
 	// parameters automatically set
 	private float amplitudeDivisor;
 	private float amplitudeMultiplicator;
 	private int leftMargin;
 	private int height;
+	private int width;
 	
 	private AmplitudeHelper amplitude;
 	private int factor;
@@ -78,9 +81,14 @@ public class ClassicWaves implements SoundCanvas {
 		graphics.setColor(foreGroundColor);
 		int x = 1;
 		for(int amp : amplitudes) {
+			if(drawHorizontal) {
+				graphics.drawLine(0, height / 2 - amp , width, height / 2 - amp);
+			}
+			else {
 			int y2 = fillBottom ? height : height / 2 - prevAmplitude;
 			graphics.drawLine(leftMargin + x, height / 2 - amp , leftMargin + x, y2);
 			prevAmplitude = amp;
+			}
 			x++;
 		}
 	}
@@ -96,6 +104,7 @@ public class ClassicWaves implements SoundCanvas {
 		System.err.println(pixelsUsed + " used factor " + factor);
 		leftMargin =  (videoOutputInfo.getWidth() - pixelsUsed) / 2;
 		this.height = videoOutputInfo.getHeight();
+		this.width = videoOutputInfo.getWidth();
 		counterInsideFrame = 0;
 		amplitude = new AmplitudeHelper(audioInputInfo);
 		amplitudeDivisor = (amplitude.getAmplitudeRange() / height);
