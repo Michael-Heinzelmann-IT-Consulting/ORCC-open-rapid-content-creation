@@ -35,6 +35,8 @@ public class ClassicWaves implements SoundCanvas {
 	
 	@UserProperty(description="color of the waves")
 	private Color foreGroundColor = Color.BLUE;
+	@UserProperty(description="whether to draw filled bottom")
+	private boolean fillBottom = false;
 	
 	// parameters automatically set
 	private float amplitudeDivisor;
@@ -49,8 +51,9 @@ public class ClassicWaves implements SoundCanvas {
 	
 	// state
 	private int counterInsideFrame;
+	private int[] amplitudes;
 	private int prevAmplitude;
-
+	
 	@Override
 	public void nextSample(int[] amplitudes) {
 
@@ -61,9 +64,8 @@ public class ClassicWaves implements SoundCanvas {
 		}
 		
 		if(samplecount % factor == 0) {
-			
+			this.amplitudes[counterInsideFrame] = max;
 			counterInsideFrame++;
-			prevAmplitude = max;
 			max = 0;
 		}
 		samplecount++;
@@ -72,9 +74,15 @@ public class ClassicWaves implements SoundCanvas {
 
 	@Override
 	public void newFrame(long frameCount, Graphics2D graphics) {	
-		counterInsideFrame = leftMargin;
+		counterInsideFrame = 0;
 		graphics.setColor(foreGroundColor);
-		graphics.drawLine(counterInsideFrame, height / 2 - max , counterInsideFrame, height / 2 - prevAmplitude);
+		int x = 1;
+		for(int amp : amplitudes) {
+			int y2 = fillBottom ? height : height / 2 - prevAmplitude;
+			graphics.drawLine(leftMargin + x, height / 2 - amp , leftMargin + x, y2);
+			prevAmplitude = amp;
+			x++;
+		}
 	}
 
 	@Override
@@ -84,10 +92,11 @@ public class ClassicWaves implements SoundCanvas {
 		int pixelLengthOfaFrame = sampleRate / frameRate; // e.g. 44100 / 25 = 1764
 		factor = (int)(pixelLengthOfaFrame / videoOutputInfo.getWidth()) + 1;
 		int pixelsUsed = pixelLengthOfaFrame / factor;
+		amplitudes = new int[pixelsUsed];
 		System.err.println(pixelsUsed + " used factor " + factor);
 		leftMargin =  (videoOutputInfo.getWidth() - pixelsUsed) / 2;
 		this.height = videoOutputInfo.getHeight();
-		counterInsideFrame = leftMargin;
+		counterInsideFrame = 0;
 		amplitude = new AmplitudeHelper(audioInputInfo);
 		amplitudeDivisor = (amplitude.getAmplitudeRange() / height);
 		if(amplitudeDivisor < 1){
