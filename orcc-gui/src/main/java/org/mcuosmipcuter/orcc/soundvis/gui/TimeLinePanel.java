@@ -18,6 +18,7 @@
 package org.mcuosmipcuter.orcc.soundvis.gui;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
@@ -53,15 +54,29 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 	private final int marginY = 24;
 	private final int displaySecondsStep = 5;
 	
+	// flexible layout screen dependent
+	int widthToUse;
+	int heightToUse = 150;
+	int guiWidth;
+	
+	// user configuration
+	boolean autoZoom = true;
+	int framesToZoom = 1;
+	private int preRunFrames;
+	
 	// state
 	private boolean loading;
+	private int noOfSamplesLoaded;
 	
 	// calculated data
 	private SuperSampleData superSampleData;
+	private SuperSampleData superSampleDataAutoZoomed;
+	private SuperSampleData superSampleDataFrameZoomed;
 	private int noOfSamples;
 	
 	// user and play positions
 	private int selectPos = margin;
+	private long selectFrame;
 	private long samplePosition;
 	
 	// data from input / output
@@ -71,9 +86,7 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 	private int videoFrameRate;
 	
 	List<SoundCanvasWrapper> currentCanvasList = new ArrayList<SoundCanvasWrapper>();
-//	private Map<Long, Set<String>> frameMarksFrom = new HashMap<Long, Set<String>>();
-//	private Map<Long, Set<String>> frameMarksTo = new HashMap<Long, Set<String>>();
-//	
+	
 	/**
 	 * Sets a gray background and adds listeners
 	 */
@@ -88,14 +101,21 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 				if(selectPos < margin) {
 					selectPos = margin;
 				}
+				int pixel = selectPos - margin;
+				selectFrame = pixel * noOfSamples / samplesPerFrame;
 				repaint();
 			}
 
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				int pixel = selectPos - margin;
-				Context.setSongPositionPointer(pixel * noOfSamples / samplesPerFrame);
-				
+				final long frame = pixel * noOfSamples / samplesPerFrame;
+				long f = frame - preRunFrames;
+				if(f < 0) {
+					f = 0;
+				}
+				Context.setSongPositionPointer(f);
+				selectFrame = frame;
 			}
 			
 		});
@@ -108,6 +128,8 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 				if(selectPos < margin) {
 					selectPos = margin;
 				}
+				int pixel = selectPos - margin;
+				selectFrame = pixel * noOfSamples / samplesPerFrame;
 				if(selectPos != oldSelectPos) {
 					repaint();
 				}
@@ -119,26 +141,12 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 			@Override
 			public void contextChanged(PropertyName propertyName) {
 				if(PropertyName.AudioInputInfo.equals(propertyName)) {
+					superSampleDataFrameZoomed = null;
+					superSampleDataAutoZoomed = null; // forces reload
 					setInputOutputData();
-					// make the asynchronous super sampling
-					AudioInput audioInput = Context.getAudioInput();
-					totalSampleLength = audioInput.getAudioInputInfo().getFrameLength();
-					noOfSamples = (int)(totalSampleLength / (getWidth() - margin*2)) + 1; 
-					SubSampleThread superSample = new SubSampleThread(audioInput, noOfSamples, new CallBack() {
-						@Override
-						public void finishedSampling(SuperSampleData superSampleData) {
-							TimeLinePanel.this.superSampleData = superSampleData;
-							selectPos = margin;
-							samplePosition = 0;
-							Context.setSongPositionPointer(0);
-							loading = false;
-							TimeLinePanel.this.repaint();
-						}
-					});
-					loading = true;
-					repaint();
-					superSample.start();
-				
+					selectPos = margin;
+					samplePosition = 0;
+					Context.setSongPositionPointer(0);
 				}
 //				if(PropertyName.FrameRate.equals(propertyName)) {
 //				// TODO issue #23	
@@ -180,18 +188,21 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 		long pos = 0;
 		if(superSampleData != null) {
 						
-			int h = getHeight();
-			int w = getWidth();
+//			int h = getHeight();
+//			int w = getWidth();
+			
+			final int h = heightToUse;
+			final int w = widthToUse;
+			//System.err.println("widthToUse " + widthToUse + " getWidth() " + getWidth() + " noOfSamples " + noOfSamples);
 			
 			int divY = (Math.max(Math.abs(superSampleData.getOverallMin()), Math.abs(superSampleData.getOverallMax())) * 2 / (h - marginY * 2)) + 1;
 			int x = margin + 1;
 			g.setColor(Color.BLACK);
-			//g.setColor(new Color(0, 0, 0, 128));
+
 			for(SuperSample s : superSampleData.getList()) {
 				g.drawLine(x, h /2 - s.getMax() / divY, x, h / 2 - s.getMin() / divY);
 				if(samplePosition > pos && samplePosition <= pos + s.getNoOfSamples()) {
 					g.setColor(Color.WHITE);
-					//g.setColor(new Color(255, 255, 255, 128));
 					g.drawLine(x, 0, x , h);
 				}
 				x++;
@@ -237,13 +248,6 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 					selectedCanvas = new Rectangle(from, y + delta, to - from, b);
 				}
 				
-//				int len = g.getFontMetrics().stringWidth(scw.getDisplayName());
-//				int textStart = 4;
-//				if(len < (to - from)) {
-//					textStart = ((to - from) - len) / 2;
-//				}
-//				g.setColor(new Color(200, 200, 200, 128));
-				//g.drawString(scw.getDisplayName(), from + textStart, y + (free * 12) + 16);
 				count++;
 			}
 			if(selectedCanvas != null) {
@@ -258,14 +262,19 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 			int totalSeconds = (int)(totalSampleLength / sampleRate);
 			int timeMod = ((int)(totalSeconds / numMarkersPossible / displaySecondsStep) + 1) * displaySecondsStep;
 			int accumSecTimeDrawn = -1;
+
 			for(int i = 0; i < w - margin; i ++) {
 				int pixel = i ;
 				Long frame = new Long(pixel * noOfSamples / samplesPerFrame);
-
-				if(margin + i  == selectPos) {
-					g.setColor(Color.YELLOW);
+				
+				if(frame == selectFrame) {
+					g.setColor(new Color(Color.YELLOW.getRed(), Color.YELLOW.getGreen(), Color.YELLOW.getBlue(), 44));
 					g.drawLine(margin + i, 0, margin + i, h);
-					g.drawString(String.valueOf(frame), margin + i + 1, h/2);
+				}
+				if(margin + i  == selectPos) {
+					g.setColor(new Color(Color.YELLOW.getRed(), Color.YELLOW.getGreen(), Color.YELLOW.getBlue(), 128));
+					g.drawLine(margin + i, 0, margin + i, h);
+					g.drawString(String.valueOf(frame), margin + i + 1, 16);
 				}
 
 				int accumSec = pixel * noOfSamples / sampleRate ;
@@ -285,30 +294,70 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 				}
 			}
 			
-//			int divY = (Math.max(Math.abs(superSampleData.getOverallMin()), Math.abs(superSampleData.getOverallMax())) * 2 / (h - margin * 2)) + 1;
-			
-//			int x = margin + 1;
-//			g.setColor(Color.BLACK);
-//			//g.setColor(new Color(0, 0, 0, 128));
-//			for(SuperSample s : superSampleData.getList()) {
-//				g.drawLine(x, h /2 - s.getMax() / divY, x, h / 2 - s.getMin() / divY);
-//				if(samplePosition > pos && samplePosition <= pos + s.getNoOfSamples()) {
-//					g.setColor(Color.WHITE);
-//					//g.setColor(new Color(255, 255, 255, 128));
-//					g.drawLine(x, 0, x , h);
-//				}
-//				x++;
-//				pos += s.getNoOfSamples();
-//			}
 		}
 	}
 	
-	private void setInputOutputData() {
+	public void setInputOutputData() {
+		
 		VideoOutputInfo videoOutputInfo = Context.getVideoOutputInfo();
 		AudioInputInfo audioInputInfo = Context.getAudioInput().getAudioInputInfo();
 		videoFrameRate = videoOutputInfo.getFramesPerSecond();
 		sampleRate = (int)audioInputInfo.getAudioFormat().getSampleRate(); // non integer sample rates are rare
 		samplesPerFrame = sampleRate / videoFrameRate; // e.g. 44100 / 25 = 1764
+		AudioInput audioInput = Context.getAudioInput();
+		totalSampleLength = audioInput.getAudioInputInfo().getFrameLength();
+		if(autoZoom) {
+			widthToUse = guiWidth;
+			noOfSamples = (int)(totalSampleLength / (widthToUse - margin*2)) + 1;
+		}
+		else {
+			noOfSamples = (int)(samplesPerFrame * ((float)framesToZoom / 100f));
+		}
+		if(autoZoom && superSampleDataAutoZoomed != null) {
+			superSampleData = superSampleDataAutoZoomed;
+		}
+		else if(!autoZoom && superSampleDataFrameZoomed != null && noOfSamples == noOfSamplesLoaded) {
+			superSampleData = superSampleDataFrameZoomed;
+		}
+		else {
+			// make the asynchronous super sampling
+
+
+			SubSampleThread superSample = new SubSampleThread(audioInput, noOfSamples, new CallBack() {
+				@Override
+				public void finishedSampling(SuperSampleData superSampleData) {
+					TimeLinePanel.this.superSampleData = superSampleData;
+					if(autoZoom) {
+						superSampleDataAutoZoomed = superSampleData;
+					}
+					else {
+						superSampleDataFrameZoomed = superSampleData;
+					}
+
+					loading = false;
+					TimeLinePanel.this.revalidate();
+					TimeLinePanel.this.repaint();
+				}
+			});
+			loading = true;
+			noOfSamplesLoaded = noOfSamples;
+
+			superSample.start();
+		}
+		if(autoZoom) {
+			System.err.println("HEEEERRRe");
+			setPreferredSize(new Dimension(600, heightToUse));
+			setSize(600, heightToUse);
+			//widthToUse = guiWidth;
+		}
+		else {
+			int widthRequired = (int)(totalSampleLength / (noOfSamples)) + margin * 2;
+			setPreferredSize(new Dimension(widthRequired, heightToUse));
+			setSize(widthRequired, heightToUse);
+			widthToUse = widthRequired;
+		}
+		selectPos = (int)(selectFrame * samplesPerFrame /  noOfSamples) + 1 + margin;
+		repaint();
 	}
 
 	/**
@@ -327,6 +376,32 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 	@Override
 	public void rowSelected(boolean selected) {
 		repaint();
+	}
+
+	public void setAutoZoom(boolean autoZoom) {
+		this.autoZoom = autoZoom;
+	}
+
+	public void setFramesToZoom(int framesToZoom) {
+		this.framesToZoom = framesToZoom;
+	}
+
+	public void setGuiWidth(int guiWidth) {
+		this.guiWidth = guiWidth;
+	}
+
+	public void setPreRunFrames(int preRunFrames) {
+		this.preRunFrames = preRunFrames;
+		long f = selectFrame - preRunFrames;
+		if(f < 0) {
+			f = 0;
+		}
+		Context.setSongPositionPointer(f);
+	}
+
+	@Override
+	public long getFrameSelected() {
+		return selectFrame;
 	}
 	
 	

@@ -123,7 +123,7 @@ public class Main {
 		});
 		
 		final GraphPanel graphicPanel = new GraphPanel();		
-		final PlayBackPanel playBackPanel = new PlayBackPanel(graphicPanel);
+
 		
 		org.mcuosmipcuter.orcc.gui.Configuration.stage1(args);
 		
@@ -235,6 +235,7 @@ public class Main {
 		frame.setExtendedState(Frame.MAXIMIZED_BOTH);
 		frame.setVisible(true);
 		
+		final PlayBackPanel playBackPanel = new PlayBackPanel(graphicPanel);
 		IOUtil.log("frame size: " + frame.getSize());
 		{
 			final JInternalFrame playBackFrame = new JInternalFrame("Timeline", true, false, true, true);
@@ -246,7 +247,7 @@ public class Main {
 			
 			playBackFrame.setSize(deskTop.getWidth(), playBackH);
 			playBackFrame.setVisible(true);
-			
+			playBackPanel.init();
 			Context.addListener(new Listener() {		
 				@Override
 				public void contextChanged(PropertyName propertyName) {
@@ -274,7 +275,7 @@ public class Main {
 		{
 			final JInternalFrame propertiesFrame = new JInternalFrame("Layers", true, false, false, true);
 			final CustomTable propTable = new CustomTable();
-			propTable.addListener(playBackPanel.getTimeLine());
+			propTable.setListener(playBackPanel.getTimeLine());
 			//final JTable propTable = new JTable();
 //			PropertyTableCellRendererEditor ptcr = new PropertyTableCellRendererEditor();
 //			propTable.setDefaultRenderer(Object.class, ptcr);

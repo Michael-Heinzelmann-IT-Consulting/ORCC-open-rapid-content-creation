@@ -54,7 +54,7 @@ public class CustomTable extends JPanel{
 
 	private static final long serialVersionUID = 1L;
 	
-	private List<CustomTableListener> tableListeners = new ArrayList<CustomTableListener>();
+	private CustomTableListener tableListener;
 	
 	public class Mover extends MouseAdapter {
 		
@@ -151,9 +151,9 @@ public class CustomTable extends JPanel{
 			container.setCursor(moveCursor);
 			owner.setBackground(selectColor);
 			owner.getSoundCanvasWrapper().setSelected(true);
-			for(CustomTableListener ctl : tableListeners) {
-				ctl.rowSelected(true);
-			}
+			
+			tableListener.rowSelected(true);
+			
 		}
 		
 		@Override
@@ -176,9 +176,7 @@ public class CustomTable extends JPanel{
 				source.getSoundCanvasWrapper().setSelected(false);
 			}
 			if(source != null || target != null) {
-				for(CustomTableListener ctl : tableListeners) {
-					ctl.rowSelected(false);
-				}
+				tableListener.rowSelected(false);			
 			}
 			target = null;
 		}
@@ -227,16 +225,15 @@ public class CustomTable extends JPanel{
 		final JSpinner fromFrame = new JSpinner(modelFrom);
 		fromFrame.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent arg0) {
-				soundCanvasWrapper.setFrameFrom((Integer)fromFrame.getValue());
-				for(CustomTableListener ctl : tableListeners) {
-					ctl.frameSet();
-				}
+				soundCanvasWrapper.setFrameFrom((Long)fromFrame.getValue());
+				tableListener.frameSet();
+				
 			}
 		});
 		((DefaultEditor)fromFrame.getEditor()).getTextField().addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
 				if(e.getClickCount() >= 2) {
-					fromFrame.setValue((int)Context.getSongPositionPointer());
+					fromFrame.setValue(tableListener.getFrameSelected());
 				}
 			}
 		});
@@ -244,16 +241,15 @@ public class CustomTable extends JPanel{
 		final JSpinner toFrame = new JSpinner(modelTo);
 		toFrame.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent arg0) {
-				soundCanvasWrapper.setFrameTo((Integer)toFrame.getValue());
-				for(CustomTableListener ctl : tableListeners) {
-					ctl.frameSet();
-				}
+				soundCanvasWrapper.setFrameTo((Long)toFrame.getValue());
+				tableListener.frameSet();
+				
 			}
 		});
 		((DefaultEditor)toFrame.getEditor()).getTextField().addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
 				if(e.getClickCount() >= 2) {
-					toFrame.setValue((int)Context.getSongPositionPointer());
+					toFrame.setValue(tableListener.getFrameSelected());
 				}
 			}
 		});
@@ -327,10 +323,7 @@ public class CustomTable extends JPanel{
 		this.moveEnabled = enabled;
 	}
 	
-	public void addListener(CustomTableListener customTableListener) {
-		tableListeners.add(customTableListener);
-	}
-	public void removeListener(CustomTableListener customTableListener) {
-		tableListeners.remove(customTableListener);
+	public void setListener(CustomTableListener customTableListener) {
+		tableListener = customTableListener;
 	}
 }

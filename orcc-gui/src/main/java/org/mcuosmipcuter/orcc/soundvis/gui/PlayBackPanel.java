@@ -25,14 +25,21 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.border.LineBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.api.util.TimeAndRateHelper;
+import org.mcuosmipcuter.orcc.gui.table.CustomTableListener;
 import org.mcuosmipcuter.orcc.soundvis.Context;
 import org.mcuosmipcuter.orcc.soundvis.Mixin;
 import org.mcuosmipcuter.orcc.soundvis.PlayPauseStop;
@@ -70,12 +77,108 @@ public class PlayBackPanel extends JPanel implements Mixin{
 	private JLabel stateLabel = new JLabel();
 	JProgressBar jProgressBar = new JProgressBar();
 	PlayPauseButton playPause;
+	JCheckBox autoZoom = new JCheckBox("autozoom");
+	SpinnerNumberModel modelZoom = new SpinnerNumberModel(1, 1, 5000, 10);
+	final JSpinner framesToZoom = new JSpinner(modelZoom);
+	SpinnerNumberModel modelPreRun = new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1);
+	final JSpinner preRunFrames = new JSpinner(modelPreRun);
 	
 	/**
 	 * Sets up a stop, play/pause button and a status label
 	 * @param renderer the renderer to work with
 	 */
 	public PlayBackPanel(final Renderer renderer) {
+		PlayPauseStopFactory np = new PlayPauseStopFactory() {		
+			@Override
+			public PlayPauseStop newPlayPauseStop() {
+				return new PlayThread(renderer);
+			}
+		};
+		playPause = new PlayPauseButton(np);
+//		setBorder(new LineBorder(Color.WHITE, 5));
+//		jProgressBar.setMaximum(100);
+//		jProgressBar.setStringPainted(true);
+//		frameCountlabel.reset();
+//		timeLabel.reset();
+//
+//		final JButton stop = new JButton("[]");
+//
+//		PlayPauseStopFactory np = new PlayPauseStopFactory() {		
+//			@Override
+//			public PlayPauseStop newPlayPauseStop() {
+//				return new PlayThread(renderer);
+//			}
+//		};
+//		playPause = new PlayPauseButton(np);
+//		playPause.setEnabled(false);
+//		stop.addActionListener(new StopActionListener(playPause));
+//		stop.addActionListener(new ActionListener() {
+//			
+//			@Override
+//			public void actionPerformed(ActionEvent e) {
+//				playPause.reset();
+//				long startFrame = Context.getSongPositionPointer();
+//				frameCountlabel.update(startFrame);
+//				sampleCount = startFrame * samplesPerFrame;
+//				updateProgress();
+//			}
+//		});
+//		Context.addListener(new Listener() {
+//			
+//			@Override
+//			public void contextChanged(PropertyName propertyName) {
+//				if(PropertyName.AppState.equals(propertyName)) {
+//					AppState appState = Context.getAppState();
+//					stateLabel.setText("" + appState);
+//					stop.setEnabled(appState != AppState.EXPORTING);
+//					if(appState == AppState.READY) {
+//						playPause.reset();
+//					}
+//					playPause.setEnabled(appState != AppState.EXPORTING);
+//				}
+//				if(PropertyName.AudioInputInfo.equals(propertyName)) {
+//					playPause.setEnabled(Context.getAudioInput() != null);
+//				}
+//				if(PropertyName.AudioInputInfo.equals(propertyName) || PropertyName.VideoFrameRate.equals(propertyName) ) {
+//					samplesPerFrame = TimeAndRateHelper.getSamplesPerFrame(Context.getAudioInput().getAudioInputInfo(), Context.getVideoOutputInfo());
+//				}
+//			}
+//		});
+//		autoZoom.setSelected(true);
+//		autoZoom.addActionListener(new ActionListener() {
+//			@Override
+//			public void actionPerformed(ActionEvent arg0) {
+//				timeLine.setAutoZoom(autoZoom.isSelected());
+//				timeLine.setInputOutputData();			
+//			}
+//		});
+//
+//		GridLayout gl = new GridLayout(1, 10, 5, 10);		
+//		
+//		JPanel commands = new JPanel();
+//		commands.setBorder(new LineBorder(Color.WHITE, 2));
+//		commands.setLayout(gl);
+//		commands.add(stop);
+//		commands.add(playPause);
+//		commands.add(stateLabel);
+//		
+//		commands.add(frameCountlabel);
+//		commands.add(timeLabel);
+//		commands.add(jProgressBar);
+//		commands.add(autoZoom);
+//		//commands.setPreferredSize(new Dimension(240, 70));
+//		
+//		timeLine.setPreferredSize(new Dimension(600, 150));
+//		System.err.println("PBP " + getWidth());
+//		//timeLine.setMinimumSize(new Dimension(600, 170));
+//		setLayout(new BorderLayout());
+//		add(commands, BorderLayout.NORTH);
+//		JScrollPane s = new JScrollPane(timeLine);
+//		add(s, BorderLayout.SOUTH);
+
+	}
+
+	public void init() {
 		setBorder(new LineBorder(Color.WHITE, 5));
 		jProgressBar.setMaximum(100);
 		jProgressBar.setStringPainted(true);
@@ -84,13 +187,7 @@ public class PlayBackPanel extends JPanel implements Mixin{
 
 		final JButton stop = new JButton("[]");
 
-		PlayPauseStopFactory np = new PlayPauseStopFactory() {		
-			@Override
-			public PlayPauseStop newPlayPauseStop() {
-				return new PlayThread(renderer);
-			}
-		};
-		playPause = new PlayPauseButton(np);
+
 		playPause.setEnabled(false);
 		stop.addActionListener(new StopActionListener(playPause));
 		stop.addActionListener(new ActionListener() {
@@ -125,6 +222,26 @@ public class PlayBackPanel extends JPanel implements Mixin{
 				}
 			}
 		});
+		autoZoom.setSelected(true);
+		autoZoom.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				timeLine.setAutoZoom(autoZoom.isSelected());
+				timeLine.setInputOutputData();			
+			}
+		});
+		framesToZoom.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent arg0) {
+				timeLine.setFramesToZoom((Integer)framesToZoom.getValue());
+				timeLine.setInputOutputData();
+			}
+		});
+		preRunFrames.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent arg0) {
+				timeLine.setPreRunFrames((Integer)preRunFrames.getValue());
+				timeLine.repaint();
+			}
+		});
 		GridLayout gl = new GridLayout(1, 10, 5, 10);		
 		
 		JPanel commands = new JPanel();
@@ -137,15 +254,20 @@ public class PlayBackPanel extends JPanel implements Mixin{
 		commands.add(frameCountlabel);
 		commands.add(timeLabel);
 		commands.add(jProgressBar);
+		commands.add(autoZoom);
+		commands.add(framesToZoom);
+		commands.add(preRunFrames);
 		//commands.setPreferredSize(new Dimension(240, 70));
 		
-		timeLine.setPreferredSize(new Dimension(600, 170));
+		timeLine.setPreferredSize(new Dimension(600, 150));
+		timeLine.setGuiWidth(getWidth());
+		System.err.println("PBP " + getWidth());
+		//timeLine.setMinimumSize(new Dimension(600, 170));
 		setLayout(new BorderLayout());
 		add(commands, BorderLayout.NORTH);
-		add(timeLine, BorderLayout.CENTER);
-
+		JScrollPane s = new JScrollPane(timeLine);
+		add(s, BorderLayout.SOUTH);
 	}
-
 
 	@Override
 	public void newFrame(long frameCount, boolean sendPost) {

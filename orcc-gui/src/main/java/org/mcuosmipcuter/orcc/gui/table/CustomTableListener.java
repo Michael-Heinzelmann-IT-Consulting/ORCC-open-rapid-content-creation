@@ -20,4 +20,5 @@ package org.mcuosmipcuter.orcc.gui.table;
 public interface CustomTableListener {
 	public void frameSet();
 	public void rowSelected(boolean selected);
+	public long getFrameSelected();
 }
