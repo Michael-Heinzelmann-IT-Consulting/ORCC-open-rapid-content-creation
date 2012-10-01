@@ -33,6 +33,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.sound.sampled.AudioFormat;
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
@@ -58,6 +59,7 @@ import org.mcuosmipcuter.orcc.soundvis.Context;
 import org.mcuosmipcuter.orcc.soundvis.Context.AppState;
 import org.mcuosmipcuter.orcc.soundvis.Context.Listener;
 import org.mcuosmipcuter.orcc.soundvis.Context.PropertyName;
+import org.mcuosmipcuter.orcc.soundvis.AudioInput;
 import org.mcuosmipcuter.orcc.soundvis.PlayPauseStop;
 import org.mcuosmipcuter.orcc.soundvis.PlayPauseStopHolder;
 import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
@@ -87,7 +89,7 @@ public class Main {
 	
 	static final int infoW = 460;
 	static final int infoH = 200;
-	static final int playBackH = 200;
+	static final int playBackH = 240;
 	static final int minCells = 3;
 	
 	/**
@@ -235,7 +237,7 @@ public class Main {
 		
 		IOUtil.log("frame size: " + frame.getSize());
 		{
-			JInternalFrame playBackFrame = new JInternalFrame("Timeline", true, false, true, true);
+			final JInternalFrame playBackFrame = new JInternalFrame("Timeline", true, false, true, true);
 			deskTop.add(playBackFrame);
 			{
 				playBackFrame.getContentPane().add(playBackPanel, BorderLayout.SOUTH);
@@ -244,18 +246,29 @@ public class Main {
 			
 			playBackFrame.setSize(deskTop.getWidth(), playBackH);
 			playBackFrame.setVisible(true);
+			
+			Context.addListener(new Listener() {		
+				@Override
+				public void contextChanged(PropertyName propertyName) {
+					if(PropertyName.AudioInputInfo.equals(propertyName)) {
+						AudioInput audioInput = Context.getAudioInput();
+						final AudioFormat audioFormat = audioInput.getAudioInputInfo().getAudioFormat();
+						playBackFrame.setTitle(audioInput.getName() + " | " + ((int)audioFormat.getSampleRate()) + " HZ | " + audioFormat.getSampleSizeInBits() + " bit");
+					}
+				}
+			});
 		}
 		{
-			JInternalFrame infoFrame = new JInternalFrame("File Info", true, false, true, true);
-			deskTop.add(infoFrame);
-			{
-				InfoPanel infoPanel = new InfoPanel();
-				infoFrame.getContentPane().add(infoPanel);
-				Context.addListener(infoPanel);
-			}
-			infoFrame.setLocation(0, playBackH);
-			infoFrame.setSize(infoW, infoH);
-			infoFrame.setVisible(true);
+//			JInternalFrame infoFrame = new JInternalFrame("File Info", true, false, true, true);
+//			deskTop.add(infoFrame);
+//			{
+//				InfoPanel infoPanel = new InfoPanel();
+//				infoFrame.getContentPane().add(infoPanel);
+//				Context.addListener(infoPanel);
+//			}
+//			infoFrame.setLocation(0, playBackH);
+//			infoFrame.setSize(infoW, infoH);
+//			infoFrame.setVisible(true);
 		}
 
 		{
@@ -341,9 +354,9 @@ public class Main {
 
 			}
 			
-			propertiesFrame.setLocation(0, playBackH + infoH);
+			propertiesFrame.setLocation(0, playBackH);
 			propertiesFrame.setVisible(true);
-			propertiesFrame.setSize(infoW, deskTop.getHeight() - playBackH - infoH);
+			propertiesFrame.setSize(infoW, deskTop.getHeight() - playBackH);
 			deskTop.add(propertiesFrame);
 		}	
 

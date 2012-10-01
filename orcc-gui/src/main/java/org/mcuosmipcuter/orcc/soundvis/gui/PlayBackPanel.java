@@ -125,7 +125,7 @@ public class PlayBackPanel extends JPanel implements Mixin{
 				}
 			}
 		});
-		GridLayout gl = new GridLayout(2, 3, 5, 10);		
+		GridLayout gl = new GridLayout(1, 10, 5, 10);		
 		
 		JPanel commands = new JPanel();
 		commands.setBorder(new LineBorder(Color.WHITE, 2));
@@ -137,11 +137,11 @@ public class PlayBackPanel extends JPanel implements Mixin{
 		commands.add(frameCountlabel);
 		commands.add(timeLabel);
 		commands.add(jProgressBar);
-		commands.setPreferredSize(new Dimension(240, 70));
+		//commands.setPreferredSize(new Dimension(240, 70));
 		
-		timeLine.setPreferredSize(new Dimension(600, 150));
+		timeLine.setPreferredSize(new Dimension(600, 170));
 		setLayout(new BorderLayout());
-		add(commands, BorderLayout.WEST);
+		add(commands, BorderLayout.NORTH);
 		add(timeLine, BorderLayout.CENTER);
 
 	}
