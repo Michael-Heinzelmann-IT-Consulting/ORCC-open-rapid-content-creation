@@ -65,11 +65,25 @@ public interface SoundCanvas {
 	 * @param videoOutputInfo info about the configured video output
 	 */
 	public void prepare(AudioInputInfo audioInputInfo, VideoOutputInfo videoOutputInfo);
-
-	public int getPreRunFrames();
 	
+	/**
+	 * This method is called when the engine is done with the frame, all cleanup and re-set work should be done here
+	 */
 	public void postFrame();
 	
+	/**
+	 * Get the number of frames this canvas needs to run before a frame image can be produced.
+	 * This will generate some delay on play back if the number is too high.
+	 * @return the number, any number starting from 0 - the lower the better
+	 */
+	public int getPreRunFrames();
+	
+	/**
+	 * Get a simplified image icon of this canvas current state for showing this in a compacted UI.
+	 * @param width width of this icon
+	 * @param height height of this icon
+	 * @param graphics graphics to draw on
+	 */
 	public void drawCurrentIcon(int width, int height, Graphics2D graphics);
 }
 
