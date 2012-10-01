@@ -55,12 +55,15 @@ public class GraphPanel extends JPanel implements Renderer, Zoomable {
 		private boolean running = true;
 		@Override
 		public void run() {
+			IOUtil.log("starting refresh...");
 			while(running) {
 				try {
 					List<SoundCanvasWrapper> currentList = new ArrayList<SoundCanvasWrapper>();
 					currentList.addAll(Context.getSoundCanvasList());
 					for(SoundCanvas soundCanvas : currentList) {
-						soundCanvas.newFrame(frameCount, graphics);
+						if(running) {
+							soundCanvas.newFrame(frameCount, graphics);
+						}
 					}
 					repaint();
 					Thread.sleep(80);
@@ -101,6 +104,14 @@ public class GraphPanel extends JPanel implements Renderer, Zoomable {
 				if(PropertyName.AppState.equals(propertyName)) {
 					AppState appState = Context.getAppState();
 					if(appState == AppState.READY || appState == AppState.PAUSED) {
+						if(repaintThread != null) {
+							repaintThread.running = false;
+							try {
+								repaintThread.join();
+							} catch (InterruptedException ex) {
+								ex.printStackTrace();
+							}
+						}
 						repaintThread = new RepaintThread();
 						repaintThread.start();
 					}

@@ -158,6 +158,9 @@ public class PlayThread extends Thread implements PlayPauseStop {
 	private boolean checkState() {
 		while(status == Status.PAUSED) {
 			IOUtil.log(".");
+			if(Context.getAppState() != AppState.PAUSED) {
+				Context.setAppState(AppState.PAUSED);
+			}
 			try {
 				Thread.sleep(500);
 			} catch (InterruptedException e) {
@@ -170,7 +173,6 @@ public class PlayThread extends Thread implements PlayPauseStop {
 	@Override
 	public void pausePlaying() {
 		status = Status.PAUSED;
-		Context.setAppState(AppState.PAUSED);
 	}
 
 	@Override
