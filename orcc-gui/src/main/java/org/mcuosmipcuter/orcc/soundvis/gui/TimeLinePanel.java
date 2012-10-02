@@ -61,7 +61,7 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 	
 	// user configuration
 	boolean autoZoom = true;
-	int framesToZoom = 1;
+	int samplesToZoom = 100;
 	private int preRunFrames;
 	
 	// state
@@ -148,9 +148,11 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 					samplePosition = 0;
 					Context.setSongPositionPointer(0);
 				}
-//				if(PropertyName.FrameRate.equals(propertyName)) {
-//				// TODO issue #23	
-//				}
+				if(PropertyName.VideoFrameRate.equals(propertyName)) {
+					superSampleDataFrameZoomed = null;
+					superSampleDataAutoZoomed = null; // forces reload
+					setInputOutputData();
+				}
 			}
 		});
 		
@@ -175,7 +177,7 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 		g.setColor(Color.GRAY);
 		g.fillRect(0, 0, getWidth(), getHeight());
 		g.setColor(Color.WHITE);
-		g.drawString("loading ...", getWidth() / 2, getHeight() / 2);
+		g.drawString("loading ...", Math.max(guiWidth / 2, selectPos), getHeight() / 2);
 	}
 	
 	@Override
@@ -187,13 +189,9 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 		}
 		long pos = 0;
 		if(superSampleData != null) {
-						
-//			int h = getHeight();
-//			int w = getWidth();
 			
 			final int h = heightToUse;
 			final int w = widthToUse;
-			//System.err.println("widthToUse " + widthToUse + " getWidth() " + getWidth() + " noOfSamples " + noOfSamples);
 			
 			int divY = (Math.max(Math.abs(superSampleData.getOverallMin()), Math.abs(superSampleData.getOverallMax())) * 2 / (h - marginY * 2)) + 1;
 			int x = margin + 1;
@@ -311,7 +309,7 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 			noOfSamples = (int)(totalSampleLength / (widthToUse - margin*2)) + 1;
 		}
 		else {
-			noOfSamples = (int)(samplesPerFrame * ((float)framesToZoom / 100f));
+			noOfSamples = samplesToZoom;
 		}
 		if(autoZoom && superSampleDataAutoZoomed != null) {
 			superSampleData = superSampleDataAutoZoomed;
@@ -320,9 +318,7 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 			superSampleData = superSampleDataFrameZoomed;
 		}
 		else {
-			// make the asynchronous super sampling
-
-
+			// make the asynchronous sub sampling
 			SubSampleThread superSample = new SubSampleThread(audioInput, noOfSamples, new CallBack() {
 				@Override
 				public void finishedSampling(SuperSampleData superSampleData) {
@@ -345,10 +341,8 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 			superSample.start();
 		}
 		if(autoZoom) {
-			System.err.println("HEEEERRRe");
 			setPreferredSize(new Dimension(600, heightToUse));
 			setSize(600, heightToUse);
-			//widthToUse = guiWidth;
 		}
 		else {
 			int widthRequired = (int)(totalSampleLength / (noOfSamples)) + margin * 2;
@@ -382,8 +376,8 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 		this.autoZoom = autoZoom;
 	}
 
-	public void setFramesToZoom(int framesToZoom) {
-		this.framesToZoom = framesToZoom;
+	public void setSamplesToZoom(int samplesToZoom) {
+		this.samplesToZoom = samplesToZoom;
 	}
 
 	public void setGuiWidth(int guiWidth) {
@@ -402,6 +396,10 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 	@Override
 	public long getFrameSelected() {
 		return selectFrame;
+	}
+
+	public int getSelectPos() {
+		return selectPos;
 	}
 	
 	

@@ -225,7 +225,7 @@ public class CustomTable extends JPanel{
 		final JSpinner fromFrame = new JSpinner(modelFrom);
 		fromFrame.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent arg0) {
-				soundCanvasWrapper.setFrameFrom((Long)fromFrame.getValue());
+				soundCanvasWrapper.setFrameFrom(((Number)fromFrame.getValue()).longValue());
 				tableListener.frameSet();
 				
 			}
@@ -241,7 +241,7 @@ public class CustomTable extends JPanel{
 		final JSpinner toFrame = new JSpinner(modelTo);
 		toFrame.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent arg0) {
-				soundCanvasWrapper.setFrameTo((Long)toFrame.getValue());
+				soundCanvasWrapper.setFrameTo(((Number)toFrame.getValue()).longValue());
 				tableListener.frameSet();
 				
 			}
