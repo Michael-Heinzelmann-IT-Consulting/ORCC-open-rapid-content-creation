@@ -23,6 +23,8 @@ import java.awt.Graphics2D;
 import java.awt.MultipleGradientPaint.CycleMethod;
 import java.awt.Point;
 import java.awt.RadialGradientPaint;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
@@ -85,6 +87,7 @@ public class GraphPanel extends JPanel implements Renderer, Zoomable {
 	private Graphics2D graphics;
 	
 	private float zoomFactor = 0.5f;
+	private boolean autoZoom;
 
 	long frameCount;
 
@@ -121,8 +124,22 @@ public class GraphPanel extends JPanel implements Renderer, Zoomable {
 						}
 					}
 				}
+				if(PropertyName.VideoDimension.equals(propertyName)) {
+					if(autoZoom) {
+						setZoomFactor(0.0f); // adapt to new size
+					}
+				}
 				
 			}
+		});
+		addComponentListener(new ComponentAdapter(){
+			@Override
+			public void componentResized(ComponentEvent arg0) {
+				if(autoZoom) {
+					setZoomFactor(0.0f); // adapt to new size
+				}
+			}
+			
 		});
 	}
 	
@@ -217,8 +234,23 @@ public class GraphPanel extends JPanel implements Renderer, Zoomable {
 		return zoomFactor;
 	}
 
-	public synchronized void setZoomFactor(float zoomFactor) {
-		this.zoomFactor = zoomFactor;
+	public synchronized void setZoomFactor(final float zoomFactor) {
+		if(zoomFactor == 0.0f) {
+			int panelW = getWidth();
+			int panelH = getHeight();
+			int width = Context.getVideoOutputInfo().getWidth();
+			int height = Context.getVideoOutputInfo().getHeight();
+			
+			float wFactor = (float)panelW / (float)width;
+			float hFactor = (float)panelH /  (float)height;
+			
+			this.zoomFactor = Math.min(wFactor, hFactor);
+			autoZoom = true;
+		}
+		else {
+			this.zoomFactor = zoomFactor;
+			autoZoom = false;
+		}
 	}
 
 }

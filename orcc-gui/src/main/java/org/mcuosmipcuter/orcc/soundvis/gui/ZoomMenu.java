@@ -25,7 +25,6 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JRadioButtonMenuItem;
 
-import org.mcuosmipcuter.orcc.soundvis.Context;
 import org.mcuosmipcuter.orcc.soundvis.Zoomable;
 
 /**
@@ -36,7 +35,7 @@ public class ZoomMenu extends JMenu{
 
 	private static final long serialVersionUID = 1L;
 
-	private float[] zooms = new float[]{0.25f, 0.5f, 1.0f};
+	private float[] zooms = new float[]{0.0f, 0.25f, 0.5f, 0.75f, 1.0f};
 	
 	/**
 	 * New menu
@@ -48,7 +47,8 @@ public class ZoomMenu extends JMenu{
 		super(title);
 		ButtonGroup group = new ButtonGroup();
 		for(final float zoom : zooms) {
-			final JMenuItem item = new JRadioButtonMenuItem((int)(zoom * 100) + "%");
+			final String text = zoom == 0.0f ? "auto" : (int)(zoom * 100) + "%";
+			final JMenuItem item = new JRadioButtonMenuItem(text);
 			item.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
 					zoomable.setZoomFactor(zoom);
