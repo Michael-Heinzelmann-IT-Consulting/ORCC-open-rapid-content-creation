@@ -116,6 +116,14 @@ public abstract class Context {
 		videoOutputInfo.setHeight(height);
 		notifyListeners(PropertyName.VideoDimension);
 	}
+	/**
+	 * Sets the target video frame rate
+	 * @param frameRate the frame rate to use
+	 */
+	public static synchronized void setOutputFrameRate(int frameRate) {
+		videoOutputInfo.setFramesPerSecond(frameRate);
+		notifyListeners(PropertyName.VideoFrameRate);
+	}
 
 	/**
 	 * Adds a canvas to work with from the given class name string.
