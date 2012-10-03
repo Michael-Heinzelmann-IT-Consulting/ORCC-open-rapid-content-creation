@@ -90,8 +90,11 @@ public abstract class Configuration {
 			// TODO use user preferences from persistent storage
 			Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.ClassicWaves");
 			Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.ColorsLR");
+			Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.GridPulse");
+			Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.Image");
 			Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.Pulsating");
 			Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.RotatingAmplitudes");
+			Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.SolidColor");
 			Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.Text");
 			Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.XOR");
 		}
@@ -123,7 +126,7 @@ public abstract class Configuration {
 		}
 		else {
 			try {
-				Context.addCanvas("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.ClassicWaves");
+				Context.addCanvas("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.SolidColor");
 			} catch (Exception ex) {
 				throw new RuntimeException(ex);
 			} 
