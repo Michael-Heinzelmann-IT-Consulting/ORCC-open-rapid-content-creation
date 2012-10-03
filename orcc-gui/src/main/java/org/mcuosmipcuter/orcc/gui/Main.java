@@ -302,6 +302,7 @@ public class Main {
 			final JMenu viewMenu = new JMenu("View");
 			graphicMenuBar.add(viewMenu);
 			viewMenu.add(new ZoomMenu("zoom", 0.0f, graphicPanel));
+			graphicPanel.setZoomFactor(0.0f);
 			
 			deskTop.add(graphicFrame);
 			{
