@@ -19,7 +19,6 @@ package org.mcuosmipcuter.orcc.soundvis.model;
 
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
-import java.io.IOException;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -37,9 +36,6 @@ public class AudioFileInputImpl implements AudioInput {
 	
 	private final AudioInputInfo audioInputInfo;
 	private final String audioFileName;
-	
-	private FileInputStream fis;
-	private AudioInputStream ais;
 	
 	/**
 	 * Creates an audio input instance from the given file name,
@@ -69,11 +65,6 @@ public class AudioFileInputImpl implements AudioInput {
 		}
 	}
 
-	@Override
-	public void close() throws IOException {
-		IOUtil.safeClose(fis);
-		IOUtil.safeClose(ais);
-	}
 	/**
 	 * Returns the file name as given in the constructor
 	 */
@@ -91,7 +82,8 @@ public class AudioFileInputImpl implements AudioInput {
 	 * runtime exceptions can still occur e.g. if the file has been deleted in the meantime.
 	 */
 	@Override
-	public AudioInputStream open() {
+	public AudioInputStream getAudioStream() {
+		FileInputStream fis;
 		try {
 			fis = new FileInputStream(audioFileName);
 		}
@@ -100,8 +92,7 @@ public class AudioFileInputImpl implements AudioInput {
 		}
 		try {
 			BufferedInputStream buf = new BufferedInputStream(fis);
-			ais = AudioSystem.getAudioInputStream(buf);
-			return ais;
+			return AudioSystem.getAudioInputStream(buf);
 		}
 		catch(Exception ex) {
 			// file existed but was no (supported) audio file, 

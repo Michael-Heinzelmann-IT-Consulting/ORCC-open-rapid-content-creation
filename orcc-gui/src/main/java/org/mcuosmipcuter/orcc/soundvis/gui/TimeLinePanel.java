@@ -33,6 +33,7 @@ import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.gui.table.CustomTableListener;
 import org.mcuosmipcuter.orcc.soundvis.AudioInput;
 import org.mcuosmipcuter.orcc.soundvis.Context;
+import org.mcuosmipcuter.orcc.soundvis.Context.AppState;
 import org.mcuosmipcuter.orcc.soundvis.Context.Listener;
 import org.mcuosmipcuter.orcc.soundvis.Context.PropertyName;
 import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
@@ -80,7 +81,7 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 	private long samplePosition;
 	
 	// data from input / output
-	private int samplesPerFrame;
+	private int samplesPerFrame = 1;
 	private int sampleRate;
 	private long totalSampleLength;
 	private int videoFrameRate;
@@ -296,7 +297,9 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 	}
 	
 	public void setInputOutputData() {
-		
+		if(Context.getAudioInput() == null) {
+			return;
+		}
 		VideoOutputInfo videoOutputInfo = Context.getVideoOutputInfo();
 		AudioInputInfo audioInputInfo = Context.getAudioInput().getAudioInputInfo();
 		videoFrameRate = videoOutputInfo.getFramesPerSecond();
@@ -337,7 +340,7 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 			});
 			loading = true;
 			noOfSamplesLoaded = noOfSamples;
-
+			
 			superSample.start();
 		}
 		if(autoZoom) {

@@ -71,7 +71,7 @@ import org.mcuosmipcuter.orcc.util.IOUtil;
  */
 public class Main {
 	
-	static final int infoW = 460;
+	static final int infoW = 490;
 	static final int infoH = 200;
 	static final int playBackH = 240;
 	static final int minCells = 3;
@@ -301,7 +301,7 @@ public class Main {
 			});
 			final JMenu viewMenu = new JMenu("View");
 			graphicMenuBar.add(viewMenu);
-			viewMenu.add(new ZoomMenu("zoom", 0.5f, graphicPanel));
+			viewMenu.add(new ZoomMenu("zoom", 0.0f, graphicPanel));
 			
 			deskTop.add(graphicFrame);
 			{

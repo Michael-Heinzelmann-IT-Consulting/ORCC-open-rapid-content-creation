@@ -96,10 +96,10 @@ public class SubSampleThread extends Thread {
 
 	@Override
 	public void run() {	
-		
+
 		final SuperSampleData superSampleData = new SuperSampleData();
 		
-		AudioInputStream ais = ai.open();
+		AudioInputStream ais = ai.getAudioStream();
 		try {
 			ByteArrayLinearDecoder.decodeLinear(ais, new DecodingCallback() {
 				final long total = ai.getAudioInputInfo().getFrameLength();
@@ -147,7 +147,6 @@ public class SubSampleThread extends Thread {
 		}
 		finally {
 			IOUtil.safeClose(ais);
-			IOUtil.safeClose(ai);
 		}
 	}
 

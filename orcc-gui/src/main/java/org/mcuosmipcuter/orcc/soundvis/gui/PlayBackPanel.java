@@ -108,7 +108,7 @@ public class PlayBackPanel extends JPanel implements Mixin{
 		jProgressBar.setStringPainted(true);
 		frameCountlabel.reset();
 		timeLabel.reset();
-
+		stateLabel.setText(String.valueOf(Context.getAppState()));
 		final JButton stop = new JButton("[]");
 
 
@@ -131,7 +131,7 @@ public class PlayBackPanel extends JPanel implements Mixin{
 			public void contextChanged(PropertyName propertyName) {
 				if(PropertyName.AppState.equals(propertyName)) {
 					AppState appState = Context.getAppState();
-					stateLabel.setText("" + appState);
+					stateLabel.setText(String.valueOf(appState));
 					stop.setEnabled(appState != AppState.EXPORTING);
 					if(appState == AppState.READY) {
 						playPause.reset();
@@ -140,6 +140,7 @@ public class PlayBackPanel extends JPanel implements Mixin{
 				}
 				if(PropertyName.AudioInputInfo.equals(propertyName)) {
 					playPause.setEnabled(Context.getAudioInput() != null);
+					autoZoom.setEnabled(Context.getAudioInput() != null);
 				}
 				if(PropertyName.AudioInputInfo.equals(propertyName) || PropertyName.VideoFrameRate.equals(propertyName) ) {
 					samplesPerFrame = TimeAndRateHelper.getSamplesPerFrame(Context.getAudioInput().getAudioInputInfo(), Context.getVideoOutputInfo());
@@ -147,6 +148,7 @@ public class PlayBackPanel extends JPanel implements Mixin{
 			}
 		});
 		autoZoom.setSelected(false);
+		autoZoom.setEnabled(false);
 		autoZoom.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -182,7 +184,8 @@ public class PlayBackPanel extends JPanel implements Mixin{
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				final int ftzOld = (Integer)framesToZoom.getValue();
-				JOptionPane.showMessageDialog(null, fz);
+				JOptionPane.showMessageDialog(null, fz, "wave zoom to number of samples", 
+						JOptionPane.PLAIN_MESSAGE);
 				int ftz = (Integer)framesToZoom.getValue(); 
 				if(ftz != ftzOld) {
 					timeLine.setAutoZoom(false);
@@ -204,13 +207,13 @@ public class PlayBackPanel extends JPanel implements Mixin{
 		commands.add(new JLabel(" frames prerun"));
 		commands.add(stop);
 		commands.add(playPause);
+		commands.add(stateLabel);
 		commands.add(autoZoom);
 		
 		JMenuBar waveBar = new JMenuBar();
 		waveBar.add(waveSettings);
 		commands.add(waveBar);
 
-		commands.add(stateLabel);
 		commands.add(frameCountlabel);
 		commands.add(timeLabel);
 		commands.add(jProgressBar);

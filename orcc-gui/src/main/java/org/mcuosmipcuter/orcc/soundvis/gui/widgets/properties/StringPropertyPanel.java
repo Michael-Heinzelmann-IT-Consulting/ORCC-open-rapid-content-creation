@@ -74,7 +74,8 @@ public class StringPropertyPanel extends PropertyPanel<String> {
 	@Override
 	public void setCurrentValue(String currentValue) {
 		super.setCurrentValue(currentValue);
-		textLabel.setText(currentValue);
+		final String text = currentValue != null && currentValue.length() > 24 ? currentValue.substring(0, 20) + " ..." : currentValue;
+		textLabel.setText(text);
 	}
 
 }

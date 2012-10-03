@@ -213,7 +213,7 @@ public class CustomTable extends JPanel{
 		timeline.setLayout(new GridLayout(1, 0, 6, 6));
 		timeline.setBorder(new LineBorder(Color.WHITE, 4));
 		
-		final JCheckBox showCheckBox = new JCheckBox("show", soundCanvasWrapper.isVisible());
+		final JCheckBox showCheckBox = new JCheckBox("on", soundCanvasWrapper.isVisible());
 		showCheckBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -259,8 +259,8 @@ public class CustomTable extends JPanel{
 			
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				
-				JOptionPane.showMessageDialog(null, row.getCanvasPropertyPanel());
+				JOptionPane.showMessageDialog(null, row.getCanvasPropertyPanel(), soundCanvasWrapper.getDisplayName(), 
+						JOptionPane.PLAIN_MESSAGE);
 
 				BufferedImage image = getImage();
 				soundCanvasWrapper.drawCurrentIcon(60, 30, image.createGraphics());

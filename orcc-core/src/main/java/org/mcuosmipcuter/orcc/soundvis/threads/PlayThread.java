@@ -67,8 +67,10 @@ public class PlayThread extends Thread implements PlayPauseStop {
 		status = Status.RUNNING;
 		Context.setAppState(AppState.PLAYING);
 
-		AudioInput audioInput = Context.getAudioInput();
+		
+		AudioInputStream ais = null;
 		try {
+			AudioInput audioInput = Context.getAudioInput();
 			renderer.start(audioInput.getAudioInputInfo(), Context.getVideoOutputInfo());
 			AudioFormat format = audioInput.getAudioInputInfo().getAudioFormat();
 			sourceDataLine = AudioSystem.getSourceDataLine(format);
@@ -77,7 +79,7 @@ public class PlayThread extends Thread implements PlayPauseStop {
 			data = new byte[samplesPerFrame * chunkSize];
 			sourceDataLine.open(format, samplesPerFrame * chunkSize);
 			sourceDataLine.start();
-			AudioInputStream ais = audioInput.open();
+			ais = audioInput.getAudioStream();
 			
 			long preRun = 0;
 			for(SoundCanvas s : Context.getSoundCanvasList()) {
@@ -143,7 +145,7 @@ public class PlayThread extends Thread implements PlayPauseStop {
 				sourceDataLine.stop();
 				sourceDataLine.close();
 			}
-			IOUtil.safeClose(audioInput);
+			IOUtil.safeClose(ais);
 		}
 	}
 	

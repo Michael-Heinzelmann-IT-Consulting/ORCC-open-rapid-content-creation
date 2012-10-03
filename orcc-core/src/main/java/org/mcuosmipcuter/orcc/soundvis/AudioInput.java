@@ -17,8 +17,6 @@
 */
 package org.mcuosmipcuter.orcc.soundvis;
 
-import java.io.Closeable;
-
 import javax.sound.sampled.AudioInputStream;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
@@ -27,7 +25,7 @@ import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
  * Abstraction of an audio input
  * @author Michael Heinzelmann
  */
-public interface AudioInput extends Closeable {
+public interface AudioInput  {
 	
 	enum Type {
 		FILE, STREAM
@@ -48,7 +46,7 @@ public interface AudioInput extends Closeable {
 	 * Open input and return stream, when done reading close with {@link #close()}
 	 * @return the stream for reading
 	 */
-	public AudioInputStream open();
+	public AudioInputStream getAudioStream();
 	
 	/**
 	 * Returns the audio info object belonging to this audio input
