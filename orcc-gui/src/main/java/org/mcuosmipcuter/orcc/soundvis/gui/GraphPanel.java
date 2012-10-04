@@ -213,10 +213,9 @@ public class GraphPanel extends JPanel implements Renderer, Zoomable {
 		}
 		if(frameCount > Context.getSongPositionPointer()) {
 			this.repaint();
-		}
-		
-		if(mixin != null) {
-			mixin.newFrame(frameCount, sendPost);
+			if(mixin != null) {
+				mixin.newFrame(frameCount, sendPost);
+			}
 		}
 		
 		this.frameCount = frameCount;

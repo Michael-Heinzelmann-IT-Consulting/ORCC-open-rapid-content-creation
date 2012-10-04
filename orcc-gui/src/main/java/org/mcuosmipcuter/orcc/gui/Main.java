@@ -303,6 +303,7 @@ public class Main {
 			graphicMenuBar.add(viewMenu);
 			viewMenu.add(new ZoomMenu("zoom", 0.0f, graphicPanel));
 			graphicPanel.setZoomFactor(0.0f);
+			graphicPanel.setOpaque(true);
 			
 			deskTop.add(graphicFrame);
 			{

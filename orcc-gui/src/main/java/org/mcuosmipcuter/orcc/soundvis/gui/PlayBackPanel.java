@@ -74,6 +74,8 @@ public class PlayBackPanel extends JPanel implements Mixin{
 	private long sampleCount;
 	private int samplesPerFrame;
 	
+	private int progressPaintState;
+	
 	TimeLinePanel timeLine = new TimeLinePanel();
 	JScrollPane timeLineScrollPane = new JScrollPane(timeLine);
 	
@@ -95,6 +97,7 @@ public class PlayBackPanel extends JPanel implements Mixin{
 		PlayPauseStopFactory np = new PlayPauseStopFactory() {		
 			@Override
 			public PlayPauseStop newPlayPauseStop() {
+				progressPaintState = 1;
 				return new PlayThread(renderer);
 			}
 		};
@@ -118,11 +121,13 @@ public class PlayBackPanel extends JPanel implements Mixin{
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				progressPaintState = 0;
 				playPause.reset();
 				long startFrame = Context.getSongPositionPointer();
 				frameCountlabel.update(startFrame);
 				sampleCount = startFrame * samplesPerFrame;
 				updateProgress();
+				timeLine.repaint();
 			}
 		});
 		Context.addListener(new Listener() {
@@ -163,7 +168,6 @@ public class PlayBackPanel extends JPanel implements Mixin{
 		preRunFrames.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent arg0) {
 				timeLine.setPreRunFrames((Integer)preRunFrames.getValue());
-				timeLine.repaint();
 			}
 		});
 
@@ -230,6 +234,14 @@ public class PlayBackPanel extends JPanel implements Mixin{
 	public void newFrame(long frameCount, boolean sendPost) {
 		frameCountlabel.update(frameCount);
 		updateProgress();
+		if(progressPaintState == 1) {
+			timeLine.repaint();
+			progressPaintState = 2;
+		}
+		if(progressPaintState == 2) {
+			timeLine.paintProgress();
+		}
+		
 	}
 	@Override
 	public boolean nextSample(int[] amplitudes, byte[] rawData, long sampleCount) {
@@ -237,6 +249,7 @@ public class PlayBackPanel extends JPanel implements Mixin{
 		if(sampleCount >= sampleLength) {
 			updateProgress();
 			playPause.reset();
+			timeLine.repaint();
 		}
 		return true; // always continue
 	}
@@ -251,7 +264,6 @@ public class PlayBackPanel extends JPanel implements Mixin{
 			jProgressBar.setValue((int)(d * 100));
 			timeLabel.update(sampleCount, sampleRate);
 			timeLine.setSamplePosition(sampleCount);
-			timeLine.repaint();
 		}
 	}
 

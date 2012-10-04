@@ -54,6 +54,13 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 	private final int margin = 20;
 	private final int marginY = 24;
 	private final int displaySecondsStep = 5;
+	private final static Color selectPointerColor = new Color(Color.YELLOW.getRed(), Color.YELLOW.getGreen(), Color.YELLOW.getBlue(), 128);
+	private final static Color selectFrameWidthColor =  new Color(Color.YELLOW.getRed(), Color.YELLOW.getGreen(), Color.YELLOW.getBlue(), 44);
+	private final static Color timeMarkerColor = new Color(136, 166, 166);
+	private final static Color timeNumbersColor = new Color(136, 200, 200);
+	private final static Color selectedCanvasColor = new Color(255, 255, 255, 200);
+	private final static Color canvasColor1 = new Color(146, 166, 176, 44);
+	private final static Color canvasColor2 = new Color(146, 176, 146, 44);
 	
 	// flexible layout screen dependent
 	int widthToUse;
@@ -74,11 +81,13 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 	private SuperSampleData superSampleDataAutoZoomed;
 	private SuperSampleData superSampleDataFrameZoomed;
 	private int noOfSamples;
+	private int divY = 1;
 	
 	// user and play positions
 	private int selectPos = margin;
 	private long selectFrame;
 	private long samplePosition;
+	private int paintProgressPos;
 	
 	// data from input / output
 	private int samplesPerFrame = 1;
@@ -115,7 +124,9 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 				if(f < 0) {
 					f = 0;
 				}
-				Context.setSongPositionPointer(f);
+				if(Context.getAppState() == AppState.READY) {
+					Context.setSongPositionPointer(f);
+				}
 				selectFrame = frame;
 			}
 			
@@ -154,23 +165,22 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 					superSampleDataAutoZoomed = null; // forces reload
 					setInputOutputData();
 				}
-			}
-		});
-		
-		Context.addListener(new Context.Listener() {
-			@Override
-			public void contextChanged(PropertyName propertyName) {
-				
 				if( Context.PropertyName.SoundCanvasList == propertyName ||
 					Context.PropertyName.SoundCanvasAdded == propertyName || 
 					Context.PropertyName.SoundCanvasRemoved == propertyName) {
-					currentCanvasList.clear();
-					currentCanvasList.addAll(Context.getSoundCanvasList());
-					repaint();
+						currentCanvasList.clear();
+						currentCanvasList.addAll(Context.getSoundCanvasList());
+						repaint();
 				}
-				
+				if(PropertyName.AppState.equals(propertyName)) {
+					if(Context.getAppState() == AppState.READY) {
+						Context.setSongPositionPointer(selectFrame - preRunFrames);
+					}
+				}
 			}
+
 		});
+
 	}
 	
 	// paint a message
@@ -180,7 +190,26 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 		g.setColor(Color.WHITE);
 		g.drawString("loading ...", Math.max(guiWidth / 2, selectPos), getHeight() / 2);
 	}
-	
+	public void paintProgress() {
+		
+		if(loading) {
+			return;
+		}
+		
+		Graphics g = getGraphics();
+		
+		int currentPos = (int)(samplePosition / noOfSamples);
+		if(paintProgressPos > currentPos) {
+			paintProgressPos = currentPos > 1 ? currentPos - 1 : 0;
+		}
+		for(int pos = paintProgressPos + 1; pos <= currentPos; pos++) {
+			SuperSample s = superSampleData.getList().get(pos);
+			int x = margin + 1 + pos;
+			g.setColor(Color.BLACK);
+			g.drawLine(x, heightToUse /2 - s.getMax() / divY, x, heightToUse / 2 - s.getMin() / divY);
+		}
+		paintProgressPos = currentPos;
+	}
 	@Override
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
@@ -194,23 +223,9 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 			final int h = heightToUse;
 			final int w = widthToUse;
 			
-			int divY = (Math.max(Math.abs(superSampleData.getOverallMin()), Math.abs(superSampleData.getOverallMax())) * 2 / (h - marginY * 2)) + 1;
-			int x = margin + 1;
-			g.setColor(Color.BLACK);
-
-			for(SuperSample s : superSampleData.getList()) {
-				g.drawLine(x, h /2 - s.getMax() / divY, x, h / 2 - s.getMin() / divY);
-				if(samplePosition > pos && samplePosition <= pos + s.getNoOfSamples()) {
-					g.setColor(Color.WHITE);
-					g.drawLine(x, 0, x , h);
-				}
-				x++;
-				pos += s.getNoOfSamples();
-			}
-			
 			
 			int y = 0;
-			int b = h ;
+			int b = h / 2;
 			int count = 0;
 			long [][] layers = new long[currentCanvasList.size()][3];
 			Rectangle selectedCanvas = null;
@@ -220,7 +235,7 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 				final long longTo = scw.getFrameTo();
 				final int from = margin + (int)(longFrom * samplesPerFrame / noOfSamples);
 				final int to = longTo == 0 ? w - margin : margin+  (int)(longTo * samplesPerFrame / noOfSamples);
-				Color c = (count % 2 == 0) ? new Color(146, 166, 176, 44) : new Color(146, 176, 146, 44);
+				Color c = (count % 2 == 0) ? canvasColor1  : canvasColor2;
 				
 				g.setColor(c);
 				int delta = 0;
@@ -236,7 +251,7 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 					}
 
 				}
-				delta = free * 6;// TODO
+				delta = free * 4;// TODO
 				g.fillRoundRect(from, y + delta, to - from, b, 16, 16);
 				layers[count][0] = longFrom;
 				layers[count][1] = longTo;
@@ -250,8 +265,7 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 				count++;
 			}
 			if(selectedCanvas != null) {
-				Color c = new Color(255, 255, 255, 200);
-				g.setColor(c);
+				g.setColor(selectedCanvasColor);
 				g.fillRoundRect(selectedCanvas.x, selectedCanvas.y, selectedCanvas.width, selectedCanvas.height, 16, 16);
 			}
 			
@@ -263,36 +277,45 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 			int accumSecTimeDrawn = -1;
 
 			for(int i = 0; i < w - margin; i ++) {
-				int pixel = i ;
-				Long frame = new Long(pixel * noOfSamples / samplesPerFrame);
 				
-				if(frame == selectFrame) {
-					g.setColor(new Color(Color.YELLOW.getRed(), Color.YELLOW.getGreen(), Color.YELLOW.getBlue(), 44));
+				if(i * noOfSamples / samplesPerFrame == selectFrame) {
+					g.setColor(selectFrameWidthColor);
 					g.drawLine(margin + i, 0, margin + i, h);
 				}
-				if(margin + i  == selectPos) {
-					g.setColor(new Color(Color.YELLOW.getRed(), Color.YELLOW.getGreen(), Color.YELLOW.getBlue(), 128));
-					g.drawLine(margin + i, 0, margin + i, h);
-					g.drawString(String.valueOf(frame), margin + i + 1, 16);
-				}
-
-				int accumSec = pixel * noOfSamples / sampleRate ;
+				
+				int accumSec = i * noOfSamples / sampleRate ;
 				
 				if(accumSec % (timeMod) == 0 && accumSec > accumSecTimeDrawn) {
 					accumSecTimeDrawn = accumSec;
 					if(i + margin < w - margin) {
-						g.setColor(new Color(136, 166, 166));
+						g.setColor(timeMarkerColor);
 						g.drawLine(margin + i, h - 20, margin + i, h - 12);
 						int minutes = accumSec / 60;
 						int seconds = accumSec % 60;
 						String minPref = minutes < 10 ? "0" : "";
 						String secPref = seconds < 10 ? "0" : "";
-						g.setColor(new Color(136, 200, 200));
+						g.setColor(timeNumbersColor);
 						g.drawString(minPref + minutes + ":" + secPref + seconds, margin + i + 1, h - 4);
 					}
 				}
 			}
 			
+			int x = margin + 1;
+			g.setColor(Color.BLACK);
+
+			for(SuperSample s : superSampleData.getList()) {
+				g.drawLine(x, h /2 - s.getMax() / divY, x, h / 2 - s.getMin() / divY);
+				if(samplePosition >= pos && samplePosition <= pos + s.getNoOfSamples()) {
+					g.setColor(Color.WHITE);
+				}
+				x++;
+				pos += s.getNoOfSamples();
+			}
+			
+			g.setColor(selectPointerColor);
+			g.drawLine(selectPos, 0, selectPos, h);
+			g.drawString(String.valueOf(selectFrame), selectPos + 1, 16);
+		
 		}
 	}
 	
@@ -326,6 +349,7 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 				@Override
 				public void finishedSampling(SuperSampleData superSampleData) {
 					TimeLinePanel.this.superSampleData = superSampleData;
+					divY = (Math.max(Math.abs(superSampleData.getOverallMin()), Math.abs(superSampleData.getOverallMax())) * 2 / (heightToUse - marginY * 2)) + 1;
 					if(autoZoom) {
 						superSampleDataAutoZoomed = superSampleData;
 					}
