@@ -197,6 +197,9 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 		}
 		
 		Graphics g = getGraphics();
+		if(g == null) {
+			return;
+		}
 		
 		int currentPos = (int)(samplePosition / noOfSamples);
 		if(paintProgressPos > currentPos) {
@@ -376,6 +379,7 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 			setPreferredSize(new Dimension(widthRequired, heightToUse));
 			setSize(widthRequired, heightToUse);
 			widthToUse = widthRequired;
+
 		}
 		selectPos = (int)(selectFrame * samplesPerFrame /  noOfSamples) + 1 + margin;
 		repaint();
