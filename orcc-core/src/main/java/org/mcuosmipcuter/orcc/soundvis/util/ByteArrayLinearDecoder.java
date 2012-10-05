@@ -37,11 +37,13 @@ public class ByteArrayLinearDecoder {
 	 * @param isBigEndian byte order used
 	 * @return decoded unsigned amplitude array
 	 */
-	public static int[] decodeLinear(byte[] source, final int channels, final int words, final boolean isBigEndian) {
-		int[] amplitudes = new int[channels];
+	public static int[] decodeLinear(byte[] source, int[] amplitudes, final int channels, final int words, final boolean isBigEndian) {
+		if(amplitudes == null) {
+			amplitudes = new int[channels];
+		}
 		int chunkPos = 0;
 		for(int channel = 0; channel < channels; channel++) {
-
+			amplitudes[channel] = 0;
 			for(int word = 1; word <= words; word++) {
 				if(isBigEndian) {
 					int us = 128 + source[chunkPos++];
@@ -59,6 +61,7 @@ public class ByteArrayLinearDecoder {
 		}
 		return amplitudes;
 	}
+
 	/**
 	 * Decode the given audio stream using the given callback
 	 * @param ais audio input stream
@@ -74,10 +77,11 @@ public class ByteArrayLinearDecoder {
 		final boolean isBigEndian = format.isBigEndian();
 
 		byte[] barr = new byte[chunkSize];
+		int[] amplitudes = new int[channels];
 		boolean keepReading = true;
 		long sampleCount = 0;
 		while(keepReading && ais.read(barr, 0, chunkSize) != -1) {
-			int[] amplitudes = ByteArrayLinearDecoder.decodeLinear(barr, channels, words, isBigEndian);
+			ByteArrayLinearDecoder.decodeLinear(barr, amplitudes, channels, words, isBigEndian);
 			keepReading = decodingCallback.nextSample(amplitudes, barr, ++sampleCount);
 		}
 	}
