@@ -78,6 +78,7 @@ public class PlayThread extends Thread implements PlayPauseStop {
 			samplesPerFrame = (int)format.getSampleRate() / Context.getVideoOutputInfo().getFramesPerSecond();
 			data = new byte[samplesPerFrame * chunkSize];
 			sourceDataLine.open(format, samplesPerFrame * chunkSize);
+			IOUtil.log("samplesPerFrame * chunkSize: " + (samplesPerFrame * chunkSize) + " size: " + sourceDataLine.getBufferSize());
 			sourceDataLine.start();
 			ais = audioInput.getAudioStream();
 			
@@ -122,9 +123,12 @@ public class PlayThread extends Thread implements PlayPauseStop {
 						frameCount++;
 						renderer.newFrame(frameCount, cont);
 						if(frameCount > Context.getSongPositionPointer()) {
-							sourceDataLine.write(data, 0, data.length); // blocks for the time of playing
-						}	
-						data = new byte[samplesPerFrame * chunkSize];
+							final int avail = sourceDataLine.available();
+							int written = sourceDataLine.write(data, 0, data.length); // blocks for the time of playing
+							if(avail == 0 || avail > data.length) {
+								IOUtil.log(avail + " was available,  written: " + written + " requested:" + data.length);
+							}	
+						}
 						dataPos = 0;	
 					}
 					return cont;

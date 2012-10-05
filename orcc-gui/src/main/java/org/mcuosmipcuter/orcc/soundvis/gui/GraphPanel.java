@@ -81,7 +81,7 @@ public class GraphPanel extends JPanel implements Renderer, Zoomable {
 
 	private static final long serialVersionUID = 1L;
 	private Mixin mixin;
-	private List<SoundCanvasWrapper> soundCanvasList; // canvas list to work with
+	private SoundCanvasWrapper[] soundCanvasArray; // canvas list as array to work with
 	
 	private BufferedImage frameImage;
 	private Graphics2D graphics;
@@ -129,6 +129,9 @@ public class GraphPanel extends JPanel implements Renderer, Zoomable {
 						setZoomFactor(0.0f); // adapt to new size
 					}
 				}
+				if(PropertyName.SoundCanvasList.equals(propertyName)) {
+					soundCanvasArray = Context.getSoundCanvasList().toArray(new SoundCanvasWrapper[0]);
+				}
 				
 			}
 		});
@@ -170,8 +173,8 @@ public class GraphPanel extends JPanel implements Renderer, Zoomable {
 	public void start(AudioInputInfo audioInputInfo, VideoOutputInfo videoOutputInfo)  {
 		frameImage = new BufferedImage(videoOutputInfo.getWidth(), videoOutputInfo.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
 		graphics = frameImage.createGraphics();
-		soundCanvasList = Context.getSoundCanvasList();
-		for(SoundCanvas soundCanvas : soundCanvasList) {
+		soundCanvasArray = Context.getSoundCanvasList().toArray(new SoundCanvasWrapper[0]);
+		for(SoundCanvas soundCanvas : soundCanvasArray) {
 			soundCanvas.prepare(audioInputInfo, videoOutputInfo);
 		}
 		mixin.start(audioInputInfo, videoOutputInfo);
@@ -194,7 +197,7 @@ public class GraphPanel extends JPanel implements Renderer, Zoomable {
 
 	@Override
 	public boolean nextSample(int[] amplitudes, byte[] rawData, long sampleCount) {
-		for(SoundCanvas soundCanvas : soundCanvasList) {
+		for(SoundCanvas soundCanvas : soundCanvasArray) {
 			soundCanvas.nextSample(amplitudes);
 		}
 		if(mixin != null) {
@@ -205,7 +208,7 @@ public class GraphPanel extends JPanel implements Renderer, Zoomable {
 
 	@Override
 	public void newFrame(long frameCount, boolean sendPost) {
-		for(SoundCanvas soundCanvas : soundCanvasList) {
+		for(SoundCanvas soundCanvas : soundCanvasArray) {
 			soundCanvas.newFrame(frameCount, graphics);
 			if(sendPost) {
 				soundCanvas.postFrame();
