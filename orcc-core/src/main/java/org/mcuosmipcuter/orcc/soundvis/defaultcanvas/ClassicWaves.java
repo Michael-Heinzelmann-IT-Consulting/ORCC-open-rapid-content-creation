@@ -99,7 +99,7 @@ public class ClassicWaves implements SoundCanvas {
 		float sampleRate = audioInputInfo.getAudioFormat().getSampleRate(); 
 		int pixelLengthOfaFrame = (int)Math.ceil(sampleRate / (float)frameRate); // e.g. 44100 / 25 = 1764
 		factor = (int)(pixelLengthOfaFrame / videoOutputInfo.getWidth()) + 1;
-		int pixelsUsed = pixelLengthOfaFrame / factor;
+		int pixelsUsed = (int)Math.ceil((float)pixelLengthOfaFrame / (float)factor);
 		amplitudes = new int[pixelsUsed];
 		//System.err.println(pixelsUsed + " used factor " + factor);
 		leftMargin =  (videoOutputInfo.getWidth() - pixelsUsed) / 2;
