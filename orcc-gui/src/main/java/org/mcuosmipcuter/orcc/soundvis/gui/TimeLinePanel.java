@@ -152,18 +152,15 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 			
 			@Override
 			public void contextChanged(PropertyName propertyName) {
-				if(PropertyName.AudioInputInfo.equals(propertyName)) {
+				if(PropertyName.AudioInputInfo.equals(propertyName) 
+						|| PropertyName.VideoFrameRate.equals(propertyName)) {
 					superSampleDataFrameZoomed = null;
 					superSampleDataAutoZoomed = null; // forces reload
 					setInputOutputData();
 					selectPos = margin;
 					samplePosition = 0;
+					selectFrame = 0;
 					Context.setSongPositionPointer(0);
-				}
-				if(PropertyName.VideoFrameRate.equals(propertyName)) {
-					superSampleDataFrameZoomed = null;
-					superSampleDataAutoZoomed = null; // forces reload
-					setInputOutputData();
 				}
 				if( Context.PropertyName.SoundCanvasList == propertyName ||
 					Context.PropertyName.SoundCanvasAdded == propertyName || 
@@ -175,6 +172,9 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 				if(PropertyName.AppState.equals(propertyName)) {
 					if(Context.getAppState() == AppState.READY) {
 						Context.setSongPositionPointer(selectFrame - preRunFrames);
+					}
+					if(Context.getAppState() == AppState.EXPORTING) {
+						Context.setSongPositionPointer(0);
 					}
 				}
 			}
@@ -197,21 +197,24 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 		}
 		
 		Graphics g = getGraphics();
+		
 		if(g == null) {
 			return;
 		}
-		
+
 		int currentPos = (int)(samplePosition / noOfSamples);
 		if(paintProgressPos > currentPos) {
 			paintProgressPos = currentPos > 1 ? currentPos - 1 : 0;
 		}
-		for(int pos = paintProgressPos + 1; pos <= currentPos; pos++) {
-			SuperSample s = superSampleData.getList().get(pos);
+		final int listLength = superSampleData.getList().length;
+		for(int pos = paintProgressPos + 1; pos <= currentPos && pos < listLength; pos++) {
+			SuperSample s = superSampleData.getList()[pos];
 			int x = margin + 1 + pos;
 			g.setColor(Color.BLACK);
 			g.drawLine(x, heightToUse /2 - s.getMax() / divY, x, heightToUse / 2 - s.getMin() / divY);
 		}
 		paintProgressPos = currentPos;
+		
 	}
 	@Override
 	protected void paintComponent(Graphics g) {
