@@ -62,7 +62,6 @@ public class ExportThread extends Thread implements PlayPauseStop {
 	// state
 	private  long sampleCount;
 	private  long frameCount;
-	private  long time = 0;
 	Status status = Status.NEW;
 
 
@@ -93,7 +92,7 @@ public class ExportThread extends Thread implements PlayPauseStop {
 
 			final IRational FRAME_RATE =  IRational.make(framesPerSecond);
 			writer.addVideoStream(0, 0, FRAME_RATE, width, height);
-			writer.addAudioStream(1, 0, codec, 2, 44100);
+			writer.addAudioStream(1, 0, codec, 2, (int)format.getSampleRate());
 
 			container = IContainer.make();
 			if (container.open(inputAudioFilename, IContainer.Type.READ, null) < 0) {
@@ -156,8 +155,7 @@ public class ExportThread extends Thread implements PlayPauseStop {
 								if(sampleCount % samplesPerFrame == 0){
 									frameCount++;
 									renderer.newFrame(frameCount, true);
-									writer.encodeVideo(0, renderer.getFrameImage(), time, TimeUnit.MILLISECONDS);
-									time += (long)(1000 / framesPerSecond);
+									writer.encodeVideo(0, renderer.getFrameImage(), ((frameCount - 1) * 1000) / framesPerSecond, TimeUnit.MILLISECONDS);
 								}
 							}
 

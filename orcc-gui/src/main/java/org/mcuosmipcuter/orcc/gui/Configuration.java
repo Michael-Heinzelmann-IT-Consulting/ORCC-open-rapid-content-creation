@@ -23,6 +23,7 @@ import java.util.TreeSet;
 import javax.swing.UIManager;
 
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
+import org.mcuosmipcuter.orcc.soundvis.AppLogicException;
 import org.mcuosmipcuter.orcc.soundvis.Context;
 import org.mcuosmipcuter.orcc.util.ClassPathExplodedDirLoader;
 import org.mcuosmipcuter.orcc.util.IOUtil;
@@ -118,7 +119,11 @@ public abstract class Configuration {
 			}
 			// file defaults
 			if(args.length > 2) {
-				Context.setAudioFromFile(args[2]);
+				try {
+					Context.setAudioFromFile(args[2]);
+				} catch (AppLogicException ex) {
+					throw new RuntimeException(ex);
+				}
 			}
 			if(args.length > 3) {
 				Context.setExportFileName(args[3]);

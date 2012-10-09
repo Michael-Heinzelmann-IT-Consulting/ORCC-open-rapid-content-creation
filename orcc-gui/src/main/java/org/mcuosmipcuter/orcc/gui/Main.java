@@ -42,6 +42,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.gui.table.CustomTable;
+import org.mcuosmipcuter.orcc.soundvis.AppLogicException;
 import org.mcuosmipcuter.orcc.soundvis.AudioInput;
 import org.mcuosmipcuter.orcc.soundvis.Context;
 import org.mcuosmipcuter.orcc.soundvis.Context.AppState;
@@ -123,7 +124,11 @@ public class Main {
 				fileMenu.add(openAudio);
 				CallBack openAudioCallback = new CallBack() {
 					public void fileSelected(File file) {
-						Context.setAudioFromFile(file.getAbsolutePath());
+						try {
+							Context.setAudioFromFile(file.getAbsolutePath());
+						} catch (AppLogicException ex) {
+							throw new RuntimeException(ex);
+						}
 					}
 				};
 				FileDialogActionListener importActionListener 
@@ -208,9 +213,6 @@ public class Main {
 			final JInternalFrame playBackFrame = new JInternalFrame("Timeline", true, false, true, true);
 			deskTop.add(playBackFrame);
 			
-			
-			
-			
 			{
 				playBackFrame.getContentPane().add(playBackPanel, BorderLayout.SOUTH);
 				graphicPanel.setMixin(playBackPanel);
@@ -280,25 +282,29 @@ public class Main {
 			final JInternalFrame graphicFrame = new JInternalFrame("Graph", true, false, true, true);
 			JMenuBar graphicMenuBar = new JMenuBar();
 			graphicFrame.setJMenuBar(graphicMenuBar);
-			
-			final JMenu configMenu = new JMenu("Configuration");
-			graphicMenuBar.add(configMenu);
-			{
+			{			
+				
+				final JMenu configMenu = new JMenu("Configuration");
+				graphicMenuBar.add(configMenu);
+
 				VideoOutputInfo v = Context.getVideoOutputInfo();
 				configMenu.add(new ResolutionMenu("video size", v.getWidth(), v.getHeight()));
 				final FrameRateMenu frameRates = new FrameRateMenu("frame rate", v.getFramesPerSecond());
 				configMenu.addSeparator();
 				configMenu.add(frameRates);
-			}
-			
-			// context listener for menu enabling
-			Context.addListener(new Listener() {
-				public void contextChanged(PropertyName propertyName) {
-					if(PropertyName.AppState.equals(propertyName)) {
-						configMenu.setEnabled(Context.getAppState() == AppState.READY);
+
+				// context listener for menu enabling
+				Context.addListener(new Listener() {
+					public void contextChanged(PropertyName propertyName) {
+						if(PropertyName.AppState.equals(propertyName)) {
+							configMenu.setEnabled(Context.getAppState() == AppState.READY);
+						}
+						if(PropertyName.AudioInputInfo.equals(propertyName)) {
+							frameRates.checkFrameRatesEnabled(Context.getAudioInput().getAudioInputInfo());
+						}
 					}
-				}
-			});
+				});
+			}
 			final JMenu viewMenu = new JMenu("View");
 			graphicMenuBar.add(viewMenu);
 			viewMenu.add(new ZoomMenu("zoom", 0.0f, graphicPanel));

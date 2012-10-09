@@ -24,6 +24,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.JMenu;
 import javax.swing.JRadioButtonMenuItem;
 
+import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
 import org.mcuosmipcuter.orcc.soundvis.Context;
 
 /**
@@ -33,7 +34,8 @@ import org.mcuosmipcuter.orcc.soundvis.Context;
 public class FrameRateMenu extends JMenu {
 
 	private static final long serialVersionUID = 1L;
-
+	
+	private int[] frameRates = new int[] {24, 25, 30, 60};
 
 	/**
 	 * Same constructor as for standard menus
@@ -42,7 +44,7 @@ public class FrameRateMenu extends JMenu {
 	public FrameRateMenu(String title, final int initialFrameRate) {
 		super(title);
 		ButtonGroup group = new ButtonGroup();
-		for(final int frameRate : new int[] {24, 25, 30, 60}) {
+		for(final int frameRate : frameRates) {
 			final JRadioButtonMenuItem item = new JRadioButtonMenuItem(frameRate + " fps");
 			item.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
@@ -61,5 +63,18 @@ public class FrameRateMenu extends JMenu {
 		}
 	}
 
+	/**
+	 * Check and set the frame rates according to audio input
+	 * @param audioInputInfo
+	 */
+	public void checkFrameRatesEnabled(AudioInputInfo audioInputInfo) {
+		float sampleRate = audioInputInfo.getAudioFormat().getSampleRate();
+		int pos = 0;
+		for(int frameRate : frameRates) {
+			boolean isWorkingFrameRate = sampleRate % frameRate == 0;
+			getItem(pos).setEnabled(isWorkingFrameRate);
+			pos++;
+		}
+	}
 }
 

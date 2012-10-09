@@ -120,7 +120,13 @@ public abstract class Context {
 	 * Sets the target video frame rate
 	 * @param frameRate the frame rate to use
 	 */
-	public static synchronized void setOutputFrameRate(int frameRate) {
+	public static synchronized void setOutputFrameRate(int frameRate) throws AppLogicException {
+		if(audioInput != null) {
+			final float sampleRate = audioInput.getAudioInputInfo().getAudioFormat().getSampleRate();
+			if(sampleRate % frameRate != 0) {
+				throw new AppLogicException("sample rate " + sampleRate + " % frame rate " + frameRate + " is not 0");
+			}
+		}
 		videoOutputInfo.setFramesPerSecond(frameRate);
 		notifyListeners(PropertyName.VideoFrameRate);
 	}
@@ -156,8 +162,14 @@ public abstract class Context {
 	 * Sets the audio from a file
 	 * @param audioFileName full path to the file
 	 */
-	public static synchronized void setAudioFromFile(String audioFileName) {
-		audioInput = new AudioFileInputImpl(audioFileName);
+	public static synchronized void setAudioFromFile(String audioFileName) throws AppLogicException {
+		AudioInput a = new AudioFileInputImpl(audioFileName);
+		final float sampleRate = a.getAudioInputInfo().getAudioFormat().getSampleRate();
+		final int frameRate = videoOutputInfo.getFramesPerSecond();
+		if(sampleRate % frameRate != 0) {
+			throw new AppLogicException("sample rate " + sampleRate + " % frame rate " + frameRate + " is not 0");
+		}
+		audioInput = a;
 		notifyListeners(PropertyName.AudioInputInfo);
 
 	}
