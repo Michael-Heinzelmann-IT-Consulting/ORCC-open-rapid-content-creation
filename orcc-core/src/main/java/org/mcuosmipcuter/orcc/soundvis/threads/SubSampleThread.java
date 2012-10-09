@@ -69,10 +69,10 @@ public class SubSampleThread extends Thread {
 		
 	}
 	public static class SuperSampleData {
-		private final List<SuperSample> list = new ArrayList<SubSampleThread.SuperSample>();
+		private SuperSample[] list;
 		private int overallMin;
 		private int overallMax;
-		public List<SuperSample> getList() {
+		public SuperSample[] getList() {
 			return list;
 		}
 		public int getOverallMin() {
@@ -98,6 +98,7 @@ public class SubSampleThread extends Thread {
 	public void run() {	
 
 		final SuperSampleData superSampleData = new SuperSampleData();
+		final List<SuperSample> list = new ArrayList<SubSampleThread.SuperSample>();
 		
 		AudioInputStream ais = ai.getAudioStream();
 		try {
@@ -124,7 +125,7 @@ public class SubSampleThread extends Thread {
 						int signedMin = min - sampleCenter;
 						int signedMax = max - sampleCenter;
 						SuperSample superSample = new SuperSample(signedMin, signedMax, counter);
-						superSampleData.list.add(superSample);
+						list.add(superSample);
 						if(signedMin < superSampleData.overallMin) {
 							superSampleData.overallMin = signedMin;
 						}
@@ -139,7 +140,7 @@ public class SubSampleThread extends Thread {
 				}
 
 			});
-			
+			superSampleData.list = list.toArray(new SuperSample[0]);
 			callBack.finishedSampling(superSampleData);
 			
 		} catch (IOException ex) {
