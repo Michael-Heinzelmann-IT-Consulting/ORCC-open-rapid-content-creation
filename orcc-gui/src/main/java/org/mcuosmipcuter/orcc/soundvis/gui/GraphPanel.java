@@ -26,8 +26,6 @@ import java.awt.RadialGradientPaint;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.swing.JPanel;
 
@@ -60,9 +58,7 @@ public class GraphPanel extends JPanel implements Renderer, Zoomable {
 			IOUtil.log("starting refresh...");
 			while(running) {
 				try {
-					List<SoundCanvasWrapper> currentList = new ArrayList<SoundCanvasWrapper>();
-					currentList.addAll(Context.getSoundCanvasList());
-					for(SoundCanvas soundCanvas : currentList) {
+					for(SoundCanvas soundCanvas : soundCanvasArray) {
 						if(running) {
 							soundCanvas.newFrame(frameCount, graphics);
 						}
@@ -70,7 +66,6 @@ public class GraphPanel extends JPanel implements Renderer, Zoomable {
 					repaint();
 					Thread.sleep(80);
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
@@ -216,11 +211,10 @@ public class GraphPanel extends JPanel implements Renderer, Zoomable {
 		}
 		if(frameCount > Context.getSongPositionPointer()) {
 			this.repaint();
-			if(mixin != null) {
-				mixin.newFrame(frameCount, sendPost);
-			}
 		}
-		
+		if(mixin != null) {
+			mixin.newFrame(frameCount, sendPost);
+		}
 		this.frameCount = frameCount;
 	}
 
