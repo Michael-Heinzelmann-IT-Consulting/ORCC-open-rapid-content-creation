@@ -23,7 +23,6 @@ import java.awt.image.BufferedImage;
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
-import org.mcuosmipcuter.orcc.soundvis.Context;
 import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
 
 /**
@@ -64,8 +63,7 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 	public void prepare(AudioInputInfo audioInputInfo,
 			VideoOutputInfo videoOutputInfo) {
 		soundCanvas.prepare(audioInputInfo, videoOutputInfo);
-		//BufferedImage bi = new BufferedImage(videoOutputInfo.getWidth(), videoOutputInfo.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
-		// TODO performance test - there seems an impact when drawing on a large image, since this image is for nothing it can be small (?)
+		//since this image is for nothing it can be small
 		BufferedImage bi = new BufferedImage(1, 1, BufferedImage.TYPE_3BYTE_BGR);
 		devNullGraphics = bi.createGraphics();
 	}
