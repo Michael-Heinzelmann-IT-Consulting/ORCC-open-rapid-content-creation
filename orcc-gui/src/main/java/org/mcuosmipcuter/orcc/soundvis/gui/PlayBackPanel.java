@@ -80,26 +80,18 @@ public class PlayBackPanel extends JPanel implements Mixin{
 	
 	private int progressPaintState;
 	
-	TimeLinePanel timeLine = new TimeLinePanel();
-	JScrollPane timeLineScrollPane = new JScrollPane(timeLine);
-	JSlider volume = new JSlider(){
-		private static final long serialVersionUID = 1L;
-		@Override
-		protected void paintComponent(Graphics g) {
-			super.paintComponent(g);
-			g.setXORMode(Color.BLACK);
-			g.drawString("volume", 20, 20);
-			g.setPaintMode();
-		}};
+	private TimeLinePanel timeLine = new TimeLinePanel();
+	private JScrollPane timeLineScrollPane = new JScrollPane(timeLine);
+	private JSlider volume;
 	private FrameLabel frameCountlabel = new FrameLabel();
 	private TimeLabel timeLabel = new TimeLabel();
 	private JLabel stateLabel = new JLabel();
-	JProgressBar jProgressBar = new JProgressBar();
-	PlayPauseButton playPause;
-	JToggleButton autoZoom = new JToggleButton("fit/zoom");
+	private JProgressBar jProgressBar = new JProgressBar();
+	private PlayPauseButton playPause;
+	private JToggleButton autoZoom = new JToggleButton("fit/zoom");
 
-	SpinnerNumberModel modelPreRun = new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 10);
-	final JSpinner preRunFrames = new JSpinner(modelPreRun);
+	private final SpinnerNumberModel modelPreRun = new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 10);
+	private final JSpinner preRunFrames = new JSpinner(modelPreRun);
 	
 	/**
 	 * Sets up a stop, play/pause button and a status label
@@ -113,6 +105,15 @@ public class PlayBackPanel extends JPanel implements Mixin{
 				return new PlayThread(renderer);
 			}
 		};
+		volume  = new JSlider(){
+			private static final long serialVersionUID = 1L;
+			@Override
+			protected void paintComponent(Graphics g) {
+				super.paintComponent(g);
+				g.setXORMode(Color.BLACK);
+				g.drawString("volume", 20, 20);
+				g.setPaintMode();
+			}};
 		playPause = new PlayPauseButton(np);
 		volume.setToolTipText("Volume");
 		volume.setValue(0);
@@ -140,6 +141,9 @@ public class PlayBackPanel extends JPanel implements Mixin{
 			}
 		}
 	}
+	/**
+	 * Setup the panel components
+	 */
 	public void init() {
 		setBorder(new LineBorder(Color.WHITE, 5));
 		jProgressBar.setMaximum(100);
@@ -191,11 +195,8 @@ public class PlayBackPanel extends JPanel implements Mixin{
 						volume.setMinimum((int)vol.getMinimum());
 						volume.setMaximum((int)vol.getMaximum());
 						volume.setEnabled(true);
-						//volume.setPaintLabels(true);
 						volume.setPaintTicks(true);
 						volume.setMajorTickSpacing(20);
-						//volume.setSize(200, 20);
-						//volume.setLabelTable(volume.createStandardLabels(20));
 						setVolume(vol);
 					}
 				}
