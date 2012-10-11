@@ -132,8 +132,8 @@ public class ColorsLR implements SoundCanvas {
 	public void postFrame() {
 		maxL = 0;
 		maxR = 0;
-		minL = (int)amplitude.getAmplitudeRange();
-		minR = (int)amplitude.getAmplitudeRange();
+		minL = (int)amplitude.getAmplitudeRange() - 1; // the max value is range minus one
+		minR = (int)amplitude.getAmplitudeRange() - 1;
 	}
 
 	@Override
