@@ -201,7 +201,8 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 		if(g == null) {
 			return;
 		}
-
+		
+		g.setColor(Color.BLACK);
 		int currentPos = (int)(samplePosition / noOfSamples);
 		if(paintProgressPos > currentPos) {
 			paintProgressPos = currentPos > 1 ? currentPos - 1 : 0;
@@ -210,7 +211,6 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 		for(int pos = paintProgressPos + 1; pos <= currentPos && pos < listLength; pos++) {
 			SuperSample s = superSampleData.getList()[pos];
 			int x = margin + 1 + pos;
-			g.setColor(Color.BLACK);
 			g.drawLine(x, heightToUse /2 - s.getMax() / divY, x, heightToUse / 2 - s.getMin() / divY);
 		}
 		paintProgressPos = currentPos;
