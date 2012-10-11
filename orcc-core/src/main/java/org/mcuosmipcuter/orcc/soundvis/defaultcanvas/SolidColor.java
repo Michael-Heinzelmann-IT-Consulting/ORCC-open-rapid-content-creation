@@ -25,6 +25,7 @@ import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
+import org.mcuosmipcuter.orcc.api.util.ColorHelper;
 
 /**
  * Displays a solid color
@@ -38,6 +39,8 @@ public class SolidColor implements SoundCanvas {
 	@UserProperty(description="alpha of the color")
 	int alpha = 255;
 	
+	private ColorHelper colorHelper = new ColorHelper(alpha);
+	
 	private int width;
 	private int height;
 
@@ -48,11 +51,9 @@ public class SolidColor implements SoundCanvas {
 
 	@Override
 	public void newFrame(long frameCount, Graphics2D graphics2D) {
-
-		int r = color.getRed();
-		int g = color.getGreen();
-		int b = color.getBlue();
-		graphics2D.setColor(new Color(r, g, b, alpha));		
+		
+		colorHelper.setColorWithAlpha(alpha, color, graphics2D);
+		
 		graphics2D.fillRect(0, 0, width, height);
 
 	}

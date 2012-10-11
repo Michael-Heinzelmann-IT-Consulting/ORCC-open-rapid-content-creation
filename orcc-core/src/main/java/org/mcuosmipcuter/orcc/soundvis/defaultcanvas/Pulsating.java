@@ -26,6 +26,7 @@ import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.api.util.AmplitudeHelper;
+import org.mcuosmipcuter.orcc.api.util.ColorHelper;
 
 /**
  * @author Michael Heinzelmann
@@ -39,6 +40,8 @@ public class Pulsating implements SoundCanvas {
 	int alpha = 255;
 	@UserProperty(description="if reverse the low amplituses are large and high amplitudes small")
 	boolean reverse = false;
+	
+	private ColorHelper colorHelper = new ColorHelper(alpha);
 	
 	private int centerX;
 	private int centerY;
@@ -66,7 +69,7 @@ public class Pulsating implements SoundCanvas {
 		if(reverse) {
 			amp = centerY * 2 - amp;
 		}
-		graphics2D.setColor(new Color(foreGround.getRed(), foreGround.getGreen(), foreGround.getBlue(), alpha));		
+		colorHelper.setColorWithAlpha(alpha, foreGround, graphics2D);	
 		graphics2D.fillOval(centerX - amp / 2, centerY - amp / 2, amp, amp);
 		
 	}

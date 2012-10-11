@@ -26,6 +26,7 @@ import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.api.util.AmplitudeHelper;
+import org.mcuosmipcuter.orcc.api.util.ColorHelper;
 
 /**
  * @author Michael Heinzelmann
@@ -56,6 +57,7 @@ public class GridPulse implements SoundCanvas {
 	private int centerY;
 
 	private AmplitudeHelper amplitude;
+	private ColorHelper colorHelper = new ColorHelper(alpha);
 	
 	int max;
 
@@ -90,9 +92,8 @@ public class GridPulse implements SoundCanvas {
 		else if(t % 2 != 0) {
 			t += 1;
 		}
-//		if(amp - t <=0) 
-//		System.err.println(max + " -> " + amp + ":" + t + " free=" + (amp - t));
-		graphics2D.setColor(new Color(foreGround.getRed(), foreGround.getGreen(), foreGround.getBlue(), alpha));	
+
+		colorHelper.setColorWithAlpha(alpha, foreGround, graphics2D);
 		final int actualCenterX = centerX + shiftX;
 		final int actualCenterY = centerY + shiftY;
 		
