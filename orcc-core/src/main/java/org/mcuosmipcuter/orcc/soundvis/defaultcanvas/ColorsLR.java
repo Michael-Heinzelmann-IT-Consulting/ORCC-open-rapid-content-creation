@@ -118,8 +118,8 @@ public class ColorsLR implements SoundCanvas {
 		amplitude = new AmplitudeHelper(audioInputInfo);
 		amplitudeDivisor = (int)amplitude.getAmplitudeRange() / 255;
 		
-		minL = (int)amplitude.getAmplitudeRange();
-		minR = (int)amplitude.getAmplitudeRange();
+		minL = (int)amplitude.getAmplitudeRange() - 1;
+		minR = (int)amplitude.getAmplitudeRange() - 1;
 	}
 
 	@Override
