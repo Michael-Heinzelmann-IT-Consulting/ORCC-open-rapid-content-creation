@@ -20,8 +20,16 @@ package org.mcuosmipcuter.orcc.api.util;
 import java.awt.Color;
 import java.awt.Graphics2D;
 
+/**
+ * Helps with color related task, stateful
+ * @author Michael Heinzelmann
+ */
 public class ColorHelper {
 	
+	/**
+	 * New helper with color initialized to the given alpha
+	 * @param initialAlpha
+	 */
 	public ColorHelper(int initialAlpha) {
 		alphaShadow = initialAlpha;
 	}
@@ -29,6 +37,12 @@ public class ColorHelper {
 	private int alphaShadow;
 	private Color colorWithAlpha;
 
+	/**
+	 * Set a new color and / or alpha
+	 * @param alpha 0-255 value of alpha
+	 * @param color the color to set
+	 * @param graphics2D the graphics where the color is set
+	 */
 	public void setColorWithAlpha(int alpha, Color color, Graphics2D graphics2D) {
 		if(alpha < 255) {
 			if(alpha != alphaShadow) {
