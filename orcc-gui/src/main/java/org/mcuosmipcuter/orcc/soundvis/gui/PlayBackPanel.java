@@ -20,11 +20,13 @@ package org.mcuosmipcuter.orcc.soundvis.gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.sound.sampled.FloatControl;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -34,9 +36,11 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
+import javax.swing.JSlider;
 import javax.swing.JSpinner;
 import javax.swing.JToggleButton;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.border.EtchedBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -78,7 +82,15 @@ public class PlayBackPanel extends JPanel implements Mixin{
 	
 	TimeLinePanel timeLine = new TimeLinePanel();
 	JScrollPane timeLineScrollPane = new JScrollPane(timeLine);
-	
+	JSlider volume = new JSlider(){
+		private static final long serialVersionUID = 1L;
+		@Override
+		protected void paintComponent(Graphics g) {
+			super.paintComponent(g);
+			g.setXORMode(Color.BLACK);
+			g.drawString("volume", 20, 20);
+			g.setPaintMode();
+		}};
 	private FrameLabel frameCountlabel = new FrameLabel();
 	private TimeLabel timeLabel = new TimeLabel();
 	private JLabel stateLabel = new JLabel();
@@ -102,9 +114,32 @@ public class PlayBackPanel extends JPanel implements Mixin{
 			}
 		};
 		playPause = new PlayPauseButton(np);
-
+		volume.setToolTipText("Volume");
+		volume.setValue(0);
+		volume.setEnabled(false);
+		volume.setPaintTrack(false);
+		volume.setBorder(new EtchedBorder());
+		volume.addChangeListener(new ChangeListener() {
+			
+			@Override
+			public void stateChanged(ChangeEvent arg0) {
+				FloatControl vol = Context.getVolumeControl();
+				setVolume(vol);
+			}
+		});
 	}
-
+	private void setVolume(FloatControl vol) {
+		if(vol != null) {
+			int value = volume.getValue();
+			if(value >= vol.getMinimum() && value <= vol.getMaximum()) {
+				vol.setValue(value);
+			}
+			else {
+				int v = (int)Math.max((int)vol.getValue(), vol.getMinimum());
+				volume.setValue(v);
+			}
+		}
+	}
 	public void init() {
 		setBorder(new LineBorder(Color.WHITE, 5));
 		jProgressBar.setMaximum(100);
@@ -150,6 +185,20 @@ public class PlayBackPanel extends JPanel implements Mixin{
 				if(PropertyName.AudioInputInfo.equals(propertyName) || PropertyName.VideoFrameRate.equals(propertyName) ) {
 					samplesPerFrame = TimeAndRateHelper.getSamplesPerFrame(Context.getAudioInput().getAudioInputInfo(), Context.getVideoOutputInfo());
 				}
+				if(PropertyName.VolumeControl.equals(propertyName)) {
+					FloatControl vol = Context.getVolumeControl();
+					if(vol != null) {
+						volume.setMinimum((int)vol.getMinimum());
+						volume.setMaximum((int)vol.getMaximum());
+						volume.setEnabled(true);
+						//volume.setPaintLabels(true);
+						volume.setPaintTicks(true);
+						volume.setMajorTickSpacing(20);
+						//volume.setSize(200, 20);
+						//volume.setLabelTable(volume.createStandardLabels(20));
+						setVolume(vol);
+					}
+				}
 			}
 		});
 		autoZoom.setSelected(false);
@@ -170,7 +219,7 @@ public class PlayBackPanel extends JPanel implements Mixin{
 				timeLine.setPreRunFrames((Integer)preRunFrames.getValue());
 			}
 		});
-
+		
 		SpinnerNumberModel modelZoom = new SpinnerNumberModel(100, 10, 60000, 10);
 		final JSpinner framesToZoom = new JSpinner(modelZoom);
 		final JPanel fz = new JPanel();
@@ -212,6 +261,7 @@ public class PlayBackPanel extends JPanel implements Mixin{
 		commands.add(stop);
 		commands.add(playPause);
 		commands.add(stateLabel);
+		commands.add(volume);
 		commands.add(autoZoom);
 		
 		JMenuBar waveBar = new JMenuBar();

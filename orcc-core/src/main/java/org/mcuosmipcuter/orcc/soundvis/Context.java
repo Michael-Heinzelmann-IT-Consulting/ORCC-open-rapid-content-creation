@@ -22,12 +22,13 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import javax.sound.sampled.FloatControl;
+
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.soundvis.model.AudioFileInputImpl;
 import org.mcuosmipcuter.orcc.soundvis.model.SoundCanvasWrapperImpl;
 import org.mcuosmipcuter.orcc.soundvis.model.VideoOutputInfoImpl;
-import org.mcuosmipcuter.orcc.soundvis.threads.SubSampleThread.SuperSampleData;
 
 /**
  * Static context object for the soundvis application = playing audio and generating saving video
@@ -40,7 +41,7 @@ public abstract class Context {
 	 */
 	public enum PropertyName {
 		AudioInputInfo, VideoDimension, SoundCanvasAdded, SoundCanvasRemoved, SoundCanvasList, ExportFileName, 
-		CanvasClassNames, AppState, SongPositionPointer, VideoFrameRate
+		CanvasClassNames, AppState, SongPositionPointer, VideoFrameRate, VolumeControl
 	}
 	/**
 	 * Enumeration of application states
@@ -94,6 +95,7 @@ public abstract class Context {
 	private static AudioInput audioInput;
 	private static VideoOutputInfoImpl videoOutputInfo = new VideoOutputInfoImpl(25, 1920, 1080);
 	private static long songPositionPointer;
+	private static FloatControl volumeControl;
 	
 	public static AudioInput getAudioInput() {
 		return audioInput;
@@ -233,6 +235,13 @@ public abstract class Context {
 	public static synchronized void setSongPositionPointer(long songPositionPointer) {
 		Context.songPositionPointer = songPositionPointer;
 		notifyListeners(PropertyName.SongPositionPointer);
+	}
+	public static synchronized void setVolumeControl(FloatControl volumeControl) {
+		Context.volumeControl = volumeControl;
+		notifyListeners(PropertyName.VolumeControl);
+	}
+	public static FloatControl getVolumeControl() {
+		return volumeControl;
 	}
 	
 }

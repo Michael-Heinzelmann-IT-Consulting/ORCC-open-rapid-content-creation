@@ -22,6 +22,7 @@ import java.io.IOException;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.FloatControl;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 
@@ -79,6 +80,8 @@ public class PlayThread extends Thread implements PlayPauseStop {
 			data = new byte[samplesPerFrame * chunkSize];
 			sourceDataLine.open(format, samplesPerFrame * chunkSize);
 			IOUtil.log("samplesPerFrame * chunkSize: " + (samplesPerFrame * chunkSize) + " size: " + sourceDataLine.getBufferSize());
+			FloatControl volumeControl = (FloatControl) sourceDataLine.getControl(FloatControl.Type.MASTER_GAIN);
+			Context.setVolumeControl(volumeControl);
 			sourceDataLine.start();
 			ais = audioInput.getAudioStream();
 			
