@@ -117,9 +117,7 @@ public class ColorsLR implements SoundCanvas {
 		
 		amplitude = new AmplitudeHelper(audioInputInfo);
 		amplitudeDivisor = (int)amplitude.getAmplitudeRange() / 255;
-		
-		minL = (int)amplitude.getAmplitudeRange() - 1;
-		minR = (int)amplitude.getAmplitudeRange() - 1;
+		resetMinMax();
 	}
 
 	@Override
@@ -130,12 +128,17 @@ public class ColorsLR implements SoundCanvas {
 
 	@Override
 	public void postFrame() {
+		resetMinMax();
+	}
+	
+	// helper method to reset min max state
+	private void resetMinMax() {
 		maxL = 0;
 		maxR = 0;
 		minL = (int)amplitude.getAmplitudeRange() - 1; // the max value is range minus one
 		minR = (int)amplitude.getAmplitudeRange() - 1;
 	}
-
+	
 	@Override
 	public void drawCurrentIcon(int width, int height, Graphics2D graphics) {
 		int r = fixedRed == -1 ? 255 : fixedRed;
