@@ -1,4 +1,5 @@
 ORCC rapid content creation for entertainment, education and media production
+Version ${pom.version} ${maven.build.timestamp}
 Copyright (C) 2012 Michael Heinzelmann, Michael Heinzelmann IT-Consulting
 
 This program is free software: you can redistribute it and/or modify
