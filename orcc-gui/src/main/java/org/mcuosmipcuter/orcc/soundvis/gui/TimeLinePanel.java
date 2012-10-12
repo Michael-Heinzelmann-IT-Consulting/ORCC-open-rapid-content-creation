@@ -95,6 +95,9 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 	private long totalSampleLength;
 	private int videoFrameRate;
 	
+	// workaround for issue
+	final boolean fullProgressRepaint = "full".equals(System.getProperty("timeline.repaint"));
+	
 	List<SoundCanvasWrapper> currentCanvasList = new ArrayList<SoundCanvasWrapper>();
 	
 	/**
@@ -190,31 +193,41 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 		g.setColor(Color.WHITE);
 		g.drawString("loading ...", Math.max(guiWidth / 2, selectPos), getHeight() / 2);
 	}
+
 	public void paintProgress() {
 		
 		if(loading) {
 			return;
 		}
 		
-		Graphics g = getGraphics();
-		
-		if(g == null) {
+		int currentPos = (int)(samplePosition / noOfSamples);
+		if(paintProgressPos == currentPos) {
 			return;
 		}
-		
-		g.setColor(Color.BLACK);
-		int currentPos = (int)(samplePosition / noOfSamples);
-		if(paintProgressPos > currentPos) {
-			paintProgressPos = currentPos > 1 ? currentPos - 1 : 0;
+		if(fullProgressRepaint) {		
+			repaint(paintProgressPos, 0, noOfSamples, heightToUse);
 		}
-		final int listLength = superSampleData.getList().length;
-		for(int pos = paintProgressPos + 1; pos <= currentPos && pos < listLength; pos++) {
-			SuperSample s = superSampleData.getList()[pos];
-			int x = margin + 1 + pos;
-			g.drawLine(x, heightToUse /2 - s.getMax() / divY, x, heightToUse / 2 - s.getMin() / divY);
+		else {
+			
+			Graphics g = getGraphics();
+		
+			if(g == null) {
+				return;
+			}
+	
+			g.setColor(Color.BLACK);
+
+			if(paintProgressPos > currentPos) {
+				paintProgressPos = currentPos > 1 ? currentPos - 1 : 0;
+			}
+			final int listLength = superSampleData.getList().length;
+			for(int pos = paintProgressPos + 1; pos <= currentPos && pos < listLength; pos++) {
+				SuperSample s = superSampleData.getList()[pos];
+				int x = margin + 1 + pos;
+				g.drawLine(x, heightToUse /2 - s.getMax() / divY, x, heightToUse / 2 - s.getMin() / divY);
+			}
 		}
 		paintProgressPos = currentPos;
-		
 	}
 	@Override
 	protected void paintComponent(Graphics g) {
