@@ -145,7 +145,7 @@ public class RotatingAmplitudes implements SoundCanvas {
 	@Override
 	public int getPreRunFrames() {
 		// depends on the amount of history we are keeping, a big size and a slow degree speed need a big pre-run
-		return size / degreesPerFrame;
+		return degreesPerFrame != 0 ? size / degreesPerFrame : 0;
 	}
 
 	@Override
