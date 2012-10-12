@@ -76,7 +76,7 @@ public class RotatingAmplitudes implements SoundCanvas {
 		}
 		int modul =  samplesPerFrame / degreesPerFrame;
 		
-		if(sampleCount % modul == 0) {
+		if(modul == 0 || sampleCount % modul == 0) {
 			int x = centerX  + (int)(max/2 * Math.cos(degrees * (Math.PI / 180)));
 			int y = centerY + (int)(max/2 * Math.sin(degrees * (Math.PI / 180)));
 			
