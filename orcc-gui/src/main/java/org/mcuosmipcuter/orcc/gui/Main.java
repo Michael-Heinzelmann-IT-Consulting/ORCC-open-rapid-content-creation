@@ -152,6 +152,12 @@ public class Main {
 			{
 				CallBack exportVideo = new CallBack() {
 					public void fileSelected(File file) {
+						if(file.exists()) {
+							int res = JOptionPane.showConfirmDialog(null, file + " exists, are you sure you want to overwrite it ?", "", JOptionPane.OK_CANCEL_OPTION);
+							if(res != JOptionPane.OK_OPTION) {
+								return;
+							}
+						}
 						Context.setExportFileName(file.getAbsolutePath());
 						final PlayPauseStop exportThread = ExportUtil.getExportPlayPause(graphicPanel);
 						for(ActionListener a : exportStop.getActionListeners()) {
