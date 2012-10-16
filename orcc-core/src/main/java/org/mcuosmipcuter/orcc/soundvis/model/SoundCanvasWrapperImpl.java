@@ -35,8 +35,14 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 	boolean enabled = true;
 	long frameFrom = 0;
 	long frameTo = 0;
-	private Graphics2D devNullGraphics;
+	private static Graphics2D devNullGraphics;
 	private boolean selected;
+	
+	static {
+		//since this image is for nothing it can be small
+		BufferedImage bi = new BufferedImage(1, 1, BufferedImage.TYPE_3BYTE_BGR);
+		devNullGraphics = bi.createGraphics();
+	}
 	
 	public SoundCanvasWrapperImpl(SoundCanvas soundCanvas) {
 		this.soundCanvas = soundCanvas;
@@ -63,9 +69,6 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 	public void prepare(AudioInputInfo audioInputInfo,
 			VideoOutputInfo videoOutputInfo) {
 		soundCanvas.prepare(audioInputInfo, videoOutputInfo);
-		//since this image is for nothing it can be small
-		BufferedImage bi = new BufferedImage(1, 1, BufferedImage.TYPE_3BYTE_BGR);
-		devNullGraphics = bi.createGraphics();
 	}
 
 	@Override
