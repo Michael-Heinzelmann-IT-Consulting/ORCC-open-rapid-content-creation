@@ -199,8 +199,10 @@ public class Main {
 				});
 			}
 		}
-		
-		final JDesktopPane deskTop = new JDesktopPane();	
+		final JInternalFrame playBackFrame = new JInternalFrame("Timeline");
+		final JInternalFrame graphicFrame = new JInternalFrame("Graph", false, false, true, false);
+		final JDesktopPane deskTop = new JDesktopPane();
+		deskTop.setDesktopManager(new CustomDeskTopManager(playBackFrame, graphicFrame));
 		deskTop.setVisible(true);
 		
 		frame.getContentPane().add(deskTop);
@@ -210,7 +212,6 @@ public class Main {
 		final PlayBackPanel playBackPanel = new PlayBackPanel(graphicPanel);
 		IOUtil.log("frame size: " + frame.getSize());
 		{
-			final JInternalFrame playBackFrame = new JInternalFrame("Timeline", true, false, true, true);
 			deskTop.add(playBackFrame);
 			
 			{
@@ -236,7 +237,7 @@ public class Main {
 		}
 
 		{
-			final JInternalFrame propertiesFrame = new JInternalFrame("Layers", true, false, false, true);
+			final JInternalFrame propertiesFrame = new JInternalFrame("Layers");
 			JMenuBar layersMenuBar = new JMenuBar();
 			final JMenu canvas = new JMenu("canvas");
 			layersMenuBar.add(canvas);
@@ -279,7 +280,6 @@ public class Main {
 		}	
 
 		{
-			final JInternalFrame graphicFrame = new JInternalFrame("Graph", true, false, true, true);
 			JMenuBar graphicMenuBar = new JMenuBar();
 			graphicFrame.setJMenuBar(graphicMenuBar);
 			{			
