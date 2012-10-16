@@ -181,6 +181,13 @@ public class PlayBackPanel extends JPanel implements Mixin{
 						playPause.reset();
 					}
 					playPause.setEnabled(appState != AppState.EXPORTING);
+					if(appState == AppState.EXPORTING) {
+						progressPaintState = 1;
+						playPause.reset();
+						frameCountlabel.update(0);
+						sampleCount = 0;
+						updateProgress();
+					}
 				}
 				if(PropertyName.AudioInputInfo.equals(propertyName)) {
 					playPause.setEnabled(Context.getAudioInput() != null);
