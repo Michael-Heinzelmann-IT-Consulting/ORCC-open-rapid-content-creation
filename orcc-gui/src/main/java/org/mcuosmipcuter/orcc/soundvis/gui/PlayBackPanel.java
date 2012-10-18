@@ -20,7 +20,6 @@ package org.mcuosmipcuter.orcc.soundvis.gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -36,11 +35,9 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
-import javax.swing.JSlider;
 import javax.swing.JSpinner;
 import javax.swing.JToggleButton;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.border.EtchedBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -60,6 +57,8 @@ import org.mcuosmipcuter.orcc.soundvis.gui.listeners.StopActionListener;
 import org.mcuosmipcuter.orcc.soundvis.gui.widgets.FrameLabel;
 import org.mcuosmipcuter.orcc.soundvis.gui.widgets.PlayPauseButton;
 import org.mcuosmipcuter.orcc.soundvis.gui.widgets.TimeLabel;
+import org.mcuosmipcuter.orcc.soundvis.gui.widgets.VolumeSlider;
+import org.mcuosmipcuter.orcc.soundvis.gui.widgets.VolumeSlider.VolumeListener;
 import org.mcuosmipcuter.orcc.soundvis.threads.PlayThread;
 
 
@@ -82,7 +81,7 @@ public class PlayBackPanel extends JPanel implements Mixin{
 	
 	private TimeLinePanel timeLine = new TimeLinePanel();
 	private JScrollPane timeLineScrollPane = new JScrollPane(timeLine);
-	private JSlider volume;
+	private VolumeSlider volumeSlider;
 	private FrameLabel frameCountlabel = new FrameLabel();
 	private TimeLabel timeLabel = new TimeLabel();
 	private JLabel stateLabel = new JLabel();
@@ -105,42 +104,20 @@ public class PlayBackPanel extends JPanel implements Mixin{
 				return new PlayThread(renderer);
 			}
 		};
-		volume  = new JSlider(){
-			private static final long serialVersionUID = 1L;
-			@Override
-			protected void paintComponent(Graphics g) {
-				super.paintComponent(g);
-				g.setXORMode(Color.BLACK);
-				g.drawString("volume", 20, 20);
-				g.setPaintMode();
-			}};
-		playPause = new PlayPauseButton(np);
-		volume.setToolTipText("Volume");
-		volume.setValue(0);
-		volume.setEnabled(false);
-		volume.setPaintTrack(false);
-		volume.setBorder(new EtchedBorder());
-		volume.addChangeListener(new ChangeListener() {
+		volumeSlider  = new VolumeSlider(new VolumeListener() {
 			
 			@Override
-			public void stateChanged(ChangeEvent arg0) {
-				FloatControl vol = Context.getVolumeControl();
-				setVolume(vol);
+			public void adjustVolume(float value) {
+				FloatControl volumeControl = Context.getVolumeControl();
+				if(value >= volumeControl.getMinimum() && value <= volumeControl.getMaximum()) {
+					volumeControl.setValue(value);
+				}
 			}
 		});
+		playPause = new PlayPauseButton(np);
+		volumeSlider.setToolTipText("sound volume");
 	}
-	private void setVolume(FloatControl vol) {
-		if(vol != null) {
-			int value = volume.getValue();
-			if(value >= vol.getMinimum() && value <= vol.getMaximum()) {
-				vol.setValue(value);
-			}
-			else {
-				int v = (int)Math.max((int)vol.getValue(), vol.getMinimum());
-				volume.setValue(v);
-			}
-		}
-	}
+
 	/**
 	 * Setup the panel components
 	 */
@@ -199,12 +176,10 @@ public class PlayBackPanel extends JPanel implements Mixin{
 				if(PropertyName.VolumeControl.equals(propertyName)) {
 					FloatControl vol = Context.getVolumeControl();
 					if(vol != null) {
-						volume.setMinimum((int)vol.getMinimum());
-						volume.setMaximum((int)vol.getMaximum());
-						volume.setEnabled(true);
-						volume.setPaintTicks(true);
-						volume.setMajorTickSpacing(20);
-						setVolume(vol);
+						volumeSlider.setMinimum(vol.getMinimum());
+						volumeSlider.setMaximum(vol.getMaximum());
+						volumeSlider.setEnabled(true);
+						volumeSlider.setValue(vol.getValue());
 					}
 				}
 			}
@@ -269,7 +244,7 @@ public class PlayBackPanel extends JPanel implements Mixin{
 		commands.add(stop);
 		commands.add(playPause);
 		commands.add(stateLabel);
-		commands.add(volume);
+		commands.add(volumeSlider);
 		commands.add(autoZoom);
 		
 		JMenuBar waveBar = new JMenuBar();

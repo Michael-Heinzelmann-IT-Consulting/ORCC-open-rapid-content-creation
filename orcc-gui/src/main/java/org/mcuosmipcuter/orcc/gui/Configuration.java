@@ -20,6 +20,7 @@ package org.mcuosmipcuter.orcc.gui;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.sound.sampled.FloatControl;
 import javax.swing.UIManager;
 
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
@@ -136,7 +137,11 @@ public abstract class Configuration {
 				throw new RuntimeException(ex);
 			} 
 		}
-
+		
+		// set a dummy control to get volume setup
+		FloatControl dummy = new FloatControl(FloatControl.Type.MASTER_GAIN, -80, 6, 1, 1, 0, "dB"){};
+		Context.setVolumeControl(dummy);
+		
 		stage = 3;
 	}
 }
