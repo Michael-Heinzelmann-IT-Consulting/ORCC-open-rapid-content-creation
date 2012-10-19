@@ -177,10 +177,15 @@ public class PlayBackPanel extends JPanel implements Mixin{
 				if(PropertyName.VolumeControl.equals(propertyName)) {
 					FloatControl vol = Context.getVolumeControl();
 					if(vol != null) {
-						volumeSlider.setMinimum(vol.getMinimum());
-						volumeSlider.setMaximum(vol.getMaximum());
+						if(vol.getMinimum()!= volumeSlider.getMinimum() || vol.getMaximum() != volumeSlider.getMaximum()) {
+							volumeSlider.setMinimum(vol.getMinimum());
+							volumeSlider.setMaximum(vol.getMaximum());
+							volumeSlider.setValue(vol.getValue());
+						}
+						else {
+							vol.setValue(volumeSlider.getValue());
+						}
 						volumeSlider.setEnabled(true);
-						volumeSlider.setValue(vol.getValue());
 					}
 				}
 			}

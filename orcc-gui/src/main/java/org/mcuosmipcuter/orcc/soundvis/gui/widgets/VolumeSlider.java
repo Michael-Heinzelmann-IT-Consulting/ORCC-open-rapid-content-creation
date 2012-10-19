@@ -158,6 +158,14 @@ public class VolumeSlider extends JPanel {
 	}
 
 	/**
+	 *  Get the model value
+	 * @return the value
+	 */
+	public float getValue() {
+		return value;
+	}
+
+	/**
 	 * Sets the model minimum value of this slider
 	 * @param minimum the minimum value
 	 */
@@ -171,6 +179,22 @@ public class VolumeSlider extends JPanel {
 	 */
 	public void setMaximum(float maximum) {
 		this.maximum = maximum;
+	}
+
+	/**
+	 * Get the model minimum value
+	 * @return the minimum value
+	 */
+	public float getMinimum() {
+		return minimum;
+	}
+
+	/**
+	 * Get the model maximum value
+	 * @return the maximum value
+	 */
+	public float getMaximum() {
+		return maximum;
 	}
 	
 	
