@@ -59,6 +59,7 @@ public class CustomTable extends JPanel{
 	private static final long serialVersionUID = 1L;
 	
 	private CustomTableListener tableListener;
+	private boolean moveEnabled = true;
 	
 	// specialized internal class for handling the mouse actions
 	private class Mover extends MouseAdapter {
@@ -148,21 +149,27 @@ public class CustomTable extends JPanel{
 		
 		@Override
 		public void mousePressed(MouseEvent e) {
-			if(!moveEnabled) {
-				return;
-			}
-			source = owner;
-			cursor = container.getCursor();
-			container.setCursor(moveCursor);
+			
 			owner.setBackground(selectColor);
 			owner.getSoundCanvasWrapper().setSelected(true);
+			source = owner;
 			
+			if(moveEnabled) {
+				cursor = container.getCursor();
+				container.setCursor(moveCursor);	
+			}
 			tableListener.rowSelected(true);
-			
 		}
 		
 		@Override
 		public void mouseReleased(MouseEvent e) {
+			if(source != null) {
+				source.setBackground(originalBackground);
+				source.getSoundCanvasWrapper().setSelected(false);
+			}
+			if(source != null || target != null) {
+				tableListener.rowSelected(false);			
+			}
 			if(!moveEnabled) {
 				return;
 			}
@@ -176,19 +183,11 @@ public class CustomTable extends JPanel{
 				target.setBackground(originalBackground);
 				target.getSoundCanvasWrapper().setSelected(false);
 			}
-			if(source != null) {
-				source.setBackground(originalBackground);
-				source.getSoundCanvasWrapper().setSelected(false);
-			}
-			if(source != null || target != null) {
-				tableListener.rowSelected(false);			
-			}
+
 			target = null;
 		}
 
 	}
-
-	private boolean moveEnabled = true;
 	
 	/**
 	 * Creates a new custom table, no parameters needed
@@ -298,28 +297,32 @@ public class CustomTable extends JPanel{
 			@Override
 			public void mousePressed(MouseEvent e) {
 				originalBackground = row.getBackground();
-				row.setBackground(Color.RED);
+				if(moveEnabled) {
+					row.setBackground(Color.RED);
+				}
 			}
 
 			@Override
 			public void mouseReleased(MouseEvent e) {
-				if(originalBackground != null) {
+				if(moveEnabled && originalBackground != null) {
 					row.setBackground(originalBackground);
 				}
 			}
 
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				CustomTable.this.remove(row);
-				CustomTable.this.revalidate();
-				List<SoundCanvasWrapper> currentList = new ArrayList<SoundCanvasWrapper>();
-				for(Component c : getComponents()) {
-					SoundCanvasWrapper s = ((Row)c).getSoundCanvasWrapper();
-					if(s != null) {
-						currentList.add(s);
+				if(moveEnabled) {
+					CustomTable.this.remove(row);
+					CustomTable.this.revalidate();
+					List<SoundCanvasWrapper> currentList = new ArrayList<SoundCanvasWrapper>();
+					for(Component c : getComponents()) {
+						SoundCanvasWrapper s = ((Row)c).getSoundCanvasWrapper();
+						if(s != null) {
+							currentList.add(s);
+						}
 					}
+					Context.replaceCanvasList(currentList);
 				}
-				Context.replaceCanvasList(currentList);
 			}
 		});
 		
