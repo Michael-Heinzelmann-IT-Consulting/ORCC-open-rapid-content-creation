@@ -22,6 +22,10 @@ import javax.swing.JPanel;
 import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
 import org.mcuosmipcuter.orcc.soundvis.gui.CanvasPropertyPanel;
 
+/**
+ * Row for the custom table {@link CustomTable}
+ * @author Michael Heinzelmann
+ */
 public class Row extends JPanel {
 	
 	private static final long serialVersionUID = 1L;
@@ -29,15 +33,27 @@ public class Row extends JPanel {
 	private final SoundCanvasWrapper soundCanvasWrapper;
 	private final CanvasPropertyPanel canvasPropertyPanel;
 	
+	/**
+	 * New row containing the given wrapped canvas
+	 * @param soundCanvasWrapper the wrapped canvas that belongs to this layer row
+	 */
 	public Row(SoundCanvasWrapper soundCanvasWrapper) {
 		this.soundCanvasWrapper = soundCanvasWrapper;
 		this.canvasPropertyPanel = new CanvasPropertyPanel(soundCanvasWrapper);
 	}
 
+	/**
+	 * Gets the panel (for showing it to the user)
+	 * @return
+	 */
 	public CanvasPropertyPanel getCanvasPropertyPanel() {
 		return canvasPropertyPanel;
 	}
 
+	/**
+	 * Gets the wrapped canvas (for updating the model)
+	 * @return
+	 */
 	public SoundCanvasWrapper getSoundCanvasWrapper() {
 		return soundCanvasWrapper;
 	}

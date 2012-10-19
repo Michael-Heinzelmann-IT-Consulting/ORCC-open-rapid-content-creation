@@ -34,10 +34,22 @@ import org.mcuosmipcuter.orcc.util.IOUtil;
  */
 public class SubSampleThread extends Thread {
 	
+	/**
+	 * Callback for asynchronous work
+	 * @author Michael Heinzelman
+	 */
 	public interface CallBack {
+		/**
+		 * Called when this thread has finished its work
+		 * @param superSampleData the sampled data
+		 */
 		public void finishedSampling(SuperSampleData superSampleData);
 	}
 	
+	/**
+	 * Sample data structure
+	 * @author Michael Heinzelmann
+	 */
 	public static class SuperSample {
 		
 		public SuperSample(int min, int max, int noOfSamples) {
@@ -49,14 +61,26 @@ public class SubSampleThread extends Thread {
 		private final int max;
 		private final int noOfSamples;
 		
+		/**
+		 * Get the minimum aggregated
+		 * @return the minimum
+		 */
 		public int getMin() {
 			return min;
 		}
 
+		/**
+		 * Get the maximum aggregated
+		 * @return the maximum
+		 */
 		public int getMax() {
 			return max;
 		}
 
+		/**
+		 * Get the number of samples that have been aggregated
+		 * @return
+		 */
 		public int getNoOfSamples() {
 			return noOfSamples;
 		}
@@ -68,26 +92,48 @@ public class SubSampleThread extends Thread {
 		}
 		
 	}
+	/**
+	 * Represents the complete wave with meta information
+	 * @author Michael Heinzelmann
+	 */
 	public static class SuperSampleData {
 		private SuperSample[] list;
 		private int overallMin;
 		private int overallMax;
+		/**
+		 * Get the list of samples, an array for performance reasons
+		 * @return the array
+		 */
 		public SuperSample[] getList() {
 			return list;
 		}
+		/**
+		 * Meta information about the overall minimum
+		 * @return the minimum overall
+		 */
 		public int getOverallMin() {
 			return overallMin;
 		}
+		/**
+		 * Meta information about the overall maximum
+		 * @return the maximum overall
+		 */
 		public int getOverallMax() {
 			return overallMax;
 		}
 		
 	}
 	
-	final AudioInput ai;
-	final int noOfSamples;
-	final CallBack callBack;
+	private final AudioInput ai;
+	private final int noOfSamples;
+	private final CallBack callBack;
 		
+	/**
+	 * Constructs a new sample thread
+	 * @param ai the audio input to use
+	 * @param noOfSamples the desired number of samples
+	 * @param callBack callback that will be notified when this thread has finished sampling
+	 */
 	public SubSampleThread(final AudioInput ai, final int noOfSamples, final CallBack callBack) {
 		this.ai = ai;
 		this.noOfSamples =  noOfSamples;

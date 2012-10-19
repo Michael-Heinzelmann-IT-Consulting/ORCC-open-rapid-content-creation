@@ -40,12 +40,28 @@ public interface SoundCanvasWrapper extends SoundCanvas {
 	 */
 	public void setVisible(boolean visible);
 	
+	/**
+	 * Gets the frame from where display of the canvas starts
+	 * @return the from frame
+	 */
 	public long getFrameFrom();
 	
+	/**
+	 * Gets the frame where display of the canvas ends
+	 * @return the to frame
+	 */
 	public long getFrameTo();
 	
+	/**
+	 * Sets the frame from where display of the canvas starts
+	 * @param frameFrom the from frame to set
+	 */
 	public void setFrameFrom(long frameFrom);
 	
+	/**
+	 * Sets the frame where display of the canvas ends
+	 * @param frameTo the to frame to set
+	 */
 	public void setFrameTo(long frameTo);
 	
 	/**
@@ -54,7 +70,15 @@ public interface SoundCanvasWrapper extends SoundCanvas {
 	 */
 	public SoundCanvas getSoundCanvas();
 	
+	/**
+	 * Returns the selected property for GUI purposes
+	 * @return true if selected
+	 */
 	public boolean isSelected();
 	
+	/**
+	 * Sets the selected property for GUI purpose
+	 * @param selected true if selected
+	 */
 	public void setSelected(boolean selected);
 }

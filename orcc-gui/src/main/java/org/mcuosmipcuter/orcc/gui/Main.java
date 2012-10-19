@@ -251,7 +251,7 @@ public class Main {
 			canvas.add(classes);
 			propertiesFrame.setJMenuBar(layersMenuBar);
 			final CustomTable propTable = new CustomTable();
-			propTable.setListener(playBackPanel.getTimeLine());
+			propTable.setListener(playBackPanel.getCustomTableListener());
 			
 	        JPanel container = new JPanel();
 	        container.setOpaque(true);

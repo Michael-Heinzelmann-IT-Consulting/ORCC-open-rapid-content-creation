@@ -28,6 +28,10 @@ import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 
 
+/**
+ * Factory that delivers property editor panels for a sound canvas
+ * @author Michael Heinzelmann
+ */
 public class PropertyPanelFactory {
 
 	/**

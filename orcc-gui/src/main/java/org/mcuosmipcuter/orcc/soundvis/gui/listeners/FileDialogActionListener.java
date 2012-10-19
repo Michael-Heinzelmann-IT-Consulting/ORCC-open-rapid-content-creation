@@ -37,6 +37,12 @@ public class FileDialogActionListener implements ActionListener {
 	private final String buttonText;
 	private final JFileChooser chooser = new JFileChooser();
 
+	/**
+	 * New listener
+	 * @param owner the owner of the dialog that will be shown
+	 * @param callBack the call back to notify when a file was selected
+	 * @param buttonText text to show on the dialog button
+	 */
 	public FileDialogActionListener(Component owner, CallBack callBack, String buttonText) {
 		this.owner = owner;
 		this.callBack = callBack;

@@ -218,18 +218,20 @@ public class GraphPanel extends JPanel implements Renderer, Zoomable {
 		this.frameCount = frameCount;
 	}
 
+	@Override
 	public BufferedImage getFrameImage() {
 		return frameImage;
 	}
 
+	/**
+	 * Sets the mixin that will receive events
+	 * @param mixin
+	 */
 	public void setMixin(Mixin mixin) {
 		this.mixin = mixin;
 	}
 
-	public synchronized float getZoomFactor() {
-		return zoomFactor;
-	}
-
+	@Override
 	public synchronized void setZoomFactor(final float zoomFactor) {
 		if(zoomFactor == 0.0f) {
 			int panelW = getWidth();

@@ -21,10 +21,8 @@ import java.lang.reflect.Field;
 
 import javax.annotation.Resource;
 
-import org.mcuosmipcuter.orcc.soundvis.AudioInput;
 import org.mcuosmipcuter.orcc.soundvis.PlayPauseStop;
 import org.mcuosmipcuter.orcc.soundvis.Renderer;
-import org.mcuosmipcuter.orcc.soundvis.model.AudioFileInputImpl;
 
 /**
  * Helper that checks for the external libraries and returns an export implementation.
@@ -64,7 +62,5 @@ public class ExportUtil {
 			throw new RuntimeException(ex);
 		}
 	}
-	public static AudioInput getAudioInputInfoFromFile(String audioFileName) {
-		return new AudioFileInputImpl(audioFileName);	
-	}
+
 }

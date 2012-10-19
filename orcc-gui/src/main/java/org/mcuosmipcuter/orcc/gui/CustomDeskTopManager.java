@@ -31,6 +31,11 @@ public class CustomDeskTopManager extends DefaultDesktopManager {
 	
 	final JInternalFrame frameToHide;
 	final JInternalFrame frameOnTop;
+	/**
+	 * Construct a manager 
+	 * @param frameToHide frame that should be hidden in favor of {@link #frameOnTop}
+	 * @param frameOnTop see {@link #frameToHide}
+	 */
 	public CustomDeskTopManager(JInternalFrame frameToHide,
 			JInternalFrame frameOnTop) {
 		this.frameToHide = frameToHide;

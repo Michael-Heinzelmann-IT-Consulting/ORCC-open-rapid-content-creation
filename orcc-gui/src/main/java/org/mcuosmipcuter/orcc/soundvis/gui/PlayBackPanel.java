@@ -45,6 +45,7 @@ import javax.swing.event.ChangeListener;
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.api.util.TimeAndRateHelper;
+import org.mcuosmipcuter.orcc.gui.table.CustomTableListener;
 import org.mcuosmipcuter.orcc.soundvis.Context;
 import org.mcuosmipcuter.orcc.soundvis.Context.AppState;
 import org.mcuosmipcuter.orcc.soundvis.Context.Listener;
@@ -307,7 +308,11 @@ public class PlayBackPanel extends JPanel implements Mixin{
 		timeLineScrollPane.getViewport().scrollRectToVisible(a);	
 	}
 	
-	public synchronized TimeLinePanel getTimeLine() {
+	/**
+	 * Get a custom table listener (for assembly purposes)
+	 * @return the listener
+	 */
+	public synchronized CustomTableListener getCustomTableListener() {
 		return timeLine;
 	}
 

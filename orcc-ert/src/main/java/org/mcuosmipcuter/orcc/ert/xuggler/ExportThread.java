@@ -43,7 +43,7 @@ import com.xuggle.xuggler.IStream;
 import com.xuggle.xuggler.IStreamCoder;
 
 /**
- *
+ * Thread writing a movie file by using the xuggler library - it has compile time dependencies to it
  */
 public class ExportThread extends Thread implements PlayPauseStop {
 	

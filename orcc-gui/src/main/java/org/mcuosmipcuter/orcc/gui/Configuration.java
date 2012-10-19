@@ -30,16 +30,21 @@ import org.mcuosmipcuter.orcc.util.ClassPathExplodedDirLoader;
 import org.mcuosmipcuter.orcc.util.IOUtil;
 
 /**
- * Configuration supporting several boot strap like stages to easy widget initialization
+ * Configuration supporting several boot strap like stages to easy widget initialization<br/>
+ * 	// args:<br/>
+	// appmode [cli, gui] usermode [user, devuser, dev], default input file, default output file, default canvas
  * @author Michael Heinzelmann
  */
 public abstract class Configuration {
-	// args:
-	// appmode [cli, gui] usermode [user, devuser, dev], default input file, default output file, default canvas
+
 	private static String appMode;
 	private static String usrMode;
 	private static int stage;
 	
+	/**
+	 * Initial stage that creates all the basics: look & feel
+	 * @param args you should pass the ones from main
+	 */
 	public static synchronized void init(String[] args) {
 
 		appMode = args.length > 0 ? args[0] : "gui";
@@ -74,7 +79,12 @@ public abstract class Configuration {
 		
 		stage = 1;
 	}
-		/////////////////////
+
+	
+	/**
+	 * Setting up the canvas implementations
+	 * @param args you should pass the ones from main
+	 */
 	public static synchronized void stage1(String[] args) {	
 		
 		if(stage < 1) {
@@ -103,6 +113,10 @@ public abstract class Configuration {
 		stage = 2;
 	}
 	
+	/**
+	 * Setting up canvas to use, audio (currently only in dev mode) and creating a dummy volume control
+	 * @param args you should pass the ones from main
+	 */
 	public static synchronized void stage2(String[] args) {	
 		
 		if(stage < 2) {

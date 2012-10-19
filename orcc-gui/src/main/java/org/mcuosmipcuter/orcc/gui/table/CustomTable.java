@@ -50,13 +50,18 @@ import javax.swing.event.ChangeListener;
 import org.mcuosmipcuter.orcc.soundvis.Context;
 import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
 
+/**
+ * Custom table for GUI handling of the soundvis canvas layers
+ * @author Michael Heinzelmann
+ */
 public class CustomTable extends JPanel{
 
 	private static final long serialVersionUID = 1L;
 	
 	private CustomTableListener tableListener;
 	
-	public class Mover extends MouseAdapter {
+	// specialized internal class for handling the mouse actions
+	private class Mover extends MouseAdapter {
 		
 		private final JComponent container;
 		private final  Row owner;
@@ -70,7 +75,7 @@ public class CustomTable extends JPanel{
 		private Color selectColor = Color.GRAY;
 		
 		
-		public Mover(JComponent container, Row owner, Cursor moveCursor) {
+		private Mover(JComponent container, Row owner, Cursor moveCursor) {
 			this.container = container;
 			this.owner = owner;
 			this.moveCursor = moveCursor;
@@ -134,7 +139,7 @@ public class CustomTable extends JPanel{
 							currentList.add(s);
 						}
 					}
-					Context.reorderCanvasList(currentList);
+					Context.replaceCanvasList(currentList);
 					container.revalidate();
 				}
 
@@ -185,6 +190,9 @@ public class CustomTable extends JPanel{
 
 	private boolean moveEnabled = true;
 	
+	/**
+	 * Creates a new custom table, no parameters needed
+	 */
 	public CustomTable() {
 		setLayout(new GridLayout(0, 1, 1, 1));
 	}
@@ -199,6 +207,10 @@ public class CustomTable extends JPanel{
 		
 		return frameImage;
 	}
+	/**
+	 * Adds a layer containing the given canvas
+	 * @param soundCanvasWrapper the wrapped canvas 
+	 */
 	public void addLayer(final SoundCanvasWrapper soundCanvasWrapper) {
 		final Row row = new Row(soundCanvasWrapper);
 		row.setPreferredSize(new Dimension(360, 36));
@@ -307,7 +319,7 @@ public class CustomTable extends JPanel{
 						currentList.add(s);
 					}
 				}
-				Context.reorderCanvasList(currentList);
+				Context.replaceCanvasList(currentList);
 			}
 		});
 		
@@ -319,10 +331,17 @@ public class CustomTable extends JPanel{
 		this.revalidate();
 	}
 	
+	/**
+	 * Sets whether the rows will react to mouse events, the popups for the property editor are not affected
+	 */
 	public void setEnabled(boolean enabled) {
 		this.moveEnabled = enabled;
 	}
 	
+	/**
+	 * Set the listener, only one listener supported
+	 * @param customTableListener the listener
+	 */
 	public void setListener(CustomTableListener customTableListener) {
 		tableListener = customTableListener;
 	}

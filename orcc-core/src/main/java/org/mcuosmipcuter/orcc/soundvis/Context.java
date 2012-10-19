@@ -97,10 +97,18 @@ public abstract class Context {
 	private static long songPositionPointer;
 	private static FloatControl volumeControl;
 	
+	/**
+	 * Gets the audio input info object
+	 * @return the input or null
+	 */
 	public static AudioInput getAudioInput() {
 		return audioInput;
 	}
 
+	/**
+	 *  Gets the video output info object
+	 * @return the video output info, never null, there is a default of 25fps 1920x1080
+	 */
 	public static synchronized VideoOutputInfo getVideoOutputInfo() {
 		return videoOutputInfo;
 	}
@@ -109,7 +117,7 @@ public abstract class Context {
 	
 	
 	/**
-	 * Sets the target video dimension
+	 * Sets the target video dimension and notifies listeners
 	 * @param width width in pixels
 	 * @param height height in pixels
 	 */
@@ -119,7 +127,7 @@ public abstract class Context {
 		notifyListeners(PropertyName.VideoDimension);
 	}
 	/**
-	 * Sets the target video frame rate
+	 * Sets the target video frame rate and notifies listeners
 	 * @param frameRate the frame rate to use
 	 */
 	public static synchronized void setOutputFrameRate(int frameRate) throws AppLogicException {
@@ -134,7 +142,7 @@ public abstract class Context {
 	}
 
 	/**
-	 * Adds a canvas to work with from the given class name string.
+	 * Adds a canvas to work with from the given class name string and notifies listeners.
 	 * @param canvasClassName fully qualified name of the {@link SoundCanvas} instance to use
 	 * @throws InstantiationException
 	 * @throws IllegalAccessException
@@ -149,19 +157,26 @@ public abstract class Context {
 		soundCanvasList.add(soundCanvasWrapper);
 		notifyListeners(PropertyName.SoundCanvasAdded);
 	}
+	/**
+	 * Removes the given canvas from the list and notifies listeners
+	 * @param soundCanvas the canvas to remove
+	 */
 	public static synchronized void removeCanvas(SoundCanvasWrapper soundCanvas) {
 		soundCanvasList.remove(soundCanvas);
 		notifyListeners(PropertyName.SoundCanvasRemoved);
 	}
-	public static synchronized void reorderCanvasList(List<SoundCanvasWrapper> newList) {
-
+	
+	/**
+	 * Replaces the current list with the new one and notifies listeners
+	 * @param newList the new list
+	 */
+	public static synchronized void replaceCanvasList(List<SoundCanvasWrapper> newList) {
 		soundCanvasList.clear();
-		soundCanvasList.addAll(newList); // TODO when wrapper is implemented do a reorder
+		soundCanvasList.addAll(newList);
 		notifyListeners(PropertyName.SoundCanvasList);
-
 	}
 	/**
-	 * Sets the audio from a file
+	 * Sets the audio from a file and notifies listeners
 	 * @param audioFileName full path to the file
 	 */
 	public static synchronized void setAudioFromFile(String audioFileName) throws AppLogicException {
@@ -183,7 +198,7 @@ public abstract class Context {
 		return exportFileName;
 	}
 	/**
-	 * Sets the full path to the video export file
+	 * Sets the full path to the video export file and notifies listeners
 	 * @param exportFileName the name to use
 	 */
 	public static synchronized void setExportFileName(String exportFileName) {
@@ -198,7 +213,7 @@ public abstract class Context {
 		return canvasClassNames;
 	}
 	/**
-	 * Adds a canvas class name to the internal set of names
+	 * Adds a canvas class name to the internal set of names and notifies listeners
 	 * @param canvasClassName
 	 */
 	public static synchronized void addCanvasClassName(String canvasClassName) {
@@ -210,9 +225,7 @@ public abstract class Context {
 	 * @return the instance or null if none is set
 	 */
 	public static synchronized List<SoundCanvasWrapper> getSoundCanvasList() {
-
-		return soundCanvasList;
-		
+		return soundCanvasList;	
 	}
 	/**
 	 * Returns the application state
@@ -222,24 +235,40 @@ public abstract class Context {
 		return appState;
 	}
 	/**
-	 * Sets the application state
+	 * Sets the application state and notifies listeners
 	 * @param appState the state to set
 	 */
 	public static synchronized void setAppState(AppState appState) {
 		Context.appState = appState;
 		notifyListeners(PropertyName.AppState);
 	}
+	/**
+	 * Get the current song position pointer
+	 * @return the song position pointer
+	 */
 	public static long getSongPositionPointer() {
 		return songPositionPointer; // not synchronized
 	}
+	/**
+	 * Sets the current song position pointer and notifies listeners
+	 * @param songPositionPointer the position to set
+	 */
 	public static synchronized void setSongPositionPointer(long songPositionPointer) {
 		Context.songPositionPointer = songPositionPointer;
 		notifyListeners(PropertyName.SongPositionPointer);
 	}
+	/**
+	 * Sets the currently used volume control and notifies listeners
+	 * @param volumeControl
+	 */
 	public static synchronized void setVolumeControl(FloatControl volumeControl) {
 		Context.volumeControl = volumeControl;
 		notifyListeners(PropertyName.VolumeControl);
 	}
+	/**
+	 * Gets the currently used volume control 
+	 * @return the volume control
+	 */
 	public static FloatControl getVolumeControl() {
 		return volumeControl;
 	}

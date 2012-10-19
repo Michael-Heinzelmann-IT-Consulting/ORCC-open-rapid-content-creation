@@ -191,6 +191,9 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 		g.drawString("loading ...", Math.max(guiWidth / 2, selectPos), getHeight() / 2);
 	}
 
+	/**
+	 * Method to paint the progress difference since last call only, this method is required for performance reasons
+	 */
 	public void paintProgress() {
 
 		if(loading) {
@@ -331,6 +334,9 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 		}
 	}
 	
+	/**
+	 * Sets the data for the time line (takes it internally from the {@link Context}) and start an asynchronous sampling
+	 */
 	public void setInputOutputData() {
 		if(Context.getAudioInput() == null) {
 			return;
@@ -412,18 +418,34 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 		repaint();
 	}
 
+	/**
+	 * Sets whether to zoom the wave automatically to the full track length, or not, for this case see {@link #setSamplesToZoom(int)}
+	 * @param autoZoom
+	 */
 	public void setAutoZoom(boolean autoZoom) {
 		this.autoZoom = autoZoom;
 	}
 
+	/**
+	 * Sets the fixed amount samples to zoom if auto zoom is off
+	 * @param samplesToZoom the number of samples to use for a sub sample
+	 */
 	public void setSamplesToZoom(int samplesToZoom) {
 		this.samplesToZoom = samplesToZoom;
 	}
 
+	/**
+	 * Sets the GUI width after it is known (depends on the users screen dimensions)
+	 * @param guiWidth the GUI width to set
+	 */
 	public void setGuiWidth(int guiWidth) {
 		this.guiWidth = guiWidth;
 	}
 
+	/**
+	 * Sets the number of frames to run before selection point (sets also the song position pointer)
+	 * @param preRunFrames
+	 */
 	public void setPreRunFrames(int preRunFrames) {
 		this.preRunFrames = preRunFrames;
 		long f = selectFrame - preRunFrames;
@@ -438,6 +460,10 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 		return selectFrame;
 	}
 
+	/**
+	 * Get the selected pixel position (for scrolling)
+	 * @return the position
+	 */
 	public int getSelectPos() {
 		return selectPos;
 	}

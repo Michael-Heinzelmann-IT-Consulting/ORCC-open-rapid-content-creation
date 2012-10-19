@@ -54,6 +54,10 @@ public class IntegerPropertyPanel extends PropertyPanel<Integer> {
 			}
 		});
 	}
+	/**
+	 * Constructor with a canvas, all other values will be default
+	 * @param soundCanvas the canvas to work with
+	 */
 	public IntegerPropertyPanel(SoundCanvas soundCanvas) {
 		this(soundCanvas, 0, Integer.MIN_VALUE, Integer.MAX_VALUE, 1);
 	}

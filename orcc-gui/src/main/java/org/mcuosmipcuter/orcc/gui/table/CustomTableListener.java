@@ -17,8 +17,23 @@
 */
 package org.mcuosmipcuter.orcc.gui.table;
 
+/**
+ * Listener to communicate with the table
+ * @author Michael Heinzelmann
+ */
 public interface CustomTableListener {
+	/**
+	 * A frame range limit has been set
+	 */
 	public void frameSet();
+	/**
+	 * Row has been selected or un selected by the user
+	 * @param selected whether selected or not
+	 */
 	public void rowSelected(boolean selected);
+	/**
+	 * Tells the table which frame is currently selected in the time line
+	 * @return the selected frame
+	 */
 	public long getFrameSelected();
 }

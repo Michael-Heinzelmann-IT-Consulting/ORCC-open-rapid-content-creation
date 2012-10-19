@@ -40,7 +40,15 @@ public class VolumeSlider extends JPanel {
 	
 	private int margin = 10;
 
+	/**
+	 * Callback interface for asynchronous communication
+	 * @author Michael Heinzelmann
+	 */
 	public interface VolumeListener {
+		/**
+		 * Method to notify of a volume change
+		 * @param value the current volume value
+		 */
 		public void adjustVolume(float value);
 	}
 	
@@ -139,20 +147,28 @@ public class VolumeSlider extends JPanel {
 		g.drawString(str, selectPoint - g.getFontMetrics().stringWidth(str) / 2, h);
 	}
 
-	public float getValue() {
-		return value;
-	}
-
+	/**
+	 * Sets the model value of this slider and updates the view
+	 * @param value
+	 */
 	public void setValue(float value) {
 		this.value = value;
 		model2view(value);
 		repaint();
 	}
 
+	/**
+	 * Sets the model minimum value of this slider
+	 * @param minimum the minimum value
+	 */
 	public void setMinimum(float minimum) {
 		this.minimum = minimum;
 	}
 
+	/**
+	 * Sets the model maximum value of this slider
+	 * @param maximum the maximum value
+	 */
 	public void setMaximum(float maximum) {
 		this.maximum = maximum;
 	}

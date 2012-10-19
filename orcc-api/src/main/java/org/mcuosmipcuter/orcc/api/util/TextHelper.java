@@ -63,6 +63,12 @@ public class TextHelper {
 			graphics2d.setFont(oldFont);
 		}
 	}
+	/**
+	 * Get the dimensions of the given text array of lines
+	 * @param lines lines of text
+	 * @param graphics2d the graphics where the text will appear
+	 * @return the dimensions
+	 */
 	public static Dimension getTextDimesion(String[] lines, Graphics2D graphics2d) {
 		int maxWidth = 0;
 		int height = 0;
