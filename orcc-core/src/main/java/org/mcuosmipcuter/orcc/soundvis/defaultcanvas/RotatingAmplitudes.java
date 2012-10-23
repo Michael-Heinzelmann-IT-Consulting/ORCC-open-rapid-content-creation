@@ -24,6 +24,7 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
+import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
@@ -41,6 +42,7 @@ public class RotatingAmplitudes implements SoundCanvas {
 	private Color foreGround = Color.BLACK;
 	@UserProperty(description="whether to draw xor")
 	private boolean xor = false;
+	@LimitedIntProperty(description="size must be greater zero", minimum=1)
 	@UserProperty(description="frames to keep")
 	int size = 360;
 	@UserProperty(description="x distance from center")
