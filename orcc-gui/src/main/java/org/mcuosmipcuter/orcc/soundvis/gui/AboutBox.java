@@ -21,11 +21,11 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
-import org.mcuosmipcuter.orcc.gui.Main;
 import org.mcuosmipcuter.orcc.util.IOUtil;
 
 /**
@@ -37,8 +37,8 @@ public class AboutBox {
 	 * Show modal about box using the /license.txt resource file as model
 	 * and  {@link JTextArea} {@link JScrollPane} and a {@link JOptionPane} view components
 	 */
-	public static void showModal() {
-		InputStream is = Main.class.getResourceAsStream("/license.txt");
+	public static void showFileText(String filePath, boolean modal) {
+		InputStream is = AboutBox.class.getResourceAsStream(filePath);
 		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(is));
 		try {
 			StringBuilder stringBuilder = new StringBuilder();
@@ -52,9 +52,11 @@ public class AboutBox {
 			ta.setText(stringBuilder.toString());
 			ta.setCaretPosition(0);
 			Object[] array = {sp}; 
-			JOptionPane.showMessageDialog(null, array, 
-					"ORCC is free software and comes WITHOUT ANY WARRANTY see license below:", 
-					JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane jp = new JOptionPane(array, JOptionPane.PLAIN_MESSAGE);		
+			JDialog jd = jp.createDialog("ORCC is free software and comes WITHOUT ANY WARRANTY see license");
+			jd.setModal(modal);
+			jd.setAlwaysOnTop(!modal);
+			jd.setVisible(true);
 		}
 		catch(Exception ex) {
 			ex.printStackTrace();

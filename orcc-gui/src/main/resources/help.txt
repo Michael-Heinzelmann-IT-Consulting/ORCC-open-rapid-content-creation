@@ -1,0 +1,86 @@
+ORCC soundvis GUI help
+
+This are the main steps to create a sound video:
+
+1.) open audio
+  To create a sound visual animation you need first load an audio file, 
+
+  File -> open audio
+
+  select a file, currently only uncompressed formats .wav and .aiff are supported
+  If you try to open a file with an unsupported audio format you get an error box.
+  
+  You can play the audio by pressing the play > button, audio level
+
+2.) In the 'Video' section change settings in the menu:
+
+  Configuration -> video size
+  Configuration -> frame rate
+  
+  It is possible to change video settings later, but some canvas might appear different on
+  different video sizes and frame settings need to be adapted manually when changing
+  the frame rate, therefore it is best to decide early on the format.
+
+3.) add canvas layers
+ 
+  In the Layers section you select a canvas from the menu:
+ 
+  canvas -> add canvas -> <canvas name>
+  
+  Make sure the playback is stopped (showing state READY next to the play button)
+  
+4.) adjust showing length of canvas
+
+  Per default the added canvas is showing from start of the audio until the end
+  To adjust the showing duration you can either
+  
+    - type the frame number in the 'from' or 'to' box
+    
+    or
+    
+    - on the 'Audio Timeline' audio wave form adjust the yellow bar to the right position
+      then double click on 'from' or 'to' box of the canvas and the frame number
+      will automatically be copied from the wave selection
+      
+      The fit/zoom button will zoom in to the audio so adjustments can be made
+      precisely to the wave form
+      The resolution of the zoom can be set via the menu
+      wave -> set -> zoom
+      The 'frames prerun' box will allow to set the number of frames the playback
+      should start before the selection, this will help to find the right frame.
+      
+  The duration and layer position of the canvas can be checked by clicking on the canvas 
+  name, frame duration and layer position is highlighted in the audio wave form display
+  
+ 5.) Change layer position
+  
+    Depending on the type of canvas it draws more or less opaque, some canvas are
+    for background use others for foreground, to change the layer position:
+    
+    drag the canvas row up or down (playback must be READY or PAUSED)
+ 
+ 6.) Change canvas settings
+ 
+   Click on the ... button of the canvas to bring up the property editor
+   The editor shows all individual settings for that canvas
+   This is possible in all playback states, some canvas will show the desired
+   changes only in PLAY state while the audio is playing.
+   
+ 7.) Disabling or deleting a canvas
+ 
+   To disable a canvas click the checkbox 'on' or 'off'
+   The canvas will keep all settings but will not be part of the animation
+  
+   To delete a canvas click on the X on the right, all settings will be lost
+  
+ 8.) Exporting video
+ 
+   If you have downloaded and installed the external libraries the export menu
+   is enabled:
+   
+   Export -> start
+   
+   A file dialog will appear where you can select the directory and the name
+   of the exported file. Currently only .mov formats are tested, depending on
+   the external libraries capabilities and your computers system other formats
+   maybe possible.

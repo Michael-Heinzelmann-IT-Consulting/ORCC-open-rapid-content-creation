@@ -29,6 +29,14 @@
   <version>1.0.7-SNAPSHOT</version>
   <name>orcc-gui</name>
   <packaging>jar</packaging>
+  <build>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
+  </build>
   <dependencies>
     <dependency>
       <groupId>org.mcuosmipcuter.orcc.core</groupId>

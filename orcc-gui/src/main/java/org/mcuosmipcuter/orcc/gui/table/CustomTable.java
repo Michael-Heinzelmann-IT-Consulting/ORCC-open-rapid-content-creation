@@ -229,11 +229,13 @@ public class CustomTable extends JPanel{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				soundCanvasWrapper.setVisible(showCheckBox.isSelected());
+				showCheckBox.setText(showCheckBox.isSelected() ? "on" : "off");
 			}
 		});
 		
 		SpinnerNumberModel modelFrom = new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1);
 		final JSpinner fromFrame = new JSpinner(modelFrom);
+		fromFrame.setToolTipText("from");
 		fromFrame.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent arg0) {
 				soundCanvasWrapper.setFrameFrom(((Number)fromFrame.getValue()).longValue());
@@ -250,6 +252,7 @@ public class CustomTable extends JPanel{
 		});
 		SpinnerNumberModel modelTo = new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1);
 		final JSpinner toFrame = new JSpinner(modelTo);
+		toFrame.setToolTipText("to");
 		toFrame.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent arg0) {
 				soundCanvasWrapper.setFrameTo(((Number)toFrame.getValue()).longValue());

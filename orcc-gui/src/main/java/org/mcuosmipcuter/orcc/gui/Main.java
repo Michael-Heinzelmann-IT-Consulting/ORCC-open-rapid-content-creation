@@ -196,17 +196,24 @@ public class Main {
 			final JMenu helpMenu = new JMenu("Help");
 			mb.add(helpMenu);
 			{
+				JMenuItem basics = new JMenuItem("basics");
+				helpMenu.add(basics);
+				basics.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						AboutBox.showFileText("/help.txt", false);
+					}
+				});
 				JMenuItem about = new JMenuItem("about");
 				helpMenu.add(about);
 				about.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-						AboutBox.showModal();
+						AboutBox.showFileText("/license.txt", true);
 					}
 				});
 			}
 		}
-		final JInternalFrame playBackFrame = new JInternalFrame("Timeline");
-		final JInternalFrame graphicFrame = new JInternalFrame("Graph", false, false, true, false);
+		final JInternalFrame playBackFrame = new JInternalFrame("Audio Timeline");
+		final JInternalFrame graphicFrame = new JInternalFrame("Video", false, false, true, false);
 		final JDesktopPane deskTop = new JDesktopPane();
 		deskTop.setDesktopManager(new CustomDeskTopManager(playBackFrame, graphicFrame));
 		deskTop.setVisible(true);
@@ -331,7 +338,7 @@ public class Main {
 							PropertyName.SoundCanvasRemoved.equals(propertyName)||
 							PropertyName.VideoDimension.equals(propertyName) || 
 							PropertyName.VideoFrameRate.equals(propertyName)) { 
-						String title = Context.getVideoOutputInfo().getWidth() 
+						String title = "Video " + Context.getVideoOutputInfo().getWidth() 
 								+ "x" + Context.getVideoOutputInfo().getHeight() + "p  @"
 								+ Context.getVideoOutputInfo().getFramesPerSecond() + "fps | " +
 								Context.getSoundCanvasList();
