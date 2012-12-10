@@ -25,6 +25,7 @@ import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
+import org.mcuosmipcuter.orcc.api.util.AmplitudeHelper;
 import org.mcuosmipcuter.orcc.api.util.ColorHelper;
 
 /**
@@ -38,24 +39,38 @@ public class SolidColor implements SoundCanvas {
 	@LimitedIntProperty(description="alpha is limited from 0 to 255", minimum=0, maximum=255)
 	@UserProperty(description="alpha of the color")
 	int alpha = 255;
+	@LimitedIntProperty(description="frequency cannot be below 0", minimum=0)
+	@UserProperty(description="fill every <frameFrequny> frame")
+	int frameFrequency = 0;
+	@LimitedIntProperty(description="threshold must be between 0 and 100", minimum=0, maximum = 100)
+	@UserProperty(description="consider amplitudes above this threshold for drawing, value in percent of maximum amplitude")
+	private int threshold;
 	
 	private ColorHelper colorHelper = new ColorHelper(alpha);
+	protected AmplitudeHelper amplitudeHelper;
 	
 	private int width;
 	private int height;
+	
+	private boolean thresholdExceeded;
 
 	@Override
 	public void nextSample(int[] amplitudes) {
-		
+		if(threshold > 0) {
+			int mono = amplitudeHelper.getSignedMono(amplitudes);
+			int percent = amplitudeHelper.getSignedPercent(Math.abs(mono));	
+			if(percent > threshold) {
+				thresholdExceeded = true;
+			}
+		}
 	}
 
 	@Override
 	public void newFrame(long frameCount, Graphics2D graphics2D) {
-		
-		colorHelper.setColorWithAlpha(alpha, color, graphics2D);
-		
-		graphics2D.fillRect(0, 0, width, height);
-
+		if((threshold == 0 && frameFrequency == 0) || (frameFrequency >= 1 && frameCount % frameFrequency == 0) || thresholdExceeded) {
+			colorHelper.setColorWithAlpha(alpha, color, graphics2D);
+			graphics2D.fillRect(0, 0, width, height);
+		}
 	}
 
 	@Override
@@ -63,6 +78,7 @@ public class SolidColor implements SoundCanvas {
 			VideoOutputInfo videoOutputInfo) {
 		width = videoOutputInfo.getWidth();
 		height = videoOutputInfo.getHeight();
+		amplitudeHelper = new AmplitudeHelper(audioInputInfo);
 	}
 
 	@Override
@@ -73,8 +89,7 @@ public class SolidColor implements SoundCanvas {
 
 	@Override
 	public void postFrame() {
-		// TODO Auto-generated method stub
-		
+		thresholdExceeded = false;
 	}
 
 	@Override

@@ -108,6 +108,7 @@ public abstract class Configuration {
 			Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.RotatingAmplitudes");
 			Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.SolidColor");
 			Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.Text");
+			Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.ThresholdVerticalLines");
 			Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.XOR");
 		}
 		stage = 2;

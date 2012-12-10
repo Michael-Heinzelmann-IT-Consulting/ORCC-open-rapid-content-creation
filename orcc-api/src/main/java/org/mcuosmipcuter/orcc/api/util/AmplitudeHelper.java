@@ -28,7 +28,7 @@ import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
 public class AmplitudeHelper {
 	
 	private final AudioFormat audioFormat;
-	private final long amplitudeRange;
+	private final int amplitudeRange;
 	
 	/**
 	 * New helper using the given info
@@ -37,14 +37,17 @@ public class AmplitudeHelper {
 	public AmplitudeHelper(AudioInputInfo audioInputInfo) {
 		this.audioFormat = audioInputInfo.getAudioFormat();
 		int sampleSizeBits = audioFormat.getSampleSizeInBits();
-		amplitudeRange = (long)Math.pow(2, sampleSizeBits);
+		if(sampleSizeBits > 30) {
+			throw new IllegalArgumentException(sampleSizeBits + " sampleSize is larger than allowed 30 bit");
+		}
+		amplitudeRange = (int)Math.pow(2, sampleSizeBits);
 	}
 
 	/**
 	 * Gets the decimal amplitude range ( 2^sample-bits )
 	 * @return the range
 	 */
-	public long getAmplitudeRange() {
+	public int getAmplitudeRange() {
 		return  amplitudeRange;
 	}
 	/**
@@ -54,7 +57,7 @@ public class AmplitudeHelper {
 	 */
 	public int getSignedMono(int[] amplitudes) {
 		final int value = amplitudes.length == 2 ? (amplitudes[0] + amplitudes[1]) / 2 : amplitudes[0];
-		return value - (int)amplitudeRange / 2 ;
+		return value - amplitudeRange / 2 ;
 	}
 	/**
 	 * Same as {@link #getSignedMono(int[])} but unsigned
@@ -64,5 +67,12 @@ public class AmplitudeHelper {
 	public int getUnSignedMono(int[] amplitudes) {
 		return amplitudes.length == 2 ? (amplitudes[0] + amplitudes[1]) / 2 : amplitudes[0];
 	}
-
+	/**
+	 * Get the value of the amplitude in percent relative to the maximum amplitude
+	 * @param amplitude the amplitude to convert
+	 * @return the percentage equivalent of amplitude
+	 */
+	public int getSignedPercent(int amplitude) {
+		return Math.round((((float)amplitude / ((float)amplitudeRange / 2f)) * 100f));
+	}
 }
