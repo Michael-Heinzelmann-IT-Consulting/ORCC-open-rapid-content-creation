@@ -85,6 +85,7 @@ public class GraphPanel extends JPanel implements Renderer, Zoomable {
 	private boolean autoZoom;
 
 	long frameCount;
+	RepaintThread repaintThread;
 
 	
 	/**
@@ -96,20 +97,13 @@ public class GraphPanel extends JPanel implements Renderer, Zoomable {
 		drawDefaultBackGround();
 		
 		Context.addListener(new Listener() {
-			RepaintThread repaintThread;
+			
 			@Override
 			public void contextChanged(PropertyName propertyName) {
 				if(PropertyName.AppState.equals(propertyName)) {
 					AppState appState = Context.getAppState();
 					if(appState == AppState.READY || appState == AppState.PAUSED) {
-						if(repaintThread != null) {
-							repaintThread.running = false;
-							try {
-								repaintThread.join();
-							} catch (InterruptedException ex) {
-								ex.printStackTrace();
-							}
-						}
+						joinRepaintThread();
 						repaintThread = new RepaintThread();
 						repaintThread.start();
 					}
@@ -154,11 +148,23 @@ public class GraphPanel extends JPanel implements Renderer, Zoomable {
 	}
 	
 	/**
-	 * Displays the preview for the canvas set in the context 
+	 * Displays default background in the new size 
 	 */
-	public void preView() {
+	public void displaySizeChanged() {
+		joinRepaintThread();
 		drawDefaultBackGround();
 		repaint();
+	}
+	
+	private void joinRepaintThread() {
+		if(repaintThread != null) {
+			repaintThread.running = false;
+			try {
+				repaintThread.join();
+			} catch (InterruptedException ex) {
+				ex.printStackTrace();
+			}
+		}
 	}
 
 	/**

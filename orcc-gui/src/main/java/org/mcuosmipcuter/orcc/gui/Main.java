@@ -343,7 +343,9 @@ public class Main {
 								+ Context.getVideoOutputInfo().getFramesPerSecond() + "fps | " +
 								Context.getSoundCanvasList();
 						graphicFrame.setTitle(title);
-						graphicPanel.preView();
+						if(PropertyName.VideoDimension.equals(propertyName)) {
+							graphicPanel.displaySizeChanged();	
+						}
 					}
 				}
 			});
