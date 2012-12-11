@@ -22,11 +22,11 @@
   <parent>
     <groupId>org.mcuosmipcuter.orcc</groupId>
     <artifactId>orcc</artifactId>
-    <version>1.0.8-SNAPSHOT</version>
+    <version>1.0.9-SNAPSHOT</version>
   </parent>
   <groupId>org.mcuosmipcuter.orcc.core</groupId>
   <artifactId>orcc-core</artifactId>
-  <version>1.0.8-SNAPSHOT</version>
+  <version>1.0.9-SNAPSHOT</version>
   <name>orcc-core</name>
   <packaging>jar</packaging>
   <build>
@@ -41,7 +41,7 @@
     <dependency>
       <groupId>org.mcuosmipcuter.orcc.api</groupId>
       <artifactId>orcc-api</artifactId>
-      <version>1.0.8-SNAPSHOT</version>
+      <version>1.0.9-SNAPSHOT</version>
     </dependency>
   </dependencies>
 </project>
