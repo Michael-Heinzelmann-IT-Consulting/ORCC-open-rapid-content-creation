@@ -16,8 +16,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 =====================================================================
 
-
-INSTALL instructions :
+INSTALL instructions:
 
 1.) You need Java runtime environment 1.6 or higher,
 this might be already installed, you can check in Control Panel (Windows)
@@ -26,7 +25,25 @@ if it's not installed visit:
 
 http://www.java.com/download/
 
-2.) download
-orcc-dist-${pom.version}-distribution-play-only.zip
 
-from this site and extract to some directory on your machine.
+2.) download
+orcc-dist-${pom.version}-distribution-full.zip
+
+from this site and extract to some directory on your machine
+
+
+3.) additionally you need locate and get following two external libraries:
+
+xuggle-xuggler-5.4.jar
+
+from 
+http://xuggle.googlecode.com/svn/trunk/repo/share/java/xuggle/xuggle-xuggler/5.4/
+
+
+slf4j-api-1.6.6.jar
+
+from
+http://www.slf4j.org/dist/
+
+
+and place these files into the unzipped directory.
