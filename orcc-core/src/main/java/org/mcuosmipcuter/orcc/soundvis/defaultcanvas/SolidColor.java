@@ -40,11 +40,11 @@ public class SolidColor implements SoundCanvas {
 	@UserProperty(description="alpha of the color")
 	int alpha = 255;
 	@LimitedIntProperty(description="frequency cannot be below 0", minimum=0)
-	@UserProperty(description="fill every <frameFrequny> frame")
-	int frameFrequency = 0;
+	@UserProperty(description="repaint every <frameFrequency> frame")
+	int repaintFrameFrequency = 1;
 	@LimitedIntProperty(description="threshold must be between 0 and 100", minimum=0, maximum = 100)
-	@UserProperty(description="consider amplitudes above this threshold for drawing, value in percent of maximum amplitude")
-	private int threshold;
+	@UserProperty(description="amplitudes above this threshold will trigger a repaint, value in percent of maximum amplitude")
+	private int repaintThreshold;
 	
 	private ColorHelper colorHelper = new ColorHelper(alpha);
 	protected AmplitudeHelper amplitudeHelper;
@@ -56,10 +56,10 @@ public class SolidColor implements SoundCanvas {
 
 	@Override
 	public void nextSample(int[] amplitudes) {
-		if(threshold > 0) {
+		if(repaintThreshold > 0) {
 			int mono = amplitudeHelper.getSignedMono(amplitudes);
 			int percent = amplitudeHelper.getSignedPercent(Math.abs(mono));	
-			if(percent > threshold) {
+			if(percent > repaintThreshold) {
 				thresholdExceeded = true;
 			}
 		}
@@ -67,7 +67,11 @@ public class SolidColor implements SoundCanvas {
 
 	@Override
 	public void newFrame(long frameCount, Graphics2D graphics2D) {
-		if((threshold == 0 && frameFrequency == 0) || (frameFrequency >= 1 && frameCount % frameFrequency == 0) || thresholdExceeded) {
+		if(	frameCount == 1 ||
+			(repaintThreshold == 0 && repaintFrameFrequency == 1) || 
+			(repaintFrameFrequency > 0 && frameCount % repaintFrameFrequency == 0) || 
+			repaintThreshold > 0 && thresholdExceeded) {
+			
 			colorHelper.setColorWithAlpha(alpha, color, graphics2D);
 			graphics2D.fillRect(0, 0, width, height);
 		}
