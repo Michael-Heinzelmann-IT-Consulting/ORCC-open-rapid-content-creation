@@ -23,6 +23,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
+import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
 
 
 /**
@@ -43,8 +44,8 @@ public class IntegerPropertyPanel extends PropertyPanel<Integer> {
 	 * @param maximum the maximum for the spinner
 	 * @param stepSize the step size for the spinner
 	 */
-	public IntegerPropertyPanel(SoundCanvas soundCanvas, int value, int minimum, int maximum, int stepSize) {
-		super(soundCanvas);
+	public IntegerPropertyPanel(SoundCanvasWrapper soundCanvasWrapper, int value, int minimum, int maximum, int stepSize) {
+		super(soundCanvasWrapper);
 		SpinnerNumberModel model = new SpinnerNumberModel(value, minimum, maximum, stepSize);
 		jSpinner = new JSpinner(model);
 		add(jSpinner);
@@ -58,8 +59,8 @@ public class IntegerPropertyPanel extends PropertyPanel<Integer> {
 	 * Constructor with a canvas, all other values will be default
 	 * @param soundCanvas the canvas to work with
 	 */
-	public IntegerPropertyPanel(SoundCanvas soundCanvas) {
-		this(soundCanvas, 0, Integer.MIN_VALUE, Integer.MAX_VALUE, 1);
+	public IntegerPropertyPanel(SoundCanvasWrapper soundCanvasWrapper) {
+		this(soundCanvasWrapper, 0, Integer.MIN_VALUE, Integer.MAX_VALUE, 1);
 	}
 
 	@Override

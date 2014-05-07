@@ -26,8 +26,12 @@ import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
+import org.mcuosmipcuter.orcc.gui.table.Row;
+import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
 
 
 /**
@@ -37,35 +41,69 @@ import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 public class ColorPropertyPanel extends PropertyPanel<Color> {
 
 	private static final long serialVersionUID = 1L;
-	private JButton colorButton = new JButton();
-	private JLabel colorLabel = new JLabel("");
+	private JButton colorButton = new JButton(" + ");
+	private JLabel colorLabel = new JLabel("      ");
+	final JColorChooser chooser = new JColorChooser();
+	boolean expanded;
 	/**
 	 * Constructor
 	 * @param soundCanvas the canvas to work with
 	 */
-	public ColorPropertyPanel(SoundCanvas soundCanvas) {
-		super(soundCanvas);
+	public ColorPropertyPanel(SoundCanvasWrapper soundCanvasWrapper) {
+		super(soundCanvasWrapper);
 		colorLabel.setOpaque(true);
 		JPanel valueSelect = new JPanel();
-		valueSelect.setLayout(new GridLayout(1, 2));
+		//valueSelect.setLayout(new GridLayout(1, 2));
 		valueSelect.add(colorLabel);
 		valueSelect.add(colorButton);
-		add(valueSelect);
-		colorButton.addActionListener(new ActionListener() {	
+		colorButton.addActionListener(new ActionListener() {
+			
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				colorButton.setEnabled(false);
-				Color newColor = JColorChooser.showDialog(null, getName(), getCurrentValue());
-				colorButton.setEnabled(true);
+				
+				if(expanded) {
+					remove(chooser);
+					//add(colorLabel);
+					colorButton.setText(" + ");
+				}
+				else {
+					//remove(colorLabel);
+					add(chooser);
+					colorButton.setText(" - ");
+				}
+				ColorPropertyPanel.this.revalidate();
+				((Row)ColorPropertyPanel.this.getParent().getParent()).changeSize(ColorPropertyPanel.this);
+				
+				expanded = !expanded;
+			}
+		});
+		
+
+		//add(valueSelect);
+
+		chooser.setPreviewPanel(new JPanel());
+		chooser.getSelectionModel().addChangeListener(new ChangeListener() {
+			
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				// TODO Auto-generated method stub
+				
+				Color newColor = chooser.getColor();
+				//System.err.println("newColor: " + newColor);
 				if(newColor != null) {
-					colorLabel.setBackground(newColor);
+					//colorLabel.setBackground(newColor);
 					setNewValue(newColor);
 				}
 			}
 		});
+
+		//addSelectorComponent(chooser);
+		addSelectorComponent(valueSelect);
+
 	}
 	@Override
 	public void setCurrentValue(Color currentValue) {
+		System.err.println("currentValue " + currentValue);
 		super.setCurrentValue(currentValue);
 		colorLabel.setBackground(currentValue);
 		this.repaint();

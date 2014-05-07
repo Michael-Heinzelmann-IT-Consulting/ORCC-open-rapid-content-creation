@@ -26,6 +26,7 @@ import java.util.Set;
 import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
+import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
 
 
 /**
@@ -41,9 +42,11 @@ public class PropertyPanelFactory {
 	 * @param soundCanvas the canvas to work on
 	 * @return the panel set, can be empty if the canvas has no editable properties
 	 */
-	public static Set<PropertyPanel<?>> getCanvasPanels(SoundCanvas soundCanvas)  {
+	public static Set<PropertyPanel<?>> getCanvasPanels(SoundCanvasWrapper soundCanvasWrapper)  {
 		@SuppressWarnings({ "unchecked", "rawtypes" })
 		Set<PropertyPanel<?>> result = new LinkedHashSet();
+		
+		SoundCanvas soundCanvas = soundCanvasWrapper.getSoundCanvas();
 
 		for(Field field : soundCanvas.getClass().getDeclaredFields()) {
 			
@@ -53,7 +56,7 @@ public class PropertyPanelFactory {
 				
 				Object value = getValue(field, soundCanvas);
 				@SuppressWarnings("unchecked")
-				PropertyPanel<Object> c = panelFromFieldType(field, soundCanvas);
+				PropertyPanel<Object> c = panelFromFieldType(field, soundCanvasWrapper);
 				c.setName(field.getName());
 				c.setDefaultValue(value);
 				c.setCurrentValue(value);
@@ -65,32 +68,36 @@ public class PropertyPanelFactory {
 		return result;
 	}
 	@SuppressWarnings("rawtypes")
-	private static PropertyPanel panelFromFieldType(Field field, SoundCanvas soundCanvas) {
+	private static PropertyPanel panelFromFieldType(Field field, SoundCanvasWrapper soundCanvasWrapper) {
 		Class<?> type = field.getType();
 		if(boolean.class.equals(type)) {
-			return new BooleanPropertyPanel(soundCanvas);
+			return new BooleanPropertyPanel(soundCanvasWrapper);
 		}
 		if(int.class.equals(type)) {
 			final IntegerPropertyPanel i;
 			if(field.isAnnotationPresent(LimitedIntProperty.class)) {
 				LimitedIntProperty l = field.getAnnotation(LimitedIntProperty.class);
-				Integer integer = getValue(field, soundCanvas);
+				Integer integer = getValue(field, soundCanvasWrapper.getSoundCanvas());
 				int value = integer != null ? integer.intValue() : 0;
-				i = new IntegerPropertyPanel(soundCanvas, value, l.minimum(), l.maximum(), l.stepSize());
+				i = new IntegerPropertyPanel(soundCanvasWrapper, value, l.minimum(), l.maximum(), l.stepSize());
 			}
 			else {
-				i = new IntegerPropertyPanel(soundCanvas);
+				i = new IntegerPropertyPanel(soundCanvasWrapper);
 			}
 			return i;
 		}
 		if(String.class.equals(type)) {
-			return new StringPropertyPanel(soundCanvas);
+			return new StringPropertyPanel(soundCanvasWrapper);
 		}
 		if(Color.class.equals(type)) {
-			return new ColorPropertyPanel(soundCanvas);
+			return new ColorPropertyPanel(soundCanvasWrapper);
 		}
 		if(BufferedImage.class.equals(type)) {
-			return new BufferedImagePropertyPanel(soundCanvas);
+			return new BufferedImagePropertyPanel(soundCanvasWrapper);
+		}
+		if(type.isEnum()) {
+			Object[] es = type.getEnumConstants();
+			return new EnumPropertyPanel(soundCanvasWrapper, es);
 		}
 		throw new RuntimeException(type + " type not supported");
 	}

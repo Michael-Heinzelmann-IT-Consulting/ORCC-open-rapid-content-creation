@@ -23,6 +23,8 @@ import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -37,7 +39,6 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JSpinner.DefaultEditor;
@@ -47,6 +48,7 @@ import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.mcuosmipcuter.orcc.api.soundvis.PropertyListener;
 import org.mcuosmipcuter.orcc.soundvis.Context;
 import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
 
@@ -76,11 +78,40 @@ public class CustomTable extends JPanel{
 		private Color selectColor = Color.GRAY;
 		
 		
-		private Mover(JComponent container, Row owner, Cursor moveCursor) {
+		private Mover(JComponent container, Row owner, Cursor moveCursor, final Component grabComponent) {
 			this.container = container;
 			this.owner = owner;
 			this.moveCursor = moveCursor;
 			this.originalBackground = owner.getBackground();
+			grabComponent.addMouseListener(new MouseAdapter() {
+				boolean mouseDown;
+				@Override
+				public void mousePressed(MouseEvent e) {
+					mouseDown = true;
+					if(moveEnabled) {
+						grabComponent.setCursor(Mover.this.moveCursor);	
+					}
+				}
+				@Override
+				public void mouseReleased(MouseEvent e) {
+					mouseDown = false;
+					grabComponent.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));	
+				}
+				@Override
+				public void mouseEntered(MouseEvent arg0) {
+					if(!mouseDown) {
+						cursor = grabComponent.getCursor();
+						grabComponent.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+					}
+				}
+				@Override
+				public void mouseExited(MouseEvent e) {
+					if(!mouseDown) {
+						grabComponent.setCursor(cursor);
+					}
+				}
+				
+			});
 		}
 
 		@Override
@@ -133,8 +164,10 @@ public class CustomTable extends JPanel{
 					list.add(targetIndex, source);
 					container.removeAll();
 					List<SoundCanvasWrapper> currentList = new ArrayList<SoundCanvasWrapper>();
+					GridBagConstraints gc = new GridBagConstraints();
+					gc.gridwidth = GridBagConstraints.REMAINDER; //end row
 					for(Component c : list) {
-						container.add(c);
+						container.add(c, gc);
 						SoundCanvasWrapper s = ((Row)c).getSoundCanvasWrapper();
 						if(s != null) {
 							currentList.add(s);
@@ -193,7 +226,8 @@ public class CustomTable extends JPanel{
 	 * Creates a new custom table, no parameters needed
 	 */
 	public CustomTable() {
-		setLayout(new GridLayout(0, 1, 1, 1));
+		//setLayout(new GridLayout(0, 1, 1, 1));
+		setLayout(new GridBagLayout());
 	}
 	private  BufferedImage getImage() {
 		int width = 60;
@@ -212,12 +246,25 @@ public class CustomTable extends JPanel{
 	 */
 	public void addLayer(final SoundCanvasWrapper soundCanvasWrapper) {
 		final Row row = new Row(soundCanvasWrapper);
-		row.setPreferredSize(new Dimension(360, 36));
+		row.setPreferredSize(new Dimension(660, 36));
+		//row.setMaximumSize(new Dimension(360, 36));
 		row.setLayout(new BorderLayout());
 		row.setBorder(new EtchedBorder());
 		row.setBackground(Color.WHITE);
 		final JLabel layer = new JLabel(soundCanvasWrapper.getDisplayName());
 		layer.setPreferredSize(new Dimension(180, 16));
+		layer.setToolTipText("edit or move " + soundCanvasWrapper.getDisplayName());
+		soundCanvasWrapper.addPropertyChangeListener(new PropertyListener() {
+			
+			@Override
+			public void propertyWritten(String name) {
+				BufferedImage image = getImage();
+				soundCanvasWrapper.drawCurrentIcon(60, 30, image.createGraphics());
+				layer.setIcon(new ImageIcon(image));
+				
+			}
+		});
+
 		row.add(layer, BorderLayout.WEST);
 		
 		final JPanel timeline = new JPanel();
@@ -267,25 +314,56 @@ public class CustomTable extends JPanel{
 				}
 			}
 		});
-		final JButton editor = new JButton("...");
+		final JButton expandButton = new JButton(" + ");
 		
-		editor.addActionListener(new ActionListener() {
+		expandButton.addActionListener(new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				JOptionPane.showMessageDialog(null, row.getCanvasPropertyPanel(), soundCanvasWrapper.getDisplayName(), 
-						JOptionPane.PLAIN_MESSAGE);
+//				JOptionPane.showMessageDialog(null, row.getCanvasPropertyPanel(), soundCanvasWrapper.getDisplayName(), 
+//						JOptionPane.PLAIN_MESSAGE);
+				//row.setPreferredSize(new Dimension(360, 150));
 
-				BufferedImage image = getImage();
-				soundCanvasWrapper.drawCurrentIcon(60, 30, image.createGraphics());
-				layer.setIcon(new ImageIcon(image));
+				row.toggleProperties();
+				expandButton.setText(row.isPanelVisible() ? " - " : " + ");
+				row.revalidate();
+				CustomTable.this.revalidate();
 			}
 		});
 		
-		timeline.add(editor);
+		SpinnerNumberModel modelTransparency = new SpinnerNumberModel(100, 0, 100, 1);
+		final JSpinner transparency = new JSpinner(modelTransparency);
+		transparency.setToolTipText("repaint transparency");
+		transparency.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent arg0) {
+				soundCanvasWrapper.setTransparency((((Number)transparency.getValue()).intValue()));
+			}
+		});
+		
+		SpinnerNumberModel modelThreshold = new SpinnerNumberModel(0, 0, 100, 1);
+		final JSpinner threshold = new JSpinner(modelThreshold);
+		threshold.setToolTipText("repaint threshold");
+		threshold.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent arg0) {
+				soundCanvasWrapper.setRepaintThreshold(((((Number)threshold.getValue()).intValue())));
+			}
+		});
+		final JCheckBox xorCheckBox = new JCheckBox("std", soundCanvasWrapper.isXor());
+		xorCheckBox.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				soundCanvasWrapper.setXor(xorCheckBox.isSelected());
+				xorCheckBox.setText(xorCheckBox.isSelected() ? "xor" : "std");
+			}
+		});
+		
+		timeline.add(expandButton);
 		timeline.add(showCheckBox);
 		timeline.add(fromFrame);
 		timeline.add(toFrame);
+		timeline.add(transparency);
+		timeline.add(threshold);
+		timeline.add(xorCheckBox);
 
 		BufferedImage image = getImage();
 		soundCanvasWrapper.drawCurrentIcon(60, 30, image.createGraphics());
@@ -329,11 +407,13 @@ public class CustomTable extends JPanel{
 			}
 		});
 		
-		Mover mgm = new Mover(this, row, Cursor.getPredefinedCursor(Cursor.S_RESIZE_CURSOR));
-		row.addMouseMotionListener(mgm);
-		row.addMouseListener(mgm);
+		Mover mgm = new Mover(this, row, Cursor.getPredefinedCursor(Cursor.S_RESIZE_CURSOR), layer);
+		layer.addMouseMotionListener(mgm);
+		layer.addMouseListener(mgm);
+		GridBagConstraints c = new GridBagConstraints();
+		c.gridwidth = GridBagConstraints.REMAINDER; //end row
 
-		this.add(row);
+		this.add(row, c);
 		this.revalidate();
 	}
 	

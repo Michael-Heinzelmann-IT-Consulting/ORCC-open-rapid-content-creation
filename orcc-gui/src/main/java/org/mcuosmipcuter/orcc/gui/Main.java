@@ -72,7 +72,7 @@ import org.mcuosmipcuter.orcc.util.IOUtil;
  */
 public class Main {
 	
-	static final int infoW = 490;
+	static final int infoW = 690;
 	static final int infoH = 200;
 	static final int playBackH = 240;
 	static final int minCells = 3;

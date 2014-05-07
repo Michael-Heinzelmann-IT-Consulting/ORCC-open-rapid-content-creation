@@ -30,6 +30,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
+import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
 
 
 /**
@@ -46,8 +47,8 @@ public class StringPropertyPanel extends PropertyPanel<String> {
 	 * Constructor
 	 * @param soundCanvas the canvas to work with
 	 */
-	public StringPropertyPanel(SoundCanvas soundCanvas) {
-		super(soundCanvas);
+	public StringPropertyPanel(SoundCanvasWrapper soundCanvasWrapper) {
+		super(soundCanvasWrapper);
 		JPanel valueSelect = new JPanel();
 		valueSelect.setLayout(new GridLayout(1, 2));
 		textLabel.setFont(new Font("Monospaced", Font.PLAIN, 12));

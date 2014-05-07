@@ -1,6 +1,6 @@
 /**
 *   ORCC rapid content creation for entertainment, education and media production
-*   Copyright (C) 2012 Michael Heinzelmann, Michael Heinzelmann IT-Consulting
+*   Copyright (C) 2013 Michael Heinzelmann, Michael Heinzelmann IT-Consulting
 *
 *   This program is free software: you can redistribute it and/or modify
 *   it under the terms of the GNU General Public License as published by
@@ -17,39 +17,50 @@
 */
 package org.mcuosmipcuter.orcc.soundvis.gui.widgets.properties;
 
-import javax.swing.JCheckBox;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
+import javax.swing.JComboBox;
+
+import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
 
 /**
- * Panel for boolean properties using a {@link JCheckBox}
  * @author Michael Heinzelmann
+ *
  */
-public class BooleanPropertyPanel extends PropertyPanel<Boolean> {
+public class EnumPropertyPanel extends PropertyPanel  {
+	private static enum EN {
+		A, B
+	}
+	private JComboBox jComboBox = new JComboBox();
 
-	private static final long serialVersionUID = 1L;
-
-	private JCheckBox check = new JCheckBox();
-	/**
-	 * Constructor
-	 * @param soundCanvas the canvas to work with
-	 */
-	public BooleanPropertyPanel(SoundCanvasWrapper soundCanvasWrapper) {
+	public EnumPropertyPanel(SoundCanvasWrapper soundCanvasWrapper, final Object[] values) {
 		super(soundCanvasWrapper);
-		add(check);
-		check.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
-				setNewValue(check.isSelected());
+		for(Object v : values) {
+			jComboBox.addItem(v);
+		}
+		
+		jComboBox.addItemListener(new ItemListener() {
+			
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				//String enumString = String.valueOf(e.getItem());
+				for(Object v : values) {
+					if(v.equals(e.getItem())) {
+						System.err.println("MMMM");
+						setNewValue(v);
+					}
+				}
 			}
 		});
+		add(jComboBox);
 	}
-	@Override
-	public void setCurrentValue(Boolean currentValue) {
-		super.setCurrentValue(currentValue);
-		check.setSelected(currentValue);
-		this.repaint();
-	}
+/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	
 
 }

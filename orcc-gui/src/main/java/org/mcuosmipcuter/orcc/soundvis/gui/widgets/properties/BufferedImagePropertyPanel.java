@@ -19,6 +19,8 @@ package org.mcuosmipcuter.orcc.soundvis.gui.widgets.properties;
 
 import java.awt.GridLayout;
 import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -30,6 +32,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
+import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
 import org.mcuosmipcuter.orcc.soundvis.gui.listeners.FileDialogActionListener;
 
 
@@ -40,19 +43,21 @@ import org.mcuosmipcuter.orcc.soundvis.gui.listeners.FileDialogActionListener;
 public class BufferedImagePropertyPanel extends PropertyPanel<BufferedImage> {
 
 	private static final long serialVersionUID = 1L;
-	private JButton fileButton = new JButton();
+	private JButton fileButton = new JButton("...");
+	private JButton scaleButton = new JButton("scale");
 	private JLabel thumbLabel = new JLabel("");
 	
 	/**
 	 * Constructor
 	 * @param soundCanvas the canvas to work with
 	 */
-	public BufferedImagePropertyPanel(SoundCanvas soundCanvas) {
-		super(soundCanvas);
+	public BufferedImagePropertyPanel(final SoundCanvasWrapper soundCanvasWrapper) {
+		super(soundCanvasWrapper);
 		thumbLabel.setOpaque(true);
 		JPanel valueSelect = new JPanel();
 		valueSelect.setLayout(new GridLayout(1, 2));
 		valueSelect.add(thumbLabel);
+		valueSelect.add(scaleButton);
 		valueSelect.add(fileButton);
 		add(valueSelect);
 		FileDialogActionListener.CallBack callBack = new FileDialogActionListener.CallBack(){
@@ -68,7 +73,15 @@ public class BufferedImagePropertyPanel extends PropertyPanel<BufferedImage> {
 				
 			}
 		};
-		fileButton.addActionListener(new FileDialogActionListener(null, callBack, "set as background"));
+		fileButton.addActionListener(new FileDialogActionListener(null, callBack, "set as image"));
+		scaleButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				scaleButton.setEnabled(false);
+				// TODO soundCanvas.propertyWritten("scale");
+				scaleButton.setEnabled(true);
+			}
+		});
 
 	}
 	@Override

@@ -45,8 +45,7 @@ public class CanvasPropertyPanel extends JPanel {
 		GridLayout gl = new GridLayout(10, 1, 5, 4);		
 		setLayout(gl);
 		
-		SoundCanvas soundCanvas = soundCanvasWrapper.getSoundCanvas();
-		Set<PropertyPanel<?>> props = PropertyPanelFactory.getCanvasPanels(soundCanvas);
+		Set<PropertyPanel<?>> props = PropertyPanelFactory.getCanvasPanels(soundCanvasWrapper);
 
 		for(final PropertyPanel<?> p : props) {
 			add(p);

@@ -27,6 +27,7 @@ import java.awt.event.ActionListener;
 
 import javax.sound.sampled.FloatControl;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -91,7 +92,8 @@ public class PlayBackPanel extends JPanel implements Mixin{
 	private JToggleButton autoZoom = new JToggleButton("fit/zoom");
 
 	private final SpinnerNumberModel modelPreRun = new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 10);
-	private final JSpinner preRunFrames = new JSpinner(modelPreRun);
+	//private final JSpinner preRunFrames = new JSpinner(modelPreRun);
+	private JCheckBox fullPreRun = new JCheckBox("full pre run");
 	
 	/**
 	 * Sets up a stop, play/pause button and a status label
@@ -203,12 +205,16 @@ public class PlayBackPanel extends JPanel implements Mixin{
 			}
 		});
 
-		preRunFrames.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent arg0) {
-				timeLine.setPreRunFrames((Integer)preRunFrames.getValue());
-			}
+//		preRunFrames.addChangeListener(new ChangeListener() {
+//			public void stateChanged(ChangeEvent arg0) {
+//				timeLine.setPreRunFrames((Integer)preRunFrames.getValue());
+//			}
+//		});
+		fullPreRun.addChangeListener(new ChangeListener() {
+		public void stateChanged(ChangeEvent arg0) {
+			Context.setFullPreRun(fullPreRun.isSelected());
+		}
 		});
-		
 		SpinnerNumberModel modelZoom = new SpinnerNumberModel(100, 10, 60000, 10);
 		final JSpinner framesToZoom = new JSpinner(modelZoom);
 		final JPanel fz = new JPanel();
@@ -245,8 +251,9 @@ public class PlayBackPanel extends JPanel implements Mixin{
 		commands.setBorder(new LineBorder(Color.WHITE, 2));
 		commands.setLayout(gl);
 		
-		commands.add(preRunFrames);
-		commands.add(new JLabel(" frames prerun"));
+//		commands.add(preRunFrames);
+//		commands.add(new JLabel(" frames prerun"));
+		commands.add(fullPreRun);
 		commands.add(stop);
 		commands.add(playPause);
 		commands.add(stateLabel);

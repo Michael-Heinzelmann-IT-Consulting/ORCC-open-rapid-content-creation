@@ -50,29 +50,6 @@ import org.mcuosmipcuter.orcc.util.IOUtil;
  * @author Michael Heinzelmann
  */
 public class GraphPanel extends JPanel implements Renderer, Zoomable {
-	
-	public class RepaintThread extends Thread {
-		private boolean running = true;
-		@Override
-		public void run() {
-			IOUtil.log("starting refresh...");
-			while(running) {
-				try {
-					for(SoundCanvas soundCanvas : soundCanvasArray) {
-						if(running) {
-							soundCanvas.newFrame(frameCount, graphics);
-						}
-					}
-					repaint();
-					Thread.sleep(80);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-			IOUtil.log("done refresh.");
-		}
-	
-	}
 
 	private static final long serialVersionUID = 1L;
 	private Mixin mixin;
@@ -85,7 +62,6 @@ public class GraphPanel extends JPanel implements Renderer, Zoomable {
 	private boolean autoZoom;
 
 	long frameCount;
-	RepaintThread repaintThread;
 
 	
 	/**
@@ -100,19 +76,7 @@ public class GraphPanel extends JPanel implements Renderer, Zoomable {
 			
 			@Override
 			public void contextChanged(PropertyName propertyName) {
-				if(PropertyName.AppState.equals(propertyName)) {
-					AppState appState = Context.getAppState();
-					if(appState == AppState.READY || appState == AppState.PAUSED) {
-						joinRepaintThread();
-						repaintThread = new RepaintThread();
-						repaintThread.start();
-					}
-					else {
-						if(repaintThread != null) {
-							repaintThread.running = false;
-						}
-					}
-				}
+				// TODO repaint on canvas property changed
 				if(PropertyName.VideoDimension.equals(propertyName)) {
 					if(autoZoom) {
 						setZoomFactor(0.0f); // adapt to new size
@@ -151,20 +115,8 @@ public class GraphPanel extends JPanel implements Renderer, Zoomable {
 	 * Displays default background in the new size 
 	 */
 	public void displaySizeChanged() {
-		joinRepaintThread();
 		drawDefaultBackGround();
 		repaint();
-	}
-	
-	private void joinRepaintThread() {
-		if(repaintThread != null) {
-			repaintThread.running = false;
-			try {
-				repaintThread.join();
-			} catch (InterruptedException ex) {
-				ex.printStackTrace();
-			}
-		}
 	}
 
 	/**

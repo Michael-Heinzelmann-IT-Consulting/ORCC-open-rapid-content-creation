@@ -17,13 +17,18 @@
 */
 package org.mcuosmipcuter.orcc.soundvis.gui.widgets.properties;
 
-import java.awt.GridLayout;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.GridBagConstraints;
 import java.lang.reflect.Field;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
+import org.mcuosmipcuter.orcc.soundvis.Context;
+import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
 
 
 /**
@@ -46,18 +51,24 @@ public abstract  class PropertyPanel <T> extends JPanel {
 
 	// reference for writing the property
 	private final SoundCanvas soundCanvas;
+	private final SoundCanvasWrapper soundCanvasWrapper;
 	
 	/**
 	 * New panel with a grid layout
 	 */
-	public PropertyPanel(SoundCanvas soundCanvas) {
-		if(soundCanvas == null) {
+	public PropertyPanel(SoundCanvasWrapper soundCanvasWrapper) {
+		if(soundCanvasWrapper == null) {
 			throw new IllegalArgumentException("soundCanvas null not allowed!");
 		}
-		this.soundCanvas = soundCanvas;
-		GridLayout gl = new GridLayout(1, 2);		
-		setLayout(gl);
-		add(nameLabel);
+		this.soundCanvasWrapper = soundCanvasWrapper;
+		this.soundCanvas = soundCanvasWrapper.getSoundCanvas();
+//		GridLayout gl = new GridLayout(1, 2);		
+//		setLayout(gl);
+		setLayout(new BorderLayout(6, 6));
+		
+		//setBackground(Color.CYAN);
+
+		add(nameLabel, BorderLayout.WEST);
 	}
 	/**
 	 * This is where we actually write the new value by using reflection
@@ -69,9 +80,15 @@ public abstract  class PropertyPanel <T> extends JPanel {
 			field.setAccessible(true);
 			field.set(soundCanvas, value);
 			setCurrentValue(value);
+			soundCanvasWrapper.propertyWritten(name);
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}
+	}
+	protected void addSelectorComponent(Component c) {
+		GridBagConstraints gc = new GridBagConstraints();
+		gc.gridwidth = GridBagConstraints.REMAINDER; //end row
+		add(c, BorderLayout.EAST);
 	}
 	/* (non-Javadoc)
 	 * @see java.awt.Component#getName()
