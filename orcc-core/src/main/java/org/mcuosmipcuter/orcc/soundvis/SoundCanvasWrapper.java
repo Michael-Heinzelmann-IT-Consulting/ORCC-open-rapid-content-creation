@@ -17,13 +17,14 @@
 */
 package org.mcuosmipcuter.orcc.soundvis;
 
+import org.mcuosmipcuter.orcc.api.soundvis.PropertyListener;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 
 /**
  * Decorator / wrapper of a sound canvas, adding methods for internal use
  * @author Michael Heinzelmann
  */
-public interface SoundCanvasWrapper extends SoundCanvas {
+public interface SoundCanvasWrapper extends SoundCanvas, PropertyListener {
 	/**
 	 * Gets the name that should be used for displaying
 	 * @return the name
@@ -81,4 +82,12 @@ public interface SoundCanvasWrapper extends SoundCanvas {
 	 * @param selected true if selected
 	 */
 	public void setSelected(boolean selected);
+	public abstract void setRepaintThreshold(int repaintThreshold);
+	public abstract int getRepaintThreshold();
+	public abstract void setXor(boolean xor);
+	public abstract boolean isXor();
+	public void setTransparency(int transparency);
+	public int getTransparency();
+	
+	public void addPropertyChangeListener(PropertyListener propertyListener);
 }

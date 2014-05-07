@@ -26,28 +26,30 @@ import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.api.util.AmplitudeHelper;
-import org.mcuosmipcuter.orcc.api.util.ColorHelper;
 
 /**
  * @author Michael Heinzelmann
  */
 public class Pulsating implements SoundCanvas {
 	
+	public static enum DRAW_MODE {
+		CIRCLE, SQARE, RECTANGLE, ELLIPSE
+	}
+	
 	@UserProperty(description="foreground color")
-	private Color foreGround = Color.BLACK;
-	@LimitedIntProperty(description="alpha is limited from 0 to 255", minimum=0, maximum=255)
-	@UserProperty(description="alpha of the foreground color")
-	int alpha = 255;
+	private Color foreGround = Color.BLACK;	@LimitedIntProperty(description="alpha is limited from 0 to 255", minimum=0, maximum=255)
 	@UserProperty(description="if reverse the low amplituses are large and high amplitudes small")
 	boolean reverse = false;
-	
-	private ColorHelper colorHelper = new ColorHelper(alpha);
+	@UserProperty(description="mode of fill")
+	DRAW_MODE drawMode = DRAW_MODE.CIRCLE;
 	
 	private int centerX;
 	private int centerY;
 
-	private float amplitudeDivisor;
-	private float amplitudeMultiplicator;
+	private float amplitudeDivisorH;
+	private float amplitudeMultiplicatorH;
+	private float amplitudeDivisorW;
+	private float amplitudeMultiplicatorW;
 	private AmplitudeHelper amplitude;
 	
 	int max;
@@ -65,15 +67,31 @@ public class Pulsating implements SoundCanvas {
 	@Override
 	public void newFrame(long frameCount, Graphics2D graphics2D) {
 		
-		int amp = amplitudeDivisor > 1 ? (int)(max / amplitudeDivisor) : (int)(max * amplitudeMultiplicator);
+		int ampH = amplitudeDivisorH > 1 ? (int)(max / amplitudeDivisorH) : (int)(max * amplitudeMultiplicatorH);
+		int ampW = amplitudeDivisorW > 1 ? (int)(max / amplitudeDivisorW) : (int)(max * amplitudeMultiplicatorW);
 		if(reverse) {
-			amp = centerY * 2 - amp;
+			ampH = centerY * 2 - ampH;
+			ampW = centerX * 2 - ampW;
 		}
-		colorHelper.setColorWithAlpha(alpha, foreGround, graphics2D);	
-		graphics2D.fillOval(centerX - amp / 2, centerY - amp / 2, amp, amp);
+		graphics2D.setColor(foreGround);	
+		switch(drawMode) {
+			case CIRCLE:
+				graphics2D.fillOval(centerX - ampH / 2, centerY - ampH / 2, ampH, ampH);
+				break;
+			case SQARE:
+				graphics2D.fillRect(centerX - ampH / 2, centerY - ampH / 2, ampH, ampH);
+				break;
+			case ELLIPSE:
+				graphics2D.fillOval(centerX - ampW / 2, centerY - ampH / 2, ampW, ampH);
+				break;
+			case RECTANGLE:
+				graphics2D.fillRect(centerX - ampW / 2, centerY - ampH / 2, ampW, ampH);
+				break;
+			default:
+
+		}
 		
 	}
-
 	@Override
 	public void prepare(AudioInputInfo audioInputInfo,
 			VideoOutputInfo videoOutputInfo) {
@@ -81,16 +99,14 @@ public class Pulsating implements SoundCanvas {
 		centerY = videoOutputInfo.getHeight() / 2;
 
 		amplitude = new AmplitudeHelper(audioInputInfo);
-		amplitudeDivisor = (amplitude.getAmplitudeRange() / videoOutputInfo.getHeight());
-		if(amplitudeDivisor < 1){
-			amplitudeMultiplicator = videoOutputInfo.getHeight() / amplitude.getAmplitudeRange();
+		amplitudeDivisorH = (amplitude.getAmplitudeRange() / videoOutputInfo.getHeight());
+		if(amplitudeDivisorH < 1){
+			amplitudeMultiplicatorH = videoOutputInfo.getHeight() / amplitude.getAmplitudeRange();
 		}
-	}
-
-	@Override
-	public int getPreRunFrames() {
-		// we need 1 frame for sampling data
-		return 1;
+		amplitudeDivisorW = (amplitude.getAmplitudeRange() / videoOutputInfo.getWidth());
+		if(amplitudeDivisorW < 1){
+			amplitudeMultiplicatorW = videoOutputInfo.getWidth() / amplitude.getAmplitudeRange();
+		}
 	}
 
 	@Override
@@ -100,10 +116,25 @@ public class Pulsating implements SoundCanvas {
 
 	@Override
 	public void drawCurrentIcon(int width, int height, Graphics2D graphics) {
-		graphics.setColor(new Color(foreGround.getRed(), foreGround.getGreen(), foreGround.getBlue(), alpha));	
+		graphics.setColor(new Color(foreGround.getRed(), foreGround.getGreen(), foreGround.getBlue()));	
 		int amp = Math.min(width, height);
-		graphics.fillOval(width / 2 - amp / 2,  height / 2 - amp / 2, amp, amp);
-	}
+		
+		switch(drawMode) {
+		case CIRCLE:
+			graphics.fillOval(width / 2 - amp / 2,  height / 2 - amp / 2, amp, amp);
+			break;
+		case SQARE:
+			graphics.fillRect(width / 2 - amp / 2,  height / 2 - amp / 2, amp, amp);
+			break;
+		case ELLIPSE:
+			graphics.fillOval(0,  0, width, height);
+			break;
+		case RECTANGLE:
+			graphics.fillRect(0,  0, width, height);
+			break;
+		default:
 
+	}
+	}
 
 }

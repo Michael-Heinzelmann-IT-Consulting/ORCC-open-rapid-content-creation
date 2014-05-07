@@ -98,12 +98,6 @@ public class Image implements SoundCanvas {
 	}
 
 	@Override
-	public int getPreRunFrames() {
-		// no pre-run needed this canvas just displays an image
-		return 0;
-	}
-
-	@Override
 	public void postFrame() {
 		// nothing to reset
 	}
@@ -114,6 +108,5 @@ public class Image implements SoundCanvas {
 			graphics.drawImage(image.getScaledInstance(width, height, java.awt.Image.SCALE_SMOOTH), 0, 0, null, null);
 		}
 	}
-
 
 }

@@ -36,12 +36,18 @@ import org.mcuosmipcuter.orcc.api.util.AmplitudeHelper;
  */
 public class RotatingAmplitudes implements SoundCanvas {
 	
+	public static enum DRAW_MODE {
+		LINE, DOT, DOT_LINE, POLY_LINE
+	}
+	
+	public static enum AMP_MODE {
+		SIGNED, UNSIGNED
+	}
+	
 	@UserProperty(description="degrees per frame speed")
 	private int degreesPerFrame = 30;
 	@UserProperty(description="foreground color")
 	private Color foreGround = Color.BLACK;
-	@UserProperty(description="whether to draw xor")
-	private boolean xor = false;
 	@LimitedIntProperty(description="size must be greater zero", minimum=1)
 	@UserProperty(description="frames to keep")
 	int size = 360;
@@ -49,6 +55,23 @@ public class RotatingAmplitudes implements SoundCanvas {
 	int shiftX = 0;
 	@UserProperty(description="y distance from center")
 	int shiftY = 0;
+	
+	@LimitedIntProperty(description="limits for zoom", minimum=1)
+	@UserProperty(description="amp zoom in %")
+	int ampZoom = 100;
+	
+	@UserProperty(description="first polygon from center")
+	boolean startFromCenter = false;
+	
+	@UserProperty(description="mode for drawing")
+	private DRAW_MODE drawMode = DRAW_MODE.LINE;
+	
+	@UserProperty(description="mode for amplitude calculation")
+	private AMP_MODE ampMode = AMP_MODE.UNSIGNED;
+	
+	@LimitedIntProperty(description="limits for dot size", minimum=2, stepSize= 2)
+	@UserProperty(description="dot size for dot mode for drawing")
+	private int dotSize = 2;
 	
 	private int centerX;
 	private int centerY;
@@ -68,10 +91,10 @@ public class RotatingAmplitudes implements SoundCanvas {
 	@Override
 	public void nextSample(int[] amplitudes) {
 
-		int mono = amplitude.getUnSignedMono(amplitudes);
+		int mono = amplitude.getSignedMono(amplitudes);
 		int amp = amplitudeDivisor > 1 ? (int)(mono / amplitudeDivisor) : (int)(mono * amplitudeMultiplicator);
-		if(amp > max) {
-			max = amp;
+		if(Math.abs(amp) > Math.abs(max)) {
+			max = ampMode == AMP_MODE.UNSIGNED ?  Math.abs(amp) : amp;
 		}
 		if(degreesPerFrame == 0) {
 			return; // do nothing
@@ -79,18 +102,32 @@ public class RotatingAmplitudes implements SoundCanvas {
 		int modul =  samplesPerFrame / degreesPerFrame;
 		
 		if(modul == 0 || sampleCount % modul == 0) {
-			int x = centerX  + (int)(max/2 * Math.cos(degrees * (Math.PI / 180)));
-			int y = centerY + (int)(max/2 * Math.sin(degrees * (Math.PI / 180)));
-			
+			int drawAmp = max;
+			if(ampZoom != 100) {
+				double scale = (double)ampZoom / 100;
+				drawAmp = (int)((double)max * scale);
+			}
+			int x = centerX  + (int)(drawAmp * Math.cos(degrees * (Math.PI / 180)));
+			int y = centerY + (int)(drawAmp * Math.sin(degrees * (Math.PI / 180)));
+			Point latestRemoved = null;
 			if(deque.size() == size) {
-				deque.removeFirst();
+				latestRemoved = deque.removeFirst();
 			}
 			if(deque.size() > size) {
 				while(deque.size() >= size) {
-					deque.removeFirst();
+					latestRemoved = deque.removeFirst();
 				}
 			}
-			deque.addLast(new Point(x, y));
+			Point p;
+			if(latestRemoved != null) {
+				latestRemoved.x = x;
+				latestRemoved.y = y;
+				p = latestRemoved;
+			}
+			else {
+				p = new Point(x, y);
+			}
+			deque.addLast(p);
 			max = 0;
 			if(degreesPerFrame > 0) {
 				this.degrees++;
@@ -110,15 +147,26 @@ public class RotatingAmplitudes implements SoundCanvas {
 	@Override
 	public void newFrame(long frameCount, Graphics2D graphics2D) {
 		
-		if(xor) {
-			graphics2D.setXORMode(new Color(255 - foreGround.getRed(), 255 - foreGround.getGreen(), 255 - foreGround.getBlue()) );
-		}
 		graphics2D.setColor(foreGround);
+		int prevX = centerX + shiftX;;
+		int prevY = centerY + shiftY;
+		boolean begin = true;
+		
 		for(Point p : deque) {
-			graphics2D.drawLine(centerX + shiftX, centerY + shiftY, p.x + shiftX, p.y + shiftY);
-		}
-		if(xor) {
-			graphics2D.setPaintMode();
+			if(drawMode == DRAW_MODE.LINE || drawMode == DRAW_MODE.DOT_LINE) {
+				graphics2D.drawLine(centerX + shiftX, centerY + shiftY, p.x + shiftX, p.y + shiftY);
+			}
+			if(drawMode == DRAW_MODE.DOT || drawMode == DRAW_MODE.DOT_LINE) {
+				graphics2D.fillOval(p.x + shiftX - dotSize / 2, p.y + shiftY - dotSize / 2, dotSize, dotSize);
+			}
+			if(drawMode == DRAW_MODE.POLY_LINE) {
+				if(! begin ||startFromCenter) {
+					graphics2D.drawLine(prevX + shiftX, prevY + shiftY, p.x + shiftX, p.y + shiftY);
+				}
+				prevX = p.x + shiftX;
+				prevY = p.y + shiftY;
+			}
+			begin = false;
 		}
 		
 	}
@@ -142,12 +190,6 @@ public class RotatingAmplitudes implements SoundCanvas {
 		}
 		degrees = 0;
 		deque.clear();
-	}
-
-	@Override
-	public int getPreRunFrames() {
-		// depends on the amount of history we are keeping, a big size and a slow degree speed need a big pre-run
-		return degreesPerFrame != 0 ? size / degreesPerFrame : 0;
 	}
 
 	@Override

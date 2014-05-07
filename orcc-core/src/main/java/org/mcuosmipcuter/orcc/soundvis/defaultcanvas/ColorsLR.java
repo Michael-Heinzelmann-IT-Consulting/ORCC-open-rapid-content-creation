@@ -42,9 +42,6 @@ public class ColorsLR implements SoundCanvas {
 	@LimitedIntProperty(minimum=-1, maximum=255, description="-1 means blue is automatic")
 	@UserProperty(description="RGB value 0-255 for blue if -1 the amplitude min-max color is used")
 	int fixedBlue = -1;
-	@LimitedIntProperty(description="alpha is limited from 0 to 255", minimum=0, maximum=255)
-	@UserProperty(description="alpha of the foreground color")
-	int alpha = 255;
 	
 	private int centerX;
 	private int centerY;
@@ -66,10 +63,10 @@ public class ColorsLR implements SoundCanvas {
 			if(amplitudes[0] > maxL) {
 				maxL = amplitudes[0];
 			}
-			if(amplitudes[0] < minR) {
+			if(amplitudes[1] < minR) {
 				minR = amplitudes[1];
 			}
-			if(amplitudes[0] > maxR) {
+			if(amplitudes[1] > maxR) {
 				maxR = amplitudes[1];
 			}
 		}
@@ -83,29 +80,31 @@ public class ColorsLR implements SoundCanvas {
 		int r = fixedRed == -1 ? rgb : fixedRed;
 		int g = fixedGreen == -1 ? rgb: fixedGreen;
 		int b = fixedBlue == -1 ? rgb: fixedBlue;
-		graphics2D.setColor(new Color(r, g, b, alpha));		
+		graphics2D.setColor(new Color(r, g, b));		
 		graphics2D.fillRect(0, 0, centerX, centerY);
 		
 		rgb = minL / amplitudeDivisor;
 		r = fixedRed == -1 ? rgb: fixedRed;
 		g = fixedGreen == -1 ? rgb : fixedGreen;
 		b = fixedBlue == -1 ? rgb: fixedBlue;
-		graphics2D.setColor(new Color(r, g, b, alpha));		
+		graphics2D.setColor(new Color(r, g, b));		
 		graphics2D.fillRect(0, centerY, centerX, centerY);
 		
 		rgb = maxR / amplitudeDivisor;
 		r = fixedRed == -1 ? rgb : fixedRed;
 		g = fixedGreen == -1 ? rgb: fixedGreen;
 		b = fixedBlue == -1 ? rgb: fixedBlue;
-		graphics2D.setColor(new Color(r, g, b, alpha));		
+		graphics2D.setColor(new Color(r, g, b));		
 		graphics2D.fillRect(centerX, 0, centerX, centerY);
 		
 		rgb = minR/ amplitudeDivisor;
 		r = fixedRed == -1 ? rgb : fixedRed;
 		g = fixedGreen == -1 ? rgb: fixedGreen;
 		b = fixedBlue == -1 ? rgb: fixedBlue;
-		graphics2D.setColor(new Color(r, g, b, alpha));		
-		graphics2D.fillRect(centerX, centerY, centerX, centerY);
+		graphics2D.setColor(new Color(r, g, b));		
+		graphics2D.fillRect(centerX, centerY, centerX - 0, centerY);
+		
+		resetMinMax();
 		
 	}
 
@@ -118,12 +117,6 @@ public class ColorsLR implements SoundCanvas {
 		amplitude = new AmplitudeHelper(audioInputInfo);
 		amplitudeDivisor = (int)amplitude.getAmplitudeRange() / 255;
 		resetMinMax();
-	}
-
-	@Override
-	public int getPreRunFrames() {
-		// allow 1 frame for getting data
-		return 1;
 	}
 
 	@Override
@@ -153,6 +146,5 @@ public class ColorsLR implements SoundCanvas {
 		graphics.setColor(Color.DARK_GRAY);
 		graphics.fillRect(width / 2, height / 2, width / 2, height / 2);
 	}
-
 
 }

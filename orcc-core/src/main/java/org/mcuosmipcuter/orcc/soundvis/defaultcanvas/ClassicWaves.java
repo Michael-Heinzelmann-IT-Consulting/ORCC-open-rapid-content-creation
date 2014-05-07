@@ -114,12 +114,6 @@ public class ClassicWaves implements SoundCanvas {
 	}
 
 	@Override
-	public int getPreRunFrames() {
-		// exactly 1 frame
-		return 1;
-	}
-
-	@Override
 	public void postFrame() {
 		// TODO Auto-generated method stub
 		
@@ -127,10 +121,24 @@ public class ClassicWaves implements SoundCanvas {
 
 	@Override
 	public void drawCurrentIcon(int width, int height, Graphics2D graphics) {
-		// TODO Auto-generated method stub
+		graphics.setColor(foreGroundColor);
+		int x = 1;
+		int prevAmp = 0;
+		for(int i =0 ; i < width; i++) {
+			int amp = (int)((0.5 - Math.random()) * height ) ;
+			if(drawHorizontal) {
+				graphics.drawLine(0, height / 2 - amp , width, height / 2 - amp);
+			}
+			else {
+				int y2 = fillBottom ? height : height / 2 - prevAmp;
+				graphics.drawLine( x, height / 2 - amp ,  x, y2);
+				prevAmp = amp;
+			}
+			x++;
+			prevAmp = amp;
+		}
 		
 	}
-
 
 
 }

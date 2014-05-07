@@ -26,6 +26,7 @@ import java.util.Calendar;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
 import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
+import org.mcuosmipcuter.orcc.api.soundvis.PropertyListener;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
@@ -35,7 +36,7 @@ import org.mcuosmipcuter.orcc.api.util.TextHelper;
  * @author Michael Heinzelmann
  *
  */
-public class Text implements SoundCanvas {
+public class Text implements SoundCanvas, PropertyListener {
 	
 	private int year = Calendar.getInstance().get(Calendar.YEAR);
 	private String user = System.getProperty("user.name");
@@ -49,15 +50,15 @@ public class Text implements SoundCanvas {
 	private Color textColor = Color.BLACK;
 	@UserProperty(description="top margin of test")
 	int topMargin = 200;
-	@UserProperty(description="number of spaces used for tabs")
-	@LimitedIntProperty(description="tab size limitation, 0 means no replacement", minimum=0)
-	private int tabReplacement = 2;
+	
+	@UserProperty(description="scrolling in pixel per frame")
+	private int scrollIncrement;
 	
 	VideoOutputInfo videoOutputInfo;
 	
-	private double topPos;
+	private int topPos;
 	private int maxTextWidth;
-	private double scrollIncrement;
+	
 	
 	/* (non-Javadoc)
 	 * @see org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas#nextSample(int[])
@@ -84,17 +85,21 @@ public class Text implements SoundCanvas {
 		
 		String[] lines = text.split("\n");
 		
-		int top = (int)topPos; // TODO
+		int top = topPos;
 		final int strHeight = graphics2d.getFontMetrics().getHeight();
 		int leftMargin = (videoOutputInfo.getWidth() - maxTextWidth) / 2 ;
 		for(String line : lines) {
 			graphics2d.drawString(line, leftMargin, top);
 			top += strHeight;
 		}
-		topPos = topMargin - scrollIncrement * frameCount;
+		topPos += scrollIncrement;
 	}
 	
-	private Dimension getTextDimesion(String[] lines, Graphics2D graphics2d) {
+	private void adjustTextDimension() {
+		
+		String[] lines = text.split("\n");
+		Graphics2D graphics2d = new BufferedImage(1, 1, BufferedImage.TYPE_3BYTE_BGR).createGraphics();
+		
 		Font f = graphics2d.getFont().deriveFont((float)fontSize);
 		graphics2d.setFont(f);
 		int maxWidth = 0;
@@ -107,7 +112,8 @@ public class Text implements SoundCanvas {
 			}
 			height += strHeight;
 		}
-		return new Dimension(maxWidth, height);
+		Dimension d = new Dimension(maxWidth, height);
+		maxTextWidth = d.width;
 	}
 
 	/* (non-Javadoc)
@@ -118,36 +124,10 @@ public class Text implements SoundCanvas {
 			VideoOutputInfo videoOutputInfo) {
 
 		this.videoOutputInfo = videoOutputInfo;
-		//topPos = topMargin;
+		adjustTextDimension();
 		
-		double framesInVideo = (audioInputInfo.getFrameLength() / audioInputInfo.getAudioFormat().getSampleRate() * videoOutputInfo.getFramesPerSecond());
-		
-		if(tabReplacement > 0) {
-			StringBuilder b = new StringBuilder();
-			for(int i = 0; i < tabReplacement; i++) {
-				b.append(" ");
-			}
-			String str = b.toString();
-			text = text.replaceAll("\t", str);
-		}
-		String[] lines = text.split("\n");
-		Dimension d = getTextDimesion(lines, new BufferedImage(1, 1, BufferedImage.TYPE_3BYTE_BGR).createGraphics());
-		maxTextWidth = d.width;
-		System.err.println(d);
-		if(d.height < videoOutputInfo.getHeight()) {
-			scrollIncrement = 0;
-		}
-		else {
-			int distanceToScroll = d.height - videoOutputInfo.getHeight() + topMargin;
-			scrollIncrement = distanceToScroll / framesInVideo;
-		}
+		topPos = topMargin;
 
-	}
-
-	@Override
-	public int getPreRunFrames() {
-		// we do not hold state and use the frame count provided, hence no pre run needed
-		return 0;
 	}
 
 	@Override
@@ -160,6 +140,14 @@ public class Text implements SoundCanvas {
 	public void drawCurrentIcon(int width, int height, Graphics2D graphics) {
 		graphics.setColor(textColor);
 		TextHelper.writeText(text, graphics, height, textColor, width, height / 10);
+		
+	}
+
+	@Override
+	public void propertyWritten(String name) {
+		if("text".equals(name)) {
+			adjustTextDimension();
+		}
 		
 	}
 

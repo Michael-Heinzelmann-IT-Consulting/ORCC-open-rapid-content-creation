@@ -26,7 +26,6 @@ import javax.sound.sampled.FloatControl;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 
-import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.soundvis.AudioInput;
 import org.mcuosmipcuter.orcc.soundvis.Context;
 import org.mcuosmipcuter.orcc.soundvis.Context.AppState;
@@ -85,30 +84,20 @@ public class PlayThread extends Thread implements PlayPauseStop {
 			sourceDataLine.start();
 			ais = audioInput.getAudioStream();
 			
-			long preRun = 0;
-			for(SoundCanvas s : Context.getSoundCanvasList()) {
-				int f = s.getPreRunFrames();
-				IOUtil.log(s + " getPreRunFrames() = " + f);
-				if(f > preRun) {
-					preRun = f;
-				}
-			}
+			final long frameStart = Context.isFullPreRun() ? 0 : Context.getSongPositionPointer();
 			
-			final long frameStart = Context.getSongPositionPointer() - preRun > 0 ? Context.getSongPositionPointer() - preRun : 0;
-			
-			if( Context.getSongPositionPointer() > preRun) {	
-				long byteStart = frameStart * samplesPerFrame * chunkSize;
-				long count = 0;
-				while(count < byteStart  && ais.available() > 0) {
-					int step = count < byteStart - samplesPerFrame * chunkSize ? samplesPerFrame * chunkSize : chunkSize;
-					long skipped = ais.skip( step);
-					count += skipped;
-				}
-				if(count != byteStart) {
-					IOUtil.log("WARNING did not reach correct start pos in stream: count " + count + "  vs. " + byteStart + " ");
-				}
-				frameCount = count / (samplesPerFrame * chunkSize);
+			long byteStart = frameStart * samplesPerFrame * chunkSize;
+			long count = 0;
+			while(count < byteStart  && ais.available() > 0) {
+				int step = count < byteStart - samplesPerFrame * chunkSize ? samplesPerFrame * chunkSize : chunkSize;
+				long skipped = ais.skip( step);
+				count += skipped;
 			}
+			if(count != byteStart) {
+				IOUtil.log("WARNING did not reach correct start pos in stream: count " + count + "  vs. " + byteStart + " ");
+			}
+			frameCount = count / (samplesPerFrame * chunkSize);
+			
 			ByteArrayLinearDecoder.decodeLinear(ais, new DecodingCallback() {
 				
 				@Override

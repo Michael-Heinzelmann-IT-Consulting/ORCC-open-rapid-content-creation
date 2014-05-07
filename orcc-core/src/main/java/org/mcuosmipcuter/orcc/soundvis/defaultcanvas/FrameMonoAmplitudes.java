@@ -75,11 +75,6 @@ public abstract class FrameMonoAmplitudes implements SoundCanvas {
 	}
 	public abstract void subClassPrepare(AudioInputInfo audioInputInfo, VideoOutputInfo videoOutputInfo);
 
-	@Override
-	public final int getPreRunFrames() {
-		// exactly 1 frame
-		return 1;
-	}
 
 	@Override
 	public final void postFrame() {

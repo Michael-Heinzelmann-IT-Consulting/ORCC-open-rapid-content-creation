@@ -17,12 +17,18 @@
 */
 package org.mcuosmipcuter.orcc.soundvis.model;
 
+import java.awt.AlphaComposite;
+import java.awt.Composite;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
+import org.mcuosmipcuter.orcc.api.soundvis.PropertyListener;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
+import org.mcuosmipcuter.orcc.api.util.AmplitudeHelper;
 import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
 
 /**
@@ -31,12 +37,22 @@ import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
  */
 public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 	
-	final SoundCanvas soundCanvas;
-	boolean enabled = true;
-	long frameFrom = 0;
-	long frameTo = 0;
+	private Set<PropertyListener> propertyListeners = new HashSet<PropertyListener>();
+	
+	private final SoundCanvas soundCanvas;
+	private boolean enabled = true;
+	private long frameFrom = 0;
+	private long frameTo = 0;
 	private static Graphics2D devNullGraphics;
 	private boolean selected;
+	private int repaintThreshold;
+	private boolean thresholdExceeded;
+	protected AmplitudeHelper amplitudeHelper;
+	private int transparency = 100;
+	private boolean xor;
+	
+	int max;
+	int maxBefore;
 	
 	static {
 		//since this image is for nothing it can be small
@@ -50,25 +66,70 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 	@Override
 	public void nextSample(int[] amplitudes) {
 		soundCanvas.nextSample(amplitudes);
+		int mono = amplitudeHelper.getSignedMono(amplitudes);
+		int percent = amplitudeHelper.getSignedPercent(Math.abs(mono));
+		if(percent > max) {
+			max = percent;
+		}
+//		if(repaintThreshold > 0) {
+//			int mono = amplitudeHelper.getSignedMono(amplitudes);
+//			int percent = amplitudeHelper.getSignedPercent(Math.abs(mono));	
+//			if(percent > repaintThreshold) {
+//				thresholdExceeded = true;
+//			}
+//		}
 	}
 
 	@Override
 	public void newFrame(long frameCount, Graphics2D graphics2d) {
-		if(enabled && frameCount >= frameFrom && (frameCount <= frameTo || frameTo <= 0)) {
+		if((max - maxBefore) > repaintThreshold) {
+			thresholdExceeded = true;
+		}
+		if(
+				(
+						enabled && 
+						frameCount >= frameFrom && (frameCount <= frameTo || frameTo <= 0)
+				) 
+				&&
+				(
+						repaintThreshold == 0 || 
+						repaintThreshold > 0 && thresholdExceeded
+				) 
+			)
+		{
+			if(xor) {
+				graphics2d.setXORMode(graphics2d.getColor());
+			}
+			Composite origComposite = null;
+			if(transparency != 100) {
+				origComposite = graphics2d.getComposite();
+				graphics2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, transparency / 100f));  
+			}
+
 			// draws to the real graphics
 			soundCanvas.newFrame(frameCount, graphics2d);
+			
+			if(transparency != 100) {
+				graphics2d.setComposite(origComposite);
+			}
+			if(xor) {
+				graphics2d.setPaintMode();
+			}
 		}
 		else {
 			// it's not reasonable to proxy graphics or make a wrapper with 
 			//limited number of methods, use a dummy graphics object 
 			soundCanvas.newFrame(frameCount, devNullGraphics);
 		}
+		maxBefore = max;
+		max = 0;
 	}
 
 	@Override
 	public void prepare(AudioInputInfo audioInputInfo,
 			VideoOutputInfo videoOutputInfo) {
 		soundCanvas.prepare(audioInputInfo, videoOutputInfo);
+		amplitudeHelper = new AmplitudeHelper(audioInputInfo);
 	}
 
 	@Override
@@ -93,12 +154,9 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 		return getDisplayName();
 	}
 	@Override
-	public int getPreRunFrames() {
-		return soundCanvas.getPreRunFrames();
-	}
-	@Override
 	public void postFrame() {
 		soundCanvas.postFrame();
+		thresholdExceeded = false;
 	}
 	@Override
 	public void drawCurrentIcon(int width, int height, Graphics2D graphics) {
@@ -128,5 +186,42 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 	public void setSelected(boolean selected) {
 		this.selected = selected;
 	}
-
+	@Override
+	public int getRepaintThreshold() {
+		return repaintThreshold;
+	}
+	@Override
+	public void setRepaintThreshold(int repaintThreshold) {
+		this.repaintThreshold = repaintThreshold;
+	}
+	@Override
+	public boolean isXor() {
+		return xor;
+	}
+	@Override
+	public void setXor(boolean xor) {
+		this.xor = xor;
+	}
+	@Override
+	public void setTransparency(int transparency) {
+		this.transparency = transparency;
+	}
+	@Override
+	public int getTransparency() {
+		return transparency;
+	}
+	@Override
+	public void propertyWritten(String name) {
+		if(soundCanvas instanceof PropertyListener) {
+			((PropertyListener)soundCanvas).propertyWritten(name);
+		}
+		for(PropertyListener pl : propertyListeners) {
+			pl.propertyWritten(name);
+		}
+	}
+	@Override
+	public void addPropertyChangeListener(PropertyListener propertyListener) {
+		propertyListeners.add(propertyListener);
+	}
+	
 }

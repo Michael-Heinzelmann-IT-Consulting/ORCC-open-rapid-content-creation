@@ -21,12 +21,10 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
-import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.api.util.AmplitudeHelper;
-import org.mcuosmipcuter.orcc.api.util.ColorHelper;
 
 /**
  * @author Michael Heinzelmann
@@ -43,9 +41,6 @@ public class GridPulse implements SoundCanvas {
 	boolean fillOnFull = true;
 	@UserProperty(description="foreground color")
 	private Color foreGround = Color.BLACK;
-	@LimitedIntProperty(description="alpha is limited from 0 to 255", minimum=0, maximum=255)
-	@UserProperty(description="alpha of the foreground color")
-	int alpha = 255;
 	@UserProperty(description="if reverse the low amplituses are large and high amplitudes small")
 	boolean reverse = false;
 	@UserProperty(description="x distance from center")
@@ -57,7 +52,6 @@ public class GridPulse implements SoundCanvas {
 	private int centerY;
 
 	private AmplitudeHelper amplitude;
-	private ColorHelper colorHelper = new ColorHelper(alpha);
 	
 	int max;
 
@@ -93,7 +87,7 @@ public class GridPulse implements SoundCanvas {
 			t += 1;
 		}
 
-		colorHelper.setColorWithAlpha(alpha, foreGround, graphics2D);
+		graphics2D.setColor(foreGround);
 		final int actualCenterX = centerX + shiftX;
 		final int actualCenterY = centerY + shiftY;
 		
@@ -146,19 +140,13 @@ public class GridPulse implements SoundCanvas {
 	}
 
 	@Override
-	public int getPreRunFrames() {
-		// we need 1 frame for sampling data
-		return 1;
-	}
-
-	@Override
 	public void postFrame() {
 		max = 0;
 	}
 
 	@Override
 	public void drawCurrentIcon(int width, int height, Graphics2D graphics) {
-		graphics.setColor(new Color(foreGround.getRed(), foreGround.getGreen(), foreGround.getBlue(), alpha));	
+		graphics.setColor(new Color(foreGround.getRed(), foreGround.getGreen(), foreGround.getBlue()));	
 		int amp = Math.min(width, height) / 5;
 		for(int x = 0; x < width; x += amp) {
 			graphics.drawLine(x, 0, x, height);
@@ -167,6 +155,5 @@ public class GridPulse implements SoundCanvas {
 			graphics.drawLine(0, y, width, y);
 		}
 	}
-
 
 }

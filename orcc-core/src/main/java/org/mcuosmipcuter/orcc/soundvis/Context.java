@@ -41,7 +41,7 @@ public abstract class Context {
 	 */
 	public enum PropertyName {
 		AudioInputInfo, VideoDimension, SoundCanvasAdded, SoundCanvasRemoved, SoundCanvasList, ExportFileName, 
-		CanvasClassNames, AppState, SongPositionPointer, VideoFrameRate, VolumeControl
+		CanvasClassNames, AppState, SongPositionPointer, VideoFrameRate, VolumeControl, FullPreRun
 	}
 	/**
 	 * Enumeration of application states
@@ -96,6 +96,7 @@ public abstract class Context {
 	private static VideoOutputInfoImpl videoOutputInfo = new VideoOutputInfoImpl(25, 1920, 1080);
 	private static long songPositionPointer;
 	private static FloatControl volumeControl;
+	private static boolean fullPreRun;
 	
 	/**
 	 * Gets the audio input info object
@@ -271,6 +272,17 @@ public abstract class Context {
 	 */
 	public static FloatControl getVolumeControl() {
 		return volumeControl;
+	}
+	/**
+	 * Whether a full pre run should precede the playing from song position pointer
+	 * @return the boolean value
+	 */
+	public static boolean isFullPreRun() {
+		return fullPreRun;
+	}
+	public static synchronized void setFullPreRun(boolean fullPreRun) {
+		Context.fullPreRun = fullPreRun;
+		notifyListeners(PropertyName.FullPreRun);
 	}
 	
 }
