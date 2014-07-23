@@ -20,6 +20,7 @@ package org.mcuosmipcuter.orcc.soundvis.model;
 import java.awt.AlphaComposite;
 import java.awt.Composite;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.util.HashSet;
 import java.util.Set;
@@ -50,7 +51,7 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 	protected AmplitudeHelper amplitudeHelper;
 	private int transparency = 100;
 	private boolean xor;
-	
+	private Image iconImage;
 	int max;
 	int maxBefore;
 	
@@ -222,6 +223,14 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 	@Override
 	public void addPropertyChangeListener(PropertyListener propertyListener) {
 		propertyListeners.add(propertyListener);
+	}
+	@Override
+	public Image getIconImage() {
+		return iconImage;
+	}
+	@Override
+	public void setIconImage(Image iconImage) {
+		this.iconImage = iconImage;
 	}
 	
 }

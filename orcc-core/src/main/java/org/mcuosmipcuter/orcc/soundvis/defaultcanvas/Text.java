@@ -30,6 +30,7 @@ import org.mcuosmipcuter.orcc.api.soundvis.PropertyListener;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
+import org.mcuosmipcuter.orcc.api.util.DimensionHelper;
 import org.mcuosmipcuter.orcc.api.util.TextHelper;
 
 /**
@@ -43,20 +44,17 @@ public class Text implements SoundCanvas, PropertyListener {
 	
 	@UserProperty(description="the text to display")
 	private String text = "ORCC rapid content creation for entertainment, education and media production\n" + year + " " + user + " graphics by soundvis";
-	@UserProperty(description="font size for text")
-	@LimitedIntProperty(description="font size limitation", minimum=4)
-	private int fontSize = 36;
+	@UserProperty(description="font size for text in % of video height")
+	@LimitedIntProperty(description="font size limitation", minimum=1)
+	private int fontSize = 20;
 	@UserProperty(description="text color")
 	private Color textColor = Color.BLACK;
-	@UserProperty(description="top margin of test")
-	int topMargin = 200;
+	@UserProperty(description="top margin of test in % of video height")
+	int topMargin = 20;
 	
-	@UserProperty(description="scrolling in pixel per frame")
-	private int scrollIncrement;
 	
 	VideoOutputInfo videoOutputInfo;
-	
-	private int topPos;
+	private DimensionHelper dimensionHelper;
 	private int maxTextWidth;
 	
 	
@@ -65,8 +63,6 @@ public class Text implements SoundCanvas, PropertyListener {
 	 */
 	@Override
 	public void nextSample(int[] amplitudes) {
-		// TODO Auto-generated method stub
-
 	}
 
 	/* (non-Javadoc)
@@ -78,21 +74,21 @@ public class Text implements SoundCanvas, PropertyListener {
 		if(text == null || text.length() == 0) {
 			return;
 		}
-		Font f = graphics2d.getFont().deriveFont((float)fontSize);
+		
+		Font f = graphics2d.getFont().deriveFont(dimensionHelper.getFontSizeForPercentX(fontSize));
 		graphics2d.setFont(f);
 		graphics2d.setColor(textColor);
 		
 		
 		String[] lines = text.split("\n");
 		
-		int top = topPos;
+		int top = dimensionHelper.realY(topMargin);
 		final int strHeight = graphics2d.getFontMetrics().getHeight();
 		int leftMargin = (videoOutputInfo.getWidth() - maxTextWidth) / 2 ;
 		for(String line : lines) {
 			graphics2d.drawString(line, leftMargin, top);
 			top += strHeight;
 		}
-		topPos += scrollIncrement;
 	}
 	
 	private void adjustTextDimension() {
@@ -100,7 +96,7 @@ public class Text implements SoundCanvas, PropertyListener {
 		String[] lines = text.split("\n");
 		Graphics2D graphics2d = new BufferedImage(1, 1, BufferedImage.TYPE_3BYTE_BGR).createGraphics();
 		
-		Font f = graphics2d.getFont().deriveFont((float)fontSize);
+		Font f = graphics2d.getFont().deriveFont(dimensionHelper.getFontSizeForPercentX(fontSize));
 		graphics2d.setFont(f);
 		int maxWidth = 0;
 		int height = 0;
@@ -116,24 +112,17 @@ public class Text implements SoundCanvas, PropertyListener {
 		maxTextWidth = d.width;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas#prepare(org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo, org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo, java.awt.Graphics2D, org.mcuosmipcuter.orcc.api.soundvis.CanvasBackGround)
-	 */
 	@Override
 	public void prepare(AudioInputInfo audioInputInfo,
 			VideoOutputInfo videoOutputInfo) {
 
 		this.videoOutputInfo = videoOutputInfo;
+		dimensionHelper = new DimensionHelper(videoOutputInfo);
 		adjustTextDimension();
-		
-		topPos = topMargin;
-
 	}
 
 	@Override
 	public void postFrame() {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
@@ -145,10 +134,7 @@ public class Text implements SoundCanvas, PropertyListener {
 
 	@Override
 	public void propertyWritten(String name) {
-		if("text".equals(name)) {
-			adjustTextDimension();
-		}
-		
+		adjustTextDimension();
 	}
 
 

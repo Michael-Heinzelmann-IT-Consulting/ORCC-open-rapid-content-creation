@@ -49,6 +49,7 @@ public class IntegerPropertyPanel extends PropertyPanel<Integer> {
 		SpinnerNumberModel model = new SpinnerNumberModel(value, minimum, maximum, stepSize);
 		jSpinner = new JSpinner(model);
 		add(jSpinner);
+		
 		jSpinner.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent arg0) {
 				setNewValue((Integer)jSpinner.getValue());

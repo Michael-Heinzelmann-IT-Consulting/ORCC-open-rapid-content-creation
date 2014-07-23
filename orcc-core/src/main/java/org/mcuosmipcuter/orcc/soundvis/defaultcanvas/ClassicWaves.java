@@ -40,6 +40,12 @@ public class ClassicWaves implements SoundCanvas {
 	@UserProperty(description="whether to draw horizontal lines")
 	private boolean drawHorizontal = false;
 	
+	@UserProperty(description="whether to draw without margin")
+	private boolean drawMargin = false;
+	
+	@UserProperty(description="beam width of analyzer")
+	private int beamWidth = 0;
+	
 	// parameters automatically set
 	private float amplitudeDivisor;
 	private float amplitudeMultiplicator;
@@ -54,7 +60,8 @@ public class ClassicWaves implements SoundCanvas {
 	
 	// state
 	private int counterInsideFrame;
-	private int[] amplitudes;
+	private int[] amplitudeBuffer;
+	private int[] marginBuffer;
 	private int prevAmplitude;
 	
 	@Override
@@ -67,7 +74,7 @@ public class ClassicWaves implements SoundCanvas {
 		}
 		
 		if(samplecount % factor == 0) {
-			this.amplitudes[counterInsideFrame] = max;
+			this.amplitudeBuffer[counterInsideFrame] = max;
 			counterInsideFrame++;
 			max = 0;
 		}
@@ -79,17 +86,49 @@ public class ClassicWaves implements SoundCanvas {
 	public void newFrame(long frameCount, Graphics2D graphics) {	
 		counterInsideFrame = 0;
 		graphics.setColor(foreGroundColor);
-		int x = 1;
-		for(int amp : amplitudes) {
+		int x = 0;
+		final int lm = drawMargin ? 0 : leftMargin;
+		int aMaxamp = 0;
+		int aMinAmp = 0;
+
+		int maxArrayPos = drawMargin ? marginBuffer.length + amplitudeBuffer.length : amplitudeBuffer.length;
+		for(int i = 0; i < maxArrayPos; i++) {
+			int amp;
+			if(drawMargin) {
+				amp = i < marginBuffer.length ? marginBuffer[i] : amplitudeBuffer[i - marginBuffer.length];
+			}
+			else {
+				amp = amplitudeBuffer[i];
+			}
 			if(drawHorizontal) {
 				graphics.drawLine(0, height / 2 - amp , width, height / 2 - amp);
 			}
+			else if(beamWidth > 0) {
+				if(amp > aMaxamp) {
+					aMaxamp = amp;
+				}
+				if(amp < aMinAmp) {
+					aMinAmp = amp;
+				}
+				if((x + 1) % beamWidth == 0) {
+					final int rectWidth = fillBottom ? height / 2 + aMaxamp : aMaxamp - aMinAmp;
+					graphics.fillRect(x  + lm - beamWidth, height / 2 - aMaxamp, beamWidth, rectWidth);
+					aMaxamp = 0;
+					aMinAmp = 0;
+				}
+			}
 			else {
-			int y2 = fillBottom ? height : height / 2 - prevAmplitude;
-			graphics.drawLine(leftMargin + x, height / 2 - amp , leftMargin + x, y2);
-			prevAmplitude = amp;
+				int y2 = fillBottom ? height : height / 2 - prevAmplitude;
+				graphics.drawLine(lm + x, height / 2 - amp , lm + x, y2);
+				prevAmplitude = amp;
 			}
 			x++;
+		}
+		for(int i = 0; i < marginBuffer.length; i++) {
+			marginBuffer[i] = amplitudeBuffer[amplitudeBuffer.length - marginBuffer.length + i];		
+		}
+		if(drawMargin  && ! drawHorizontal && amplitudeBuffer.length - marginBuffer.length > 0) {
+			prevAmplitude = amplitudeBuffer[amplitudeBuffer.length - marginBuffer.length - 1];	
 		}
 	}
 
@@ -100,7 +139,8 @@ public class ClassicWaves implements SoundCanvas {
 		int pixelLengthOfaFrame = (int)Math.ceil(sampleRate / (float)frameRate); // e.g. 44100 / 25 = 1764
 		factor = (int)(pixelLengthOfaFrame / videoOutputInfo.getWidth()) + 1;
 		int pixelsUsed = (int)Math.ceil((float)pixelLengthOfaFrame / (float)factor);
-		amplitudes = new int[pixelsUsed];
+		amplitudeBuffer = new int[pixelsUsed];
+		marginBuffer = new int[videoOutputInfo.getWidth() - pixelsUsed];
 		//System.err.println(pixelsUsed + " used factor " + factor);
 		leftMargin =  (videoOutputInfo.getWidth() - pixelsUsed) / 2;
 		this.height = videoOutputInfo.getHeight();

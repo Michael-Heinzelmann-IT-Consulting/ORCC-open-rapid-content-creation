@@ -17,6 +17,8 @@
 */
 package org.mcuosmipcuter.orcc.soundvis;
 
+import java.awt.Image;
+
 import org.mcuosmipcuter.orcc.api.soundvis.PropertyListener;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 
@@ -90,4 +92,6 @@ public interface SoundCanvasWrapper extends SoundCanvas, PropertyListener {
 	public int getTransparency();
 	
 	public void addPropertyChangeListener(PropertyListener propertyListener);
+	public void setIconImage(Image image);
+	public Image getIconImage();
 }

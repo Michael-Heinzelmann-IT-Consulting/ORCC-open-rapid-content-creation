@@ -26,6 +26,7 @@ import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
+import org.mcuosmipcuter.orcc.api.util.DimensionHelper;
 
 /**
  * Displays a solid color
@@ -33,12 +34,14 @@ import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
  */
 public class Image implements SoundCanvas {
 	
+	private DimensionHelper dimensionHelper;
+	
 	@UserProperty(description="image to show")
 	private BufferedImage image = null;
-	@UserProperty(description="whether to scale the image width")
-	private boolean scaleToWidth = true;
-	@UserProperty(description="whether to scale the image height")
-	private boolean scaleToHeight = true;
+//	@UserProperty(description="whether to scale the image width")
+//	private boolean scaleToWidth = true;
+//	@UserProperty(description="whether to scale the image height")
+//	private boolean scaleToHeight = true;
 	@UserProperty(description="upper left x position")
 	private int upperLeftCornerX = 0;
 	@UserProperty(description="upper left y position")
@@ -55,8 +58,9 @@ public class Image implements SoundCanvas {
 	private int scaledHeight = 0;
 	
 	private BufferedImage scaledImage = null;
-	private int scaledHash;
-	private int scaled;
+	private int imageHashCode;
+	private String scaled;
+	private String outputHash;
 	VideoOutputInfo videoOutputInfo;
 
 	@Override
@@ -67,26 +71,11 @@ public class Image implements SoundCanvas {
 	@Override
 	public void newFrame(long frameCount, Graphics2D graphics2D) {
 		if(image != null) {	
-			final int width = scaledWidth == 0 ? videoOutputInfo.getWidth() : scaledWidth;
-			final int height = scaledHeight == 0 ? videoOutputInfo.getHeight() : scaledHeight;
-			final int hc = System.identityHashCode(image);
-			final int sc = (scaleToWidth ? 1 : 0) + (scaleToHeight ? 10 : 0); // 0, 1, 10, 11
-			if((scaleToWidth || scaleToHeight) && (scaledHash != hc || sc != scaled)) {
 
-				float ratio = (float)image.getWidth() / (float)image.getHeight();
-				int w = scaleToWidth ? width : scaleToHeight ? (int)((float)height * ratio) : image.getWidth();
-				int h = scaleToHeight ? height : scaleToWidth ? (int)((float)width / ratio) : image.getHeight();
-				scaledImage = new BufferedImage(w, h, BufferedImage.TYPE_3BYTE_BGR);
-				int wDraw = scaleToWidth ? width : -1;
-				int hDraw = scaleToHeight ? height : -1;
-				scaledImage.getGraphics().drawImage(image.getScaledInstance(wDraw, hDraw, java.awt.Image.SCALE_SMOOTH), 0, 0, Color.BLACK, null);
-				scaledHash = hc;
-				scaled = sc;
-			}
 
-			BufferedImage i = (scaleToWidth || scaleToHeight) ? scaledImage : image;
-			final int x = centeredHorizontal ? (videoOutputInfo.getWidth() - i.getWidth()) / 2 : upperLeftCornerX;
-			final int y = centeredVertical ? (videoOutputInfo.getHeight() - i.getHeight()) / 2 : upperLeftCornerY;
+			BufferedImage i = (scaledWidth != 0 || scaledHeight != 0) ? scaledImage : image;
+			final int x = centeredHorizontal ? (videoOutputInfo.getWidth() - i.getWidth()) / 2 : dimensionHelper.realX(upperLeftCornerX);
+			final int y = centeredVertical ? (videoOutputInfo.getHeight() - i.getHeight()) / 2 : dimensionHelper.realX(upperLeftCornerY);
 			graphics2D.drawImage(i, x, y, null, null);
 		}
 	}
@@ -95,6 +84,15 @@ public class Image implements SoundCanvas {
 	public void prepare(AudioInputInfo audioInputInfo,
 			VideoOutputInfo videoOutputInfo) {
 		this.videoOutputInfo = videoOutputInfo;
+		this.dimensionHelper = new DimensionHelper(videoOutputInfo);
+		final String oh = videoOutputInfo.getWidth() + "=" + videoOutputInfo.getHeight();
+		if(!oh.equals(outputHash)) {
+			if(image != null) {
+				resizeImage();
+			}
+			outputHash = oh;
+		}
+		
 	}
 
 	@Override
@@ -103,10 +101,35 @@ public class Image implements SoundCanvas {
 	}
 
 	@Override
-	public void drawCurrentIcon(int width, int height, Graphics2D graphics) {
+	public void drawCurrentIcon(int widthPx, int heightPx, Graphics2D graphics) {
 		if(image != null) {
-			graphics.drawImage(image.getScaledInstance(width, height, java.awt.Image.SCALE_SMOOTH), 0, 0, null, null);
+
+			final int hc = System.identityHashCode(image);
+			final String sc = scaledWidth + "=" + scaledHeight;
+
+			//final int sc = (scaleToWidth ? 1 : 0) + (scaleToHeight ? 10 : 0); // 0, 1, 10, 11
+			if(hc != imageHashCode || !sc.equals(scaled)) {
+				resizeImage();
+				imageHashCode = hc;
+				scaled = sc;
+				graphics.drawImage(image.getScaledInstance(widthPx, heightPx, java.awt.Image.SCALE_SMOOTH), 0, 0, null, null);
+			}
 		}
+	}
+	
+	private void resizeImage() {
+		final boolean scaleToWidth = scaledWidth != 0;
+		final boolean scaleToHeight = scaledHeight != 0;
+		final int width = scaledWidth == 0 ? videoOutputInfo.getWidth() : dimensionHelper.realX(scaledWidth);
+		final int height = scaledHeight == 0 ? videoOutputInfo.getHeight() : dimensionHelper.realY(scaledHeight);
+		float ratio = (float)image.getWidth() / (float)image.getHeight();
+		int w = scaleToWidth ? width : scaleToHeight ? (int)((float)height * ratio) : image.getWidth();
+		int h = scaleToHeight ? height : scaleToWidth ? (int)((float)width / ratio) : image.getHeight();
+		scaledImage = new BufferedImage(w, h, BufferedImage.TYPE_3BYTE_BGR);
+		int wDraw = scaleToWidth ? width : -1;
+		int hDraw = scaleToHeight ? height : -1;
+		scaledImage.getGraphics().drawImage(image.getScaledInstance(wDraw, hDraw, java.awt.Image.SCALE_SMOOTH), 0, 0, Color.BLACK, null);
+
 	}
 
 }

@@ -36,6 +36,7 @@ public class ResolutionMenu extends JMenu{
 	private static final long serialVersionUID = 1L;
 
 	private int[][] resolutions = new int[][] {
+			new int[] {192, 108},
 			new int[] {160, 120},
 			new int[] {240, 180},
 			new int[] {320, 240},

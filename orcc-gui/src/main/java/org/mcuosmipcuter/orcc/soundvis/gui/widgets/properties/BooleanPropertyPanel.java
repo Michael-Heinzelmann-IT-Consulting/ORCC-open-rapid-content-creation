@@ -40,8 +40,12 @@ public class BooleanPropertyPanel extends PropertyPanel<Boolean> {
 		super(soundCanvasWrapper);
 		add(check);
 		check.addChangeListener(new ChangeListener() {
+			boolean checked = check.isSelected();
 			public void stateChanged(ChangeEvent e) {
-				setNewValue(check.isSelected());
+				if(checked != check.isSelected()) {
+					setNewValue(check.isSelected());
+				}
+				checked = check.isSelected();
 			}
 		});
 	}

@@ -26,12 +26,15 @@ import javax.sound.sampled.FloatControl;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 
+import org.mcuosmipcuter.orcc.api.soundvis.ExtendedFrameHistory;
+import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.soundvis.AudioInput;
 import org.mcuosmipcuter.orcc.soundvis.Context;
 import org.mcuosmipcuter.orcc.soundvis.Context.AppState;
 import org.mcuosmipcuter.orcc.soundvis.DecodingCallback;
 import org.mcuosmipcuter.orcc.soundvis.PlayPauseStop;
 import org.mcuosmipcuter.orcc.soundvis.Renderer;
+import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
 import org.mcuosmipcuter.orcc.soundvis.util.ByteArrayLinearDecoder;
 import org.mcuosmipcuter.orcc.util.IOUtil;
 
@@ -84,20 +87,30 @@ public class PlayThread extends Thread implements PlayPauseStop {
 			sourceDataLine.start();
 			ais = audioInput.getAudioStream();
 			
-			final long frameStart = Context.isFullPreRun() ? 0 : Context.getSongPositionPointer();
-			
-			long byteStart = frameStart * samplesPerFrame * chunkSize;
-			long count = 0;
-			while(count < byteStart  && ais.available() > 0) {
-				int step = count < byteStart - samplesPerFrame * chunkSize ? samplesPerFrame * chunkSize : chunkSize;
-				long skipped = ais.skip( step);
-				count += skipped;
+			long preRun = 1;
+			for(SoundCanvasWrapper s : Context.getSoundCanvasList()) {
+				int f = s.getSoundCanvas() instanceof ExtendedFrameHistory ? ((ExtendedFrameHistory)s.getSoundCanvas()).getCurrentHistoryFrameSize() : 1;
+				IOUtil.log(s + " getPreRunFrames() = " + f);
+				if(f > preRun) {
+					preRun = f;
+				}
 			}
-			if(count != byteStart) {
-				IOUtil.log("WARNING did not reach correct start pos in stream: count " + count + "  vs. " + byteStart + " ");
-			}
-			frameCount = count / (samplesPerFrame * chunkSize);
 			
+			final long frameStart = Context.getSongPositionPointer() - preRun > 0 ? Context.getSongPositionPointer() - preRun : 0;
+			
+			if( Context.getSongPositionPointer() > preRun) {	
+				long byteStart = frameStart * samplesPerFrame * chunkSize;
+				long count = 0;
+				while(count < byteStart  && ais.available() > 0) {
+					int step = count < byteStart - samplesPerFrame * chunkSize ? samplesPerFrame * chunkSize : chunkSize;
+					long skipped = ais.skip( step);
+					count += skipped;
+				}
+				if(count != byteStart) {
+					IOUtil.log("WARNING did not reach correct start pos in stream: count " + count + "  vs. " + byteStart + " ");
+				}
+				frameCount = count / (samplesPerFrame * chunkSize);
+			}
 			ByteArrayLinearDecoder.decodeLinear(ais, new DecodingCallback() {
 				
 				@Override

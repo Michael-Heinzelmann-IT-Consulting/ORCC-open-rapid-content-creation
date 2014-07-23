@@ -35,10 +35,6 @@ public class SolidColor implements SoundCanvas {
 	
 	@UserProperty(description="color of the area")
 	private Color color = Color.WHITE;
-	@LimitedIntProperty(description="frequency cannot be below 0", minimum=0)
-	@UserProperty(description="repaint every <frameFrequency> frame")
-	int repaintFrameFrequency = 1;
-	@LimitedIntProperty(description="threshold must be between 0 and 100", minimum=0, maximum = 100)
 	
 	protected AmplitudeHelper amplitudeHelper;
 	
@@ -50,14 +46,9 @@ public class SolidColor implements SoundCanvas {
 	}
 
 	@Override
-	public void newFrame(long frameCount, Graphics2D graphics2D) {
-		if(	frameCount == 1 ||
-			(repaintFrameFrequency == 1) || 
-			(repaintFrameFrequency > 0 && frameCount % repaintFrameFrequency == 0)) {
-			
-			graphics2D.setColor(color);
-			graphics2D.fillRect(0, 0, width, height);
-		}
+	public void newFrame(long frameCount, Graphics2D graphics2D) {	
+		graphics2D.setColor(color);
+		graphics2D.fillRect(0, 0, width, height);
 	}
 
 	@Override

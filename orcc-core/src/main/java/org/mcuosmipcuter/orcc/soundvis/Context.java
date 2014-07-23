@@ -41,7 +41,7 @@ public abstract class Context {
 	 */
 	public enum PropertyName {
 		AudioInputInfo, VideoDimension, SoundCanvasAdded, SoundCanvasRemoved, SoundCanvasList, ExportFileName, 
-		CanvasClassNames, AppState, SongPositionPointer, VideoFrameRate, VolumeControl, FullPreRun
+		CanvasClassNames, AppState, SongPositionPointer, VideoFrameRate, VolumeControl, FullPreRun, SoundCanvasProperty
 	}
 	/**
 	 * Enumeration of application states
@@ -83,6 +83,7 @@ public abstract class Context {
 	// private helper method
 	private static void notifyListeners(PropertyName propertyName) {
 		for(Listener listener : listeners) {
+			//System.err.println("listener: " + listener + " " + propertyName);
 			listener.contextChanged(propertyName);
 		}
 	}
@@ -283,6 +284,11 @@ public abstract class Context {
 	public static synchronized void setFullPreRun(boolean fullPreRun) {
 		Context.fullPreRun = fullPreRun;
 		notifyListeners(PropertyName.FullPreRun);
+	}
+	public static void canvasPropertyWritten(String name,
+			SoundCanvas soundCanvas) {
+		notifyListeners(PropertyName.SoundCanvasProperty);
+		
 	}
 	
 }

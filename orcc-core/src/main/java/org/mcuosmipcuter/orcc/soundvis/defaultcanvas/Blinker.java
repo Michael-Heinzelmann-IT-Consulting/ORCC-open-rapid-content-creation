@@ -19,11 +19,9 @@ package org.mcuosmipcuter.orcc.soundvis.defaultcanvas;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Point;
 import java.awt.RadialGradientPaint;
 import java.awt.MultipleGradientPaint.CycleMethod;
-import java.util.ArrayDeque;
-import java.util.Deque;
+import java.awt.geom.Point2D;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
 import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
@@ -31,38 +29,47 @@ import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.api.util.AmplitudeHelper;
+import org.mcuosmipcuter.orcc.api.util.DimensionHelper;
 
 /**
  * @author Michael Heinzelmann
  *
  */
 public class Blinker implements SoundCanvas {
+
+	@UserProperty(description="x size of tile in % of video width")
+	int tileX = 100;
+	@UserProperty(description="y size of tile in % of video height")
+	int tileY = 100;
+	@UserProperty(description="x position of center in % of video width")
+	int centerX = 50;
+	@UserProperty(description="y position of center in % of video height")
+	int centerY = 50;
+	@UserProperty(description="x position of focus  in % of video width")
+	int focusX = 50;
+	@UserProperty(description="y position of focus  in % of video height")
+	int focusY = 50;
+	@UserProperty(description="color of background")
+	private Color backColor = Color.WHITE;
+	@UserProperty(description="color of middle")
+	private Color midColor = Color.YELLOW;
+	@UserProperty(description="color of center")
+	private Color centerColor = Color.RED;
+	@UserProperty(description="cycle method")
+	private CycleMethod cycleMethod = CycleMethod.NO_CYCLE;
+	@UserProperty(description="size of radius in % of video height")
+	private int radius = 100;
+	@LimitedIntProperty(description="must be inbetween min and max", minimum=1, maximum=99)
+	@UserProperty(description="distance in %")
+	private int distance = 50;
 	
-
-	@UserProperty(description="foreground color")
-	private Color foreGround = Color.WHITE;
-	@UserProperty(description="whether to draw xor")
-	private boolean xor = false;
-
-
-	@UserProperty(description="x size of tile")
-	int tileX = 240;
-	@UserProperty(description="y size of tile")
-	int tileY = 180;
-	
-	int size;
-	
-	private int width;
-	private int height;
-
 	private float amplitudeDivisor;
 
-	private AmplitudeHelper amplitude;	
+	private AmplitudeHelper amplitude;
+	private DimensionHelper dimensionHelper;
 	long degrees;
 
 	int max;
-	int samplesPerFrame;
-	long frameCount;
 	
 	/* (non-Javadoc)
 	 * @see org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas#nextSample(int[])
@@ -84,16 +91,29 @@ public class Blinker implements SoundCanvas {
 	public void newFrame(long frameCount, Graphics2D graphics2D) {
 
 		int c = (int)(max / amplitudeDivisor);
+		if(c < 1) {
+			c = 1;
+		}
 		
-		if(xor) {
-			graphics2D.setXORMode(foreGround);
-		}
-			graphics2D.setColor(new Color(c, c, c));
-			graphics2D.fillRect(0, 0, tileX, tileY);
-		if(xor) {
-			graphics2D.setPaintMode();
-		}
-		this.frameCount = frameCount;
+		int w = dimensionHelper.realX(tileX);
+		int h = dimensionHelper.realY(tileY);
+		int x = dimensionHelper.realX(centerX);
+		int y = dimensionHelper.realY(centerY);
+		int fx = dimensionHelper.realX(focusX);
+		int fy = dimensionHelper.realY(focusY);
+		
+	     Point2D center = new Point2D.Float(x, y);
+	     Point2D focus = new Point2D.Float(fx, fy);
+
+	     float radiusPx = h /(radius/100f) * (c/255f);
+	     float dist = distance / 100f;
+	     float[] distances = {0.0f,  dist, 1.0f};
+	     Color[] colors = {centerColor, midColor , backColor};
+	     RadialGradientPaint p =
+	         new RadialGradientPaint(center, radiusPx, focus, distances, colors, cycleMethod);
+	     graphics2D.setPaint(p);
+	     graphics2D.fillRect(0, 0, w, h);
+
 	}
 
 	/* (non-Javadoc)
@@ -102,17 +122,10 @@ public class Blinker implements SoundCanvas {
 	@Override
 	public void prepare(AudioInputInfo audioInputInfo,
 			VideoOutputInfo videoOutputInfo) {
-		int frameRate = videoOutputInfo.getFramesPerSecond();
-		int sampleRate = (int)audioInputInfo.getAudioFormat().getSampleRate(); // non integer sample rates are rare
-		samplesPerFrame = sampleRate / frameRate; // e.g. 44100 / 25 = 1764
-		width = videoOutputInfo.getWidth();
-		height = videoOutputInfo.getHeight();
-
 		amplitude = new AmplitudeHelper(audioInputInfo);
 		amplitudeDivisor = (amplitude.getAmplitudeRange() / 255);
-
 		max = 0;
-		size = (width / tileX) * (height / tileY);
+		dimensionHelper = new DimensionHelper(videoOutputInfo);
 	}
 
 	@Override

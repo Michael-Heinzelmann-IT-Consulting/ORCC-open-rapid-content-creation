@@ -234,7 +234,7 @@ public class Main {
 			
 			playBackFrame.setSize(deskTop.getWidth(), playBackH);
 			playBackFrame.setVisible(true);
-			playBackPanel.init();
+			//playBackPanel.init();
 			Context.addListener(new Listener() {		
 				@Override
 				public void contextChanged(PropertyName propertyName) {
@@ -344,7 +344,7 @@ public class Main {
 								Context.getSoundCanvasList();
 						graphicFrame.setTitle(title);
 						if(PropertyName.VideoDimension.equals(propertyName)) {
-							graphicPanel.displaySizeChanged();	
+							//graphicPanel.displaySizeChanged();	
 						}
 					}
 				}

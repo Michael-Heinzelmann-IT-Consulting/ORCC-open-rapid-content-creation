@@ -254,14 +254,14 @@ public class CustomTable extends JPanel{
 		final JLabel layer = new JLabel(soundCanvasWrapper.getDisplayName());
 		layer.setPreferredSize(new Dimension(180, 16));
 		layer.setToolTipText("edit or move " + soundCanvasWrapper.getDisplayName());
+		soundCanvasWrapper.setIconImage(getImage());
 		soundCanvasWrapper.addPropertyChangeListener(new PropertyListener() {
 			
 			@Override
 			public void propertyWritten(String name) {
-				BufferedImage image = getImage();
-				soundCanvasWrapper.drawCurrentIcon(60, 30, image.createGraphics());
-				layer.setIcon(new ImageIcon(image));
-				
+				soundCanvasWrapper.drawCurrentIcon(60, 30, (Graphics2D) soundCanvasWrapper.getIconImage().getGraphics());
+				layer.setIcon(new ImageIcon(soundCanvasWrapper.getIconImage()));
+				Context.canvasPropertyWritten(name, soundCanvasWrapper.getSoundCanvas());
 			}
 		});
 

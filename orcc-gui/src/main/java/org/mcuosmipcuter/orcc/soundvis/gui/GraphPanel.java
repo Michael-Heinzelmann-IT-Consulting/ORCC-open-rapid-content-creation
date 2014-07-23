@@ -26,6 +26,7 @@ import java.awt.RadialGradientPaint;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.image.BufferedImage;
+import java.util.EnumSet;
 
 import javax.swing.JPanel;
 
@@ -61,7 +62,7 @@ public class GraphPanel extends JPanel implements Renderer, Zoomable {
 	private float zoomFactor = 0.5f;
 	private boolean autoZoom;
 
-	long frameCount;
+	private long frameCount;
 
 	
 	/**
@@ -77,13 +78,20 @@ public class GraphPanel extends JPanel implements Renderer, Zoomable {
 			@Override
 			public void contextChanged(PropertyName propertyName) {
 				// TODO repaint on canvas property changed
+				System.err.println("xcxcxvxv: " + propertyName);
+
 				if(PropertyName.VideoDimension.equals(propertyName)) {
 					if(autoZoom) {
 						setZoomFactor(0.0f); // adapt to new size
 					}
+					displaySizeChanged(true);
 				}
-				if(PropertyName.SoundCanvasList.equals(propertyName)) {
-					soundCanvasArray = Context.getSoundCanvasList().toArray(new SoundCanvasWrapper[0]);
+//				if(PropertyName.SoundCanvasList.equals(propertyName)) {
+//					displaySizeChanged(false);
+//				}
+				EnumSet<PropertyName> match = EnumSet.of(PropertyName.SoundCanvasProperty, PropertyName.SoundCanvasAdded, PropertyName.SoundCanvasList);
+				if(Context.getAppState() != AppState.PLAYING && match.contains(propertyName)){
+					displaySizeChanged(false);
 				}
 				
 			}
@@ -114,8 +122,22 @@ public class GraphPanel extends JPanel implements Renderer, Zoomable {
 	/**
 	 * Displays default background in the new size 
 	 */
-	public void displaySizeChanged() {
-		drawDefaultBackGround();
+	public void displaySizeChanged(boolean prepare) {
+		
+		soundCanvasArray = Context.getSoundCanvasList().toArray(new SoundCanvasWrapper[0]);
+		
+		//if(soundCanvasArray.length == 0) {
+			drawDefaultBackGround();
+		//}
+
+			for(SoundCanvas soundCanvas : soundCanvasArray) {
+				if(prepare) {
+					soundCanvas.prepare(Context.getAudioInput().getAudioInputInfo(), Context.getVideoOutputInfo());
+				}
+				System.err.println("xbxbx new frame: " + soundCanvas);
+				soundCanvas.newFrame(frameCount, graphics);
+			}
+		
 		repaint();
 	}
 

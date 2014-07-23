@@ -24,6 +24,7 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
+import org.mcuosmipcuter.orcc.api.soundvis.ExtendedFrameHistory;
 import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
@@ -34,7 +35,7 @@ import org.mcuosmipcuter.orcc.api.util.AmplitudeHelper;
  * @author Michael Heinzelmann
  *
  */
-public class RotatingAmplitudes implements SoundCanvas {
+public class RotatingAmplitudes implements SoundCanvas, ExtendedFrameHistory {
 	
 	public static enum DRAW_MODE {
 		LINE, DOT, DOT_LINE, POLY_LINE
@@ -201,6 +202,12 @@ public class RotatingAmplitudes implements SoundCanvas {
 	public void drawCurrentIcon(int width, int height, Graphics2D graphics) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public int getCurrentHistoryFrameSize() {
+		// depends on the amount of history we are keeping, a big size and a slow degree speed need a big pre-run
+		return degreesPerFrame != 0 ? size / degreesPerFrame : 0;
 	}
 
 }

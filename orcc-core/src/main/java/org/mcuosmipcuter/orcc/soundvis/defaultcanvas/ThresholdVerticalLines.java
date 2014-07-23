@@ -22,19 +22,71 @@ import java.awt.Graphics2D;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
 import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
+import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
+import org.mcuosmipcuter.orcc.api.util.AmplitudeHelper;
 
 /**
  * @author Michael Heinzelmann
  *
  */
-public class ThresholdVerticalLines extends FrameMonoAmplitudes {
+public class ThresholdVerticalLines implements SoundCanvas {
 	@UserProperty(description="color of the waves")
 	private Color foreGroundColor = Color.BLUE;
 	@LimitedIntProperty(description="threshold must be between 0 and 100", minimum=0, maximum = 100)
 	@UserProperty(description="consider amplitudes above this threshold for drawing, value in percent of maximum amplitude")
 	private int threshold;
+	protected int leftMargin;
+	protected int height;
+	protected int width;
+	protected int[] amplitudes;	
+	protected AmplitudeHelper amplitudeHelper;
+	
+	private int factor;
+	private long samplecount;
+	private int max;
+	private int counterInsideFrame;
+	
+	
+	@Override
+	public final void nextSample(int[] amplitudes) {
+
+		int mono = amplitudeHelper.getSignedMono(amplitudes);
+		if(factor == 1 || Math.abs(mono) > Math.abs(max)) {
+			max = mono;
+		}
+		
+		if(samplecount % factor == 0) {
+			this.amplitudes[counterInsideFrame] = max;
+			counterInsideFrame++;
+			max = 0;
+		}
+		samplecount++;
+
+	}
+
+	@Override
+	public final void prepare(AudioInputInfo audioInputInfo, VideoOutputInfo videoOutputInfo)  {
+		int frameRate = videoOutputInfo.getFramesPerSecond();
+		float sampleRate = audioInputInfo.getAudioFormat().getSampleRate(); 
+		int pixelLengthOfaFrame = (int)Math.ceil(sampleRate / (float)frameRate); // e.g. 44100 / 25 = 1764
+		factor = (int)(pixelLengthOfaFrame / videoOutputInfo.getWidth()) + 1;
+		int pixelsUsed = (int)Math.ceil((float)pixelLengthOfaFrame / (float)factor);
+		amplitudes = new int[pixelsUsed];
+		leftMargin =  (videoOutputInfo.getWidth() - pixelsUsed) / 2;
+		this.height = videoOutputInfo.getHeight();
+		this.width = videoOutputInfo.getWidth();
+		counterInsideFrame = 0;
+		amplitudeHelper = new AmplitudeHelper(audioInputInfo);
+	}
+
+
+	@Override
+	public final void postFrame() {
+		counterInsideFrame = 0;
+	}
+
 	@Override
 	public void newFrame(long frameCount, Graphics2D graphics) {	
 		
@@ -53,14 +105,19 @@ public class ThresholdVerticalLines extends FrameMonoAmplitudes {
 	 */
 	@Override
 	public void drawCurrentIcon(int width, int height, Graphics2D graphics) {
-		// TODO Auto-generated method stub
+		float t = threshold / 100f;
+		System.err.println(t + " - " + (new Exception().getStackTrace()[1]));
+		graphics.setColor(Color.WHITE);
+		graphics.fillRect(0, 0, width, height);
+		graphics.setColor(foreGroundColor);
+
+		for(int x = 0; x < width; x++) {
+			if(Math.random() > t) {
+				graphics.drawLine(x, 0, x, height);
+			}
+		}
 
 	}
-	@Override
-	public void subClassPrepare(AudioInputInfo audioInputInfo,
-			VideoOutputInfo videoOutputInfo) {
-		amplitudeHelper.getAmplitudeRange();
-		
-	}
+	
 
 }

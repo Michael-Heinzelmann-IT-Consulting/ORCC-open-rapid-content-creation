@@ -27,7 +27,6 @@ import java.awt.event.ActionListener;
 
 import javax.sound.sampled.FloatControl;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -92,8 +91,7 @@ public class PlayBackPanel extends JPanel implements Mixin{
 	private JToggleButton autoZoom = new JToggleButton("fit/zoom");
 
 	private final SpinnerNumberModel modelPreRun = new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 10);
-	//private final JSpinner preRunFrames = new JSpinner(modelPreRun);
-	private JCheckBox fullPreRun = new JCheckBox("full pre run");
+	private final JSpinner preRunFrames = new JSpinner(modelPreRun);
 	
 	/**
 	 * Sets up a stop, play/pause button and a status label
@@ -119,6 +117,7 @@ public class PlayBackPanel extends JPanel implements Mixin{
 		});
 		playPause = new PlayPauseButton(np);
 		volumeSlider.setToolTipText("sound volume");
+		init();
 	}
 
 	/**
@@ -205,16 +204,12 @@ public class PlayBackPanel extends JPanel implements Mixin{
 			}
 		});
 
-//		preRunFrames.addChangeListener(new ChangeListener() {
-//			public void stateChanged(ChangeEvent arg0) {
-//				timeLine.setPreRunFrames((Integer)preRunFrames.getValue());
-//			}
-//		});
-		fullPreRun.addChangeListener(new ChangeListener() {
-		public void stateChanged(ChangeEvent arg0) {
-			Context.setFullPreRun(fullPreRun.isSelected());
-		}
+		preRunFrames.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent arg0) {
+				timeLine.setPreRunFrames((Integer)preRunFrames.getValue());
+			}
 		});
+
 		SpinnerNumberModel modelZoom = new SpinnerNumberModel(100, 10, 60000, 10);
 		final JSpinner framesToZoom = new JSpinner(modelZoom);
 		final JPanel fz = new JPanel();
@@ -251,9 +246,8 @@ public class PlayBackPanel extends JPanel implements Mixin{
 		commands.setBorder(new LineBorder(Color.WHITE, 2));
 		commands.setLayout(gl);
 		
-//		commands.add(preRunFrames);
-//		commands.add(new JLabel(" frames prerun"));
-		commands.add(fullPreRun);
+		commands.add(preRunFrames);
+		commands.add(new JLabel(" frames prerun"));
 		commands.add(stop);
 		commands.add(playPause);
 		commands.add(stateLabel);
@@ -268,12 +262,15 @@ public class PlayBackPanel extends JPanel implements Mixin{
 		commands.add(timeLabel);
 		commands.add(jProgressBar);
 		
-		timeLine.setPreferredSize(new Dimension(600, 150));
-		timeLine.setGuiWidth(getWidth());
+
 		setLayout(new BorderLayout());
 		add(commands, BorderLayout.NORTH);
 		
 		add(timeLineScrollPane, BorderLayout.SOUTH);
+		
+		timeLine.setPreferredSize(new Dimension(600, 150));
+		System.err.println("wwwwwww " + getWidth());
+		timeLine.setGuiWidth(getWidth());
 	}
 
 	@Override

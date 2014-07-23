@@ -65,7 +65,7 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 	// flexible layout screen dependent
 	int widthToUse;
 	int heightToUse = 150;
-	int guiWidth;
+	//int guiWidth;
 	
 	// user configuration
 	boolean autoZoom = true;
@@ -188,7 +188,7 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 		g.setColor(Color.GRAY);
 		g.fillRect(0, 0, getWidth(), getHeight());
 		g.setColor(Color.WHITE);
-		g.drawString("loading ...", Math.max(guiWidth / 2, selectPos), getHeight() / 2);
+		g.drawString("loading ...", Math.max(getWidth() / 2, selectPos), getHeight() / 2);
 	}
 
 	/**
@@ -349,7 +349,7 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 		AudioInput audioInput = Context.getAudioInput();
 		totalSampleLength = audioInput.getAudioInputInfo().getFrameLength();
 		if(autoZoom) {
-			widthToUse = guiWidth;
+			widthToUse = getWidth();
 			noOfSamples = (int)(totalSampleLength / (widthToUse - margin*2)) + 1;
 		}
 		else {
@@ -439,7 +439,7 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 	 * @param guiWidth the GUI width to set
 	 */
 	public void setGuiWidth(int guiWidth) {
-		this.guiWidth = guiWidth;
+		//this.guiWidth = guiWidth;
 	}
 
 	/**
