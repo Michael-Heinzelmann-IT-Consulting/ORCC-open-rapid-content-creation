@@ -226,7 +226,6 @@ public class CustomTable extends JPanel{
 	 * Creates a new custom table, no parameters needed
 	 */
 	public CustomTable() {
-		//setLayout(new GridLayout(0, 1, 1, 1));
 		setLayout(new GridBagLayout());
 	}
 	private  BufferedImage getImage() {
@@ -247,7 +246,6 @@ public class CustomTable extends JPanel{
 	public void addLayer(final SoundCanvasWrapper soundCanvasWrapper) {
 		final Row row = new Row(soundCanvasWrapper);
 		row.setPreferredSize(new Dimension(660, 36));
-		//row.setMaximumSize(new Dimension(360, 36));
 		row.setLayout(new BorderLayout());
 		row.setBorder(new EtchedBorder());
 		row.setBackground(Color.WHITE);
@@ -320,10 +318,6 @@ public class CustomTable extends JPanel{
 			
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-//				JOptionPane.showMessageDialog(null, row.getCanvasPropertyPanel(), soundCanvasWrapper.getDisplayName(), 
-//						JOptionPane.PLAIN_MESSAGE);
-				//row.setPreferredSize(new Dimension(360, 150));
-
 				row.toggleProperties();
 				expandButton.setText(row.isPanelVisible() ? " - " : " + ");
 				row.revalidate();
