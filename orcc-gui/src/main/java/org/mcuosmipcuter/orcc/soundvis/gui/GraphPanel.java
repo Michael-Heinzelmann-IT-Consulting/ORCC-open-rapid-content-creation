@@ -41,7 +41,6 @@ import org.mcuosmipcuter.orcc.soundvis.Mixin;
 import org.mcuosmipcuter.orcc.soundvis.Renderer;
 import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
 import org.mcuosmipcuter.orcc.soundvis.Zoomable;
-import org.mcuosmipcuter.orcc.util.IOUtil;
 
 
 /**
@@ -77,8 +76,6 @@ public class GraphPanel extends JPanel implements Renderer, Zoomable {
 			
 			@Override
 			public void contextChanged(PropertyName propertyName) {
-				// TODO repaint on canvas property changed
-				System.err.println("xcxcxvxv: " + propertyName);
 
 				if(PropertyName.VideoDimension.equals(propertyName)) {
 					if(autoZoom) {
@@ -86,9 +83,6 @@ public class GraphPanel extends JPanel implements Renderer, Zoomable {
 					}
 					displaySizeChanged(true);
 				}
-//				if(PropertyName.SoundCanvasList.equals(propertyName)) {
-//					displaySizeChanged(false);
-//				}
 				EnumSet<PropertyName> match = EnumSet.of(PropertyName.SoundCanvasProperty, PropertyName.SoundCanvasAdded, PropertyName.SoundCanvasList);
 				if(Context.getAppState() != AppState.PLAYING && match.contains(propertyName)){
 					displaySizeChanged(false);
@@ -123,21 +117,18 @@ public class GraphPanel extends JPanel implements Renderer, Zoomable {
 	 * Displays default background in the new size 
 	 */
 	public void displaySizeChanged(boolean prepare) {
-		
-		soundCanvasArray = Context.getSoundCanvasList().toArray(new SoundCanvasWrapper[0]);
-		
-		//if(soundCanvasArray.length == 0) {
-			drawDefaultBackGround();
-		//}
 
-			for(SoundCanvas soundCanvas : soundCanvasArray) {
-				if(prepare) {
-					soundCanvas.prepare(Context.getAudioInput().getAudioInputInfo(), Context.getVideoOutputInfo());
-				}
-				System.err.println("xbxbx new frame: " + soundCanvas);
-				soundCanvas.newFrame(frameCount, graphics);
+		soundCanvasArray = Context.getSoundCanvasList().toArray(new SoundCanvasWrapper[0]);
+
+		drawDefaultBackGround();
+
+		for(SoundCanvas soundCanvas : soundCanvasArray) {
+			if(prepare) {
+				soundCanvas.prepare(Context.getAudioInput().getAudioInputInfo(), Context.getVideoOutputInfo());
 			}
-		
+			soundCanvas.newFrame(frameCount, graphics);
+		}
+
 		repaint();
 	}
 

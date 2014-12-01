@@ -51,6 +51,7 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 	private static final long serialVersionUID = 1L;
 
 	// fixed layout
+	final static int MINIMUM_WIDTH = 600;
 	private final int margin = 20;
 	private final int marginY = 24;
 	private final int displaySecondsStep = 5;
@@ -64,6 +65,8 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 	
 	// flexible layout screen dependent
 	int widthToUse;
+	int expandedWidth;
+	
 	int heightToUse = 150;
 	//int guiWidth;
 	
@@ -349,7 +352,10 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 		AudioInput audioInput = Context.getAudioInput();
 		totalSampleLength = audioInput.getAudioInputInfo().getFrameLength();
 		if(autoZoom) {
-			widthToUse = getWidth();
+			if(expandedWidth == 0) {
+				expandedWidth = getWidth();
+			}
+			widthToUse = expandedWidth;
 			noOfSamples = (int)(totalSampleLength / (widthToUse - margin*2)) + 1;
 		}
 		else {
@@ -386,8 +392,8 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 			superSample.start();
 		}
 		if(autoZoom) {
-			setPreferredSize(new Dimension(600, heightToUse));
-			setSize(600, heightToUse);
+			setPreferredSize(new Dimension(MINIMUM_WIDTH, heightToUse));
+			setSize(MINIMUM_WIDTH, heightToUse);
 		}
 		else {
 			int widthRequired = (int)(totalSampleLength / (noOfSamples)) + margin * 2;
@@ -432,14 +438,6 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 	 */
 	public void setSamplesToZoom(int samplesToZoom) {
 		this.samplesToZoom = samplesToZoom;
-	}
-
-	/**
-	 * Sets the GUI width after it is known (depends on the users screen dimensions)
-	 * @param guiWidth the GUI width to set
-	 */
-	public void setGuiWidth(int guiWidth) {
-		//this.guiWidth = guiWidth;
 	}
 
 	/**

@@ -61,6 +61,7 @@ import org.mcuosmipcuter.orcc.soundvis.gui.widgets.TimeLabel;
 import org.mcuosmipcuter.orcc.soundvis.gui.widgets.VolumeSlider;
 import org.mcuosmipcuter.orcc.soundvis.gui.widgets.VolumeSlider.VolumeListener;
 import org.mcuosmipcuter.orcc.soundvis.threads.PlayThread;
+import org.mcuosmipcuter.orcc.util.IOUtil;
 
 
 
@@ -269,8 +270,7 @@ public class PlayBackPanel extends JPanel implements Mixin{
 		add(timeLineScrollPane, BorderLayout.SOUTH);
 		
 		timeLine.setPreferredSize(new Dimension(600, 150));
-		System.err.println("wwwwwww " + getWidth());
-		timeLine.setGuiWidth(getWidth());
+		IOUtil.log(getClass().getSimpleName() + " width: " + getWidth());
 	}
 
 	@Override
