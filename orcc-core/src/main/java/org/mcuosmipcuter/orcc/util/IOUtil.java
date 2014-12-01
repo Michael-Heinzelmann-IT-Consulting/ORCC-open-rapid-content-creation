@@ -52,7 +52,7 @@ public class IOUtil {
 	 */
 	public static void log(String msg) {
 		if(isLogOn) {
-			System.err.println(Thread.currentThread().getName() + ": "+ msg);
+			System.out.println(Thread.currentThread().getName() + ": "+ msg);
 		}
 	}
 
