@@ -18,6 +18,7 @@
 package org.mcuosmipcuter.orcc.soundvis.model;
 
 import java.awt.AlphaComposite;
+import java.awt.Color;
 import java.awt.Composite;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -161,6 +162,8 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 	}
 	@Override
 	public void drawCurrentIcon(int width, int height, Graphics2D graphics) {
+		graphics.setColor(Color.WHITE);
+		graphics.fillRect(0, 0, width, height);
 		soundCanvas.drawCurrentIcon(width, height, graphics);
 	}
 	@Override
