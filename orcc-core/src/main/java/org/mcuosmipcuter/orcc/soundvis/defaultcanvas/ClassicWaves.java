@@ -33,15 +33,17 @@ import org.mcuosmipcuter.orcc.api.util.AmplitudeHelper;
  */
 public class ClassicWaves implements SoundCanvas {
 	
+	public static enum FILL {
+		NONE, TOP, BOTTOM
+	}
+	
 	@UserProperty(description="color of the waves")
 	private Color foreGroundColor = Color.BLUE;
 	@UserProperty(description="whether to draw filled bottom")
-	private boolean fillBottom = false;
-	@UserProperty(description="whether to draw horizontal lines")
-	private boolean drawHorizontal = false;
+	private FILL fill = FILL.NONE;
 	
 	@UserProperty(description="whether to draw without margin")
-	private boolean drawMargin = false;
+	private boolean drawMargin = true;
 	
 	@UserProperty(description="beam width of analyzer")
 	private int beamWidth = 0;
@@ -51,7 +53,6 @@ public class ClassicWaves implements SoundCanvas {
 	private float amplitudeMultiplicator;
 	private int leftMargin;
 	private int height;
-	private int width;
 	
 	private AmplitudeHelper amplitude;
 	private int factor;
@@ -100,10 +101,7 @@ public class ClassicWaves implements SoundCanvas {
 			else {
 				amp = amplitudeBuffer[i];
 			}
-			if(drawHorizontal) {
-				graphics.drawLine(0, height / 2 - amp , width, height / 2 - amp);
-			}
-			else if(beamWidth > 0) {
+			if(beamWidth > 0) {
 				if(amp > aMaxamp) {
 					aMaxamp = amp;
 				}
@@ -111,14 +109,14 @@ public class ClassicWaves implements SoundCanvas {
 					aMinAmp = amp;
 				}
 				if((x + 1) % beamWidth == 0) {
-					final int rectWidth = fillBottom ? height / 2 + aMaxamp : aMaxamp - aMinAmp;
-					graphics.fillRect(x  + lm - beamWidth, height / 2 - aMaxamp, beamWidth, rectWidth);
+					final int rectWidth = getY(aMaxamp - aMinAmp, height / 2 - aMaxamp, height / 2 + aMaxamp);
+					graphics.fillRect(x  + lm - beamWidth + 1, fill == FILL.TOP ? 0 : height / 2 - aMaxamp, beamWidth, rectWidth);
 					aMaxamp = 0;
 					aMinAmp = 0;
 				}
 			}
 			else {
-				int y2 = fillBottom ? height : height / 2 - prevAmplitude;
+				int y2 = getY(height / 2 - prevAmplitude, 0,height);
 				graphics.drawLine(lm + x, height / 2 - amp , lm + x, y2);
 				prevAmplitude = amp;
 			}
@@ -127,7 +125,7 @@ public class ClassicWaves implements SoundCanvas {
 		for(int i = 0; i < marginBuffer.length; i++) {
 			marginBuffer[i] = amplitudeBuffer[amplitudeBuffer.length - marginBuffer.length + i];		
 		}
-		if(drawMargin  && ! drawHorizontal && amplitudeBuffer.length - marginBuffer.length > 0) {
+		if(drawMargin  &&  amplitudeBuffer.length - marginBuffer.length > 0) {
 			prevAmplitude = amplitudeBuffer[amplitudeBuffer.length - marginBuffer.length - 1];	
 		}
 	}
@@ -141,10 +139,8 @@ public class ClassicWaves implements SoundCanvas {
 		int pixelsUsed = (int)Math.ceil((float)pixelLengthOfaFrame / (float)factor);
 		amplitudeBuffer = new int[pixelsUsed];
 		marginBuffer = new int[videoOutputInfo.getWidth() - pixelsUsed];
-		//System.err.println(pixelsUsed + " used factor " + factor);
 		leftMargin =  (videoOutputInfo.getWidth() - pixelsUsed) / 2;
 		this.height = videoOutputInfo.getHeight();
-		this.width = videoOutputInfo.getWidth();
 		counterInsideFrame = 0;
 		amplitude = new AmplitudeHelper(audioInputInfo);
 		amplitudeDivisor = (amplitude.getAmplitudeRange() / height);
@@ -155,8 +151,6 @@ public class ClassicWaves implements SoundCanvas {
 
 	@Override
 	public void postFrame() {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
@@ -166,18 +160,25 @@ public class ClassicWaves implements SoundCanvas {
 		int prevAmp = 0;
 		for(int i =0 ; i < width; i++) {
 			int amp = (int)((0.5 - Math.random()) * height ) ;
-			if(drawHorizontal) {
-				graphics.drawLine(0, height / 2 - amp , width, height / 2 - amp);
-			}
-			else {
-				int y2 = fillBottom ? height : height / 2 - prevAmp;
-				graphics.drawLine( x, height / 2 - amp ,  x, y2);
-				prevAmp = amp;
-			}
+			int y2 = getY(height / 2 - prevAmp, 0,height);
+			graphics.drawLine( x, height / 2 - amp ,  x, y2);
+			prevAmp = amp;
 			x++;
 			prevAmp = amp;
 		}
 		
+	}
+	
+	private int getY(int none, int top, int bottom) {
+		switch(fill) {
+		case NONE:
+			default:
+			return none;
+		case TOP:
+			return top;
+		case BOTTOM:
+			return bottom;
+		}
 	}
 
 
