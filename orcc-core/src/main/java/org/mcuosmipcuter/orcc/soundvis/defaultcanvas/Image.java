@@ -24,6 +24,7 @@ import java.awt.image.BufferedImage;
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
 import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
+import org.mcuosmipcuter.orcc.api.soundvis.TimedChange;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.api.util.DimensionHelper;
@@ -34,30 +35,32 @@ import org.mcuosmipcuter.orcc.api.util.DimensionHelper;
  */
 public class Image implements SoundCanvas {
 	
-	private DimensionHelper dimensionHelper;
-	
+	@TimedChange
 	@UserProperty(description="image to show")
 	private BufferedImage image = null;
-//	@UserProperty(description="whether to scale the image width")
-//	private boolean scaleToWidth = true;
-//	@UserProperty(description="whether to scale the image height")
-//	private boolean scaleToHeight = true;
+	
 	@UserProperty(description="upper left x position")
 	private int upperLeftCornerX = 0;
-	@UserProperty(description="upper left y position")
-	private int upperLeftCornerY = 0;
 	@UserProperty(description="to center horizontally")
 	private boolean centeredHorizontal = true;
+	
+	@UserProperty(description="upper left y position")
+	private int upperLeftCornerY = 0;
 	@UserProperty(description="to center vertically")
 	private boolean centeredVertical = true;
+	
+	@TimedChange
 	@LimitedIntProperty(minimum=0, description="width cannot be lower than 0")
 	@UserProperty(description="width of image, 0 means use video width")
 	private int scaledWidth = 0;
+	
+	@TimedChange
 	@LimitedIntProperty(minimum=0, description="height cannot be lower than 0")
 	@UserProperty(description="height of image, 0 means use video height")
 	private int scaledHeight = 0;
 	
-	private BufferedImage scaledImage = null;
+	private DimensionHelper dimensionHelper;
+	private BufferedImage scaledImage;
 	private int imageHashCode;
 	private String scaled;
 	private String outputHash;
@@ -101,7 +104,7 @@ public class Image implements SoundCanvas {
 	}
 
 	@Override
-	public void drawCurrentIcon(int widthPx, int heightPx, Graphics2D graphics) {
+	public void updateUI(int widthPx, int heightPx, Graphics2D graphics) {
 		if(image != null) {
 
 			final int hc = System.identityHashCode(image);

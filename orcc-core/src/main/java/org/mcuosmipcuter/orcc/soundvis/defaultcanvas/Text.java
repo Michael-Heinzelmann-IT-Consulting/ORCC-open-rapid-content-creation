@@ -22,6 +22,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.lang.reflect.Field;
 import java.util.Calendar;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
@@ -126,14 +127,14 @@ public class Text implements SoundCanvas, PropertyListener {
 	}
 
 	@Override
-	public void drawCurrentIcon(int width, int height, Graphics2D graphics) {
+	public void updateUI(int width, int height, Graphics2D graphics) {
 		graphics.setColor(textColor);
 		TextHelper.writeText(text, graphics, height, textColor, width, height / 10);
 		
 	}
 
 	@Override
-	public void propertyWritten(String name) {
+	public void propertyWritten(Field field) {
 		adjustTextDimension();
 	}
 

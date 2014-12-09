@@ -135,7 +135,7 @@ public class Tiles implements SoundCanvas, ExtendedFrameHistory {
 	}
 
 	@Override
-	public void drawCurrentIcon(int width, int height, Graphics2D graphics) {
+	public void updateUI(int width, int height, Graphics2D graphics) {
 		// TODO Auto-generated method stub
 		
 	}

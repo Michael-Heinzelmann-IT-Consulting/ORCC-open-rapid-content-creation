@@ -25,6 +25,7 @@ import java.util.Set;
 
 import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
+import org.mcuosmipcuter.orcc.api.soundvis.TimedChange;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
 
@@ -57,7 +58,7 @@ public class PropertyPanelFactory {
 				Object value = getValue(field, soundCanvas);
 				@SuppressWarnings("unchecked")
 				PropertyPanel<Object> c = panelFromFieldType(field, soundCanvasWrapper);
-				c.setName(field.getName());
+				c.setField(field);
 				c.setDefaultValue(value);
 				c.setCurrentValue(value);
 				c.setDescription(field.getAnnotation(UserProperty.class).description());
@@ -70,6 +71,7 @@ public class PropertyPanelFactory {
 	@SuppressWarnings("rawtypes")
 	private static PropertyPanel panelFromFieldType(Field field, SoundCanvasWrapper soundCanvasWrapper) {
 		Class<?> type = field.getType();
+		final boolean timed = field.isAnnotationPresent(TimedChange.class);
 		if(boolean.class.equals(type)) {
 			return new BooleanPropertyPanel(soundCanvasWrapper);
 		}
@@ -79,10 +81,10 @@ public class PropertyPanelFactory {
 				LimitedIntProperty l = field.getAnnotation(LimitedIntProperty.class);
 				Integer integer = getValue(field, soundCanvasWrapper.getSoundCanvas());
 				int value = integer != null ? integer.intValue() : 0;
-				i = new IntegerPropertyPanel(soundCanvasWrapper, value, l.minimum(), l.maximum(), l.stepSize());
+				i = new IntegerPropertyPanel(soundCanvasWrapper, timed, value, l.minimum(), l.maximum(), l.stepSize());
 			}
 			else {
-				i = new IntegerPropertyPanel(soundCanvasWrapper);
+				i = new IntegerPropertyPanel(soundCanvasWrapper, timed);
 			}
 			return i;
 		}

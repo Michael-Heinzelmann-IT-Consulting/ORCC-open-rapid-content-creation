@@ -17,8 +17,17 @@
 */
 package org.mcuosmipcuter.orcc.api.soundvis;
 
-import java.lang.reflect.Field;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-public interface PropertyListener {
-	public void propertyWritten(Field field);
+/**
+ * The property change should be timed when this annotation is used
+ * @author Michael Heinzelmann
+ */
+@Retention(RetentionPolicy.RUNTIME)
+@Target(value=ElementType.FIELD)
+public @interface TimedChange {
+
 }

@@ -23,6 +23,7 @@ import java.awt.Composite;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
+import java.lang.reflect.Field;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -161,10 +162,10 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 		thresholdExceeded = false;
 	}
 	@Override
-	public void drawCurrentIcon(int width, int height, Graphics2D graphics) {
+	public void updateUI(int width, int height, Graphics2D graphics) {
 		graphics.setColor(Color.WHITE);
 		graphics.fillRect(0, 0, width, height);
-		soundCanvas.drawCurrentIcon(width, height, graphics);
+		soundCanvas.updateUI(width, height, graphics);
 	}
 	@Override
 	public long getFrameFrom() {
@@ -215,12 +216,12 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 		return transparency;
 	}
 	@Override
-	public void propertyWritten(String name) {
+	public void propertyWritten(Field field) {
 		if(soundCanvas instanceof PropertyListener) {
-			((PropertyListener)soundCanvas).propertyWritten(name);
+			((PropertyListener)soundCanvas).propertyWritten(field);
 		}
 		for(PropertyListener pl : propertyListeners) {
-			pl.propertyWritten(name);
+			pl.propertyWritten(field);
 		}
 	}
 	@Override

@@ -104,7 +104,7 @@ public class ThresholdVerticalLines implements SoundCanvas {
 	 * @see org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas#drawCurrentIcon(int, int, java.awt.Graphics2D)
 	 */
 	@Override
-	public void drawCurrentIcon(int width, int height, Graphics2D graphics) {
+	public void updateUI(int width, int height, Graphics2D graphics) {
 		float t = threshold / 100f;
 		System.err.println(t + " - " + (new Exception().getStackTrace()[1]));
 		graphics.setColor(Color.WHITE);

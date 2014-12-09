@@ -64,7 +64,7 @@ public class SolidColor implements SoundCanvas {
 	}
 
 	@Override
-	public void drawCurrentIcon(int width, int height, Graphics2D graphics) {
+	public void updateUI(int width, int height, Graphics2D graphics) {
 		graphics.setColor(color);
 		graphics.fillRect(0, 0, width, height);
 		if(color.getRed() > 245 && color.getGreen() > 245 && color.getBlue() > 245) {

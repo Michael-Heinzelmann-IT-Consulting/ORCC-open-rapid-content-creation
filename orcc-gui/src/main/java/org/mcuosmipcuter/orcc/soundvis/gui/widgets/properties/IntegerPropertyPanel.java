@@ -44,24 +44,26 @@ public class IntegerPropertyPanel extends PropertyPanel<Integer> {
 	 * @param maximum the maximum for the spinner
 	 * @param stepSize the step size for the spinner
 	 */
-	public IntegerPropertyPanel(SoundCanvasWrapper soundCanvasWrapper, int value, int minimum, int maximum, int stepSize) {
+	public IntegerPropertyPanel(SoundCanvasWrapper soundCanvasWrapper, boolean timed, int value, int minimum, int maximum, int stepSize) {
 		super(soundCanvasWrapper);
 		SpinnerNumberModel model = new SpinnerNumberModel(value, minimum, maximum, stepSize);
 		jSpinner = new JSpinner(model);
 		add(jSpinner);
-		
-		jSpinner.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent arg0) {
+		ChangeListener cl = new ChangeListener() {
+			
+			@Override
+			public void stateChanged(ChangeEvent e) {
 				setNewValue((Integer)jSpinner.getValue());
 			}
-		});
+		};
+		jSpinner.addChangeListener(timed ? new TimedChangeListener(cl) : cl);
 	}
 	/**
 	 * Constructor with a canvas, all other values will be default
 	 * @param soundCanvas the canvas to work with
 	 */
-	public IntegerPropertyPanel(SoundCanvasWrapper soundCanvasWrapper) {
-		this(soundCanvasWrapper, 0, Integer.MIN_VALUE, Integer.MAX_VALUE, 1);
+	public IntegerPropertyPanel(SoundCanvasWrapper soundCanvasWrapper, boolean timed) {
+		this(soundCanvasWrapper, timed, 0, Integer.MIN_VALUE, Integer.MAX_VALUE, 1);
 	}
 
 	@Override

@@ -133,7 +133,7 @@ public class ColorsLR implements SoundCanvas {
 	}
 	
 	@Override
-	public void drawCurrentIcon(int width, int height, Graphics2D graphics) {
+	public void updateUI(int width, int height, Graphics2D graphics) {
 		int r = fixedRed == -1 ? 255 : fixedRed;
 		int g = fixedGreen == -1 ? 255: fixedGreen;
 		int b = fixedBlue == -1 ? 255: fixedBlue;

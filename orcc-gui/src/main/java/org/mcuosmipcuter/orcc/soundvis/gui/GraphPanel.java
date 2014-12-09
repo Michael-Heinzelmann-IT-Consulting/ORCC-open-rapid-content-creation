@@ -76,16 +76,19 @@ public class GraphPanel extends JPanel implements Renderer, Zoomable {
 			
 			@Override
 			public void contextChanged(PropertyName propertyName) {
+				if(PropertyName.BeforeSoundCanvasProperty.equals(propertyName)) {
+					getGraphics().drawString("UPDATE", 100, 100);
+				}
 
 				if(PropertyName.VideoDimension.equals(propertyName)) {
 					if(autoZoom) {
 						setZoomFactor(0.0f); // adapt to new size
 					}
-					displaySizeChanged(true);
+					displayUpdate(true);
 				}
 				EnumSet<PropertyName> match = EnumSet.of(PropertyName.SoundCanvasProperty, PropertyName.SoundCanvasAdded, PropertyName.SoundCanvasList);
 				if(Context.getAppState() != AppState.PLAYING && match.contains(propertyName)){
-					displaySizeChanged(false);
+					displayUpdate(false);
 				}
 				
 			}
@@ -114,9 +117,9 @@ public class GraphPanel extends JPanel implements Renderer, Zoomable {
 	}
 	
 	/**
-	 * Displays default background in the new size 
+	 * Update the display
 	 */
-	public void displaySizeChanged(boolean prepare) {
+	public void displayUpdate(boolean prepare) {
 
 		soundCanvasArray = Context.getSoundCanvasList().toArray(new SoundCanvasWrapper[0]);
 

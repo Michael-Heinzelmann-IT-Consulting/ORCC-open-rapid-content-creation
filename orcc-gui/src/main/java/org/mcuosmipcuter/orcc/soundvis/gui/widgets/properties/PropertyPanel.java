@@ -18,7 +18,6 @@
 package org.mcuosmipcuter.orcc.soundvis.gui.widgets.properties;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.lang.reflect.Field;
@@ -27,7 +26,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
-import org.mcuosmipcuter.orcc.soundvis.Context;
 import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
 
 
@@ -39,6 +37,7 @@ public abstract  class PropertyPanel <T> extends JPanel {
 	
 	private static final long serialVersionUID = 1L;
 	
+	protected Field field;
 	protected String name;
 	protected T defaultValue;
 	protected T currentValue;
@@ -62,12 +61,7 @@ public abstract  class PropertyPanel <T> extends JPanel {
 		}
 		this.soundCanvasWrapper = soundCanvasWrapper;
 		this.soundCanvas = soundCanvasWrapper.getSoundCanvas();
-//		GridLayout gl = new GridLayout(1, 2);		
-//		setLayout(gl);
 		setLayout(new BorderLayout(6, 6));
-		
-		//setBackground(Color.CYAN);
-
 		add(nameLabel, BorderLayout.WEST);
 	}
 	/**
@@ -80,7 +74,7 @@ public abstract  class PropertyPanel <T> extends JPanel {
 			field.setAccessible(true);
 			field.set(soundCanvas, value);
 			setCurrentValue(value);
-			soundCanvasWrapper.propertyWritten(name);
+			soundCanvasWrapper.propertyWritten(field);
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}
@@ -96,10 +90,13 @@ public abstract  class PropertyPanel <T> extends JPanel {
 	public String getName() {
 		return name;
 	}
-	/* (non-Javadoc)
-	 * @see java.awt.Component#setName(java.lang.String)
+
+	/**
+	 * Set the field represented by this panel
+	 * @param field
 	 */
-	public void setName(String name) {
+	public void setField(Field field) {
+		String name = field.getName();
 		nameLabel.setText(name);
 		this.name = name;
 	}
@@ -148,6 +145,13 @@ public abstract  class PropertyPanel <T> extends JPanel {
 	public void setDescription(String description) {
 		this.description = description;
 		setToolTipText(description);
+	}
+	/**
+	 * Get the field represented by this panel
+	 * @return
+	 */
+	public Field getField() {
+		return field;
 	}
 	
 }

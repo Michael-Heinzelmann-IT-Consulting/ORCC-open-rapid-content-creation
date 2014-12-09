@@ -145,7 +145,7 @@ public class GridPulse implements SoundCanvas {
 	}
 
 	@Override
-	public void drawCurrentIcon(int width, int height, Graphics2D graphics) {
+	public void updateUI(int width, int height, Graphics2D graphics) {
 		graphics.setColor(new Color(foreGround.getRed(), foreGround.getGreen(), foreGround.getBlue()));	
 		int amp = Math.min(width, height) / 5;
 		for(int x = 0; x < width; x += amp) {

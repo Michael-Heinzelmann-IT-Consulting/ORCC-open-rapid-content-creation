@@ -72,12 +72,12 @@ public interface SoundCanvas {
 	public void postFrame();
 	
 	/**
-	 * Get a simplified image icon of this canvas current state for showing this in a compacted UI.
+	 *  Draw a simplified image icon of this canvas current state for showing this in a compacted UI.
 	 * @param width width of this icon
 	 * @param height height of this icon
 	 * @param graphics graphics to draw on
 	 */
-	public void drawCurrentIcon(int width, int height, Graphics2D graphics);
+	public void updateUI(int width, int height, Graphics2D graphics);
 	
 }
 

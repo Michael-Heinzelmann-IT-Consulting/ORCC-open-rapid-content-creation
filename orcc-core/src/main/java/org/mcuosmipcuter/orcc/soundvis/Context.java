@@ -41,7 +41,7 @@ public abstract class Context {
 	 */
 	public enum PropertyName {
 		AudioInputInfo, VideoDimension, SoundCanvasAdded, SoundCanvasRemoved, SoundCanvasList, ExportFileName, 
-		CanvasClassNames, AppState, SongPositionPointer, VideoFrameRate, VolumeControl, FullPreRun, SoundCanvasProperty
+		CanvasClassNames, AppState, SongPositionPointer, VideoFrameRate, VolumeControl, FullPreRun, SoundCanvasProperty, BeforeSoundCanvasProperty
 	}
 	/**
 	 * Enumeration of application states
@@ -289,6 +289,9 @@ public abstract class Context {
 			SoundCanvas soundCanvas) {
 		notifyListeners(PropertyName.SoundCanvasProperty);
 		
+	}
+	public static void beforePropertyUpdate(String name) {
+		notifyListeners(PropertyName.BeforeSoundCanvasProperty);
 	}
 	
 }

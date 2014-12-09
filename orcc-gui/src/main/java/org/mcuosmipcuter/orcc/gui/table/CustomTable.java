@@ -31,6 +31,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,6 +50,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.mcuosmipcuter.orcc.api.soundvis.PropertyListener;
+import org.mcuosmipcuter.orcc.api.soundvis.TimedChange;
 import org.mcuosmipcuter.orcc.soundvis.Context;
 import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
 
@@ -256,8 +258,16 @@ public class CustomTable extends JPanel{
 		soundCanvasWrapper.addPropertyChangeListener(new PropertyListener() {
 			
 			@Override
-			public void propertyWritten(String name) {
-				soundCanvasWrapper.drawCurrentIcon(60, 30, (Graphics2D) soundCanvasWrapper.getIconImage().getGraphics());
+			public void propertyWritten(Field field) {
+				String name = field.getName();
+				long start = System.currentTimeMillis();
+				//System.err.println("updateUI name " + name);
+				if(field.isAnnotationPresent(TimedChange.class)) {
+					System.err.println("beforePropertyUpdate " + name);
+					Context.beforePropertyUpdate(name);
+				}
+				soundCanvasWrapper.updateUI(60, 30, (Graphics2D) soundCanvasWrapper.getIconImage().getGraphics());
+				//System.err.println((System.currentTimeMillis() - start) + "ms updateUI name " + name);
 				layer.setIcon(new ImageIcon(soundCanvasWrapper.getIconImage()));
 				Context.canvasPropertyWritten(name, soundCanvasWrapper.getSoundCanvas());
 			}
@@ -360,7 +370,7 @@ public class CustomTable extends JPanel{
 		timeline.add(xorCheckBox);
 
 		BufferedImage image = getImage();
-		soundCanvasWrapper.drawCurrentIcon(60, 30, image.createGraphics());
+		soundCanvasWrapper.updateUI(60, 30, image.createGraphics());
 		layer.setIcon(new ImageIcon(image));
 
 		final JLabel remove = new JLabel(" x ");
