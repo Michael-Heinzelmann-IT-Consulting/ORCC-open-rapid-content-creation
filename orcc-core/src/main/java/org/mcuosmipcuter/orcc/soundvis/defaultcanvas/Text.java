@@ -47,10 +47,10 @@ public class Text implements SoundCanvas, PropertyListener {
 	private String text = "ORCC rapid content creation for entertainment, education and media production\n" + year + " " + user + " graphics by soundvis";
 	@UserProperty(description="font size for text in % of video height")
 	@LimitedIntProperty(description="font size limitation", minimum=1)
-	private int fontSize = 20;
+	private int fontSize = 5;
 	@UserProperty(description="text color")
 	private Color textColor = Color.BLACK;
-	@UserProperty(description="top margin of test in % of video height")
+	@UserProperty(description="top margin of text in % of video height")
 	int topMargin = 20;
 	
 	

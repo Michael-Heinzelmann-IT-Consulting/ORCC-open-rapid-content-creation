@@ -27,7 +27,6 @@ import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 
 import org.mcuosmipcuter.orcc.api.soundvis.ExtendedFrameHistory;
-import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.soundvis.AudioInput;
 import org.mcuosmipcuter.orcc.soundvis.Context;
 import org.mcuosmipcuter.orcc.soundvis.Context.AppState;
@@ -169,7 +168,6 @@ public class PlayThread extends Thread implements PlayPauseStop {
 
 	private boolean checkState() {
 		while(status == Status.PAUSED) {
-			IOUtil.log(".");
 			if(Context.getAppState() != AppState.PAUSED) {
 				Context.setAppState(AppState.PAUSED);
 			}

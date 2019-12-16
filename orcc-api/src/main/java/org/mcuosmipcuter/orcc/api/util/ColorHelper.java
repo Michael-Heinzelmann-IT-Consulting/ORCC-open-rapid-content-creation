@@ -59,4 +59,18 @@ public class ColorHelper {
 		alphaShadow = alpha;
 	}
 	
+	public static int rgbNoClipping(int raw) {
+		return raw < 0 ? 0 : (raw > 255 ? 255 : raw);
+	}
+	
+	public static void setColorFromPercentNoClipping(int redPercent, int greenPercent, int bluePercent, Graphics2D graphics2D) {
+		Color base = graphics2D.getColor();
+		int rr =  rgbNoClipping(base.getRed()  + (int)(((float)redPercent / 100f) * 255));
+		int rg = rgbNoClipping(base.getGreen() + (int)(((float)greenPercent / 100f) * 255));
+		int rb = rgbNoClipping(base.getBlue() + (int)(((float)bluePercent / 100f) * 255));
+		
+		
+		graphics2D.setColor(new Color(rr, rg, rb));
+	}
+	
 }

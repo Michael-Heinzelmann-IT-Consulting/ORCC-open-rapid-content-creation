@@ -17,7 +17,11 @@
 */
 package org.mcuosmipcuter.orcc.soundvis.gui;
 
+import java.awt.AlphaComposite;
+import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Composite;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.MultipleGradientPaint.CycleMethod;
@@ -28,11 +32,13 @@ import java.awt.event.ComponentEvent;
 import java.awt.image.BufferedImage;
 import java.util.EnumSet;
 
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
+import org.mcuosmipcuter.orcc.api.util.TextHelper;
 import org.mcuosmipcuter.orcc.soundvis.Context;
 import org.mcuosmipcuter.orcc.soundvis.Context.AppState;
 import org.mcuosmipcuter.orcc.soundvis.Context.Listener;
@@ -41,6 +47,7 @@ import org.mcuosmipcuter.orcc.soundvis.Mixin;
 import org.mcuosmipcuter.orcc.soundvis.Renderer;
 import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
 import org.mcuosmipcuter.orcc.soundvis.Zoomable;
+import org.mcuosmipcuter.orcc.soundvis.threads.ProgressPainterThread;
 
 
 /**
@@ -62,22 +69,51 @@ public class GraphPanel extends JPanel implements Renderer, Zoomable {
 	private boolean autoZoom;
 
 	private long frameCount;
-
+	private boolean paintProgressOverLay;
+	ProgressPainterThread progressPainterThread = new ProgressPainterThread();
+	JPanel pr = new JPanel();
+	private boolean updating;
 	
 	/**
 	 * Constructor, adds the mouse drag handling for the back ground image
 	 */
 	public GraphPanel() {
-		
+		JLabel l = new JLabel("PROGRESS ...");
+		Font f = getFont().deriveFont((float)80);
+		l.setFont(f);
+		pr.add(BorderLayout.CENTER, l);
 		setBackground(Color.LIGHT_GRAY);
+		//add(BorderLayout.CENTER, pr);
+		add( pr);
+		pr.setVisible(false);
 		drawDefaultBackGround();
 		
 		Context.addListener(new Listener() {
 			
+			
 			@Override
 			public void contextChanged(PropertyName propertyName) {
+				System.err.println("::::" + propertyName);
 				if(PropertyName.BeforeSoundCanvasProperty.equals(propertyName)) {
-					getGraphics().drawString("UPDATE", 100, 100);
+					//System.err.println(getGraphics());
+					//getGraphics().drawString("UPDATE", 100, 100);
+					
+					//getGraphics().setXORMode(Color.ORANGE);
+					//graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.6f)); 
+					//graphics.setColor(Color.WHITE);
+					//System.err.println(getGraphics());
+					
+					
+					//graphics.fillRect(0, 0, Context.getVideoOutputInfo().getWidth(), Context.getVideoOutputInfo().getHeight());
+					//
+//					pr.setSize(Context.getVideoOutputInfo().getWidth(), Context.getVideoOutputInfo().getHeight());
+//					pr.setVisible(true);
+					//repaint();
+//					paintProgressOverLay = true;
+				}
+				else {
+					//pr.setVisible(false);
+//					paintProgressOverLay = false;
 				}
 
 				if(PropertyName.VideoDimension.equals(propertyName)) {
@@ -85,6 +121,7 @@ public class GraphPanel extends JPanel implements Renderer, Zoomable {
 						setZoomFactor(0.0f); // adapt to new size
 					}
 					displayUpdate(true);
+
 				}
 				EnumSet<PropertyName> match = EnumSet.of(PropertyName.SoundCanvasProperty, PropertyName.SoundCanvasAdded, PropertyName.SoundCanvasList);
 				if(Context.getAppState() != AppState.PLAYING && match.contains(propertyName)){
@@ -146,6 +183,7 @@ public class GraphPanel extends JPanel implements Renderer, Zoomable {
 		for(SoundCanvas soundCanvas : soundCanvasArray) {
 			soundCanvas.prepare(audioInputInfo, videoOutputInfo);
 		}
+		progressPainterThread.prepare(audioInputInfo, videoOutputInfo);
 		mixin.start(audioInputInfo, videoOutputInfo);
 	}
 
@@ -157,7 +195,18 @@ public class GraphPanel extends JPanel implements Renderer, Zoomable {
 		if(zoomFactor != 1) {
 			((Graphics2D)g).scale(zoomFactor, zoomFactor);
 		}
-		g.drawImage(frameImage, 0, 0, Color.BLACK, null);
+
+		{
+			g.drawImage(frameImage, 0, 0, Color.BLACK, null);
+		}
+		if(updating) {
+			Composite origComposite = ((Graphics2D)g).getComposite();
+			((Graphics2D)g).setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.6f)); 
+			g.fillRect(0, 0, Context.getVideoOutputInfo().getWidth(), Context.getVideoOutputInfo().getHeight());
+			((Graphics2D)g).setComposite(origComposite);
+			////progressPainterThread.newFrame(frameCount, (Graphics2D) g);
+			TextHelper.writeText("Recalculating ...", (Graphics2D) g, 80, Color.BLACK, Context.getVideoOutputInfo().getWidth(), Context.getVideoOutputInfo().getHeight() / 2);
+		}
 		if(zoomFactor != 1) {
 			((Graphics2D)g).scale(1, 1);
 		}
@@ -182,6 +231,9 @@ public class GraphPanel extends JPanel implements Renderer, Zoomable {
 			if(sendPost) {
 				soundCanvas.postFrame();
 			}
+		}
+		if(updating) {
+			//progressPainterThread.newFrame(frameCount, graphics);
 		}
 		if(frameCount > Context.getSongPositionPointer()) {
 			this.repaint();
@@ -223,6 +275,10 @@ public class GraphPanel extends JPanel implements Renderer, Zoomable {
 			this.zoomFactor = zoomFactor;
 			autoZoom = false;
 		}
+	}
+
+	public void setUpdating(boolean updating) {
+		this.updating = updating;
 	}
 
 }

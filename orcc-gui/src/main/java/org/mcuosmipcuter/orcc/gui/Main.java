@@ -107,7 +107,7 @@ public class Main {
 			}
 		});
 		
-		final GraphPanel graphicPanel = new GraphPanel();		
+		final GraphPanel graphicPanel = new GraphPanel();
 
 		
 		org.mcuosmipcuter.orcc.gui.Configuration.stage1(args);
@@ -343,9 +343,16 @@ public class Main {
 								+ Context.getVideoOutputInfo().getFramesPerSecond() + "fps | " +
 								Context.getSoundCanvasList();
 						graphicFrame.setTitle(title);
-						if(PropertyName.VideoDimension.equals(propertyName)) {
-							//graphicPanel.displaySizeChanged();	
-						}
+					}
+					if(PropertyName.BeforeSoundCanvasProperty.equals(propertyName)) {
+						System.err.println("--------------");
+						graphicPanel.setUpdating(true);
+						graphicPanel.paintComponent(graphicPanel.getGraphics());
+						graphicFrame.repaint();
+					}
+					else {
+						graphicPanel.setUpdating(false);
+						graphicFrame.repaint();
 					}
 				}
 			});

@@ -39,5 +39,11 @@ public class DimensionHelper {
 	public float getFontSizeForPercentX(int percentOfVWidth) {
 		return percentOfVWidth * 4f / 300f * videoWidth;
 	}
+	public int getVideoWidth() {
+		return videoWidth;
+	}
+	public int getVideoHeight() {
+		return videoHeight;
+	}
 
 }

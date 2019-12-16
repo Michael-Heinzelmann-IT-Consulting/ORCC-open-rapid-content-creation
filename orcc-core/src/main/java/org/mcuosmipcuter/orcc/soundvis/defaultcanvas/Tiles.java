@@ -47,6 +47,8 @@ public class Tiles implements SoundCanvas, ExtendedFrameHistory {
 	@UserProperty(description="RGB value 0-255 for blue if -1 the amplitude min-max color is used")
 	int fixedBlue = -1;
 
+	@UserProperty(description="start with full queue")
+	boolean fillBeforStart = false;
 
 	@UserProperty(description="x size of tile")
 	int tileX = 240;
@@ -94,6 +96,9 @@ public class Tiles implements SoundCanvas, ExtendedFrameHistory {
 			int b = fixedBlue == -1 ? c: fixedBlue;
 			deque.addLast(new Color(r, g, b));
 		}
+		else {
+			// paused or stopped
+		}
 
 		int x = 0;
 		int y = 0;
@@ -127,6 +132,14 @@ public class Tiles implements SoundCanvas, ExtendedFrameHistory {
 		max = 0;
 		deque.clear();
 		size = (width / tileX) * (height / tileY);
+		if(fillBeforStart) {
+			for(int i = 0; i < size; i++) {
+				int r = fixedRed == -1 ? 127 : fixedRed;
+				int g = fixedGreen == -1 ? 127 : fixedGreen;
+				int b = fixedBlue == -1 ? 127 : fixedBlue;
+				deque.addLast(new Color(r, g, b));
+			}
+		}
 	}
 
 	@Override

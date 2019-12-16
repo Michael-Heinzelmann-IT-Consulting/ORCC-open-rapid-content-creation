@@ -30,7 +30,7 @@ import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.api.util.DimensionHelper;
 
 /**
- * Displays a solid color
+ * Displays an image
  * @author Michael Heinzelmann
  */
 public class Image implements SoundCanvas {
@@ -61,6 +61,8 @@ public class Image implements SoundCanvas {
 	
 	private DimensionHelper dimensionHelper;
 	private BufferedImage scaledImage;
+	private java.awt.Image iconImage;
+	boolean imageUpdating;
 	private int imageHashCode;
 	private String scaled;
 	private String outputHash;
@@ -74,12 +76,16 @@ public class Image implements SoundCanvas {
 	@Override
 	public void newFrame(long frameCount, Graphics2D graphics2D) {
 		if(image != null) {	
-
-
 			BufferedImage i = (scaledWidth != 0 || scaledHeight != 0) ? scaledImage : image;
 			final int x = centeredHorizontal ? (videoOutputInfo.getWidth() - i.getWidth()) / 2 : dimensionHelper.realX(upperLeftCornerX);
 			final int y = centeredVertical ? (videoOutputInfo.getHeight() - i.getHeight()) / 2 : dimensionHelper.realX(upperLeftCornerY);
-			graphics2D.drawImage(i, x, y, null, null);
+			if(imageUpdating) {
+				graphics2D.setColor(Color.BLACK);
+				graphics2D.drawRect(x, y, i.getWidth(), i.getHeight());
+			}
+			else {
+				graphics2D.drawImage(i, x, y, null, null);
+			}
 		}
 	}
 
@@ -110,13 +116,19 @@ public class Image implements SoundCanvas {
 			final int hc = System.identityHashCode(image);
 			final String sc = scaledWidth + "=" + scaledHeight;
 
-			//final int sc = (scaleToWidth ? 1 : 0) + (scaleToHeight ? 10 : 0); // 0, 1, 10, 11
 			if(hc != imageHashCode || !sc.equals(scaled)) {
+//				BufferedImage i = (scaledWidth != 0 || scaledHeight != 0) ? scaledImage : image;
+//				final int x = centeredHorizontal ? (videoOutputInfo.getWidth() - i.getWidth()) / 2 : dimensionHelper.realX(upperLeftCornerX);
+//				final int y = centeredVertical ? (videoOutputInfo.getHeight() - i.getHeight()) / 2 : dimensionHelper.realX(upperLeftCornerY);
+//				graphics.drawString("IMAE UPDAT", x, y);
+				imageUpdating = true;
 				resizeImage();
 				imageHashCode = hc;
 				scaled = sc;
-				graphics.drawImage(image.getScaledInstance(widthPx, heightPx, java.awt.Image.SCALE_SMOOTH), 0, 0, null, null);
+				iconImage = image.getScaledInstance(widthPx, heightPx, java.awt.Image.SCALE_SMOOTH);
+				imageUpdating = false;
 			}
+			graphics.drawImage(iconImage, 0, 0, null, null);
 		}
 	}
 	
