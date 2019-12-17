@@ -20,15 +20,15 @@ package org.mcuosmipcuter.orcc.ert.xuggler;
 
 import java.util.concurrent.TimeUnit;
 
-import javax.annotation.Resource;
 import javax.sound.sampled.AudioFormat;
 
 import org.mcuosmipcuter.orcc.soundvis.AudioInput;
-import org.mcuosmipcuter.orcc.soundvis.PlayPauseStop;
-import org.mcuosmipcuter.orcc.soundvis.Renderer;
 import org.mcuosmipcuter.orcc.soundvis.Context;
 import org.mcuosmipcuter.orcc.soundvis.Context.AppState;
+import org.mcuosmipcuter.orcc.soundvis.PlayPauseStop;
+import org.mcuosmipcuter.orcc.soundvis.Renderer;
 import org.mcuosmipcuter.orcc.soundvis.util.ByteArrayLinearDecoder;
+import org.mcuosmipcuter.orcc.soundvis.util.ExportUtil.VideoRenderer;
 import org.mcuosmipcuter.orcc.util.IOUtil;
 
 import com.xuggle.ferry.IBuffer;
@@ -47,7 +47,7 @@ import com.xuggle.xuggler.IStreamCoder;
  */
 public class ExportThread extends Thread implements PlayPauseStop {
 	
-	@Resource
+	@VideoRenderer
 	Renderer renderer;
 	
 	// snapshot of context

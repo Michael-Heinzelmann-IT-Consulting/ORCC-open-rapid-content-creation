@@ -17,9 +17,13 @@
 */
 package org.mcuosmipcuter.orcc.soundvis.util;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.lang.reflect.Field;
 
-import javax.annotation.Resource;
+//import javax.annotation.Resource;
 
 import org.mcuosmipcuter.orcc.soundvis.PlayPauseStop;
 import org.mcuosmipcuter.orcc.soundvis.Renderer;
@@ -29,7 +33,11 @@ import org.mcuosmipcuter.orcc.soundvis.Renderer;
  * @author Michael Heinzelmann
  */
 public class ExportUtil {
-	
+	@Retention(RetentionPolicy.RUNTIME)
+	@Target(value=ElementType.FIELD)
+	public @interface VideoRenderer {
+		// marker
+	}
 	/**
 	 * Checks the classpath whether we have appropriate export libraries
 	 * @return true if export is enabled
@@ -52,7 +60,7 @@ public class ExportUtil {
 		try {
 			PlayPauseStop e = (PlayPauseStop) Class.forName("org.mcuosmipcuter.orcc.ert.xuggler.ExportThread").newInstance();
 			for(Field field : e.getClass().getDeclaredFields()) {
-				if(field.isAnnotationPresent(Resource.class)) {
+				if(field.isAnnotationPresent(VideoRenderer.class)) {
 					field.setAccessible(true);
 					field.set(e, renderer);
 				}
