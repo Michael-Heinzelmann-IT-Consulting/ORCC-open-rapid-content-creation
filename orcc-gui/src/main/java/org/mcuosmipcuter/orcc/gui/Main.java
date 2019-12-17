@@ -23,6 +23,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.event.WindowStateListener;
 import java.io.File;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.List;
@@ -220,7 +221,20 @@ public class Main {
 		
 		frame.getContentPane().add(deskTop);
 		frame.setExtendedState(Frame.MAXIMIZED_BOTH);
+		frame.addWindowStateListener(new WindowStateListener() {
+			
+			@Override
+			public void windowStateChanged(WindowEvent e) {
+				IOUtil.log("window state " + e);
+				synchronized(frame) {
+					frame.notify();
+				}
+			}
+		});
 		frame.setVisible(true);
+		synchronized(frame) {
+			frame.wait(30000);
+		}
 		
 		final PlayBackPanel playBackPanel = new PlayBackPanel(graphicPanel);
 		IOUtil.log("frame size: " + frame.getSize());
