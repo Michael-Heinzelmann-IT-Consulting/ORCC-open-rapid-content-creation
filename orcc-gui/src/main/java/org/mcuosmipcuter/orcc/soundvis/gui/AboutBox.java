@@ -20,6 +20,9 @@ package org.mcuosmipcuter.orcc.soundvis.gui;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Properties;
 
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
@@ -63,6 +66,38 @@ public class AboutBox {
 		}
 		finally {
 			IOUtil.safeClose(bufferedReader);
+		}
+	}
+	public static void showSystemProperties(boolean modal) {
+		try {
+			StringBuilder stringBuilder = new StringBuilder();
+			Map <String, String> envMap = System.getenv();
+			for(Entry<String, String> ee : envMap.entrySet()){
+				stringBuilder.append(ee.getKey() + "=" + ee.getValue());
+				stringBuilder.append("\n");
+			}
+			stringBuilder.append("\n");
+			Properties properties = System.getProperties();
+			for(Entry<Object, Object> pe : properties.entrySet()){
+				stringBuilder.append(pe.getKey() + "=" + pe.getValue());
+				stringBuilder.append("\n");
+			}
+			JTextArea ta = new JTextArea(20, 50);
+			JScrollPane sp = new JScrollPane(ta);
+			ta.setText(stringBuilder.toString());
+			ta.setCaretPosition(0);
+			Object[] array = {sp}; 
+			JOptionPane jp = new JOptionPane(array, JOptionPane.PLAIN_MESSAGE);		
+			JDialog jd = jp.createDialog("ORCC is free software and comes WITHOUT ANY WARRANTY see license");
+			jd.setModal(modal);
+			jd.setAlwaysOnTop(!modal);
+			jd.setVisible(true);
+		}
+		catch(Exception ex) {
+			ex.printStackTrace();
+		}
+		finally {
+			
 		}
 	}
 }

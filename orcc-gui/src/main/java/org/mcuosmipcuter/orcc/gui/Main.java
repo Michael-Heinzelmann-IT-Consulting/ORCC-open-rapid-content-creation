@@ -204,6 +204,13 @@ public class Main {
 						AboutBox.showFileText("/help.txt", false);
 					}
 				});
+				JMenuItem system = new JMenuItem("system environment");
+				helpMenu.add(system);
+				system.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						AboutBox.showSystemProperties(true);
+					}
+				});
 				JMenuItem about = new JMenuItem("about");
 				helpMenu.add(about);
 				about.addActionListener(new ActionListener() {
