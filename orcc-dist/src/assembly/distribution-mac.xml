@@ -59,5 +59,17 @@
       </binaries>
     </moduleSet>
   </moduleSets>
+  
+  <dependencySets>
+    <dependencySet>
+    <includes>
+    	<include>xuggle:xuggle-xuggler</include>
+    	<include>org.slf4j:slf4j-api</include>
+    	<include>io.humble:humble-video-all</include>
+    	<include>io.humble:humble-video-noarch</include>
+    	<include>io.humble:humble-video-arch-x86_64-apple-darwin12</include>
+    </includes>
+   </dependencySet>
+   </dependencySets>
 
 </assembly>

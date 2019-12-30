@@ -84,6 +84,7 @@ public class ByteArrayLinearDecoder {
 			ByteArrayLinearDecoder.decodeLinear(barr, amplitudes, channels, words, isBigEndian);
 			keepReading = decodingCallback.nextSample(amplitudes, barr, ++sampleCount);
 		}
+		decodingCallback.finished();
 	}
 	
 }

@@ -47,5 +47,28 @@
       <artifactId>xuggle-xuggler</artifactId>
       <version>5.4</version>
     </dependency>
+    <dependency>
+    <!-- transitive for xuggler -->
+    <groupId>org.slf4j</groupId>
+     <artifactId>slf4j-api</artifactId>
+     <version>1.6.6</version>
+	</dependency>
+	
+	<!-- replcacement for deprecated xuggler -->
+	<dependency>
+      <groupId>io.humble</groupId>
+      <artifactId>humble-video-all</artifactId>
+      <version>0.3.0</version>
+    </dependency>
+    	<dependency>
+      <groupId>io.humble</groupId>
+      <artifactId>humble-video-noarch</artifactId>
+      <version>0.3.0</version>
+    </dependency>
+    <dependency>
+    <groupId>io.humble</groupId>
+    <artifactId>humble-video-arch-x86_64-apple-darwin12</artifactId>
+    <version>0.2.1</version>
+</dependency>
   </dependencies>
 </project>

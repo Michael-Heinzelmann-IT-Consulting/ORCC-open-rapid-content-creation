@@ -58,5 +58,14 @@
       </binaries>
     </moduleSet>
   </moduleSets>
-
+  
+  <dependencySets>
+    <dependencySet>
+    <includes>
+    	<include>xuggle:xuggle-xuggler</include>
+    	<include>org.slf4j:slf4j-api</include>
+    </includes>
+   </dependencySet>
+   </dependencySets>
+   
 </assembly>

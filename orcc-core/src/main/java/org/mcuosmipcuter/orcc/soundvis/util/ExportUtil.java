@@ -58,7 +58,8 @@ public class ExportUtil {
 	 */
 	public static PlayPauseStop getExportPlayPause(Renderer renderer) {
 		try {
-			PlayPauseStop e = (PlayPauseStop) Class.forName("org.mcuosmipcuter.orcc.ert.xuggler.ExportThread").newInstance();
+			//PlayPauseStop e = (PlayPauseStop) Class.forName("org.mcuosmipcuter.orcc.ert.xuggler.ExportThread").newInstance();
+			PlayPauseStop e = (PlayPauseStop) Class.forName("org.mcuosmipcuter.orcc.ert.humble_video.ExportThread").getDeclaredConstructor().newInstance();
 			for(Field field : e.getClass().getDeclaredFields()) {
 				if(field.isAnnotationPresent(VideoRenderer.class)) {
 					field.setAccessible(true);

@@ -33,4 +33,6 @@ public interface DecodingCallback {
 	 */
 	public boolean nextSample(int[] amplitudes, byte[] rawData, long sampleCount);
 
+	default void finished() {
+	}
 }
