@@ -247,7 +247,7 @@ public class CustomTable extends JPanel{
 	 */
 	public void addLayer(final SoundCanvasWrapper soundCanvasWrapper) {
 		final Row row = new Row(soundCanvasWrapper);
-		row.setPreferredSize(new Dimension(660, 36));
+		row.setPreferredSize(new Dimension(700, 36));
 		row.setLayout(new BorderLayout());
 		row.setBorder(new EtchedBorder());
 		row.setBackground(Color.WHITE);

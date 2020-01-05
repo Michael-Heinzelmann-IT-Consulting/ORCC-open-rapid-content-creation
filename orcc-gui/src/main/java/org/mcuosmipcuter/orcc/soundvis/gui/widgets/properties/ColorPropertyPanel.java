@@ -18,6 +18,7 @@
 package org.mcuosmipcuter.orcc.soundvis.gui.widgets.properties;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -60,7 +61,7 @@ public class ColorPropertyPanel extends PropertyPanel<Color> {
 			
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				
+				chooser.setPreferredSize(new Dimension(500, 200));
 				if(expanded) {
 					remove(chooser);
 					//add(colorLabel);
