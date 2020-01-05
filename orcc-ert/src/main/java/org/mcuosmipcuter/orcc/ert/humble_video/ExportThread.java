@@ -47,7 +47,7 @@ import io.humble.video.awt.MediaPictureConverter;
 import io.humble.video.awt.MediaPictureConverterFactory;
 
 /**
- * Thread writing a movie file by using the xuggler library - it has compile
+ * Thread writing a movie file by using the humble video library - it has compile
  * time dependencies to it
  */
 public class ExportThread extends Thread implements PlayPauseStop {
@@ -79,8 +79,7 @@ public class ExportThread extends Thread implements PlayPauseStop {
 		status = Status.RUNNING;
 		Context.setAppState(AppState.EXPORTING);
 
-		// final Muxer muxer = Muxer.make(Context.getExportFileName(), null, null);
-		final Muxer muxer = Muxer.make(Context.getExportFileName(), null, null);
+		Muxer muxer = null;
 		AudioInputStream ais = null;
 
 		try {
@@ -92,28 +91,19 @@ public class ExportThread extends Thread implements PlayPauseStop {
 
 			final Rational framerate = Rational.make(1, framesPerSecond);
 			for(MuxerFormat mf : MuxerFormat.getFormats()) {
-				System.err.println(mf.getExtensions() + " | " + mf);
+				//System.err.println(mf.getExtensions() + " | " + mf);
 			}
-			/**
-			 * First we create a muxer using the passed in filename and formatname if given.
-			 */
-			/// final Muxer muxer = Muxer.make(Context.getExportFileName(), null, "mov");
-			/**
-			 * Now, we need to decide what type of codec to use to encode video. Muxers have
-			 * limited sets of codecs they can use. We're going to pick the first one that
-			 * works, or if the user supplied a codec name, we're going to force-fit that in
-			 * instead.
-			 */
+			String formatName = Context.getExportFileName().endsWith(".mp4") ? "mov" : null;
+			muxer = Muxer.make(Context.getExportFileName(), null, formatName);
+			final Muxer muxerPointer = muxer;
 			System.err.println("my MuxerFormat " + muxer.getFormat());
+			
 			final MuxerFormat videoFormat = muxer.getFormat();
 			final Codec videoCodec;
-//		    String videoCodecname = "libx264";//"mov";
-//		    String audioCodecName = "libmp3lame"; //mov
-//		    Type sampleFormat = Type.SAMPLE_FMT_S16P;
 			String vCName = Context.getExportFileName().endsWith(".mp4") ? "mpeg4" : "libx264";
-			String videoCodecname = vCName;// "mpeg4"; libx264rgb: qtrle rpza 8bps adpcm_ima_qt -notw h264
-			String audioCodecName = "libmp3lame"; // "pcm_s16le_planar"; 
-			Type sampleFormat = Type.SAMPLE_FMT_S16P;
+			String videoCodecname = vCName;
+			String audioCodecName =  "libmp3lame"; ////"pcm_s16be";//
+			Type sampleFormat = Type.SAMPLE_FMT_S16P;//Type.SAMPLE_FMT_S16P for mp3
 
 			videoCodec = Codec.findEncodingCodecByName(videoCodecname);
 
@@ -135,7 +125,7 @@ public class ExportThread extends Thread implements PlayPauseStop {
 			System.err.println("getSupportedProfile(0) " + audioCodec.getSupportedProfile(0));
 			System.err.println("SupportedAudioFormats " + audioCodec.getSupportedAudioFormats());
 			final Encoder audioEncoder = Encoder.make(audioCodec);
-			audioEncoder.setSampleFormat(sampleFormat);// SAMPLE_FMT_S16P
+			audioEncoder.setSampleFormat(sampleFormat);
 			if (videoFormat.getFlag(MuxerFormat.Flag.GLOBAL_HEADER)) {
 				audioEncoder.setFlag(Encoder.Flag.FLAG_GLOBAL_HEADER, true);
 			}
@@ -145,17 +135,9 @@ public class ExportThread extends Thread implements PlayPauseStop {
 			audioEncoder.setChannelLayout(Layout.CH_LAYOUT_STEREO);
 			audioEncoder.open(null, null);
 			muxer.addNewStream(audioEncoder);
+			final AudioExportHelper audioExportHelper = new AudioExportHelper(audioEncoder, muxer);
 
-			/**
-			 * Now that we know what codec, we need to create an encoder
-			 */
 			final Encoder videoEncoder = Encoder.make(videoCodec);
-			/**
-			 * Video encoders need to know at a minimum: width height pixel format Some also
-			 * need to know frame-rate (older codecs that had a fixed rate at which video
-			 * files could be written needed this). There are many other options you can set
-			 * on an encoder, but we're going to keep it simpler here.
-			 */
 			videoEncoder.setWidth(width);
 			videoEncoder.setHeight(height);
 			// We are going to use 420P as the format because that's what most video formats
@@ -164,11 +146,6 @@ public class ExportThread extends Thread implements PlayPauseStop {
 			videoEncoder.setPixelFormat(pixelformat);
 			videoEncoder.setTimeBase(framerate);
 
-			/**
-			 * An annoynace of some formats is that they need global (rather than
-			 * per-stream) headers, and in that case you have to tell the encoder. And since
-			 * Encoders are decoupled from Muxers, there is no easy way to know this beyond
-			 */
 			if (videoFormat.getFlag(MuxerFormat.Flag.GLOBAL_HEADER)) {
 				videoEncoder.setFlag(Encoder.Flag.FLAG_GLOBAL_HEADER, true);
 			}
@@ -183,75 +160,48 @@ public class ExportThread extends Thread implements PlayPauseStop {
 			/** And open the muxer for business. */
 			muxer.open(null, null);
 
-			/**
-			 * Next, we need to make sure we have the right MediaPicture format objects to
-			 * encode data with. Java (and most on-screen graphics programs) use some
-			 * variant of Red-Green-Blue image encoding (a.k.a. RGB or BGR). Most video
-			 * codecs use some variant of YCrCb formatting. So we're going to have to
-			 * convert. To do that, we'll introduce a MediaPictureConverter object later.
-			 * object.
-			 */
-//		      MediaPictureConverter videoConverter = null;
-
 			final MediaPicture picture = MediaPicture.make(videoEncoder.getWidth(), videoEncoder.getHeight(),
 					pixelformat);
 			picture.setTimeBase(framerate);
 
-			//////////////// mcuosmip
 
 			final MediaPacket videoPacket = MediaPacket.make();
 
 			ByteArrayLinearDecoder.decodeLinear(ais, new DecodingCallback() {
-				final int NR_CHANNELS = 2;
+//				final int NR_CHANNELS = 2;
 
-				private long sampleCount;
+//				private long sampleCount;
 				MediaPictureConverter videoConverter = null;
-				int bufPos;
 
-				MediaAudio samples = makeNewSample();
+//				int bufPos;
 
-				private void writeaudioPacket() {
-					samples.setTimeStamp(sampleCount);
-					samples.setComplete(true);
-					MediaPacket audioPacket = MediaPacket.make();
-					do {
-						audioEncoder.encodeAudio(audioPacket, samples);
-						if (audioPacket.isComplete()) {
-							muxer.write(audioPacket, false);
-						}
-					} while (audioPacket.isComplete());
-				}
-
-				private MediaAudio makeNewSample() {
-					bufPos = 0;
-					samples = MediaAudio.make(audioEncoder.getFrameSize(), audioEncoder.getSampleRate(),
-							audioEncoder.getChannels(), audioEncoder.getChannelLayout(),
-							audioEncoder.getSampleFormat());
-					return samples;
-				}
+//				MediaAudio samples = makeNewSample();
+//
+//				private void writeaudioPacket() {
+//					samples.setTimeStamp(sampleCount);
+//					samples.setComplete(true);
+//					MediaPacket audioPacket = MediaPacket.make();
+//					do {
+//						audioEncoder.encodeAudio(audioPacket, samples);
+//						if (audioPacket.isComplete()) {
+//							muxerPointer.write(audioPacket, false);
+//						}
+//					} while (audioPacket.isComplete());
+//				}
+//
+//				private MediaAudio makeNewSample() {
+//					bufPos = 0;
+//					samples = MediaAudio.make(audioEncoder.getFrameSize(), audioEncoder.getSampleRate(),
+//							audioEncoder.getChannels(), audioEncoder.getChannelLayout(),
+//							audioEncoder.getSampleFormat());
+//					return samples;
+//				}
 
 				@Override
 				public boolean nextSample(int[] amplitudes, byte[] rawData, long sampleCount) {
-					this.sampleCount = sampleCount;
-					boolean cont = renderer.nextSample(amplitudes, rawData, 0 * samplesPerFrame + sampleCount);
-					int dataSize = Math.min(samples.getDataPlaneSize(0), samples.getDataPlaneSize(0));
-					// System.err.println("dataSize " + dataSize);
-					if (bufPos < dataSize) {
-						// continue appending
-					} else {
-						writeaudioPacket();
-						makeNewSample();
-					}
-					byte[] L = new byte[2];
-					byte[] R = new byte[2];
-					L[0] = rawData[0];
-					L[1] = rawData[1];
-					R[0] = rawData[2];
-					R[1] = rawData[3];
-					samples.getData(0).put(L, 0, bufPos, L.length);
-					samples.getData(1).put(R, 0, bufPos, R.length);
 
-					bufPos += rawData.length / NR_CHANNELS;
+					boolean cont = renderer.nextSample(amplitudes, rawData, 0 * samplesPerFrame + sampleCount);
+					audioExportHelper.append4ByteData(rawData, sampleCount);
 
 					if (sampleCount % samplesPerFrame == 0) {
 
@@ -260,10 +210,6 @@ public class ExportThread extends Thread implements PlayPauseStop {
 						renderer.newFrame(frameCount, cont);
 
 						final BufferedImage screen = renderer.getFrameImage();
-						/**
-						 * This is LIKELY not in YUV420P format, so we're going to convert it using some
-						 * handy utilities.
-						 */
 						if (videoConverter == null) {
 							videoConverter = MediaPictureConverterFactory.createConverter(screen, picture);
 						}
@@ -273,7 +219,7 @@ public class ExportThread extends Thread implements PlayPauseStop {
 						do {
 							videoEncoder.encode(videoPacket, picture);
 							if (videoPacket.isComplete()) {
-								muxer.write(videoPacket, false);
+								muxerPointer.write(videoPacket, false);
 							}
 						} while (videoPacket.isComplete());
 
@@ -283,16 +229,11 @@ public class ExportThread extends Thread implements PlayPauseStop {
 
 				@Override
 				public void finished() {
-					writeaudioPacket();
+					audioExportHelper.flush();
 				}
 			});
 
-			/**
-			 * Encoders, like decoders, sometimes cache pictures so it can do the right
-			 * key-frame optimizations. So, they need to be flushed as well. As with the
-			 * decoders, the convention is to pass in a null input until the output is not
-			 * complete.
-			 */
+			// flushing
 			do {
 				videoEncoder.encode(videoPacket, null);
 				if (videoPacket.isComplete()) {
@@ -300,15 +241,15 @@ public class ExportThread extends Thread implements PlayPauseStop {
 				}
 			} while (videoPacket.isComplete());
 
-			MediaPacket audioPacket = MediaPacket.make();
-			do {
-				audioEncoder.encode(audioPacket, null);
-				if (audioPacket.isComplete())
-					muxer.write(audioPacket, false);
-			} while (audioPacket.isComplete());
+				audioExportHelper.flush();
+//			MediaPacket audioPacket = MediaPacket.make();
+//			do {
+//				audioEncoder.encode(audioPacket, null);
+//				if (audioPacket.isComplete())
+//					muxer.write(audioPacket, false);
+//			} while (audioPacket.isComplete());
 
 		} catch (Throwable e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} finally {
 			status = Status.DONE;

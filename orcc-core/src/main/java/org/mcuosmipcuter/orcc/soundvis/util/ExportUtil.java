@@ -27,6 +27,7 @@ import java.lang.reflect.Field;
 
 import org.mcuosmipcuter.orcc.soundvis.PlayPauseStop;
 import org.mcuosmipcuter.orcc.soundvis.Renderer;
+import org.mcuosmipcuter.orcc.util.IOUtil;
 
 /**
  * Helper that checks for the external libraries and returns an export implementation.
@@ -43,12 +44,20 @@ public class ExportUtil {
 	 * @return true if export is enabled
 	 */
 	public static boolean isExportEnabled() {
+		
+		try {
+			Class.forName("io.humble.video.Muxer");
+			return true;
+		} catch (ClassNotFoundException e) {
+			IOUtil.log("Humble Video not installed.");
+		}
 		try {
 			Class.forName("com.xuggle.mediatool.IMediaWriter");
 			return true;
 		} catch (ClassNotFoundException e) {
-			return false;
+			IOUtil.log("Xuggler not installed.");
 		}
+		return false;
 	}
 	
 	/**
