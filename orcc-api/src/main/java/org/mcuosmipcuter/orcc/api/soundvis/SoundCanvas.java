@@ -69,8 +69,13 @@ public interface SoundCanvas {
 	/**
 	 * This method is called when the engine is done with the frame, all cleanup and re-set work should be done here
 	 */
-	public void postFrame();
-	
+	public default void postFrame() {	
+	}
+	/**
+	 * This method is called when either the range from or to changes
+	 */
+	public default void setFrameRange(long from, long to) {	
+	}
 	/**
 	 *  Draw a simplified image icon of this canvas current state for showing this in a compacted UI.
 	 * @param width width of this icon

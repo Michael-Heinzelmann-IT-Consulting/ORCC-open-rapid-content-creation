@@ -166,7 +166,7 @@ public class GraphPanel extends JPanel implements Renderer, Zoomable {
 			if(prepare) {
 				soundCanvas.prepare(Context.getAudioInput().getAudioInputInfo(), Context.getVideoOutputInfo());
 			}
-			soundCanvas.newFrame(frameCount, graphics);
+			soundCanvas.newFrame(Context.getAppState() == AppState.PLAYING ? frameCount : Context.getSongPositionPointer(), graphics);
 		}
 
 		repaint();

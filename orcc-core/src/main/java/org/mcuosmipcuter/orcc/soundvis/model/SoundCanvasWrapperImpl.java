@@ -178,10 +178,12 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 	@Override
 	public void setFrameFrom(long frameFrom) {
 		this.frameFrom = frameFrom;
+		soundCanvas.setFrameRange(frameFrom, frameTo);
 	}
 	@Override
 	public void setFrameTo(long frameTo) {
 		this.frameTo = frameTo;
+		soundCanvas.setFrameRange(frameFrom, frameTo);
 	}
 	@Override
 	public boolean isSelected() {

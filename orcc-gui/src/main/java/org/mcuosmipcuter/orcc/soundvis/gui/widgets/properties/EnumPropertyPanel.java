@@ -22,22 +22,19 @@ import java.awt.event.ItemListener;
 
 import javax.swing.JComboBox;
 
-import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
 
 /**
  * @author Michael Heinzelmann
  *
  */
-public class EnumPropertyPanel extends PropertyPanel  {
-	private static enum EN {
-		A, B
-	}
-	private JComboBox jComboBox = new JComboBox();
+public class EnumPropertyPanel extends PropertyPanel<Enum<?>>  {
 
-	public EnumPropertyPanel(SoundCanvasWrapper soundCanvasWrapper, final Object[] values) {
+	private JComboBox<Enum<?>> jComboBox = new JComboBox<Enum<?>>();
+
+	public EnumPropertyPanel(SoundCanvasWrapper soundCanvasWrapper, final Enum<?>[] values) {
 		super(soundCanvasWrapper);
-		for(Object v : values) {
+		for(Enum<?> v : values) {
 			jComboBox.addItem(v);
 		}
 		
@@ -45,10 +42,8 @@ public class EnumPropertyPanel extends PropertyPanel  {
 			
 			@Override
 			public void itemStateChanged(ItemEvent e) {
-				//String enumString = String.valueOf(e.getItem());
-				for(Object v : values) {
+				for(Enum<?> v : values) {
 					if(v.equals(e.getItem())) {
-						System.err.println("MMMM");
 						setNewValue(v);
 					}
 				}
@@ -56,11 +51,7 @@ public class EnumPropertyPanel extends PropertyPanel  {
 		});
 		add(jComboBox);
 	}
-/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
 
-	
+	private static final long serialVersionUID = 1L;	
 
 }
