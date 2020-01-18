@@ -32,11 +32,12 @@ public class EnumPropertyPanel extends PropertyPanel<Enum<?>>  {
 
 	private JComboBox<Enum<?>> jComboBox = new JComboBox<Enum<?>>();
 
-	public EnumPropertyPanel(SoundCanvasWrapper soundCanvasWrapper, final Enum<?>[] values) {
+	public EnumPropertyPanel(SoundCanvasWrapper soundCanvasWrapper, final Enum<?>[] values, Enum<?> value) {
 		super(soundCanvasWrapper);
 		for(Enum<?> v : values) {
 			jComboBox.addItem(v);
 		}
+		jComboBox.setSelectedItem(value);
 		
 		jComboBox.addItemListener(new ItemListener() {
 			

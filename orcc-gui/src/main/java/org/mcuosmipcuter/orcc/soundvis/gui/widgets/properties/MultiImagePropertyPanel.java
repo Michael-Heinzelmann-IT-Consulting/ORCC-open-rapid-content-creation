@@ -17,8 +17,13 @@
 */
 package org.mcuosmipcuter.orcc.soundvis.gui.widgets.properties;
 
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
 import java.awt.GridLayout;
 import java.awt.Image;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
@@ -29,7 +34,6 @@ import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
@@ -44,7 +48,8 @@ public class MultiImagePropertyPanel extends PropertyPanel<BufferedImage[]> {
 
 	private static final long serialVersionUID = 1L;
 	private JButton fileButton = new JButton("...");
-	private JLabel thumbLabel = new JLabel("");
+
+	private JPanel imagebar = new JPanel();
 	
 	/**
 	 * Constructor
@@ -52,12 +57,16 @@ public class MultiImagePropertyPanel extends PropertyPanel<BufferedImage[]> {
 	 */
 	public MultiImagePropertyPanel(final SoundCanvasWrapper soundCanvasWrapper) {
 		super(soundCanvasWrapper);
-		thumbLabel.setOpaque(true);
+
 		JPanel valueSelect = new JPanel();
-		valueSelect.setLayout(new GridLayout(1, 2));
-		valueSelect.add(thumbLabel);
-		valueSelect.add(fileButton);
+		valueSelect.setLayout(new BorderLayout(2, 2));
+		fileButton.setPreferredSize(new Dimension(40, 20));
+		valueSelect.add(fileButton, BorderLayout.NORTH);
+		//imagebar.setBackground(Color.BLACK);
+		valueSelect.add(imagebar);
+		valueSelect.setPreferredSize(new Dimension(500, 240));
 		add(valueSelect);
+		
 //		FileDialogActionListener.CallBack callBack = new FileDialogActionListener.CallBack(){
 //			@Override
 //			public void fileSelected(File file) {
@@ -96,13 +105,39 @@ public class MultiImagePropertyPanel extends PropertyPanel<BufferedImage[]> {
 		        }
 			}
 		});
-
+		
 	}
 	@Override
 	public void setCurrentValue(BufferedImage[] currentValue) {
 		super.setCurrentValue(currentValue);
+		imagebar.removeAll();
+		
 		if(currentValue != null && currentValue.length > 0){
-			thumbLabel.setIcon(new ImageIcon(currentValue[0].getScaledInstance(thumbLabel.getWidth(), thumbLabel.getHeight(), Image.SCALE_FAST)));
+			GridBagConstraints gc = new GridBagConstraints();
+//			gc.gridwidth = GridBagConstraints.REMAINDER;	
+//			gc.fill = GridBagConstraints.HORIZONTAL;
+//			gc.gridx = GridBagConstraints.EAST;
+			gc.insets = new Insets(3, 3, 3, 3);
+			int rows = currentValue.length / 5 ;
+			rows = currentValue.length % 5 == 0 ? rows : rows+1;
+			imagebar.setLayout(new GridLayout(rows, 5 ));
+			for(Image i : currentValue) {
+			//JLabel thumbLabel = new JLabel("");
+			JButton ib = new JButton();
+			ib.setMaximumSize(new Dimension(72, 72));
+			ib.setIcon(new ImageIcon(i.getScaledInstance(70, 70, Image.SCALE_FAST)));
+			imagebar.add(ib, gc);
+
+			
+
+			
+		}
+			imagebar.revalidate();
+			
+//			for(int i = 0; i < imagebar.getComponentCount() && i < currentValue.length; i++) {
+//				JButton ib = (JButton) imagebar.getComponent(i);
+//			ib.setIcon(new ImageIcon(currentValue[i].getScaledInstance(70, 70, Image.SCALE_FAST)));
+			//}
 		}
 		this.repaint();
 	}

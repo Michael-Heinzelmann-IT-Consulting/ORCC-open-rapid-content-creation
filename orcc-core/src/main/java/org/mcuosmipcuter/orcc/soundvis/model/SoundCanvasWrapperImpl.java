@@ -238,5 +238,13 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 	public void setIconImage(Image iconImage) {
 		this.iconImage = iconImage;
 	}
+	@Override
+	public long[][] getFrameFromTos() {
+		long[][] fromTos = soundCanvas.getFrameFromTos();
+		if(fromTos.length > 0) {
+			return fromTos;
+		}
+		return SoundCanvasWrapper.super.getFrameFromTos();
+	}
 	
 }

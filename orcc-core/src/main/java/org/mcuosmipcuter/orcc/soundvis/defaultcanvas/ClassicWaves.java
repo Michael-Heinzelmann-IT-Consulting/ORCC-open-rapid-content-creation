@@ -64,6 +64,11 @@ public class ClassicWaves implements SoundCanvas {
 	private int[] amplitudeBuffer;
 	private int[] marginBuffer;
 	private int prevAmplitude;
+	private int prevSmoothAmpPos;
+	private int prevMaxAmp;
+	private int prevSmoothAmpNeg;
+	private int prevMinAmp;
+	
 	
 	@Override
 	public void nextSample(int[] amplitudes) {
@@ -101,27 +106,43 @@ public class ClassicWaves implements SoundCanvas {
 			else {
 				amp = amplitudeBuffer[i];
 			}
+			if(amp > aMaxamp) {
+				aMaxamp = amp;
+			}
+			if(amp < aMinAmp) {
+				aMinAmp = amp;
+			}
 			if(beamWidth > 0) {
-				if(amp > aMaxamp) {
-					aMaxamp = amp;
-				}
-				if(amp < aMinAmp) {
-					aMinAmp = amp;
-				}
+
 				if((x + 1) % beamWidth == 0) {
 					final int rectWidth = getY(aMaxamp - aMinAmp, height / 2 - aMaxamp, height / 2 + aMaxamp);
-					graphics.fillRect(x  + lm - beamWidth + 1, fill == FILL.TOP ? 0 : height / 2 - aMaxamp, beamWidth, rectWidth);
+					//graphics.fillRect(x  + lm - beamWidth + 1, fill == FILL.TOP ? 0 : height / 2 - aMaxamp, beamWidth, rectWidth);
+					//graphics.fillRoundRect(x  + lm - beamWidth + 1, fill == FILL.TOP ? 0 : height / 2 - aMaxamp, (int)(beamWidth*.7), rectWidth, beamWidth , beamWidth);
+					graphics.fillArc(x  + lm - beamWidth + 1, height / 2 - aMaxamp, beamWidth, rectWidth, 0, 360);
 					aMaxamp = 0;
 					aMinAmp = 0;
 				}
 			}
 			else {
 				int y2 = getY(height / 2 - prevAmplitude, 0,height);
-				graphics.drawLine(lm + x, height / 2 - amp , lm + x, y2);
+				//graphics.drawLine(lm + x, height / 2 - amp , lm + x, y2);
+				final int rectWidth = getY(aMaxamp - aMinAmp, height / 2 - aMaxamp, height / 2 + aMaxamp);
+				graphics.drawArc(lm + x, height / 2 -rectWidth/2 , lm + 400, rectWidth, 0, 180);
 				prevAmplitude = amp;
 			}
+			
 			x++;
 		}
+		int aFactor = 2;
+		if(aMaxamp > prevMaxAmp) {
+			//prevSmoothAmpPos+= aFactor;
+		}else if(aMaxamp < prevMaxAmp) {
+			//prevSmoothAmpPos-= aFactor;
+		}
+		prevSmoothAmpPos = aMaxamp;
+		prevMaxAmp = aMaxamp;
+		//graphics.drawLine(0, height / 2 - prevSmoothAmpPos , marginBuffer.length + amplitudeBuffer.length, height / 2 - prevSmoothAmpPos);
+		
 		for(int i = 0; i < marginBuffer.length; i++) {
 			marginBuffer[i] = amplitudeBuffer[amplitudeBuffer.length - marginBuffer.length + i];		
 		}
@@ -147,6 +168,11 @@ public class ClassicWaves implements SoundCanvas {
 		if(amplitudeDivisor < 1){
 			amplitudeMultiplicator = height / amplitude.getAmplitudeRange();
 		}
+		prevMaxAmp = 0;
+		prevMinAmp = 0;
+		prevSmoothAmpPos = 0;
+		prevSmoothAmpNeg = 0;
+		
 	}
 
 	@Override

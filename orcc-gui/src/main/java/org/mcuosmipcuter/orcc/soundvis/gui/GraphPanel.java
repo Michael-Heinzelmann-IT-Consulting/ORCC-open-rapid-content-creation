@@ -93,7 +93,7 @@ public class GraphPanel extends JPanel implements Renderer, Zoomable {
 			
 			@Override
 			public void contextChanged(PropertyName propertyName) {
-				System.err.println("::::" + propertyName);
+				//System.err.println("::::" + propertyName);
 				if(PropertyName.BeforeSoundCanvasProperty.equals(propertyName)) {
 					//System.err.println(getGraphics());
 					//getGraphics().drawString("UPDATE", 100, 100);
@@ -123,9 +123,10 @@ public class GraphPanel extends JPanel implements Renderer, Zoomable {
 					displayUpdate(true);
 
 				}
-				EnumSet<PropertyName> match = EnumSet.of(PropertyName.SoundCanvasProperty, PropertyName.SoundCanvasAdded, PropertyName.SoundCanvasList);
-				if(Context.getAppState() != AppState.PLAYING && match.contains(propertyName)){
-					displayUpdate(false);
+				EnumSet<PropertyName> match = EnumSet.of(PropertyName.SoundCanvasProperty,
+						PropertyName.SoundCanvasAdded, PropertyName.SoundCanvasList, PropertyName.SongPositionPointer);
+				if (Context.getAppState() != AppState.PLAYING && match.contains(propertyName)) {
+					displayUpdate(true);
 				}
 				
 			}

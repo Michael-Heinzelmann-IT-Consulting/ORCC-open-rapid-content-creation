@@ -277,7 +277,21 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 				g.setColor(Color.GRAY);
 				g.drawRoundRect(from, y + delta, to - from, b, 16, 16);
 				if(scw.isSelected()) {
-					selectedCanvas = new Rectangle(from, y + delta, to - from, b);
+					long[][] fromTos = scw.getFrameFromTos();
+					if(fromTos.length > 1) {
+						g.setColor(new Color(delta*100, false));
+						for(int i = 0; i < fromTos.length; i++) {
+							int subFrom = margin +  (int)fromTos[i][0]* samplesPerFrame / noOfSamples;
+							int subTo = margin + (int)fromTos[i][1]* samplesPerFrame / noOfSamples;
+							//
+							g.drawRoundRect(subFrom, y + delta, subTo - subFrom, b + b/2 + delta, 16, 16);
+					
+						}
+					}
+					else {
+						selectedCanvas = new Rectangle(from, y + delta, to - from, b);
+					}
+
 				}
 				
 				count++;

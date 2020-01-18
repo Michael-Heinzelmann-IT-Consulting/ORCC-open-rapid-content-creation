@@ -168,34 +168,8 @@ public class ExportThread extends Thread implements PlayPauseStop {
 			final MediaPacket videoPacket = MediaPacket.make();
 
 			ByteArrayLinearDecoder.decodeLinear(ais, new DecodingCallback() {
-//				final int NR_CHANNELS = 2;
 
-//				private long sampleCount;
 				MediaPictureConverter videoConverter = null;
-
-//				int bufPos;
-
-//				MediaAudio samples = makeNewSample();
-//
-//				private void writeaudioPacket() {
-//					samples.setTimeStamp(sampleCount);
-//					samples.setComplete(true);
-//					MediaPacket audioPacket = MediaPacket.make();
-//					do {
-//						audioEncoder.encodeAudio(audioPacket, samples);
-//						if (audioPacket.isComplete()) {
-//							muxerPointer.write(audioPacket, false);
-//						}
-//					} while (audioPacket.isComplete());
-//				}
-//
-//				private MediaAudio makeNewSample() {
-//					bufPos = 0;
-//					samples = MediaAudio.make(audioEncoder.getFrameSize(), audioEncoder.getSampleRate(),
-//							audioEncoder.getChannels(), audioEncoder.getChannelLayout(),
-//							audioEncoder.getSampleFormat());
-//					return samples;
-//				}
 
 				@Override
 				public boolean nextSample(int[] amplitudes, byte[] rawData, long sampleCount) {

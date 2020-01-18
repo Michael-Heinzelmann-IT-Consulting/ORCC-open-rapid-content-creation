@@ -104,6 +104,7 @@ public abstract class Configuration {
 			Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.ColorsLR");
 			Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.GridPulse");
 			Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.Image");
+			Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.SlideShow");
 			Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.Pulsating");
 			Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.RotatingAmplitudes");
 			Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.SolidColor");
@@ -125,6 +126,14 @@ public abstract class Configuration {
 		}
 		
 		if(usrMode.startsWith("dev")) {
+			// file defaults
+			try {
+				if(args.length > 2) {
+						Context.setAudioFromFile(args[2]);
+				}
+			} catch (AppLogicException ex) {
+				throw new RuntimeException(ex);
+			}
 			// default canvas
 			if(args.length > 4) {
 				try {
@@ -133,20 +142,14 @@ public abstract class Configuration {
 					throw new RuntimeException(ex);
 				} 
 			}
-			// file defaults
-			if(args.length > 2) {
-				try {
-					Context.setAudioFromFile(args[2]);
-				} catch (AppLogicException ex) {
-					throw new RuntimeException(ex);
-				}
-			}
+
 			if(args.length > 3) {
 				Context.setExportFileName(args[3]);
 			}
 		}
 		else {
 			try {
+				Context.setAudioFromClasspath("/silence_pcm_16bit_wav_30s.wav");
 				Context.addCanvas("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.SolidColor");
 			} catch (Exception ex) {
 				throw new RuntimeException(ex);

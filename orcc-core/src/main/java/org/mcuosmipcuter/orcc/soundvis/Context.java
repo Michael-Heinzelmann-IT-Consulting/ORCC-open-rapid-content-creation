@@ -26,6 +26,7 @@ import javax.sound.sampled.FloatControl;
 
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
+import org.mcuosmipcuter.orcc.soundvis.model.AudioClasspathInputImpl;
 import org.mcuosmipcuter.orcc.soundvis.model.AudioFileInputImpl;
 import org.mcuosmipcuter.orcc.soundvis.model.SoundCanvasWrapperImpl;
 import org.mcuosmipcuter.orcc.soundvis.model.VideoOutputInfoImpl;
@@ -183,6 +184,17 @@ public abstract class Context {
 	 */
 	public static synchronized void setAudioFromFile(String audioFileName) throws AppLogicException {
 		AudioInput a = new AudioFileInputImpl(audioFileName);
+		setAudio(a);
+	}
+	/**
+	 * Sets the audio from a classpath resource and notifies listeners
+	 * @param audioFileName full path to the file
+	 */
+	public static synchronized void setAudioFromClasspath(String audioResourcePath) throws AppLogicException {
+		AudioInput a = new AudioClasspathInputImpl(audioResourcePath);
+		setAudio(a);
+	}
+	private static void setAudio(AudioInput a) throws AppLogicException {
 		final float sampleRate = a.getAudioInputInfo().getAudioFormat().getSampleRate();
 		final int frameRate = videoOutputInfo.getFramesPerSecond();
 		if(sampleRate % frameRate != 0) {
@@ -190,7 +202,6 @@ public abstract class Context {
 		}
 		audioInput = a;
 		notifyListeners(PropertyName.AudioInputInfo);
-
 	}
 	/**
 	 * Full path to the video export file

@@ -22,6 +22,7 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.lang.reflect.Field;
 
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
@@ -61,7 +62,10 @@ public class ColorPropertyPanel extends PropertyPanel<Color> {
 			
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				chooser.setPreferredSize(new Dimension(500, 200));
+				//chooser.setPreferredSize(new Dimension(660, 200));
+				System.err.println(" m  l l  " + chooser.getMinimumSize());
+				chooser.setMinimumSize(new Dimension(460, 180));
+				chooser.setPreferredSize(new Dimension(460, 180));
 				if(expanded) {
 					remove(chooser);
 					//add(colorLabel);
@@ -109,6 +113,11 @@ public class ColorPropertyPanel extends PropertyPanel<Color> {
 		colorLabel.setBackground(currentValue);
 		this.repaint();
 	}
-
+	@Override
+	public void setField(Field field) {
+		String name = field.getName();
+		nameLabel.setText("");
+		this.name = name;
+	}
 }
 

@@ -84,5 +84,9 @@ public interface SoundCanvas {
 	 */
 	public void updateUI(int width, int height, Graphics2D graphics);
 	
+	public default long[][] getFrameFromTos(){
+		return new long[][] {};
+	}
+	
 }
 

@@ -55,6 +55,10 @@ public interface SoundCanvasWrapper extends SoundCanvas, PropertyListener {
 	 */
 	public long getFrameTo();
 	
+	public default long[][] getFrameFromTos(){
+		return new long[][] {new long[] {getFrameFrom(), getFrameTo()}};
+	}
+	
 	/**
 	 * Sets the frame from where display of the canvas starts
 	 * @param frameFrom the from frame to set

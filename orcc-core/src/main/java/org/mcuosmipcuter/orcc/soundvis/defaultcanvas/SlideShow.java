@@ -17,10 +17,17 @@
 */
 package org.mcuosmipcuter.orcc.soundvis.defaultcanvas;
 
+import java.awt.AlphaComposite;
 import java.awt.Color;
+import java.awt.Composite;
 import java.awt.Graphics2D;
+import java.awt.Shape;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
 import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
@@ -40,13 +47,13 @@ public class SlideShow implements SoundCanvas {
 	@UserProperty(description="images to show")
 	private BufferedImage[] images = null;
 	
-	@UserProperty(description="upper left x position")
-	private int upperLeftCornerX = 0;
+	@UserProperty(description="center x position")
+	private int centerX = 0;
 	@UserProperty(description="to center horizontally")
 	private boolean centeredHorizontal = true;
 	
-	@UserProperty(description="upper left y position")
-	private int upperLeftCornerY = 0;
+	@UserProperty(description="center y position")
+	private int centerY = 0;
 	@UserProperty(description="to center vertically")
 	private boolean centeredVertical = true;
 	
@@ -59,22 +66,19 @@ public class SlideShow implements SoundCanvas {
 	@UserProperty(description="loop image sequence")
 	private boolean loop = true;
 	
-	//@TimedChange
+
 	@LimitedIntProperty(minimum=0, description="width cannot be lower than 0")
 	@UserProperty(description="width of image, 0 means use video width")
 	private int scaledWidth = 0;
 	
-	//@TimedChange
 	@LimitedIntProperty(minimum=0, description="height cannot be lower than 0")
 	@UserProperty(description="height of image, 0 means use video height")
 	private int scaledHeight = 0;
 	
 	private DimensionHelper dimensionHelper;
-	//private BufferedImage[] scaledImages;
+
 	private java.awt.Image iconImage;
-	//boolean imageUpdating;
-	//private String scaled;
-	//private String outputHash;
+
 	VideoOutputInfo videoOutputInfo;
 	
 	@UserProperty(description="moveX in px per frame")
@@ -84,9 +88,63 @@ public class SlideShow implements SoundCanvas {
 	@UserProperty(description="moveY in px per frame")
 	private int moveY = 0;
 	private int deltaY;
+	
+	@UserProperty(description="rotate dgrees per frame")
+	private int rotate = 0;
+	double rotatePosition;
+	
+	@UserProperty(description="cout out")
+	private CLIP_SHAPE cutOut = CLIP_SHAPE.NONE;
+	
+	@LimitedIntProperty(minimum=0, description="cannot be lower than 0")
+	@UserProperty(description="in scale 0 means none")
+	private int scaleIn;
+	@UserProperty(description="direction rule to scale in")
+	private SCALE_RULE scaleRuleIn = SCALE_RULE.BOTH;
+	
+	@LimitedIntProperty(minimum=0, description="cannot be lower than 0")
+	@UserProperty(description="in scale 0 means none")
+	private int scaleOut;
+	@UserProperty(description="direction rule to scale out")
+	private SCALE_RULE scaleRuleOut = SCALE_RULE.BOTH;
+	
+	public static enum SCALE_RULE {
+		HORIZONTAL, VERTICAL, BOTH
+	}
+	
+	public static enum CLIP_SHAPE {
+		NONE, ELLIPSE, CIRCLE, ROUND_RECTANGLE,
+	}
+	
+	@LimitedIntProperty(minimum=0, description="cannot be lower than 0")
+	@UserProperty(description="number of frames to fade in")
+	private int fadeIn = 0;
+	AlphaComposite ac  = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f);
+	
+	@LimitedIntProperty(minimum=0, description="cannot be lower than 0")
+	@UserProperty(description="number of frames to fade out")
+	private int fadeOut = 0;
+	
+	@UserProperty(description="rule for composite")
+	private RULE compositeRule = RULE.SRC_OVER;
+	
+	public static enum RULE {
+		CLEAR(1), SRC(2), DST(9), SRC_OVER(3), DST_OVER(4), SRC_IN(5), DST_IN(6), SRC_OUT(7), DST_OUT(8), SRC_ATOP(10),
+		DST_ATOP(11), XOR(12);
+
+		private int number;
+
+		private RULE(int number) {
+			this.number = number;
+		}
+		public int getNumber() {
+			return this.number;
+		}
+	}
 
 	private long frameFrom;
 	private long frameTo;
+	private long frameToConcrete;
 
 	@Override
 	public void nextSample(int[] amplitudes) {
@@ -109,6 +167,7 @@ public class SlideShow implements SoundCanvas {
 			if(imageIndex != oldImageIndex) {
 				deltaX = 0;
 				deltaY = 0;
+				rotatePosition = 0;
 			}
 			else {
 				deltaX = (int)(frameCount % numberOfFramesToUse) * moveX;
@@ -118,18 +177,19 @@ public class SlideShow implements SoundCanvas {
 
 			BufferedImage image = images[imageIndex];
 			if(image != null) {	
-//				BufferedImage i = (scaledWidth != 0 || scaledHeight != 0) ? scaledImages[imageIndex] : image;
+
+				int posInSlideDuration = (int)frameCount % numberOfFramesToUse;
 				
 				float origH = image.getHeight();
 				float origW = image.getWidth();
-				float aRatio = origH / origW; 
+
 				final boolean scaleToWidth = scaledWidth != 0;
 				final boolean scaleToHeight = scaledHeight != 0;
-				float scaleX;// = scaleToWidth ?  (float)videoOutputInfo.getWidth() / origW : scaleToHeight ? 1 : aRatio;
-				float scaleY;// = scaleToHeight ?  (float)videoOutputInfo.getHeight() / origH  : scaleToWidth ? 1 : aRatio;
+				float scaleX;
+				float scaleY;
 				if(scaleToWidth && scaleToHeight) {
-					scaleX = (float)dimensionHelper.realX(scaledWidth) / origW;// (float)videoOutputInfo.getWidth() / origW;
-					scaleY = (float)dimensionHelper.realY(scaledHeight) / origH; // (float)videoOutputInfo.getHeight() / origH;
+					scaleX = (float)dimensionHelper.realX(scaledWidth) / origW;
+					scaleY = (float)dimensionHelper.realY(scaledHeight) / origH;
 				}
 				else  {
 					if(scaleToWidth) {
@@ -144,30 +204,125 @@ public class SlideShow implements SoundCanvas {
 						scaleY = 1.0f;
 					}
 				}
-				float translateX = centeredHorizontal ? ((float)(videoOutputInfo.getWidth() - (image.getWidth() * scaleX))) / 2f : dimensionHelper.realX(upperLeftCornerX);
-				float translateY =   centeredVertical ? ((float)(videoOutputInfo.getHeight() -(image.getHeight()* scaleY))) / 2f : dimensionHelper.realY(upperLeftCornerY);
+				float currentScale = 1;
+				float currentScaleX = 1;
+				float currentScaleY = 1;
+				if(scaleIn != 0 && posInSlideDuration <= scaleIn) {
+					float scaleRateIn = 100f / (scaleIn * 100f);
+					currentScale = posInSlideDuration * scaleRateIn;
+					if(scaleRuleIn == SCALE_RULE.HORIZONTAL || scaleRuleIn == SCALE_RULE.BOTH) {
+						scaleX *= currentScale;
+						currentScaleX = currentScale;
+					}
+					if(scaleRuleIn == SCALE_RULE.VERTICAL || scaleRuleIn == SCALE_RULE.BOTH) {
+						scaleY *= currentScale;
+						currentScaleY = currentScale;
+					}
+				}
+				if(scaleOut != 0 && posInSlideDuration > (numberOfFramesToUse - scaleOut)) {
+					float scaleRateOut = 100f / (scaleOut * 100f);
+					currentScale = (numberOfFramesToUse - posInSlideDuration - 1) * scaleRateOut;
+					if(scaleRuleOut == SCALE_RULE.HORIZONTAL || scaleRuleOut == SCALE_RULE.BOTH) {
+						scaleX *= currentScale;
+						currentScaleX = currentScale;
+					}
+					if(scaleRuleOut == SCALE_RULE.VERTICAL || scaleRuleOut == SCALE_RULE.BOTH) {
+						scaleY *= currentScale;
+						currentScaleY = currentScale;
+					}
+				}
 
+				
+				float translateX =  ((float)(videoOutputInfo.getWidth() + dimensionHelper.realX(centerX) - (image.getWidth() * scaleX))) / 2f ;
+				float translateY =    ((float)(videoOutputInfo.getHeight() + dimensionHelper.realY(centerY) -(image.getHeight()* scaleY))) / 2f;
+
+				
 				translateX = translateX + deltaX;
 				deltaX += moveX;
 				translateY = translateY + deltaY;
 				deltaY += moveY;
+				float wShape = (float) (scaleToWidth ? dimensionHelper.realX(scaledWidth) * currentScaleX
+				: scaleToHeight ? origW * scaleX : origW * currentScaleX);
+				float hShape = (float) (scaleToHeight ? dimensionHelper.realY(scaledHeight) * currentScaleY
+				: scaleToWidth ? origH * scaleY : origH * currentScaleY);
+				Shape clip = null;
+				if (cutOut != CLIP_SHAPE.NONE) {
+//					float wShape = (float) (scaleToWidth ? dimensionHelper.realX(scaledWidth) * currentScaleX
+//							: scaleToHeight ? origW * scaleX : origW * currentScaleX);
+//					float hShape = (float) (scaleToHeight ? dimensionHelper.realY(scaledHeight) * currentScaleY
+//							: scaleToWidth ? origH * scaleY : origH * currentScaleY);
+					//Shape clip;
+					if (cutOut == CLIP_SHAPE.ELLIPSE) {
+						clip = new Ellipse2D.Float(0, 0, wShape / scaleX , hShape / scaleY);
+					}
+					else if(cutOut == CLIP_SHAPE.CIRCLE) {
+						if(wShape >= hShape) {
+							clip = new Ellipse2D.Float(0+(wShape-hShape)/ scaleX/2, 0, hShape /scaleX , hShape / scaleY);
+							//System.err.println("1 w > h");
+						}
+						else {
+							//System.err.println("2 h > w");
+							clip = new Ellipse2D.Float(0 , 0 + (hShape- wShape)/scaleY/2, wShape / scaleX , wShape / scaleY);
+						}
+					} else {
+						float corner = Math.min(wShape / scaleX / 10, hShape/ scaleY / 10);
+						clip = new RoundRectangle2D.Float(0, 0, wShape / scaleX , hShape / scaleY, corner, corner);
+					}
+	
+					//graphics2D.setClip(clip);
 
-				
-				AffineTransform transform = new AffineTransform(scaleX, 0, 0, scaleY, translateX,translateY);
-				//System.err.println(transform);
-//				if(imageUpdating) {
-//					graphics2D.setColor(Color.BLACK);
-//					graphics2D.drawRect(x, y, i.getWidth(), i.getHeight());
+				}
+//				graphics2D.setColor(Color.BLACK);
+//				if(clip != null) {
+//				graphics2D.draw(clip);
 //				}
-//				else {
+				//graphics2D.drawRect((int)translateX, (int)translateY, (int)wShape, (int)hShape);
+				AffineTransform transform = new AffineTransform(1, 0, 0, 1, translateX,translateY);
+				//AffineTransform transform = new AffineTransform(scaleX, 0, 0, scaleY, translateX,translateY);
+				if(rotate != 0) {
+					double theta = Math.PI * rotate / 180;
+					rotatePosition = posInSlideDuration * theta;
+					//transform.rotate(rotatePosition, wShape / 2 / scaleX , hShape / 2/ scaleY);
+					transform.rotate(rotatePosition, wShape / 2 , hShape / 2);
+					
+					
+				}
+				transform.scale(scaleX, scaleY);
+				//graphics2D.clip(clip);
+				final Composite saveComposite = graphics2D.getComposite();
+				float transparency = 1.0f;
+
+				if(fadeIn != 0 && posInSlideDuration <= fadeIn) {
+					float fadeRate = 100f / (fadeIn * 100f);
+					transparency = posInSlideDuration * fadeRate;
+					transparency = transparency < 0 ? 0 : (transparency > 1 ? 1f : transparency);
+					//System.err.println("transparency in " +transparency);
+					graphics2D.setComposite(AlphaComposite.getInstance(compositeRule.getNumber(), transparency));  
+				}
+				if(fadeOut != 0 && posInSlideDuration > (numberOfFramesToUse - fadeOut)) {
+					float fadeRate = 100f / (fadeOut * 100f);
+					transparency = (numberOfFramesToUse - posInSlideDuration - 1) * fadeRate;
+					transparency = transparency < 0 ? 0 : (transparency > 1 ? 1f : transparency);
+					//System.err.println("transparency out " +transparency);
+					graphics2D.setComposite(AlphaComposite.getInstance(compositeRule.getNumber(), transparency));  
+				}
 				final AffineTransform saveAT = graphics2D.getTransform();
 				try {			
 					graphics2D.transform(transform);
+					//graphics2D.clip(clip);
+					graphics2D.setClip(clip);
 					//graphics2D.scale(scaleX, scaleY);
 					graphics2D.drawImage(image, 0, 0, null, null);
+					//graphics2D.drawString("numberOfFramesToUse: " + numberOfFramesToUse, 50, 50);
+//					graphics2D.setColor(Color.RED);
+//					if(clip != null) {
+//					graphics2D.draw(clip);
+//					}
 				}
 				finally {
+					graphics2D.setComposite(saveComposite);
 					graphics2D.setTransform(saveAT);
+					graphics2D.setClip(null);
 				}
 			}
 		}
@@ -178,14 +333,6 @@ public class SlideShow implements SoundCanvas {
 			VideoOutputInfo videoOutputInfo) {
 		this.videoOutputInfo = videoOutputInfo;
 		this.dimensionHelper = new DimensionHelper(videoOutputInfo);
-//		final String oh = videoOutputInfo.getWidth() + "=" + videoOutputInfo.getHeight();
-//		if(!oh.equals(outputHash)) {
-//			if(images != null) {
-//				resizeImages();
-//			}
-//			outputHash = oh;
-//			imageIndex = 0;
-//		}
 		if(numberOfFrames == 0) {
 			if(images != null) {
 				
@@ -201,6 +348,7 @@ public class SlideShow implements SoundCanvas {
 				else {
 					to = frameTo;
 				}
+				frameToConcrete = to;
 				long frameRange = to - frameFrom;
 				numberOfFramesToUse = (int)frameRange / images.length; // even distribution, remainder depends loop flag
 			}
@@ -223,39 +371,28 @@ public class SlideShow implements SoundCanvas {
 	@Override
 	public void updateUI(int widthPx, int heightPx, Graphics2D graphics) {
 		if(images != null && images.length > 0) {
-//			final String sc = scaledWidth + "=" + scaledHeight;
-//			boolean allNew = scaledImages == null || scaledImages.length != images.length || !sc.equals(scaled);
-//			if(allNew) {
-//				scaledImages = new BufferedImage[images.length];
-//				imageUpdating = true;
-//				scaled = sc;
-//				resizeImages();
-//				iconImage = images[0].getScaledInstance(widthPx, heightPx, java.awt.Image.SCALE_SMOOTH);
-//				imageUpdating = false;
-//			}
 			iconImage = images[0].getScaledInstance(widthPx, heightPx, java.awt.Image.SCALE_SMOOTH);
 			graphics.drawImage(iconImage, 0, 0, null, null);
 			graphics.drawString(images.length + " images", 4, heightPx - 2);
 		
 		}
 	}
-	
-	private void resizeImages() {
-//		for(int i = 0; i < images.length; i++) {
-//			BufferedImage image = images[i];
-//			final boolean scaleToWidth = scaledWidth != 0;
-//			final boolean scaleToHeight = scaledHeight != 0;
-//			final int width = scaledWidth == 0 ? videoOutputInfo.getWidth() : dimensionHelper.realX(scaledWidth);
-//			final int height = scaledHeight == 0 ? videoOutputInfo.getHeight() : dimensionHelper.realY(scaledHeight);
-//			float ratio = (float)image.getWidth() / (float)image.getHeight();
-//			int w = scaleToWidth ? width : scaleToHeight ? (int)((float)height * ratio) : image.getWidth();
-//			int h = scaleToHeight ? height : scaleToWidth ? (int)((float)width / ratio) : image.getHeight();
-//			BufferedImage scaledImage = new BufferedImage(w, h, BufferedImage.TYPE_3BYTE_BGR);
-//			int wDraw = scaleToWidth ? width : -1;
-//			int hDraw = scaleToHeight ? height : -1;
-//			scaledImage.getGraphics().drawImage(image.getScaledInstance(wDraw, hDraw, java.awt.Image.SCALE_SMOOTH), 0, 0, Color.BLACK, null);
-//			scaledImages[i] = scaledImage;
-//		}
+
+	@Override
+	public long[][] getFrameFromTos() {
+		if(images != null && numberOfFramesToUse > 0) {
+			long frame = frameFrom;
+			List<long[]> ftos = new ArrayList<long[]>();
+			while(frame < frameToConcrete) {
+				ftos.add(new long[] {frame, frame + numberOfFramesToUse});
+				frame += numberOfFramesToUse;
+			}
+			return ftos.toArray(new long[][] {});
+		}
+		return SoundCanvas.super.getFrameFromTos();
 	}
+	
+	
+	
 
 }

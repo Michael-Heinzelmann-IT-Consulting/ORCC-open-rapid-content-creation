@@ -200,7 +200,7 @@ public class CustomTable extends JPanel{
 		public void mouseReleased(MouseEvent e) {
 			if(source != null) {
 				source.setBackground(originalBackground);
-				source.getSoundCanvasWrapper().setSelected(false);
+				source.getSoundCanvasWrapper().setSelected(owner.isPanelVisible());
 			}
 			if(source != null || target != null) {
 				tableListener.rowSelected(false);			
@@ -247,7 +247,7 @@ public class CustomTable extends JPanel{
 	 */
 	public void addLayer(final SoundCanvasWrapper soundCanvasWrapper) {
 		final Row row = new Row(soundCanvasWrapper);
-		row.setPreferredSize(new Dimension(700, 36));
+		row.setPreferredSize(new Dimension(640, 36));
 		row.setLayout(new BorderLayout());
 		row.setBorder(new EtchedBorder());
 		row.setBackground(Color.WHITE);
@@ -265,10 +265,12 @@ public class CustomTable extends JPanel{
 				if(field.isAnnotationPresent(TimedChange.class)) {
 					System.err.println("beforePropertyUpdate " + name);
 					Context.beforePropertyUpdate(name);
-				}
+				
 				soundCanvasWrapper.updateUI(60, 30, (Graphics2D) soundCanvasWrapper.getIconImage().getGraphics());
 				//System.err.println((System.currentTimeMillis() - start) + "ms updateUI name " + name);
 				layer.setIcon(new ImageIcon(soundCanvasWrapper.getIconImage()));
+
+				}
 				Context.canvasPropertyWritten(name, soundCanvasWrapper.getSoundCanvas());
 			}
 		});
@@ -330,6 +332,7 @@ public class CustomTable extends JPanel{
 			public void actionPerformed(ActionEvent arg0) {
 				row.toggleProperties();
 				expandButton.setText(row.isPanelVisible() ? " - " : " + ");
+				soundCanvasWrapper.setSelected(row.isPanelVisible());
 				row.revalidate();
 				CustomTable.this.revalidate();
 			}

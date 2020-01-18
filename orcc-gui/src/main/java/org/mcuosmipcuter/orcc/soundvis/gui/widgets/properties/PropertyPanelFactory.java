@@ -103,7 +103,8 @@ public class PropertyPanelFactory {
 		}
 		if(type.isEnum()) {
 			Object[] es = type.getEnumConstants();
-			return new EnumPropertyPanel(soundCanvasWrapper, (Enum<?>[]) es);
+			Object value = getValue(field, soundCanvasWrapper.getSoundCanvas());
+			return new EnumPropertyPanel(soundCanvasWrapper, (Enum<?>[]) es, (Enum<?>)value);
 		}
 		throw new RuntimeException(type + " type not supported");
 	}

@@ -40,6 +40,9 @@ public class SolidColor implements SoundCanvas {
 	
 	private int width;
 	private int height;
+	@LimitedIntProperty(description = "min 1", minimum = 1)
+	@UserProperty(description="color of the area")
+	private int modulus = 1;
 
 	@Override
 	public void nextSample(int[] amplitudes) {
@@ -47,8 +50,10 @@ public class SolidColor implements SoundCanvas {
 
 	@Override
 	public void newFrame(long frameCount, Graphics2D graphics2D) {	
-		graphics2D.setColor(color);
-		graphics2D.fillRect(0, 0, width, height);
+		if(frameCount % modulus == 0 || frameCount == 1) {
+			graphics2D.setColor(color);
+			graphics2D.fillRect(0, 0, width, height);
+		}
 	}
 
 	@Override
