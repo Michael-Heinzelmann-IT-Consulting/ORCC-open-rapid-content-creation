@@ -26,6 +26,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
+import org.mcuosmipcuter.orcc.api.soundvis.TimedChange;
+import org.mcuosmipcuter.orcc.soundvis.Context;
 import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
 
 
@@ -71,6 +73,9 @@ public abstract  class PropertyPanel <T> extends JPanel {
 	protected void setNewValue(T value) {
 		 try {
 			Field field = soundCanvas.getClass().getDeclaredField(getName());
+			if(field.isAnnotationPresent(TimedChange.class)) {
+				Context.beforePropertyUpdate(field.getName());
+			}
 			field.setAccessible(true);
 			field.set(soundCanvas, value);
 			setCurrentValue(value);

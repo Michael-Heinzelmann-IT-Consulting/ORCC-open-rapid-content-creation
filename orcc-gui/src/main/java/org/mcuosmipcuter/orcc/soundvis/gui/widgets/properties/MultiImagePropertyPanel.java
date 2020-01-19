@@ -18,7 +18,7 @@
 package org.mcuosmipcuter.orcc.soundvis.gui.widgets.properties;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridLayout;
@@ -29,13 +29,22 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.border.LineBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
+import org.mcuosmipcuter.orcc.soundvis.Context;
 import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
 import org.mcuosmipcuter.orcc.soundvis.gui.listeners.FileDialogActionListener;
 
@@ -50,6 +59,7 @@ public class MultiImagePropertyPanel extends PropertyPanel<BufferedImage[]> {
 	private JButton fileButton = new JButton("...");
 
 	private JPanel imagebar = new JPanel();
+	private Image selectedImage; // TODO image wrapper
 	
 	/**
 	 * Constructor
@@ -62,24 +72,13 @@ public class MultiImagePropertyPanel extends PropertyPanel<BufferedImage[]> {
 		valueSelect.setLayout(new BorderLayout(2, 2));
 		fileButton.setPreferredSize(new Dimension(40, 20));
 		valueSelect.add(fileButton, BorderLayout.NORTH);
-		//imagebar.setBackground(Color.BLACK);
-		valueSelect.add(imagebar);
+		imagebar.setBackground(Color.BLACK);
+        JScrollPane scrollPane = new JScrollPane(imagebar);
+        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		valueSelect.add(scrollPane);
 		valueSelect.setPreferredSize(new Dimension(500, 240));
 		add(valueSelect);
 		
-//		FileDialogActionListener.CallBack callBack = new FileDialogActionListener.CallBack(){
-//			@Override
-//			public void fileSelected(File file) {
-//				try {
-//					BufferedImage image = ImageIO.read(file);
-//					setNewValue(image);
-//
-//				} catch (IOException ex) {
-//					throw new RuntimeException(ex);
-//				}
-//				
-//			}
-//		};
 		fileButton.addActionListener(new ActionListener() {
 			
 			@Override
@@ -89,6 +88,7 @@ public class MultiImagePropertyPanel extends PropertyPanel<BufferedImage[]> {
 				// TODO image thumbnails chooser.setFileView(fileView);
 		        int returnVal = chooser.showDialog(null, "select files");
 		        if(returnVal == JFileChooser.APPROVE_OPTION) {
+		        	Context.beforePropertyUpdate("files");
 		        	File[] selectedFiles =  chooser.getSelectedFiles();
 		        	BufferedImage[] images = new BufferedImage[selectedFiles.length];
 		        	for(int i = 0; i <  selectedFiles.length; i++) {
@@ -107,37 +107,55 @@ public class MultiImagePropertyPanel extends PropertyPanel<BufferedImage[]> {
 		});
 		
 	}
+	
+	@Override
+	public void setField(Field field) {
+		String name = field.getName();
+		nameLabel.setText("");
+		this.name = name;
+	}
 	@Override
 	public void setCurrentValue(BufferedImage[] currentValue) {
 		super.setCurrentValue(currentValue);
 		imagebar.removeAll();
+		JPanel images = new JPanel();
+		images.setBackground(Color.BLACK);
 		
 		if(currentValue != null && currentValue.length > 0){
+			int COLS = 6;
 			GridBagConstraints gc = new GridBagConstraints();
-//			gc.gridwidth = GridBagConstraints.REMAINDER;	
-//			gc.fill = GridBagConstraints.HORIZONTAL;
-//			gc.gridx = GridBagConstraints.EAST;
-			gc.insets = new Insets(3, 3, 3, 3);
-			int rows = currentValue.length / 5 ;
-			rows = currentValue.length % 5 == 0 ? rows : rows+1;
-			imagebar.setLayout(new GridLayout(rows, 5 ));
-			for(Image i : currentValue) {
-			//JLabel thumbLabel = new JLabel("");
+			gc.gridwidth = GridBagConstraints.REMAINDER;	
+			//gc.fill = GridBagConstraints.HORIZONTAL;
+			//gc.gridx = GridBagConstraints.EAST;
+			gc.insets = new Insets(16, 16, 16, 16);
+			int rows = currentValue.length / COLS ;
+			rows = currentValue.length % COLS == 0 ? rows : rows+1;
+			images.setLayout(new GridLayout(rows, currentValue.length < COLS ? currentValue.length : COLS));
+			final Set<JButton> jbuttons = new HashSet<JButton>();
+			for(final Image i : currentValue) {
 			JButton ib = new JButton();
-			ib.setMaximumSize(new Dimension(72, 72));
-			ib.setIcon(new ImageIcon(i.getScaledInstance(70, 70, Image.SCALE_FAST)));
-			imagebar.add(ib, gc);
 
-			
+			ib.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					selectedImage = i;
+					jbuttons.stream().forEach(jb -> jb.setSelected(jb == e.getSource()));
+				}
+			});
 
+			ib.setBackground(Color.YELLOW);
+			ib.setBorder(new LineBorder(Color.BLACK, 2));
+			ib.setSelectedIcon(new ImageIcon(i.getScaledInstance(60, 60, Image.SCALE_FAST)));
+			ib.setMaximumSize(new Dimension(80, 80));
+			ib.setPreferredSize(new Dimension(80, 80));
+			ib.setIcon(new ImageIcon(i.getScaledInstance(80, 80, Image.SCALE_FAST)));
+			images.add(ib, gc);
+			jbuttons.add(ib);
+			imagebar.add(images, BorderLayout.LINE_START);
 			
 		}
 			imagebar.revalidate();
 			
-//			for(int i = 0; i < imagebar.getComponentCount() && i < currentValue.length; i++) {
-//				JButton ib = (JButton) imagebar.getComponent(i);
-//			ib.setIcon(new ImageIcon(currentValue[i].getScaledInstance(70, 70, Image.SCALE_FAST)));
-			//}
 		}
 		this.repaint();
 	}

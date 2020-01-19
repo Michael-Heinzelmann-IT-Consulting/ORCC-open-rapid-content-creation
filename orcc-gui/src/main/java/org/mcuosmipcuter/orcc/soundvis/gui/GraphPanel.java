@@ -95,7 +95,7 @@ public class GraphPanel extends JPanel implements Renderer, Zoomable {
 			public void contextChanged(PropertyName propertyName) {
 				//System.err.println("::::" + propertyName);
 				if(PropertyName.BeforeSoundCanvasProperty.equals(propertyName)) {
-					//System.err.println(getGraphics());
+					System.err.println(getGraphics());
 					//getGraphics().drawString("UPDATE", 100, 100);
 					
 					//getGraphics().setXORMode(Color.ORANGE);
@@ -202,6 +202,7 @@ public class GraphPanel extends JPanel implements Renderer, Zoomable {
 		}
 		if(updating) {
 			Composite origComposite = ((Graphics2D)g).getComposite();
+			g.setColor(Color.WHITE);
 			((Graphics2D)g).setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.6f)); 
 			g.fillRect(0, 0, Context.getVideoOutputInfo().getWidth(), Context.getVideoOutputInfo().getHeight());
 			((Graphics2D)g).setComposite(origComposite);

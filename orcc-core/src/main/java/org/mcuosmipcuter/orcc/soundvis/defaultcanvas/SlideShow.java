@@ -49,13 +49,9 @@ public class SlideShow implements SoundCanvas {
 	
 	@UserProperty(description="center x position")
 	private int centerX = 0;
-	@UserProperty(description="to center horizontally")
-	private boolean centeredHorizontal = true;
 	
 	@UserProperty(description="center y position")
 	private int centerY = 0;
-	@UserProperty(description="to center vertically")
-	private boolean centeredVertical = true;
 	
 	@UserProperty(description="number of frames per image")
 	@LimitedIntProperty(minimum=0, description="cannot be negative")
