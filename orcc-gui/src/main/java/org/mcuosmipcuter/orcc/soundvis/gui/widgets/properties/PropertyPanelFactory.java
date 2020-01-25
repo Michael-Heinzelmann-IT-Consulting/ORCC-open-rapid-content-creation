@@ -20,7 +20,6 @@ package org.mcuosmipcuter.orcc.soundvis.gui.widgets.properties;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.lang.reflect.Field;
-import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -29,6 +28,7 @@ import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.TimedChange;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
+import org.mcuosmipcuter.orcc.soundvis.defaultcanvas.model.Slide;
 
 
 /**
@@ -98,7 +98,7 @@ public class PropertyPanelFactory {
 		if(BufferedImage.class.equals(type)) {
 			return new BufferedImagePropertyPanel(soundCanvasWrapper);
 		}
-		if(BufferedImage[].class.equals(type)) {
+		if(Slide[].class.equals(type)) {
 			return new MultiImagePropertyPanel(soundCanvasWrapper);
 		}
 		if(type.isEnum()) {

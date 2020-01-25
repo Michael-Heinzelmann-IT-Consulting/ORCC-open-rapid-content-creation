@@ -18,7 +18,6 @@
 package org.mcuosmipcuter.orcc.soundvis.defaultcanvas;
 
 import java.awt.AlphaComposite;
-import java.awt.Color;
 import java.awt.Composite;
 import java.awt.Graphics2D;
 import java.awt.Shape;
@@ -36,16 +35,21 @@ import org.mcuosmipcuter.orcc.api.soundvis.TimedChange;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.api.util.DimensionHelper;
+import org.mcuosmipcuter.orcc.soundvis.defaultcanvas.model.Slide;
+
 
 /**
  * Displays an image
  * @author Michael Heinzelmann
  */
 public class SlideShow implements SoundCanvas {
-	
 	@TimedChange
-	@UserProperty(description="images to show")
-	private BufferedImage[] images = null;
+	@UserProperty(description="slides to show")
+	private Slide[] slides;
+	
+//	@TimedChange
+//	@UserProperty(description="images to show")
+//	private BufferedImage[] images = null;
 	
 	@UserProperty(description="center x position")
 	private int centerX = 0;
@@ -149,16 +153,16 @@ public class SlideShow implements SoundCanvas {
 
 	@Override
 	public void newFrame(long frameCount, Graphics2D graphics2D) {
-		if(images != null && frameCount >= frameFrom && (frameCount <= frameTo || frameTo ==0)) {
+		if(slides != null && frameCount >= frameFrom && (frameCount <= frameTo || frameTo ==0)) {
 			long posInRange = frameCount - frameFrom;
 			if(loop) {
-				posInRange = posInRange % (numberOfFramesToUse * images.length);
+				posInRange = posInRange % (numberOfFramesToUse * slides.length);
 			}
 			final int oldImageIndex = imageIndex; // local snaphot
 			imageIndex = (int)posInRange / numberOfFramesToUse;
 
-				if(imageIndex >= images.length ) {
-					imageIndex = loop ? 0 : images.length -1;
+				if(imageIndex >= slides.length ) {
+					imageIndex = loop ? 0 : slides.length -1;
 				}
 			if(imageIndex != oldImageIndex) {
 				deltaX = 0;
@@ -171,9 +175,9 @@ public class SlideShow implements SoundCanvas {
 			}
 			
 
-			BufferedImage image = images[imageIndex];
-			if(image != null) {	
-
+			
+			if(slides!= null && slides[imageIndex] != null && slides[imageIndex].getImage() instanceof BufferedImage) {	
+				BufferedImage image = (BufferedImage) slides[imageIndex].getImage();
 				int posInSlideDuration = (int)frameCount % numberOfFramesToUse;
 				
 				float origH = image.getHeight();
@@ -330,7 +334,7 @@ public class SlideShow implements SoundCanvas {
 		this.videoOutputInfo = videoOutputInfo;
 		this.dimensionHelper = new DimensionHelper(videoOutputInfo);
 		if(numberOfFrames == 0) {
-			if(images != null) {
+			if(slides != null) {
 				
 				long to;
 				if(frameTo == 0) {
@@ -346,7 +350,7 @@ public class SlideShow implements SoundCanvas {
 				}
 				frameToConcrete = to;
 				long frameRange = to - frameFrom;
-				numberOfFramesToUse = (int)frameRange / images.length; // even distribution, remainder depends loop flag
+				numberOfFramesToUse = (int)frameRange / slides.length; // even distribution, remainder depends loop flag
 			}
 			else {
 				numberOfFramesToUse = videoOutputInfo.getFramesPerSecond(); // default 1s
@@ -366,17 +370,19 @@ public class SlideShow implements SoundCanvas {
 
 	@Override
 	public void updateUI(int widthPx, int heightPx, Graphics2D graphics) {
-		if(images != null && images.length > 0) {
-			iconImage = images[0].getScaledInstance(widthPx, heightPx, java.awt.Image.SCALE_SMOOTH);
-			graphics.drawImage(iconImage, 0, 0, null, null);
-			graphics.drawString(images.length + " images", 4, heightPx - 2);
+		if(slides != null && slides.length > 0) {
+			if(slides[0].getImage() instanceof BufferedImage) {
+				iconImage = ((BufferedImage)slides[0].getImage()).getScaledInstance(widthPx, heightPx, java.awt.Image.SCALE_SMOOTH);
+				graphics.drawImage(iconImage, 0, 0, null, null);
+			}
+			graphics.drawString(slides.length + " images", 4, heightPx - 2);
 		
 		}
 	}
 
 	@Override
 	public long[][] getFrameFromTos() {
-		if(images != null && numberOfFramesToUse > 0) {
+		if(slides != null && numberOfFramesToUse > 0) {
 			long frame = frameFrom;
 			List<long[]> ftos = new ArrayList<long[]>();
 			while(frame < frameToConcrete) {

@@ -77,7 +77,9 @@ public abstract  class PropertyPanel <T> extends JPanel {
 				Context.beforePropertyUpdate(field.getName());
 			}
 			field.setAccessible(true);
+        	System.err.println(System.currentTimeMillis()  + " before field.set ");
 			field.set(soundCanvas, value);
+			System.err.println(System.currentTimeMillis()  + " after field.set ");
 			setCurrentValue(value);
 			soundCanvasWrapper.propertyWritten(field);
 		} catch (Exception ex) {

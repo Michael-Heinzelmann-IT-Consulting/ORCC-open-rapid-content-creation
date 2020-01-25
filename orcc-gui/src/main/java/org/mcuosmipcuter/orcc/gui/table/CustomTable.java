@@ -262,16 +262,17 @@ public class CustomTable extends JPanel{
 				String name = field.getName();
 				long start = System.currentTimeMillis();
 				//System.err.println("updateUI name " + name);
+
+				Context.canvasPropertyWritten(name, soundCanvasWrapper.getSoundCanvas());
 				if(field.isAnnotationPresent(TimedChange.class)) {
-					System.err.println("beforePropertyUpdate " + name);
-					Context.beforePropertyUpdate(name);
+					System.err.println("Cust table after canvasPropertyWritten " + name);
+					//Context.beforePropertyUpdate(name);
 				
 				soundCanvasWrapper.updateUI(60, 30, (Graphics2D) soundCanvasWrapper.getIconImage().getGraphics());
 				//System.err.println((System.currentTimeMillis() - start) + "ms updateUI name " + name);
 				layer.setIcon(new ImageIcon(soundCanvasWrapper.getIconImage()));
 
 				}
-				Context.canvasPropertyWritten(name, soundCanvasWrapper.getSoundCanvas());
 			}
 		});
 

@@ -42,7 +42,7 @@ public abstract class Context {
 	 */
 	public enum PropertyName {
 		AudioInputInfo, VideoDimension, SoundCanvasAdded, SoundCanvasRemoved, SoundCanvasList, ExportFileName, 
-		CanvasClassNames, AppState, SongPositionPointer, VideoFrameRate, VolumeControl, FullPreRun, SoundCanvasProperty, BeforeSoundCanvasProperty
+		CanvasClassNames, AppState, SongPositionPointer, VideoFrameRate, VolumeControl, FullPreRun, SoundCanvasProperty, BeforeSoundCanvasProperty, SoundCanvasPropertyCancelled
 	}
 	/**
 	 * Enumeration of application states
@@ -61,6 +61,9 @@ public abstract class Context {
 		 * @param propertyName the enumerated name of the changed property
 		 */
 		public void contextChanged(PropertyName propertyName);
+		public default void progress(String msg) {
+			
+		}
 	}
 	
 	// listener list
@@ -86,6 +89,12 @@ public abstract class Context {
 		for(Listener listener : listeners) {
 			//System.err.println("listener: " + listener + " " + propertyName);
 			listener.contextChanged(propertyName);
+		}
+	}
+	private static void notifyListeners(String msg) {
+		for(Listener listener : listeners) {
+			//System.err.println("listener: " + listener + " " + propertyName);
+			listener.progress(msg);
 		}
 	}
 	
@@ -304,5 +313,10 @@ public abstract class Context {
 	public static void beforePropertyUpdate(String name) {
 		notifyListeners(PropertyName.BeforeSoundCanvasProperty);
 	}
-	
+	public static void progressUpdate(String msg) {
+		notifyListeners(msg);
+	}
+	public static void cancelPropertyUpdate(String name) {
+		notifyListeners(PropertyName.SoundCanvasPropertyCancelled);
+	}
 }
