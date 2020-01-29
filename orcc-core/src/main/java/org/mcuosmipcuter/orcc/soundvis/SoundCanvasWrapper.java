@@ -19,6 +19,7 @@ package org.mcuosmipcuter.orcc.soundvis;
 
 import java.awt.Image;
 
+import org.mcuosmipcuter.orcc.api.soundvis.DisplayDuration;
 import org.mcuosmipcuter.orcc.api.soundvis.PropertyListener;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 
@@ -55,8 +56,8 @@ public interface SoundCanvasWrapper extends SoundCanvas, PropertyListener {
 	 */
 	public long getFrameTo();
 	
-	public default long[][] getFrameFromTos(){
-		return new long[][] {new long[] {getFrameFrom(), getFrameTo()}};
+	public default DisplayDuration[] getFrameFromTos(){
+		return new DisplayDuration[] {};
 	}
 	
 	/**

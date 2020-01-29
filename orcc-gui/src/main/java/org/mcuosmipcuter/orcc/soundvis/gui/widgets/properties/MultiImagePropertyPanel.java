@@ -134,7 +134,7 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 		        }
 			}
 		});
-		setCurrentValue(null);
+		setCurrentValue(new Slide[]{});
 	}
 	
 	@Override
@@ -145,6 +145,12 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 	}
 	@Override
 	public void setCurrentValue(Slide[] currentValue) {
+		int pos = 0;
+		if(currentValue != null) {
+		for(Slide slide : currentValue) {
+			slide.setPosition(++pos);
+		}
+		}
 		super.setCurrentValue(currentValue);
 		imagebar.removeAll();
 		JPanel images = new JPanel();

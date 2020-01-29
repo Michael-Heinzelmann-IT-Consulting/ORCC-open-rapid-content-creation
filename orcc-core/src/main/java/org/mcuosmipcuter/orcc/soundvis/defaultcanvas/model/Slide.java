@@ -19,16 +19,17 @@ package org.mcuosmipcuter.orcc.soundvis.defaultcanvas.model;
 
 import java.awt.Image;
 
+import org.mcuosmipcuter.orcc.api.soundvis.DisplayObject;
+
 /**
  * @author Michael Heinzelmann
  *
  */
-public class Slide {
+public class Slide implements DisplayObject {
 	private Image image;
 	private String text;
-	
-	private long from;
-	private long to;
+	private int position;
+
 	public Image getImage() {
 		return image;
 	}
@@ -41,18 +42,20 @@ public class Slide {
 	public void setText(String text) {
 		this.text = text;
 	}
-	public long getFrom() {
-		return from;
+	public int getPosition() {
+		return position;
 	}
-	public void setFrom(long from) {
-		this.from = from;
-	}
-	public long getTo() {
-		return to;
-	}
-	public void setTo(long to) {
-		this.to = to;
+	public void setPosition(int position) {
+		this.position = position;
 	}
 	
+	@Override
+	public String getDisplayText() {
+		return "slide " + position;
+	}
+	@Override
+	public String toString() {
+		return "Slide [image=" + System.identityHashCode(image) + ", text=" + text + ", position=" + position + "]";
+	}
 	
 }

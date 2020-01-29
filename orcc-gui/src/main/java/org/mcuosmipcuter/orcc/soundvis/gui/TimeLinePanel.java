@@ -29,6 +29,7 @@ import java.util.List;
 import javax.swing.JPanel;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
+import org.mcuosmipcuter.orcc.api.soundvis.DisplayDuration;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.gui.table.CustomTableListener;
 import org.mcuosmipcuter.orcc.soundvis.AudioInput;
@@ -277,15 +278,35 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 				g.setColor(Color.GRAY);
 				g.drawRoundRect(from, y + delta, to - from, b, 16, 16);
 				if(scw.isSelected()) {
-					long[][] fromTos = scw.getFrameFromTos();
-					if(fromTos.length > 1) {
+					DisplayDuration<?>[] fromTos = scw.getFrameFromTos();
+					if(fromTos.length > 0) {
 						g.setColor(new Color(delta*100, false));
 						for(int i = 0; i < fromTos.length; i++) {
-							int subFrom = margin +  (int)fromTos[i][0]* samplesPerFrame / noOfSamples;
-							int subTo = margin + (int)fromTos[i][1]* samplesPerFrame / noOfSamples;
-							//
-							g.drawRoundRect(subFrom, y + delta, subTo - subFrom, b + b/2 + delta, 16, 16);
-					
+							int subFrom = margin +  (int)fromTos[i].getFrom()* samplesPerFrame / noOfSamples;
+							int subTo = margin + (int)(fromTos[i].getTo() +1)* samplesPerFrame / noOfSamples;
+							if(fromTos[i].getOverlapBefore() == 0 && fromTos[i].getOverlapAfter() == 0) {
+								g.drawRoundRect(subFrom, y + delta, subTo - subFrom, b + b/2 + delta, 16, 16);
+							}
+							else {
+								int x1 = subFrom + (int)Math.abs(fromTos[i].getOverlapBefore())* samplesPerFrame / noOfSamples;
+								int x2 = subTo - (int)Math.abs(fromTos[i].getOverlapAfter())* samplesPerFrame / noOfSamples;
+								int[]xPoints;
+								int[]yPoints;
+								int nPoints;
+								if(x1 != 0 && x2 == 0) {
+									xPoints = new int[] {subFrom, x1, subTo, subTo, x1};
+									yPoints = new int[] {b, y + delta, y + delta, b + b/2 + delta, b + b/2 + delta};
+									nPoints = 5;
+								}
+								else {
+									xPoints = new int[] {subFrom, x1, x2, subTo, x2, x1};
+									yPoints = new int[] {b, y + delta, y + delta, b, b + b/2 + delta, b + b/2 + delta};
+									nPoints = 6;
+								}
+								
+								g.drawPolygon(xPoints, yPoints, nPoints);
+							}
+							g.drawString(fromTos[i].getDisplayObject().getDisplayText(), subFrom + 6, y + delta + 12);
 						}
 					}
 					else {

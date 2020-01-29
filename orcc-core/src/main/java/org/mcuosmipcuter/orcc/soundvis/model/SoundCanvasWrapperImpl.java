@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
+import org.mcuosmipcuter.orcc.api.soundvis.DisplayDuration;
 import org.mcuosmipcuter.orcc.api.soundvis.PropertyListener;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
@@ -239,8 +240,8 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 		this.iconImage = iconImage;
 	}
 	@Override
-	public long[][] getFrameFromTos() {
-		long[][] fromTos = soundCanvas.getFrameFromTos();
+	public DisplayDuration<?>[] getFrameFromTos() {
+		DisplayDuration<?>[] fromTos = soundCanvas.getFrameFromTos();
 		if(fromTos.length > 0) {
 			return fromTos;
 		}
