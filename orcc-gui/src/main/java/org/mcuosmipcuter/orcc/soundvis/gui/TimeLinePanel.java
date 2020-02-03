@@ -181,6 +181,7 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 						Context.setSongPositionPointer(0);
 					}
 				}
+				repaint();
 			}
 
 		});
@@ -286,6 +287,7 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 							int subTo = margin + (int)(fromTos[i].getTo() +1)* samplesPerFrame / noOfSamples;
 							if(fromTos[i].getOverlapBefore() == 0 && fromTos[i].getOverlapAfter() == 0) {
 								g.drawRoundRect(subFrom, y + delta, subTo - subFrom, b + b/2 + delta, 16, 16);
+								g.drawString(fromTos[i].getDisplayObject().getDisplayText(), subFrom + 6, y + delta + 12);
 							}
 							else {
 								int x1 = subFrom + (int)Math.abs(fromTos[i].getOverlapBefore())* samplesPerFrame / noOfSamples;
@@ -305,8 +307,9 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 								}
 								
 								g.drawPolygon(xPoints, yPoints, nPoints);
+								g.drawString(fromTos[i].getDisplayObject().getDisplayText(), x1 + 6, y + delta + 12);
 							}
-							g.drawString(fromTos[i].getDisplayObject().getDisplayText(), subFrom + 6, y + delta + 12);
+							
 						}
 					}
 					else {

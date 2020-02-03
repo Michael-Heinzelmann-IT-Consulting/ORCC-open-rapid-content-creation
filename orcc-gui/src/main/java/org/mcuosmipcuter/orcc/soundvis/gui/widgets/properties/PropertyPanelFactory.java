@@ -24,6 +24,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
+import org.mcuosmipcuter.orcc.api.soundvis.MappedValue;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.TimedChange;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
@@ -105,6 +106,12 @@ public class PropertyPanelFactory {
 			Object[] es = type.getEnumConstants();
 			Object value = getValue(field, soundCanvasWrapper.getSoundCanvas());
 			return new EnumPropertyPanel(soundCanvasWrapper, (Enum<?>[]) es, (Enum<?>)value);
+		}
+		if(MappedValue.class.equals(type)) {
+			Object value = getValue(field, soundCanvasWrapper.getSoundCanvas());
+			Set vs = ((MappedValue)value).getAll();
+			Set<MappedValue<?>> values = vs;
+			return new MappedValuePropertyPanel(soundCanvasWrapper, values, value);
 		}
 		throw new RuntimeException(type + " type not supported");
 	}

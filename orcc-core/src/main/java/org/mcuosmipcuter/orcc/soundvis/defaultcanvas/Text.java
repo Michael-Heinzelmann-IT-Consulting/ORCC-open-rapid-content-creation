@@ -27,12 +27,14 @@ import java.util.Calendar;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
 import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
+import org.mcuosmipcuter.orcc.api.soundvis.MappedValue;
 import org.mcuosmipcuter.orcc.api.soundvis.PropertyListener;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.api.util.DimensionHelper;
 import org.mcuosmipcuter.orcc.api.util.TextHelper;
+import org.mcuosmipcuter.orcc.soundvis.FontStore;
 
 /**
  * @author Michael Heinzelmann
@@ -40,23 +42,45 @@ import org.mcuosmipcuter.orcc.api.util.TextHelper;
  */
 public class Text implements SoundCanvas, PropertyListener {
 	
+	public static enum TextAlign {
+		LEFT, CENTERED //, JUSTIFY TODO
+	}
+	
 	private int year = Calendar.getInstance().get(Calendar.YEAR);
 	private String user = System.getProperty("user.name");
 	
+	@UserProperty(description="the font to use")
+	private MappedValue<String> fontName = FontStore.getDefaultFont();
+	
 	@UserProperty(description="the text to display")
-	private String text = "ORCC rapid content creation for entertainment, education and media production\n" + year + " " + user + " graphics by soundvis";
+	private String text = "ORCC rapid content creation\nfor entertainment, education\nand media production\n" + year + " " + user + " graphics by soundvis";
+	
 	@UserProperty(description="font size for text in % of video height")
 	@LimitedIntProperty(description="font size limitation", minimum=1)
-	private int fontSize = 5;
+	private int fontSize = 4;
+	
+	@UserProperty(description="the text alignment of lines")
+	private TextAlign textAlign = TextAlign.LEFT;
+	
 	@UserProperty(description="text color")
 	private Color textColor = Color.BLACK;
+	
 	@UserProperty(description="top margin of text in % of video height")
 	int topMargin = 20;
 	
+	@UserProperty(description="")
+	@LimitedIntProperty(description="", minimum=0)
+	private int modTyping = 0;
 	
 	VideoOutputInfo videoOutputInfo;
 	private DimensionHelper dimensionHelper;
+	
+	private long frameFrom;
+	private long frameTo;
+	
 	private int maxTextWidth;
+	private String[] lines;
+	private Font font;
 	
 	
 	/* (non-Javadoc)
@@ -72,33 +96,54 @@ public class Text implements SoundCanvas, PropertyListener {
 	@Override
 	public void newFrame(long frameCount, Graphics2D graphics2d) {
 
-		if(text == null || text.length() == 0) {
+		if(text == null || text.length() == 0 || lines == null) {
 			return;
 		}
+		String[] linesToUse;
+		if(modTyping != 0 ) {
+			int posInSlideDuration = (int)(frameCount - frameFrom);
+			
+			int charPos = posInSlideDuration / modTyping;
+			
+			if(charPos >= 0 && charPos< text.length()) {
+				linesToUse = text.substring(0, charPos).split("\n");
+			}
+			else {	
+				linesToUse = lines;
+			}
+		}
+		else {
+			linesToUse = lines;
+		}
 		
-		Font f = graphics2d.getFont().deriveFont(dimensionHelper.getFontSizeForPercentX(fontSize));
-		graphics2d.setFont(f);
+		graphics2d.setFont(font);
 		graphics2d.setColor(textColor);
-		
-		
-		String[] lines = text.split("\n");
 		
 		int top = dimensionHelper.realY(topMargin);
 		final int strHeight = graphics2d.getFontMetrics().getHeight();
-		int leftMargin = (videoOutputInfo.getWidth() - maxTextWidth) / 2 ;
-		for(String line : lines) {
+		int minLeftMargin = (videoOutputInfo.getWidth() - maxTextWidth) / 2 ;
+		int lineIdx = 0;
+		for(String line : linesToUse) {
+			int leftMargin;
+			if(textAlign == TextAlign.CENTERED) {
+				final int strWidth = graphics2d.getFontMetrics().stringWidth(lines[lineIdx]);
+				leftMargin = minLeftMargin + (maxTextWidth - strWidth) / 2;
+			}
+			else {
+				leftMargin = minLeftMargin;
+			}
 			graphics2d.drawString(line, leftMargin, top);
 			top += strHeight;
+			lineIdx++;
 		}
 	}
 	
 	private void adjustTextDimension() {
 		
-		String[] lines = text.split("\n");
+		lines = text.split("\n");
 		Graphics2D graphics2d = new BufferedImage(1, 1, BufferedImage.TYPE_3BYTE_BGR).createGraphics();
 		
-		Font f = graphics2d.getFont().deriveFont(dimensionHelper.getFontSizeForPercentX(fontSize));
-		graphics2d.setFont(f);
+		graphics2d.setFont(font);
 		int maxWidth = 0;
 		int height = 0;
 		final int strHeight = graphics2d.getFontMetrics().getHeight();
@@ -116,9 +161,18 @@ public class Text implements SoundCanvas, PropertyListener {
 	@Override
 	public void prepare(AudioInputInfo audioInputInfo,
 			VideoOutputInfo videoOutputInfo) {
-
 		this.videoOutputInfo = videoOutputInfo;
 		dimensionHelper = new DimensionHelper(videoOutputInfo);
+		Font f = null;
+		if(fontName != null) {
+			f = FontStore.getFontByMappedValue(fontName);
+		}
+		if(f == null) {
+			Graphics2D graphics2d  = new BufferedImage(1, 1, BufferedImage.TYPE_3BYTE_BGR).createGraphics();
+			f = graphics2d.getFont().deriveFont(dimensionHelper.getFontSizeForPercentX(fontSize));
+			graphics2d.dispose();
+		}
+		font = f.deriveFont(dimensionHelper.getFontSizeForPercentX(fontSize));
 		adjustTextDimension();
 	}
 
@@ -136,6 +190,11 @@ public class Text implements SoundCanvas, PropertyListener {
 	@Override
 	public void propertyWritten(Field field) {
 		adjustTextDimension();
+	}
+	
+	public void setFrameRange(long frameFrom, long frameTo){
+		this.frameFrom = frameFrom;
+		this.frameTo = frameTo;
 	}
 
 
