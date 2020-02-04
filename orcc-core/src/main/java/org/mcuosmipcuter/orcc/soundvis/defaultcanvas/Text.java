@@ -18,8 +18,8 @@
 package org.mcuosmipcuter.orcc.soundvis.defaultcanvas;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.lang.reflect.Field;
@@ -43,7 +43,7 @@ import org.mcuosmipcuter.orcc.soundvis.FontStore;
 public class Text implements SoundCanvas, PropertyListener {
 	
 	public static enum TextAlign {
-		LEFT, CENTERED //, JUSTIFY TODO
+		LEFT, CENTERED, RIGHT
 	}
 	
 	private int year = Calendar.getInstance().get(Calendar.YEAR);
@@ -78,7 +78,7 @@ public class Text implements SoundCanvas, PropertyListener {
 	private long frameFrom;
 	private long frameTo;
 	
-	private int maxTextWidth;
+	private int longestLineIdx;
 	private String[] lines;
 	private Font font;
 	
@@ -120,17 +120,20 @@ public class Text implements SoundCanvas, PropertyListener {
 		graphics2d.setColor(textColor);
 		
 		int top = dimensionHelper.realY(topMargin);
-		final int strHeight = graphics2d.getFontMetrics().getHeight();
-		int minLeftMargin = (videoOutputInfo.getWidth() - maxTextWidth) / 2 ;
+		FontMetrics fontMetrics = graphics2d.getFontMetrics();
+		int maxWidth = fontMetrics.stringWidth(lines[longestLineIdx]);
+		final int strHeight = fontMetrics.getHeight();
+		int minLeftMargin = (videoOutputInfo.getWidth() - maxWidth) / 2 ;
 		int lineIdx = 0;
 		for(String line : linesToUse) {
 			int leftMargin;
-			if(textAlign == TextAlign.CENTERED) {
-				final int strWidth = graphics2d.getFontMetrics().stringWidth(lines[lineIdx]);
-				leftMargin = minLeftMargin + (maxTextWidth - strWidth) / 2;
+			if(textAlign == TextAlign.LEFT) {
+				leftMargin = minLeftMargin;
 			}
 			else {
-				leftMargin = minLeftMargin;
+				final int strWidth = graphics2d.getFontMetrics().stringWidth(lines[lineIdx]);
+				int diff = maxWidth - strWidth;
+				leftMargin = minLeftMargin + (textAlign == TextAlign.CENTERED ? diff / 2 : diff);
 			}
 			graphics2d.drawString(line, leftMargin, top);
 			top += strHeight;
@@ -138,24 +141,19 @@ public class Text implements SoundCanvas, PropertyListener {
 		}
 	}
 	
-	private void adjustTextDimension() {
+	private void adjustTextModel() {
 		
 		lines = text.split("\n");
-		Graphics2D graphics2d = new BufferedImage(1, 1, BufferedImage.TYPE_3BYTE_BGR).createGraphics();
-		
-		graphics2d.setFont(font);
-		int maxWidth = 0;
-		int height = 0;
-		final int strHeight = graphics2d.getFontMetrics().getHeight();
+		int maxLen = 0;
+		int idx = 0;
 		for(String line : lines) {
-			final int strWidth = graphics2d.getFontMetrics().stringWidth(line);
-			if(strWidth > maxWidth) {
-				maxWidth = strWidth;
+			if(line.length() > maxLen) {
+				maxLen = line.length();
+				longestLineIdx = idx;
 			}
-			height += strHeight;
+			idx++;
 		}
-		Dimension d = new Dimension(maxWidth, height);
-		maxTextWidth = d.width;
+		
 	}
 
 	@Override
@@ -173,7 +171,7 @@ public class Text implements SoundCanvas, PropertyListener {
 			graphics2d.dispose();
 		}
 		font = f.deriveFont(dimensionHelper.getFontSizeForPercentX(fontSize));
-		adjustTextDimension();
+		adjustTextModel();
 	}
 
 	@Override
@@ -189,7 +187,17 @@ public class Text implements SoundCanvas, PropertyListener {
 
 	@Override
 	public void propertyWritten(Field field) {
-		adjustTextDimension();
+		if("text".equals(field.getName())) {
+			adjustTextModel();
+		}
+		if("fontName".equals(field.getName())) {
+			font = FontStore.getFontByMappedValue(fontName);
+		}
+		if("fontSize".equals(field.getName()) || "fontName".equals(field.getName())) {
+			if(font != null) {
+				font = font.deriveFont(dimensionHelper.getFontSizeForPercentX(fontSize));
+			}
+		}
 	}
 	
 	public void setFrameRange(long frameFrom, long frameTo){
