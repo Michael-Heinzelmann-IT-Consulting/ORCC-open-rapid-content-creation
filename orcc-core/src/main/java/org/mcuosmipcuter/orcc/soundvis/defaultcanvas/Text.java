@@ -45,6 +45,9 @@ public class Text implements SoundCanvas, PropertyListener {
 	public static enum TextAlign {
 		LEFT, CENTERED, RIGHT
 	}
+	public static enum TextProgress {
+		SCROLL_END, SCROLL_TRU, PAGE
+	}
 	
 	private int year = Calendar.getInstance().get(Calendar.YEAR);
 	private String user = System.getProperty("user.name");
@@ -68,9 +71,19 @@ public class Text implements SoundCanvas, PropertyListener {
 	@UserProperty(description="top margin of text in % of video height")
 	int topMargin = 20;
 	
+	@UserProperty(description="bottom margin of text in % of video height")
+	int bottomAutoMargin = 0;
+	
+	@UserProperty(description="top progress")
+	private TextProgress textProgress = TextProgress.SCROLL_TRU;
+	
 	@UserProperty(description="")
 	@LimitedIntProperty(description="", minimum=0)
 	private int modTyping = 0;
+	
+	@UserProperty(description="")
+	@LimitedIntProperty(description="", minimum=0)
+	private int modProgress = 25;
 	
 	VideoOutputInfo videoOutputInfo;
 	private DimensionHelper dimensionHelper;
@@ -99,44 +112,142 @@ public class Text implements SoundCanvas, PropertyListener {
 		if(text == null || text.length() == 0 || lines == null) {
 			return;
 		}
-		String[] linesToUse;
+		int posInSlideDuration = (int)(frameCount - frameFrom);
+//		String[] linesToUse;
 		if(modTyping != 0 ) {
-			int posInSlideDuration = (int)(frameCount - frameFrom);
-			
-			int charPos = posInSlideDuration / modTyping;
-			
-			if(charPos >= 0 && charPos< text.length()) {
-				linesToUse = text.substring(0, charPos).split("\n");
-			}
-			else {	
-				linesToUse = lines;
-			}
+//			
+	//		int charPos = posInSlideDuration / modTyping;
+//			
+//			if(charPos >= 0 && charPos< text.length()) {
+//				linesToUse = text.substring(0, charPos).split("\n");
+//			}
+//			else {	
+//				linesToUse = lines;
+//			}
 		}
-		else {
-			linesToUse = lines;
-		}
+//		else {
+//			linesToUse = lines;
+//		}
 		
 		graphics2d.setFont(font);
 		graphics2d.setColor(textColor);
 		
-		int top = dimensionHelper.realY(topMargin);
+		int topPixels = dimensionHelper.realY(topMargin);
+
 		FontMetrics fontMetrics = graphics2d.getFontMetrics();
 		int maxWidth = fontMetrics.stringWidth(lines[longestLineIdx]);
 		final int strHeight = fontMetrics.getHeight();
-		int minLeftMargin = (videoOutputInfo.getWidth() - maxWidth) / 2 ;
-		int lineIdx = 0;
-		for(String line : linesToUse) {
-			int leftMargin;
-			if(textAlign == TextAlign.LEFT) {
-				leftMargin = minLeftMargin;
+		
+		int pixelsToUse = dimensionHelper.getVideoHeight() - topPixels - dimensionHelper.realY(bottomAutoMargin);
+		int linesToUse = pixelsToUse / strHeight;
+
+		int progessIdx = modProgress != 0 ? posInSlideDuration / modProgress : text.length();
+		
+		int caretRowIdx = 0;
+		int caretColIdx = 0;
+		int completedRowIdx = 0;
+		int len = 0;
+		for(String line : lines) {
+
+			int lineLegth = line.length() + 1; // no newline char!
+			if(modProgress != 0) {
+				if(progessIdx >= len && progessIdx < len + lineLegth) {
+					caretColIdx = progessIdx - len ;
+					//System.err.println(line.substring(0, caretColIdx));
+					if(progessIdx == text.length()) {
+						completedRowIdx = caretRowIdx;
+					}
+					else {
+						completedRowIdx = caretRowIdx - 1;
+					}
+					break;
+				}
+
+			}
+
+
+				caretColIdx = lineLegth - 1;
+				//System.err.println(line);
+			len += lineLegth;
+			if(len >= text.length()) {
+				break;
+			}
+			caretRowIdx++;
+			completedRowIdx = caretRowIdx;
+			
+			
+		}
+		System.err.println(completedRowIdx + " caretRowIdx: " + caretRowIdx + " caretColIdx: " + caretColIdx + " progessIdx: " + progessIdx + " text.length: " + text.length());
+		
+		
+		int startIdx = 0;
+		if(modProgress != 0) { 
+			if(linesToUse - caretRowIdx > 0) {
+				startIdx = 0; // more rows available than text rows
 			}
 			else {
-				final int strWidth = graphics2d.getFontMetrics().stringWidth(lines[lineIdx]);
-				int diff = maxWidth - strWidth;
-				leftMargin = minLeftMargin + (textAlign == TextAlign.CENTERED ? diff / 2 : diff);
+				if(textProgress == TextProgress.SCROLL_END) {
+					startIdx = caretRowIdx - linesToUse + 1;
+				}
+				if(textProgress == TextProgress.PAGE) {
+					startIdx = caretRowIdx -((caretRowIdx ) % linesToUse);
+				}
 			}
-			graphics2d.drawString(line, leftMargin, top);
-			top += strHeight;
+			
+//			if(textProgress == TextProgress.SCROLL_TRU || textProgress == TextProgress.SCROLL_END) {
+//				if(textProgress == TextProgress.SCROLL_TRU){
+//					startIdx = progessIdx;
+//				}
+//				if(textProgress == TextProgress.SCROLL_END) {
+//					startIdx = progessIdx + linesToUse < lines.length ? progessIdx : lines.length - linesToUse;
+//				}
+//			}
+//			if(textProgress == TextProgress.PAGE) {
+//				int pagesMaxIdx = lines.length/linesToUse;
+//				if(progessIdx  < pagesMaxIdx) {
+//					startIdx = progessIdx * linesToUse;
+//				}
+//				else {
+//					startIdx = pagesMaxIdx * linesToUse;
+//				}
+//			}
+		}
+		System.err.println("linesToUse: " + linesToUse + " startIdx: " + startIdx);
+
+		int minLeftMargin = (videoOutputInfo.getWidth() - maxWidth) / 2 ;
+		int lineTop = topPixels + strHeight;
+		int lineIdx = 0;
+
+		for(String line : lines) {
+			if(lineIdx >= startIdx && lineIdx < startIdx + linesToUse) {
+				int leftMargin;
+				if(textAlign == TextAlign.LEFT) {
+					leftMargin = minLeftMargin;
+				}
+				else {
+					final int strWidth = graphics2d.getFontMetrics().stringWidth(line);
+					int diff = maxWidth - strWidth;
+					leftMargin = minLeftMargin + (textAlign == TextAlign.CENTERED ? diff / 2 : diff);
+				}
+				String lineToUse;
+				if(modTyping != 0) {
+					if(lineIdx > caretRowIdx) {
+						break;
+					}
+					if(lineIdx <= completedRowIdx) {
+						lineToUse = line;
+					}
+					else {
+						lineToUse = line.substring(0, caretColIdx);
+					}
+				}
+				else {
+					lineToUse = line;
+				}
+				graphics2d.drawString(lineToUse, leftMargin, lineTop);	
+				
+				lineTop += strHeight;
+			}
 			lineIdx++;
 		}
 	}
