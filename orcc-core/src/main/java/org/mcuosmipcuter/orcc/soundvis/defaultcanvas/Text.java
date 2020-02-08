@@ -17,10 +17,12 @@
 */
 package org.mcuosmipcuter.orcc.soundvis.defaultcanvas;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
+import java.awt.Stroke;
 import java.awt.image.BufferedImage;
 import java.lang.reflect.Field;
 import java.util.Calendar;
@@ -46,7 +48,7 @@ public class Text implements SoundCanvas, PropertyListener {
 		LEFT, CENTERED, RIGHT
 	}
 	public static enum TextProgress {
-		SCROLL_END, SCROLL_TRU, PAGE
+		SCROLL, PAGE
 	}
 	
 	private int year = Calendar.getInstance().get(Calendar.YEAR);
@@ -58,9 +60,13 @@ public class Text implements SoundCanvas, PropertyListener {
 	@UserProperty(description="the text to display")
 	private String text = "ORCC rapid content creation\nfor entertainment, education\nand media production\n" + year + " " + user + " graphics by soundvis";
 	
+	@UserProperty(description="")
+	@LimitedIntProperty(description="", minimum=0)
+	private boolean showMargins;
+	
 	@UserProperty(description="font size for text in % of video height")
-	@LimitedIntProperty(description="font size limitation", minimum=1)
-	private int fontSize = 4;
+	@LimitedIntProperty(description="font size limitation", minimum=0)
+	private int fontSize = 0;
 	
 	@UserProperty(description="the text alignment of lines")
 	private TextAlign textAlign = TextAlign.LEFT;
@@ -68,28 +74,30 @@ public class Text implements SoundCanvas, PropertyListener {
 	@UserProperty(description="text color")
 	private Color textColor = Color.BLACK;
 	
+	@UserProperty(description="left and right margin of text in % of video width")
+	int leftRightMargin = 10;
+	
 	@UserProperty(description="top margin of text in % of video height")
 	int topMargin = 20;
 	
 	@UserProperty(description="bottom margin of text in % of video height")
-	int bottomAutoMargin = 0;
+	int bottomAutoMargin = 20;
 	
 	@UserProperty(description="top progress")
-	private TextProgress textProgress = TextProgress.SCROLL_TRU;
+	private TextProgress textProgress = TextProgress.PAGE;
 	
-	@UserProperty(description="")
+	@UserProperty(description="type the text")
 	@LimitedIntProperty(description="", minimum=0)
-	private int modTyping = 0;
+	private boolean typing;
 	
-	@UserProperty(description="")
-	@LimitedIntProperty(description="", minimum=0)
-	private int modProgress = 25;
+	@UserProperty(description="frames per character")
+	@LimitedIntProperty(description="0 = no progress", minimum=0)
+	private int modProgress = 1;
 	
 	VideoOutputInfo videoOutputInfo;
 	private DimensionHelper dimensionHelper;
 	
 	private long frameFrom;
-	private long frameTo;
 	
 	private int longestLineIdx;
 	private String[] lines;
@@ -113,33 +121,56 @@ public class Text implements SoundCanvas, PropertyListener {
 			return;
 		}
 		int posInSlideDuration = (int)(frameCount - frameFrom);
-//		String[] linesToUse;
-		if(modTyping != 0 ) {
-//			
-	//		int charPos = posInSlideDuration / modTyping;
-//			
-//			if(charPos >= 0 && charPos< text.length()) {
-//				linesToUse = text.substring(0, charPos).split("\n");
-//			}
-//			else {	
-//				linesToUse = lines;
-//			}
+		int xMargin = dimensionHelper.realX(leftRightMargin);
+
+		if(fontSize == 0 ) {
+			
+			graphics2d.setFont(font);
+			FontMetrics fontMetrics = graphics2d.getFontMetrics();
+			int pixelsToUse = videoOutputInfo.getWidth() - xMargin * 2;
+			int diff = pixelsToUse - fontMetrics.stringWidth(lines[longestLineIdx]);
+			if(diff != 0) {
+				int currFontSize = font.getSize();
+				Font scaledFont = font;
+				while((currFontSize += diff > 0 ? 1 : -1) > 0) {
+					
+					scaledFont = font.deriveFont((float)currFontSize);
+					graphics2d.setFont(scaledFont);
+					fontMetrics = graphics2d.getFontMetrics();
+					if(diff > 0) {
+						if(fontMetrics.stringWidth(lines[longestLineIdx]) > pixelsToUse) {
+							font = font.deriveFont((float)(currFontSize - 1));
+							//System.err.println("diff " + diff + " font size " + font.getSize());
+							break;
+						}
+					}
+					else {
+						if(fontMetrics.stringWidth(lines[longestLineIdx]) < pixelsToUse) {
+							font = scaledFont;
+							//System.err.println("diff " + diff + " font size " + font.getSize());
+							break;
+						}
+					}
+				}
+			}
 		}
-//		else {
-//			linesToUse = lines;
-//		}
 		
 		graphics2d.setFont(font);
 		graphics2d.setColor(textColor);
 		
 		int topPixels = dimensionHelper.realY(topMargin);
+		int bottomPixels = dimensionHelper.realY(bottomAutoMargin);
 
 		FontMetrics fontMetrics = graphics2d.getFontMetrics();
-		int maxWidth = fontMetrics.stringWidth(lines[longestLineIdx]);
+		final int maxWidth = fontMetrics.stringWidth(lines[longestLineIdx]);
 		final int strHeight = fontMetrics.getHeight();
+		final int ascent = fontMetrics.getAscent();
 		
-		int pixelsToUse = dimensionHelper.getVideoHeight() - topPixels - dimensionHelper.realY(bottomAutoMargin);
+		int pixelsToUse = dimensionHelper.getVideoHeight() - topPixels - bottomPixels;
 		int linesToUse = pixelsToUse / strHeight;
+		if(linesToUse == 0) {
+			linesToUse = 1;
+		}
 
 		int progessIdx = modProgress != 0 ? posInSlideDuration / modProgress : text.length();
 		
@@ -149,11 +180,11 @@ public class Text implements SoundCanvas, PropertyListener {
 		int len = 0;
 		for(String line : lines) {
 
-			int lineLegth = line.length() + 1; // no newline char!
+			int lineLegth = line.length() + 1; // newline char!
 			if(modProgress != 0) {
 				if(progessIdx >= len && progessIdx < len + lineLegth) {
 					caretColIdx = progessIdx - len ;
-					//System.err.println(line.substring(0, caretColIdx));
+
 					if(progessIdx == text.length()) {
 						completedRowIdx = caretRowIdx;
 					}
@@ -164,10 +195,8 @@ public class Text implements SoundCanvas, PropertyListener {
 				}
 
 			}
+			caretColIdx = lineLegth - 1;
 
-
-				caretColIdx = lineLegth - 1;
-				//System.err.println(line);
 			len += lineLegth;
 			if(len >= text.length()) {
 				break;
@@ -177,7 +206,7 @@ public class Text implements SoundCanvas, PropertyListener {
 			
 			
 		}
-		System.err.println(completedRowIdx + " caretRowIdx: " + caretRowIdx + " caretColIdx: " + caretColIdx + " progessIdx: " + progessIdx + " text.length: " + text.length());
+		//System.err.println(completedRowIdx + " caretRowIdx: " + caretRowIdx + " caretColIdx: " + caretColIdx + " progessIdx: " + progessIdx + " text.length: " + text.length());
 		
 		
 		int startIdx = 0;
@@ -186,7 +215,7 @@ public class Text implements SoundCanvas, PropertyListener {
 				startIdx = 0; // more rows available than text rows
 			}
 			else {
-				if(textProgress == TextProgress.SCROLL_END) {
+				if(textProgress == TextProgress.SCROLL) {
 					startIdx = caretRowIdx - linesToUse + 1;
 				}
 				if(textProgress == TextProgress.PAGE) {
@@ -194,28 +223,11 @@ public class Text implements SoundCanvas, PropertyListener {
 				}
 			}
 			
-//			if(textProgress == TextProgress.SCROLL_TRU || textProgress == TextProgress.SCROLL_END) {
-//				if(textProgress == TextProgress.SCROLL_TRU){
-//					startIdx = progessIdx;
-//				}
-//				if(textProgress == TextProgress.SCROLL_END) {
-//					startIdx = progessIdx + linesToUse < lines.length ? progessIdx : lines.length - linesToUse;
-//				}
-//			}
-//			if(textProgress == TextProgress.PAGE) {
-//				int pagesMaxIdx = lines.length/linesToUse;
-//				if(progessIdx  < pagesMaxIdx) {
-//					startIdx = progessIdx * linesToUse;
-//				}
-//				else {
-//					startIdx = pagesMaxIdx * linesToUse;
-//				}
-//			}
 		}
-		System.err.println("linesToUse: " + linesToUse + " startIdx: " + startIdx);
+		//System.err.println("linesToUse: " + linesToUse + " startIdx: " + startIdx);
 
-		int minLeftMargin = (videoOutputInfo.getWidth() - maxWidth) / 2 ;
-		int lineTop = topPixels + strHeight;
+		int minLeftMargin = (videoOutputInfo.getWidth()  - maxWidth) / 2 ;
+		int lineTop = topPixels + ascent;// strHeight;
 		int lineIdx = 0;
 
 		for(String line : lines) {
@@ -230,7 +242,7 @@ public class Text implements SoundCanvas, PropertyListener {
 					leftMargin = minLeftMargin + (textAlign == TextAlign.CENTERED ? diff / 2 : diff);
 				}
 				String lineToUse;
-				if(modTyping != 0) {
+				if(typing) {
 					if(lineIdx > caretRowIdx) {
 						break;
 					}
@@ -249,6 +261,20 @@ public class Text implements SoundCanvas, PropertyListener {
 				lineTop += strHeight;
 			}
 			lineIdx++;
+		}
+		if(showMargins) {
+			Stroke origStroke = graphics2d.getStroke();
+			float xd = dimensionHelper.realX(5);
+			graphics2d.setStroke(new BasicStroke(1f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 1f, new float [] {xd, xd}, 0f));
+			graphics2d.drawLine(0, topPixels, videoOutputInfo.getWidth(), topPixels);
+			graphics2d.drawLine(0, videoOutputInfo.getHeight() - bottomPixels, videoOutputInfo.getWidth(),
+					videoOutputInfo.getHeight() - bottomPixels);
+			float yd = dimensionHelper.realY(5);
+			graphics2d.setStroke(new BasicStroke(1f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 1f, new float [] {yd, yd}, 0f));
+			graphics2d.drawLine(xMargin, 0, xMargin, videoOutputInfo.getHeight());
+			graphics2d.drawLine(videoOutputInfo.getWidth() - xMargin, 0, videoOutputInfo.getWidth() - xMargin,
+					videoOutputInfo.getHeight());
+			graphics2d.setStroke(origStroke);
 		}
 	}
 	
@@ -278,10 +304,10 @@ public class Text implements SoundCanvas, PropertyListener {
 		}
 		if(f == null) {
 			Graphics2D graphics2d  = new BufferedImage(1, 1, BufferedImage.TYPE_3BYTE_BGR).createGraphics();
-			f = graphics2d.getFont().deriveFont(dimensionHelper.getFontSizeForPercentX(fontSize));
+			f = graphics2d.getFont().deriveFont(fontSize == 0 ? 1 : fontSize);
 			graphics2d.dispose();
 		}
-		font = f.deriveFont(dimensionHelper.getFontSizeForPercentX(fontSize));
+		font = f.deriveFont(fontSize == 0 ? 1 : fontSize);
 		adjustTextModel();
 	}
 
@@ -306,14 +332,13 @@ public class Text implements SoundCanvas, PropertyListener {
 		}
 		if("fontSize".equals(field.getName()) || "fontName".equals(field.getName())) {
 			if(font != null) {
-				font = font.deriveFont(dimensionHelper.getFontSizeForPercentX(fontSize));
+				font = font.deriveFont(fontSize);
 			}
 		}
 	}
 	
 	public void setFrameRange(long frameFrom, long frameTo){
 		this.frameFrom = frameFrom;
-		this.frameTo = frameTo;
 	}
 
 
