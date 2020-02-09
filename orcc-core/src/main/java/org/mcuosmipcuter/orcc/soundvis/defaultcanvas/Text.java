@@ -91,17 +91,16 @@ public class Text implements SoundCanvas, PropertyListener {
 	private boolean typing;
 	
 	@UserProperty(description="frames per character")
-	@LimitedIntProperty(description="0 = no progress", minimum=0)
-	private int modProgress = 1;
+	private int modProgress = -1;
 	
 	VideoOutputInfo videoOutputInfo;
 	private DimensionHelper dimensionHelper;
 	
 	private long frameFrom;
 	
-	private int longestLineIdx;
 	private String[] lines;
 	private Font font;
+	private int autoAdjustedFontSize;
 	
 	
 	/* (non-Javadoc)
@@ -122,57 +121,69 @@ public class Text implements SoundCanvas, PropertyListener {
 		}
 		int posInSlideDuration = (int)(frameCount - frameFrom);
 		int xMargin = dimensionHelper.realX(leftRightMargin);
-
-		if(fontSize == 0 ) {
+		int topPixels = dimensionHelper.realY(topMargin);
+		int bottomPixels = dimensionHelper.realY(bottomAutoMargin);
+		int yPixelsToUse = dimensionHelper.getVideoHeight() - topPixels - bottomPixels;
+		
+		if(fontSize == 0  ) {
 			
-			graphics2d.setFont(font);
-			FontMetrics fontMetrics = graphics2d.getFontMetrics();
-			int pixelsToUse = videoOutputInfo.getWidth() - xMargin * 2;
-			int diff = pixelsToUse - fontMetrics.stringWidth(lines[longestLineIdx]);
-			if(diff != 0) {
+			int xPixelsToUse = videoOutputInfo.getWidth() - xMargin * 2;
+
+			if(autoAdjustedFontSize == 0) {
 				int currFontSize = font.getSize();
 				Font scaledFont = font;
-				while((currFontSize += diff > 0 ? 1 : -1) > 0) {
-					
+				while((currFontSize += 1) > 0) {
+					//System.err.println("currFontSize " + currFontSize + " diff " + diff + " : " + xPixelsToUse);
 					scaledFont = font.deriveFont((float)currFontSize);
 					graphics2d.setFont(scaledFont);
-					fontMetrics = graphics2d.getFontMetrics();
-					if(diff > 0) {
-						if(fontMetrics.stringWidth(lines[longestLineIdx]) > pixelsToUse) {
-							font = font.deriveFont((float)(currFontSize - 1));
-							//System.err.println("diff " + diff + " font size " + font.getSize());
-							break;
+					FontMetrics fontMetricsPrev = graphics2d.getFontMetrics();
+					int maxLinePx = 0;
+					int longestLineIdx = -1;
+					for(int i = 0; i < lines.length; i++) {
+						int px = fontMetricsPrev.stringWidth(lines[i]);
+						if(px >= maxLinePx) {
+							maxLinePx = px;
+							longestLineIdx = i;
+							//System.err.println(i + " px" + px);
 						}
 					}
-					else {
-						if(fontMetrics.stringWidth(lines[longestLineIdx]) < pixelsToUse) {
-							font = scaledFont;
-							//System.err.println("diff " + diff + " font size " + font.getSize());
-							break;
-						}
+					fontMetricsPrev = graphics2d.getFontMetrics();
+
+					if(fontMetricsPrev.stringWidth(lines[longestLineIdx]) > xPixelsToUse || fontMetricsPrev.getHeight() > yPixelsToUse) {
+						font = font.deriveFont((float)(currFontSize - 1));
+						System.err.println("longestLineIdx:" + longestLineIdx + " maxLinePx:" + maxLinePx + " font size " + font.getSize());
+						autoAdjustedFontSize = font.getSize();
+						break;
 					}
+
 				}
 			}
 		}
 		
 		graphics2d.setFont(font);
 		graphics2d.setColor(textColor);
-		
-		int topPixels = dimensionHelper.realY(topMargin);
-		int bottomPixels = dimensionHelper.realY(bottomAutoMargin);
 
 		FontMetrics fontMetrics = graphics2d.getFontMetrics();
-		final int maxWidth = fontMetrics.stringWidth(lines[longestLineIdx]);
 		final int strHeight = fontMetrics.getHeight();
 		final int ascent = fontMetrics.getAscent();
 		
-		int pixelsToUse = dimensionHelper.getVideoHeight() - topPixels - bottomPixels;
-		int linesToUse = pixelsToUse / strHeight;
+		int linesToUse = yPixelsToUse / strHeight;
 		if(linesToUse == 0) {
 			linesToUse = 1;
 		}
 
-		int progessIdx = modProgress != 0 ? posInSlideDuration / modProgress : text.length();
+		int progessIdx;
+		if(modProgress != 0) {
+			if(modProgress > 0) {
+				progessIdx = posInSlideDuration * modProgress; // speedup
+			}
+			else {
+				progessIdx = posInSlideDuration / Math.abs(modProgress); // slowdown
+			}
+		}
+		else {
+			progessIdx = text.length();
+		}
 		
 		int caretRowIdx = 0;
 		int caretColIdx = 0;
@@ -206,9 +217,7 @@ public class Text implements SoundCanvas, PropertyListener {
 			
 			
 		}
-		//System.err.println(completedRowIdx + " caretRowIdx: " + caretRowIdx + " caretColIdx: " + caretColIdx + " progessIdx: " + progessIdx + " text.length: " + text.length());
-		
-		
+
 		int startIdx = 0;
 		if(modProgress != 0) { 
 			if(linesToUse - caretRowIdx > 0) {
@@ -224,23 +233,27 @@ public class Text implements SoundCanvas, PropertyListener {
 			}
 			
 		}
-		//System.err.println("linesToUse: " + linesToUse + " startIdx: " + startIdx);
 
-		int minLeftMargin = (videoOutputInfo.getWidth()  - maxWidth) / 2 ;
-		int lineTop = topPixels + ascent;// strHeight;
+		int lineTop = topPixels + ascent;
 		int lineIdx = 0;
 
 		for(String line : lines) {
 			if(lineIdx >= startIdx && lineIdx < startIdx + linesToUse) {
 				int leftMargin;
 				if(textAlign == TextAlign.LEFT) {
-					leftMargin = minLeftMargin;
+					leftMargin = xMargin;
 				}
 				else {
 					final int strWidth = graphics2d.getFontMetrics().stringWidth(line);
-					int diff = maxWidth - strWidth;
-					leftMargin = minLeftMargin + (textAlign == TextAlign.CENTERED ? diff / 2 : diff);
+					if(textAlign == TextAlign.RIGHT) {
+						leftMargin = videoOutputInfo.getWidth() - xMargin - strWidth;
+					}
+					else  {
+						int diff = videoOutputInfo.getWidth() - strWidth;
+						leftMargin = diff / 2;
+					}
 				}
+					
 				String lineToUse;
 				if(typing) {
 					if(lineIdx > caretRowIdx) {
@@ -281,33 +294,34 @@ public class Text implements SoundCanvas, PropertyListener {
 	private void adjustTextModel() {
 		
 		lines = text.split("\n");
-		int maxLen = 0;
-		int idx = 0;
-		for(String line : lines) {
-			if(line.length() > maxLen) {
-				maxLen = line.length();
-				longestLineIdx = idx;
-			}
-			idx++;
-		}
 		
 	}
 
 	@Override
 	public void prepare(AudioInputInfo audioInputInfo,
 			VideoOutputInfo videoOutputInfo) {
+		if(videoOutputInfo.equals(this.videoOutputInfo)) {
+			dimensionHelper = new DimensionHelper(videoOutputInfo);
+			autoAdjustedFontSize = 0;
+		}
 		this.videoOutputInfo = videoOutputInfo;
-		dimensionHelper = new DimensionHelper(videoOutputInfo);
+		
 		Font f = null;
 		if(fontName != null) {
 			f = FontStore.getFontByMappedValue(fontName);
 		}
 		if(f == null) {
 			Graphics2D graphics2d  = new BufferedImage(1, 1, BufferedImage.TYPE_3BYTE_BGR).createGraphics();
-			f = graphics2d.getFont().deriveFont(fontSize == 0 ? 1 : fontSize);
+			f = graphics2d.getFont().deriveFont(fontSize == 0 ? 1f : (float)fontSize);
 			graphics2d.dispose();
 		}
-		font = f.deriveFont(fontSize == 0 ? 1 : fontSize);
+		if(fontSize != 0) {
+			font = f.deriveFont((float)fontSize);
+		}
+		else if(autoAdjustedFontSize == 0) {
+			font = f.deriveFont(1f);
+		}
+		
 		adjustTextModel();
 	}
 
@@ -324,6 +338,8 @@ public class Text implements SoundCanvas, PropertyListener {
 
 	@Override
 	public void propertyWritten(Field field) {
+		
+		autoAdjustedFontSize = 0; // needs new adjustment
 		if("text".equals(field.getName())) {
 			adjustTextModel();
 		}
@@ -332,7 +348,7 @@ public class Text implements SoundCanvas, PropertyListener {
 		}
 		if("fontSize".equals(field.getName()) || "fontName".equals(field.getName())) {
 			if(font != null) {
-				font = font.deriveFont(fontSize);
+				font = font.deriveFont(fontSize != 0 ? (float)fontSize : 1);
 			}
 		}
 	}
