@@ -36,9 +36,6 @@ public class DimensionHelper {
 	public int realY(int percentageY){
 		return Math.round(videoHeight / 100f * percentageY);
 	}
-	public float getFontSizeForPercentX(int percentOfVWidth) {
-		return percentOfVWidth * 4f / 300f * videoWidth;
-	}
 	public int getVideoWidth() {
 		return videoWidth;
 	}

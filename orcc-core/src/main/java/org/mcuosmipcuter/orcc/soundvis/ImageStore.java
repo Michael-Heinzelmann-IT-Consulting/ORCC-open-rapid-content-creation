@@ -23,6 +23,8 @@ import java.lang.ref.SoftReference;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.mcuosmipcuter.orcc.util.IOUtil;
+
 /**
  * Shared In Memory store for loaded Images allowing multiple references to an image
  * avoiding duplicate loading and storage. 
@@ -81,11 +83,11 @@ public class ImageStore {
 		return store.containsKey(key);
 	}
 	public static Image getImage(File imageFile) {
-		System.err.println(store);
+
 		Key key = new Key(imageFile.lastModified(), imageFile.getAbsolutePath());
 		SoftReference<Image> ref = store.get(key);
 		if(ref != null) {
-			System.err.println(key + " ######## " + ref.get());
+			IOUtil.log(key + " ######## " + ref.get());
 		}
 		return ref != null ? ref.get() : null;
 	}
