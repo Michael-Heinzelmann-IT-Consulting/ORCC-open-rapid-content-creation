@@ -37,6 +37,7 @@ import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.api.util.DimensionHelper;
 import org.mcuosmipcuter.orcc.api.util.TextHelper;
 import org.mcuosmipcuter.orcc.soundvis.FontStore;
+import org.mcuosmipcuter.orcc.util.IOUtil;
 
 /**
  * @author Michael Heinzelmann
@@ -101,6 +102,8 @@ public class Text implements SoundCanvas, PropertyListener {
 	private String[] lines;
 	private Font font;
 	private int autoAdjustedFontSize;
+	private Stroke strokeX;
+	private Stroke strokeY;
 	
 	
 	/* (non-Javadoc)
@@ -133,7 +136,7 @@ public class Text implements SoundCanvas, PropertyListener {
 				int currFontSize = font.getSize();
 				Font scaledFont = font;
 				while((currFontSize += 1) > 0) {
-					//System.err.println("currFontSize " + currFontSize + " diff " + diff + " : " + xPixelsToUse);
+
 					scaledFont = font.deriveFont((float)currFontSize);
 					graphics2d.setFont(scaledFont);
 					FontMetrics fontMetricsPrev = graphics2d.getFontMetrics();
@@ -144,14 +147,13 @@ public class Text implements SoundCanvas, PropertyListener {
 						if(px >= maxLinePx) {
 							maxLinePx = px;
 							longestLineIdx = i;
-							//System.err.println(i + " px" + px);
 						}
 					}
 					fontMetricsPrev = graphics2d.getFontMetrics();
 
 					if(fontMetricsPrev.stringWidth(lines[longestLineIdx]) > xPixelsToUse || fontMetricsPrev.getHeight() > yPixelsToUse) {
 						font = font.deriveFont((float)(currFontSize - 1));
-						System.err.println("longestLineIdx:" + longestLineIdx + " maxLinePx:" + maxLinePx + " font size " + font.getSize());
+						IOUtil.log("longestLineIdx: " + longestLineIdx + " maxLinePx:" + maxLinePx + " font size " + font.getSize());
 						autoAdjustedFontSize = font.getSize();
 						break;
 					}
@@ -277,13 +279,11 @@ public class Text implements SoundCanvas, PropertyListener {
 		}
 		if(showMargins) {
 			Stroke origStroke = graphics2d.getStroke();
-			float xd = dimensionHelper.realX(5);
-			graphics2d.setStroke(new BasicStroke(1f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 1f, new float [] {xd, xd}, 0f));
+			graphics2d.setStroke(strokeX);
 			graphics2d.drawLine(0, topPixels, videoOutputInfo.getWidth(), topPixels);
 			graphics2d.drawLine(0, videoOutputInfo.getHeight() - bottomPixels, videoOutputInfo.getWidth(),
 					videoOutputInfo.getHeight() - bottomPixels);
-			float yd = dimensionHelper.realY(5);
-			graphics2d.setStroke(new BasicStroke(1f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 1f, new float [] {yd, yd}, 0f));
+			graphics2d.setStroke(strokeY);
 			graphics2d.drawLine(xMargin, 0, xMargin, videoOutputInfo.getHeight());
 			graphics2d.drawLine(videoOutputInfo.getWidth() - xMargin, 0, videoOutputInfo.getWidth() - xMargin,
 					videoOutputInfo.getHeight());
@@ -300,11 +300,17 @@ public class Text implements SoundCanvas, PropertyListener {
 	@Override
 	public void prepare(AudioInputInfo audioInputInfo,
 			VideoOutputInfo videoOutputInfo) {
-		if(videoOutputInfo.equals(this.videoOutputInfo)) {
+
+		if(!videoOutputInfo.equals(this.videoOutputInfo)) {
 			dimensionHelper = new DimensionHelper(videoOutputInfo);
-			autoAdjustedFontSize = 0;
+			float xd = dimensionHelper.realX(5);
+			strokeX = new BasicStroke(1f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 1f, new float [] {xd, xd}, 0f);
+			float yd = dimensionHelper.realY(5);	
+			strokeY = new BasicStroke(1f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 1f, new float [] {yd, yd}, 0f);
 		}
+		
 		this.videoOutputInfo = videoOutputInfo;
+		autoAdjustedFontSize = 0;
 		
 		Font f = null;
 		if(fontName != null) {
@@ -315,11 +321,8 @@ public class Text implements SoundCanvas, PropertyListener {
 			f = graphics2d.getFont().deriveFont(fontSize == 0 ? 1f : (float)fontSize);
 			graphics2d.dispose();
 		}
-		if(fontSize != 0) {
-			font = f.deriveFont((float)fontSize);
-		}
-		else if(autoAdjustedFontSize == 0) {
-			font = f.deriveFont(1f);
+		if(f != null) {
+			font = f.deriveFont(fontSize != 0 ? (float)fontSize : 1);
 		}
 		
 		adjustTextModel();
@@ -340,16 +343,14 @@ public class Text implements SoundCanvas, PropertyListener {
 	public void propertyWritten(Field field) {
 		
 		autoAdjustedFontSize = 0; // needs new adjustment
+		if(font != null) {
+			font = font.deriveFont(fontSize != 0 ? (float)fontSize : 1);
+		}
 		if("text".equals(field.getName())) {
 			adjustTextModel();
 		}
 		if("fontName".equals(field.getName())) {
 			font = FontStore.getFontByMappedValue(fontName);
-		}
-		if("fontSize".equals(field.getName()) || "fontName".equals(field.getName())) {
-			if(font != null) {
-				font = font.deriveFont(fontSize != 0 ? (float)fontSize : 1);
-			}
 		}
 	}
 	

@@ -86,10 +86,13 @@ public abstract class Context {
 	
 	// private helper method
 	private static void notifyListeners(PropertyName propertyName) {
+		//System.err.println("#73 notifyListeners " + System.currentTimeMillis());
 		for(Listener listener : listeners) {
-			//System.err.println("listener: " + listener + " " + propertyName);
+			//System.err.println("#73 " + System.currentTimeMillis() + " listener: " + listener + " " + propertyName);
 			listener.contextChanged(propertyName);
+			//System.err.println("#73 " + System.currentTimeMillis());
 		}
+		//System.err.println("#73 notifyListeners " + System.currentTimeMillis());
 	}
 	private static void notifyListeners(String msg) {
 		for(Listener listener : listeners) {
@@ -134,8 +137,8 @@ public abstract class Context {
 	 * @param height height in pixels
 	 */
 	public static synchronized void setOutputDimension(int width, int height) {
-		videoOutputInfo.setWidth(width);
-		videoOutputInfo.setHeight(height);
+		VideoOutputInfoImpl newVideoOutputInfo = new VideoOutputInfoImpl(videoOutputInfo.getFramesPerSecond(), width, height);
+		videoOutputInfo = newVideoOutputInfo;
 		notifyListeners(PropertyName.VideoDimension);
 	}
 	/**
@@ -149,7 +152,8 @@ public abstract class Context {
 				throw new AppLogicException("sample rate " + sampleRate + " % frame rate " + frameRate + " is not 0");
 			}
 		}
-		videoOutputInfo.setFramesPerSecond(frameRate);
+		VideoOutputInfoImpl newVideoOutputInfo = new VideoOutputInfoImpl(frameRate, videoOutputInfo.getWidth(), videoOutputInfo.getHeight());
+		videoOutputInfo = newVideoOutputInfo;
 		notifyListeners(PropertyName.VideoFrameRate);
 	}
 
