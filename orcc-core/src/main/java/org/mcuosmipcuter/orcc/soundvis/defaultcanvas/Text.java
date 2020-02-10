@@ -19,6 +19,7 @@ package org.mcuosmipcuter.orcc.soundvis.defaultcanvas;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Composite;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
@@ -30,6 +31,7 @@ import java.util.Calendar;
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
 import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.MappedValue;
+import org.mcuosmipcuter.orcc.api.soundvis.NestedProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.PropertyListener;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
@@ -37,6 +39,7 @@ import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.api.util.DimensionHelper;
 import org.mcuosmipcuter.orcc.api.util.TextHelper;
 import org.mcuosmipcuter.orcc.soundvis.FontStore;
+import org.mcuosmipcuter.orcc.soundvis.effects.Fader;
 import org.mcuosmipcuter.orcc.util.IOUtil;
 
 /**
@@ -94,10 +97,14 @@ public class Text implements SoundCanvas, PropertyListener {
 	@UserProperty(description="frames per character")
 	private int modProgress = -1;
 	
+	@NestedProperty(description="fading in and out")
+	private Fader fader = new Fader();
+	
 	VideoOutputInfo videoOutputInfo;
 	private DimensionHelper dimensionHelper;
 	
 	private long frameFrom;
+	private long frameTo;
 	
 	private String[] lines;
 	private Font font;
@@ -238,7 +245,8 @@ public class Text implements SoundCanvas, PropertyListener {
 
 		int lineTop = topPixels + ascent;
 		int lineIdx = 0;
-
+		Composite origComposite = fader.fade(graphics2d, posInSlideDuration, (int)(frameTo - frameFrom));
+		
 		for(String line : lines) {
 			if(lineIdx >= startIdx && lineIdx < startIdx + linesToUse) {
 				int leftMargin;
@@ -289,6 +297,8 @@ public class Text implements SoundCanvas, PropertyListener {
 					videoOutputInfo.getHeight());
 			graphics2d.setStroke(origStroke);
 		}
+		
+		graphics2d.setComposite(origComposite);
 	}
 	
 	private void adjustTextModel() {
@@ -356,6 +366,7 @@ public class Text implements SoundCanvas, PropertyListener {
 	
 	public void setFrameRange(long frameFrom, long frameTo){
 		this.frameFrom = frameFrom;
+		this.frameTo = frameTo;
 	}
 
 

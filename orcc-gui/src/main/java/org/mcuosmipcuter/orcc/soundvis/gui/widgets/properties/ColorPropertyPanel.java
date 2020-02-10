@@ -51,8 +51,8 @@ public class ColorPropertyPanel extends PropertyPanel<Color> {
 	 * Constructor
 	 * @param soundCanvas the canvas to work with
 	 */
-	public ColorPropertyPanel(SoundCanvasWrapper soundCanvasWrapper) {
-		super(soundCanvasWrapper);
+	public ColorPropertyPanel(SoundCanvasWrapper soundCanvasWrapper, Object valueOwner) {
+		super(soundCanvasWrapper, valueOwner);
 		colorLabel.setOpaque(true);
 		JPanel valueSelect = new JPanel();
 		//valueSelect.setLayout(new GridLayout(1, 2));

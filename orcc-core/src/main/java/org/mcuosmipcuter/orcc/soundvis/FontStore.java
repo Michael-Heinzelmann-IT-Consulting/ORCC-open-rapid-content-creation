@@ -48,7 +48,7 @@ public class FontStore {
 		for(Font font : fonts) {
 			logicalFontNamesAlphabetically.put(new MappedValue<String>(font.getName(), font.getFontName(), all), font);
 		}
-		System.err.println(logicalFontNamesAlphabetically);
+		//System.err.println(logicalFontNamesAlphabetically);
 	}
 	public static Font getFontByMappedValue(MappedValue<String> mappedValue) {
 		return logicalFontNamesAlphabetically.get(mappedValue);

@@ -34,8 +34,8 @@ public class MappedValuePropertyPanel extends PropertyPanel<MappedValue<?>>  {
 
 	private JComboBox<MappedValue<?>> jComboBox = new JComboBox<MappedValue<?>>();
 
-	public MappedValuePropertyPanel(SoundCanvasWrapper soundCanvasWrapper, final Set<MappedValue<?>> values, Object value) {
-		super(soundCanvasWrapper);
+	public MappedValuePropertyPanel(SoundCanvasWrapper soundCanvasWrapper, Object valueOwner, final Set<MappedValue<?>> values, Object value) {
+		super(soundCanvasWrapper, valueOwner);
 		for(MappedValue<?> v : values) {
 			jComboBox.addItem(v);
 		}

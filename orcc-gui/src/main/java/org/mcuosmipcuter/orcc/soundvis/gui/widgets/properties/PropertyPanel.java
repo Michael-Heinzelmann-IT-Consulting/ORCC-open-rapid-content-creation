@@ -51,18 +51,18 @@ public abstract  class PropertyPanel <T> extends JPanel {
 	protected JLabel nameLabel = new JLabel();
 
 	// reference for writing the property
-	private final SoundCanvas soundCanvas;
+	private final Object valueOwner;
 	private final SoundCanvasWrapper soundCanvasWrapper;
 	
 	/**
 	 * New panel with a grid layout
 	 */
-	public PropertyPanel(SoundCanvasWrapper soundCanvasWrapper) {
+	public PropertyPanel(SoundCanvasWrapper soundCanvasWrapper, Object valueOwner) {
 		if(soundCanvasWrapper == null) {
 			throw new IllegalArgumentException("soundCanvas null not allowed!");
 		}
 		this.soundCanvasWrapper = soundCanvasWrapper;
-		this.soundCanvas = soundCanvasWrapper.getSoundCanvas();
+		this.valueOwner = valueOwner;
 		setLayout(new BorderLayout(6, 6));
 		add(nameLabel, BorderLayout.WEST);
 	}
@@ -72,13 +72,13 @@ public abstract  class PropertyPanel <T> extends JPanel {
 	 */
 	protected void setNewValue(T value) {
 		 try {
-			Field field = soundCanvas.getClass().getDeclaredField(getName());
+			Field field = valueOwner.getClass().getDeclaredField(getName());
 			if(field.isAnnotationPresent(TimedChange.class)) {
 				Context.beforePropertyUpdate(field.getName());
 			}
 			field.setAccessible(true);
         	//System.err.println(System.currentTimeMillis()  + " before field.set ");
-			field.set(soundCanvas, value);
+			field.set(valueOwner, value);
 			//System.err.println(System.currentTimeMillis()  + " after field.set ");
 			setCurrentValue(value);
 			soundCanvasWrapper.propertyWritten(field);

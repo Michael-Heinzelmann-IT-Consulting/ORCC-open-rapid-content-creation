@@ -94,9 +94,9 @@ public class Row extends JPanel {
 				//gc.gridx = GridBagConstraints.EAST;
 				gc.insets = new Insets(3, 6, 3, 6);
 				panel.setLayout(new GridBagLayout());
-				Set<PropertyPanel<?>> props = PropertyPanelFactory.getCanvasPanels(soundCanvasWrapper);
+				Set<JPanel> props = PropertyPanelFactory.getCanvasPanels(soundCanvasWrapper);
 
-				for(final PropertyPanel<?> p : props) {
+				for(final JPanel p : props) {
 					panel.add(p, gc);
 				}
 			}

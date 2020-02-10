@@ -47,8 +47,8 @@ public class StringPropertyPanel extends PropertyPanel<String> {
 	 * Constructor
 	 * @param soundCanvas the canvas to work with
 	 */
-	public StringPropertyPanel(SoundCanvasWrapper soundCanvasWrapper) {
-		super(soundCanvasWrapper);
+	public StringPropertyPanel(SoundCanvasWrapper soundCanvasWrapper, Object valueOwner) {
+		super(soundCanvasWrapper, valueOwner);
 		JPanel valueSelect = new JPanel();
 		valueSelect.setLayout(new GridLayout(1, 2));
 		textLabel.setFont(new Font("Monospaced", Font.PLAIN, 12));

@@ -47,8 +47,8 @@ public class BufferedImagePropertyPanel extends PropertyPanel<BufferedImage> {
 	 * Constructor
 	 * @param soundCanvas the canvas to work with
 	 */
-	public BufferedImagePropertyPanel(final SoundCanvasWrapper soundCanvasWrapper) {
-		super(soundCanvasWrapper);
+	public BufferedImagePropertyPanel(final SoundCanvasWrapper soundCanvasWrapper, Object valueOwner) {
+		super(soundCanvasWrapper, valueOwner);
 		thumbLabel.setOpaque(true);
 		JPanel valueSelect = new JPanel();
 		valueSelect.setLayout(new GridLayout(1, 2));

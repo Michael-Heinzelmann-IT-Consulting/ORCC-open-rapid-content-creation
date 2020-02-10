@@ -36,8 +36,8 @@ public class BooleanPropertyPanel extends PropertyPanel<Boolean> {
 	 * Constructor
 	 * @param soundCanvas the canvas to work with
 	 */
-	public BooleanPropertyPanel(SoundCanvasWrapper soundCanvasWrapper) {
-		super(soundCanvasWrapper);
+	public BooleanPropertyPanel(SoundCanvasWrapper soundCanvasWrapper, Object valueOwner) {
+		super(soundCanvasWrapper, valueOwner);
 		add(check);
 		check.addChangeListener(new ChangeListener() {
 			boolean checked = check.isSelected();

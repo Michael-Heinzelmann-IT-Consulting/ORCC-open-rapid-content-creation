@@ -68,8 +68,8 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 	 * Constructor
 	 * @param soundCanvas the canvas to work with
 	 */
-	public MultiImagePropertyPanel(final SoundCanvasWrapper soundCanvasWrapper) {
-		super(soundCanvasWrapper);
+	public MultiImagePropertyPanel(final SoundCanvasWrapper soundCanvasWrapper, Object valueOwner) {
+		super(soundCanvasWrapper, valueOwner);
 
 		JPanel valueSelect = new JPanel();
 		valueSelect.setLayout(new BorderLayout(2, 2));

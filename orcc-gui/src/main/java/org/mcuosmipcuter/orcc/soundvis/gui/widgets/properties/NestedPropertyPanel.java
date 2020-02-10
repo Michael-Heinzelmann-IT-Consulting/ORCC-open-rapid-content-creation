@@ -15,37 +15,33 @@
 *   You should have received a copy of the GNU General Public License
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package org.mcuosmipcuter.orcc.soundvis.gui;
+package org.mcuosmipcuter.orcc.soundvis.gui.widgets.properties;
 
+import java.awt.Color;
 import java.awt.GridLayout;
 import java.util.Set;
 
 import javax.swing.JPanel;
-
-import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
-import org.mcuosmipcuter.orcc.soundvis.Context;
-import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
-import org.mcuosmipcuter.orcc.soundvis.gui.widgets.properties.PropertyPanel;
-import org.mcuosmipcuter.orcc.soundvis.gui.widgets.properties.PropertyPanelFactory;
+import javax.swing.border.EtchedBorder;
 
 
 /**
- * Panel to display the canvas properties editors, it updates itself by being a {@link Context.Listener}
+ * Panel to display nested canvas properties editors
  * @author Michael Heinzelmann
  */
-public class CanvasPropertyPanel extends JPanel {
+public class NestedPropertyPanel extends JPanel {
 	
 	private static final long serialVersionUID = 1L;
 	
 	/**
 	 * Sets up a grid layout
 	 */
-	public CanvasPropertyPanel(final SoundCanvasWrapper soundCanvasWrapper) {
+	public NestedPropertyPanel(Set<PropertyPanel<?>> props) {
 
-		GridLayout gl = new GridLayout(10, 1, 5, 4);		
+		setBackground(Color.YELLOW);
+		setBorder(new EtchedBorder(EtchedBorder.LOWERED));
+		GridLayout gl = new GridLayout(props.size()/2 , 2, 5, 4);		
 		setLayout(gl);
-		
-		Set<JPanel> props = PropertyPanelFactory.getCanvasPanels(soundCanvasWrapper);
 
 		for(final JPanel p : props) {
 			add(p);
