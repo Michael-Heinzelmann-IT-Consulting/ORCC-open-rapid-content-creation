@@ -18,21 +18,15 @@
 package org.mcuosmipcuter.orcc.soundvis.gui;
 
 import java.awt.AlphaComposite;
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Composite;
-import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.MultipleGradientPaint.CycleMethod;
-import java.awt.Point;
-import java.awt.RadialGradientPaint;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.image.BufferedImage;
 import java.util.EnumSet;
 
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
@@ -68,7 +62,6 @@ public class GraphPanel extends JPanel implements Renderer, Zoomable {
 	private float zoomFactor = 0.5f;
 	private boolean autoZoom;
 
-	private long frameCount;
 	ProgressPainterThread progressPainterThread = new ProgressPainterThread();
 	private boolean updating;
 	private String updateString;
@@ -128,7 +121,6 @@ public class GraphPanel extends JPanel implements Renderer, Zoomable {
 		});
 	}
 	
-	// our 'logo'
 	private void drawDefaultBackGround() {
 		int width = Context.getVideoOutputInfo().getWidth();
 		int height = Context.getVideoOutputInfo().getHeight();
@@ -136,7 +128,6 @@ public class GraphPanel extends JPanel implements Renderer, Zoomable {
 		frameImage = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
 		graphics = frameImage.createGraphics();
 		graphics.setColor(Color.WHITE);
-		graphics.setPaint(new RadialGradientPaint(new Point(0, 0), height, new float[] {0.0f, 0.5f}, new Color[] {Color.WHITE, Color.GRAY}, CycleMethod.REFLECT));
 		graphics.fillRect(0, 0, width, height);
 	}
 	
@@ -147,13 +138,13 @@ public class GraphPanel extends JPanel implements Renderer, Zoomable {
 
 		soundCanvasArray = Context.getSoundCanvasList().toArray(new SoundCanvasWrapper[0]);
 
-		drawDefaultBackGround();
-
 		for(SoundCanvas soundCanvas : soundCanvasArray) {
 			if(prepare) {
 				soundCanvas.prepare(Context.getAudioInput().getAudioInputInfo(), Context.getVideoOutputInfo());
 			}
-			soundCanvas.newFrame(Context.getAppState() == AppState.PLAYING ? frameCount : Context.getSongPositionPointer(), graphics);
+			if(Context.getAppState() != AppState.PLAYING && Context.getAppState() != AppState.EXPORTING) {
+				soundCanvas.newFrame(Context.getSongPositionPointer(), graphics);
+			}
 		}
 
 		repaint();
@@ -225,7 +216,6 @@ public class GraphPanel extends JPanel implements Renderer, Zoomable {
 		if(mixin != null) {
 			mixin.newFrame(frameCount, sendPost);
 		}
-		this.frameCount = frameCount;
 	}
 
 	@Override
