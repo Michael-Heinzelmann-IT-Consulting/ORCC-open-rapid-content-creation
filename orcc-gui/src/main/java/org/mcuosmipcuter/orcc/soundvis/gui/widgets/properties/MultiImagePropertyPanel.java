@@ -72,17 +72,18 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 		super(soundCanvasWrapper, valueOwner);
 
 		JPanel valueSelect = new JPanel();
-		valueSelect.setLayout(new BorderLayout(2, 2));
-		fileButton.setPreferredSize(new Dimension(80, 80));
-		fileButton.setFont(getFont().deriveFont(48.0f));
+		//valueSelect.setLayout(new BorderLayout(2, 2));
+		//fileButton.setPreferredSize(new Dimension(80, 80));
+		//fileButton.setFont(getFont().deriveFont(48.0f));
 
 		imagebar.setBackground(Color.BLACK);
 
         JScrollPane scrollPane = new JScrollPane(imagebar);
         scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-		valueSelect.add(scrollPane);
-		valueSelect.setPreferredSize(new Dimension(500, 240));
-		add(valueSelect);
+		//valueSelect.add(scrollPane);
+		//valueSelect.setPreferredSize(new Dimension(500, 240));
+        //valueSelect.add(fileButton);
+		add(fileButton);
 		
 		fileButton.addActionListener(new ActionListener() {
 			
@@ -276,7 +277,7 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 			gc.weightx = 1.0;
 			gc.gridwidth = col == COLS ? GridBagConstraints.REMAINDER : 1; //end row
 			gridbag.setConstraints(fileButton, gc);
-			images.add(fileButton, gc);
+			//images.add(fileButton, gc);
 			imagebar.add(images, BorderLayout.LINE_START);
 
 

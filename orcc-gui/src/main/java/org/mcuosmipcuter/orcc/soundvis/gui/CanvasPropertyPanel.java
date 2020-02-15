@@ -17,6 +17,7 @@
 */
 package org.mcuosmipcuter.orcc.soundvis.gui;
 
+import java.awt.Color;
 import java.awt.GridLayout;
 import java.util.Set;
 
@@ -41,14 +42,14 @@ public class CanvasPropertyPanel extends JPanel {
 	 * Sets up a grid layout
 	 */
 	public CanvasPropertyPanel(final SoundCanvasWrapper soundCanvasWrapper) {
-
-		GridLayout gl = new GridLayout(10, 1, 5, 4);		
-		setLayout(gl);
+setBackground(Color.GREEN);
+		//GridLayout gl = new GridLayout(5, 2, 5, 4);		
+		//setLayout(gl);
 		
 		Set<JPanel> props = PropertyPanelFactory.getCanvasPanels(soundCanvasWrapper);
 
 		for(final JPanel p : props) {
-			add(p);
+			//add(p);
 		}
 	}
 	

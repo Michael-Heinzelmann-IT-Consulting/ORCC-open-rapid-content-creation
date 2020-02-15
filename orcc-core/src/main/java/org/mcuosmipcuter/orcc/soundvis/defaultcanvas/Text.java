@@ -24,6 +24,9 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
+import java.awt.font.FontRenderContext;
+import java.awt.font.GlyphVector;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.lang.reflect.Field;
 import java.util.Calendar;
@@ -40,6 +43,8 @@ import org.mcuosmipcuter.orcc.api.util.DimensionHelper;
 import org.mcuosmipcuter.orcc.api.util.TextHelper;
 import org.mcuosmipcuter.orcc.soundvis.FontStore;
 import org.mcuosmipcuter.orcc.soundvis.effects.Fader;
+import org.mcuosmipcuter.orcc.soundvis.effects.Mover;
+import org.mcuosmipcuter.orcc.soundvis.effects.Shearer;
 import org.mcuosmipcuter.orcc.util.IOUtil;
 
 /**
@@ -99,6 +104,15 @@ public class Text implements SoundCanvas, PropertyListener {
 	
 	@NestedProperty(description="fading in and out")
 	private Fader fader = new Fader();
+	
+	@NestedProperty(description = "moving in and out")
+	private Mover mover = new Mover();
+	
+	@NestedProperty(description = "shear")
+	private Shearer shearer = new Shearer();
+	@NestedProperty(description = "shear")
+	private Shearer ishearer = new Shearer();
+	
 	
 	VideoOutputInfo videoOutputInfo;
 	private DimensionHelper dimensionHelper;
@@ -245,7 +259,18 @@ public class Text implements SoundCanvas, PropertyListener {
 
 		int lineTop = topPixels + ascent;
 		int lineIdx = 0;
-		Composite origComposite = fader.fade(graphics2d, posInSlideDuration, (int)(frameTo - frameFrom));
+		final Composite origComposite = fader.fade(graphics2d, posInSlideDuration, (int)(frameTo - frameFrom));
+		
+		final AffineTransform saveTransfrom = graphics2d.getTransform();
+		
+		AffineTransform transform = shearer.shear(posInSlideDuration, (int)(frameTo - frameFrom));
+		transform.concatenate(mover.move(posInSlideDuration, (int)(frameTo - frameFrom)));
+
+
+		
+		if(!transform.isIdentity()) {
+			graphics2d.setTransform(transform);
+		}
 		
 		for(String line : lines) {
 			if(lineIdx >= startIdx && lineIdx < startIdx + linesToUse) {
@@ -279,7 +304,17 @@ public class Text implements SoundCanvas, PropertyListener {
 				else {
 					lineToUse = line;
 				}
-				graphics2d.drawString(lineToUse, leftMargin, lineTop);	
+				FontRenderContext frx = graphics2d.getFontRenderContext();
+				GlyphVector gv = font.createGlyphVector(frx, lineToUse);
+
+				AffineTransform glyphTx = ishearer.shear(0, 0);
+				//glyphTx.quadrantRotate(1);
+				for(int i = 0; i < lineToUse.length(); i++) {
+					gv.setGlyphTransform(i, glyphTx );
+					
+				}
+				graphics2d.drawGlyphVector(gv, leftMargin, lineTop);
+				//graphics2d.drawString(lineToUse, leftMargin, lineTop);	
 				
 				lineTop += strHeight;
 			}
@@ -299,6 +334,8 @@ public class Text implements SoundCanvas, PropertyListener {
 		}
 		
 		graphics2d.setComposite(origComposite);
+		saveTransfrom.setToIdentity();
+		graphics2d.setTransform(saveTransfrom);
 	}
 	
 	private void adjustTextModel() {
@@ -345,7 +382,7 @@ public class Text implements SoundCanvas, PropertyListener {
 	@Override
 	public void updateUI(int width, int height, Graphics2D graphics) {
 		graphics.setColor(textColor);
-		TextHelper.writeText(text, graphics, height, textColor, width, height / 10);
+		TextHelper.writeText(text, graphics, height / 3, textColor, width, height / 3);
 		
 	}
 

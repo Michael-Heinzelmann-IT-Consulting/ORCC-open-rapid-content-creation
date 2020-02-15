@@ -19,11 +19,14 @@ package org.mcuosmipcuter.orcc.soundvis.gui.widgets.properties;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
+import java.awt.GridLayout;
 import java.lang.reflect.Field;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.TimedChange;
@@ -63,8 +66,12 @@ public abstract  class PropertyPanel <T> extends JPanel {
 		}
 		this.soundCanvasWrapper = soundCanvasWrapper;
 		this.valueOwner = valueOwner;
-		setLayout(new BorderLayout(6, 6));
-		add(nameLabel, BorderLayout.WEST);
+		//setLayout(new BorderLayout(6, 6));
+		GridLayout gl = new GridLayout(1 , 2, 12, 12);		
+		setLayout(gl);
+		nameLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+		add(nameLabel);
+		//setPreferredSize(new Dimension(150, 25));
 	}
 	/**
 	 * This is where we actually write the new value by using reflection
@@ -85,6 +92,10 @@ public abstract  class PropertyPanel <T> extends JPanel {
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}
+	}
+	@Override
+	public Dimension getPreferredSize() {
+		return new Dimension(100, 25);
 	}
 	protected void addSelectorComponent(Component c) {
 		GridBagConstraints gc = new GridBagConstraints();

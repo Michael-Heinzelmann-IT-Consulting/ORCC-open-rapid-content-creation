@@ -18,18 +18,22 @@
 package org.mcuosmipcuter.orcc.gui.table;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Insets;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import javax.swing.JPanel;
+import javax.swing.border.LineBorder;
 
-import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
 import org.mcuosmipcuter.orcc.soundvis.gui.CanvasPropertyPanel;
+import org.mcuosmipcuter.orcc.soundvis.gui.widgets.properties.NestedPropertyPanel;
 import org.mcuosmipcuter.orcc.soundvis.gui.widgets.properties.PropertyPanel;
 import org.mcuosmipcuter.orcc.soundvis.gui.widgets.properties.PropertyPanelFactory;
 
@@ -57,7 +61,7 @@ public class Row extends JPanel {
 	public Row(SoundCanvasWrapper soundCanvasWrapper) {
 		this.soundCanvasWrapper = soundCanvasWrapper;
 		this.canvasPropertyPanel = new CanvasPropertyPanel(soundCanvasWrapper);
-		
+
 	}
 
 	/**
@@ -87,16 +91,48 @@ public class Row extends JPanel {
 		else {
 			if(panel == null) {
 				panel = new JPanel();
-				//GridLayout gl = new GridLayout(0, 1, 5, 4);
-				GridBagConstraints gc = new GridBagConstraints();
-				gc.gridwidth = GridBagConstraints.REMAINDER;	
-				gc.fill = GridBagConstraints.HORIZONTAL;
-				//gc.gridx = GridBagConstraints.EAST;
-				gc.insets = new Insets(3, 6, 3, 6);
-				panel.setLayout(new GridBagLayout());
 				Set<JPanel> props = PropertyPanelFactory.getCanvasPanels(soundCanvasWrapper);
-
+				//GridLayout gl = new GridLayout(0, 3, 5, 4);
+				GridBagConstraints gc = new GridBagConstraints();
+				//gc.gridwidth = GridBagConstraints.REMAINDER;	
+				//gc.fill = GridBagConstraints.HORIZONTAL;
+				//gc.gridx = GridBagConstraints.EAST;
+				//gc.insets = new Insets(3, 6, 3, 6);
+				GridBagLayout gl = new GridBagLayout();
+				panel.setLayout(gl);
+				//panel.setLayout(gl);
+				//gc.fill = GridBagConstraints.BOTH;
+				gc.fill = GridBagConstraints.BOTH;
+				gc.anchor = GridBagConstraints.LINE_START;
+		         gc.weightx = 1;
+				Set<JPanel> nestedProps = new LinkedHashSet<JPanel>();
+				int c = 0;
 				for(final JPanel p : props) {
+//					if(p instanceof NestedPropertyPanel) {
+//						nestedProps.add(p);
+//					}
+//					else {
+						c++;
+						//gc.gridx = c;
+						if(c == 3) {
+							gc.gridwidth = GridBagConstraints.REMAINDER;
+							c = 0;
+						}
+						else {
+							gc.gridwidth = 1;
+						}
+						//gc.gridwidth = c % 3 == 0 ? GridBagConstraints.REMAINDER : GridBagConstraints.RELATIVE;
+						//gc.gridwidth = GridBagConstraints.RELATIVE;
+						gl.setConstraints(p, gc);
+						p.setBackground(Color.LIGHT_GRAY
+								);
+						panel.add(p);
+//					}
+				}
+				for(final JPanel p : nestedProps) {
+					//gc.weightx = 0.0; 
+					
+					gc.gridwidth = GridBagConstraints.REMAINDER; //end row
 					panel.add(p, gc);
 				}
 			}

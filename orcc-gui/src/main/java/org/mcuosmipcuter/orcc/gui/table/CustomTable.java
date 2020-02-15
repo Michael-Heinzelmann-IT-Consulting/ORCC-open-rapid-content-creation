@@ -44,8 +44,10 @@ import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JSpinner.DefaultEditor;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.LineBorder;
+import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -231,7 +233,7 @@ public class CustomTable extends JPanel{
 		setLayout(new GridBagLayout());
 	}
 	private  BufferedImage getImage() {
-		int width = 60;
+		int width = 120;
 		int height = 30;
 		
 		BufferedImage frameImage = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
@@ -247,12 +249,17 @@ public class CustomTable extends JPanel{
 	 */
 	public void addLayer(final SoundCanvasWrapper soundCanvasWrapper) {
 		final Row row = new Row(soundCanvasWrapper);
-		row.setPreferredSize(new Dimension(640, 36));
+		//row.setPreferredSize(new Dimension(640, 36));
+		row.setPreferredSize(new Dimension(640, 64));
 		row.setLayout(new BorderLayout());
-		row.setBorder(new EtchedBorder());
+		TitledBorder tb = new TitledBorder(new LineBorder(Color.ORANGE, 8));
+		tb.setTitle(soundCanvasWrapper.getDisplayName());
+		tb.setTitlePosition(TitledBorder.TOP);
+		row.setBorder(tb);
+		//row.setBorder(new LineBorder(Color.ORANGE, 6));
 		row.setBackground(Color.WHITE);
-		final JLabel layer = new JLabel(soundCanvasWrapper.getDisplayName());
-		layer.setPreferredSize(new Dimension(180, 16));
+		final JLabel layer = new JLabel(/*soundCanvasWrapper.getDisplayName()*/);
+		layer.setPreferredSize(new Dimension(140, 16));
 		layer.setToolTipText("edit or move " + soundCanvasWrapper.getDisplayName());
 		soundCanvasWrapper.setIconImage(getImage());
 		soundCanvasWrapper.addPropertyChangeListener(new PropertyListener() {
@@ -268,7 +275,7 @@ public class CustomTable extends JPanel{
 					System.err.println("Cust table after canvasPropertyWritten " + name);
 					//Context.beforePropertyUpdate(name);
 				
-				soundCanvasWrapper.updateUI(60, 30, (Graphics2D) soundCanvasWrapper.getIconImage().getGraphics());
+				soundCanvasWrapper.updateUI(120, 30, (Graphics2D) soundCanvasWrapper.getIconImage().getGraphics());
 				//System.err.println((System.currentTimeMillis() - start) + "ms updateUI name " + name);
 				layer.setIcon(new ImageIcon(soundCanvasWrapper.getIconImage()));
 
@@ -374,7 +381,7 @@ public class CustomTable extends JPanel{
 		timeline.add(xorCheckBox);
 
 		BufferedImage image = getImage();
-		soundCanvasWrapper.updateUI(60, 30, image.createGraphics());
+		soundCanvasWrapper.updateUI(120, 30, image.createGraphics());
 		layer.setIcon(new ImageIcon(image));
 
 		final JLabel remove = new JLabel(" x ");

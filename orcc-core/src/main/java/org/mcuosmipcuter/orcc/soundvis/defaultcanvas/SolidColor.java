@@ -18,14 +18,17 @@
 package org.mcuosmipcuter.orcc.soundvis.defaultcanvas;
 
 import java.awt.Color;
+import java.awt.Composite;
 import java.awt.Graphics2D;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
 import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
+import org.mcuosmipcuter.orcc.api.soundvis.NestedProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.api.util.AmplitudeHelper;
+import org.mcuosmipcuter.orcc.soundvis.effects.Fader;
 
 /**
  * Displays a solid color
@@ -43,6 +46,11 @@ public class SolidColor implements SoundCanvas {
 	@LimitedIntProperty(description = "min 1", minimum = 1)
 	@UserProperty(description="color of the area")
 	private int modulus = 1;
+	private long frameFrom;
+	private long frameTo;
+	
+	@NestedProperty(description = "fading in and out")
+	private Fader fader = new Fader();
 
 	@Override
 	public void nextSample(int[] amplitudes) {
@@ -52,7 +60,9 @@ public class SolidColor implements SoundCanvas {
 	public void newFrame(long frameCount, Graphics2D graphics2D) {	
 		if(frameCount % modulus == 0 || frameCount == 1) {
 			graphics2D.setColor(color);
+			Composite origComposite = fader.fade(graphics2D, (int)(frameCount - frameFrom), (int)(frameTo - frameFrom));
 			graphics2D.fillRect(0, 0, width, height);
+			graphics2D.setComposite(origComposite);
 		}
 	}
 
@@ -76,6 +86,10 @@ public class SolidColor implements SoundCanvas {
 			graphics.setColor(Color.BLACK);
 			graphics.drawRect(0, 0, width -1, height - 1);
 		}
+	}
+	public void setFrameRange(long frameFrom, long frameTo){
+		this.frameFrom = frameFrom;
+		this.frameTo = frameTo;
 	}
 
 }
