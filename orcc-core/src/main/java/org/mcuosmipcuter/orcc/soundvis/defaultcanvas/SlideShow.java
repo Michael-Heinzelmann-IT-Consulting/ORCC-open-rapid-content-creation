@@ -445,6 +445,10 @@ public class SlideShow implements SoundCanvas {
 			graphics.drawString(slides.length + " images", 4, heightPx - 2);
 			updateSlides();
 		}
+		else {
+			graphics.setColor(Color.DARK_GRAY);
+			graphics.drawString("-- no slides --", 4, heightPx - 2);
+		}
 	}
 
 	@Override
