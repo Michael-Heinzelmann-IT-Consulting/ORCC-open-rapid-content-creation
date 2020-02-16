@@ -29,14 +29,14 @@ public class Mover {
 	private int moveInXSpeed;
 	
 	@UserProperty(description="in move 0 means none")
-	private int moveOutXFrames;
-	@UserProperty(description="move out x speed")
-	private int moveOutXSpeed;
-	
-	@UserProperty(description="in move 0 means none")
 	private int moveInYFrames;
 	@UserProperty(description="move in y speed")
 	private int moveInYSpeed;
+	
+	@UserProperty(description="in move 0 means none")
+	private int moveOutXFrames;
+	@UserProperty(description="move out x speed")
+	private int moveOutXSpeed;
 	
 	@UserProperty(description="in move 0 means none")
 	private int moveOutYFrames;
@@ -70,6 +70,22 @@ public class Mover {
 				
 		return translateX != 0 || translateY != 0 ? new AffineTransform(1, 0, 0, 1, translateX,translateY) : new AffineTransform();
 
+	}
+
+	public int getMoveInXFrames() {
+		return moveInXFrames;
+	}
+
+	public int getMoveInYFrames() {
+		return moveInYFrames;
+	}
+
+	public int getMoveOutXFrames() {
+		return moveOutXFrames;
+	}
+
+	public int getMoveOutYFrames() {
+		return moveOutYFrames;
 	}
 
 }

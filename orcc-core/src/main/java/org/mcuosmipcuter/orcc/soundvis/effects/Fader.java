@@ -74,4 +74,14 @@ public class Fader {
 		return saveComposite;
 	}
 
+
+	public int getFadeIn() {
+		return fadeIn;
+	}
+
+
+	public int getFadeOut() {
+		return fadeOut;
+	}
+
 }
