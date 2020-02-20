@@ -20,7 +20,6 @@ package org.mcuosmipcuter.orcc.soundvis.effects;
 import java.awt.geom.AffineTransform;
 
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
-import org.mcuosmipcuter.orcc.soundvis.defaultcanvas.SlideShow.SCALE_RULE;
 
 /**
  * @author user
@@ -32,9 +31,9 @@ public class Scaler {
 		HORIZONTAL, VERTICAL, BOTH
 	}
 	@UserProperty(description="max size x")
-	private int maxScaleX = 1;
+	private int maxScaleXPercent = 100;
 	@UserProperty(description="max size y")
-	private int maxScaleY = 1;
+	private int maxScaleYPercent = 100;
 	
 	@UserProperty(description="in scale 0 means none")
 	private int scaleIn;
@@ -51,8 +50,8 @@ public class Scaler {
 	public AffineTransform scale(int posInSlideDuration, int numberOfFramesSlideIsVisible) {
 		AffineTransform transform = new AffineTransform();
 
-		float scaleX = maxScaleX;
-		float scaleY = maxScaleY;
+		float scaleX = maxScaleXPercent / 100f;
+		float scaleY = maxScaleYPercent / 100f;
 		float currentScaleIn = 1;
 		float currentScaleOut = 1;
 
@@ -87,7 +86,7 @@ public class Scaler {
 			transform.scale(scaleX, scaleY);
 		}
 		else {
-			transform.scale(maxScaleX, maxScaleY);
+			transform.scale(maxScaleXPercent / 100f, maxScaleYPercent / 100f);
 		}
 
 		

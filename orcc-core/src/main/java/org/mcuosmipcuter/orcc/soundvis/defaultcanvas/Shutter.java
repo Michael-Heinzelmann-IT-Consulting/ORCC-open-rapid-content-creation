@@ -28,12 +28,14 @@ import java.awt.geom.Area;
 import java.awt.geom.Ellipse2D;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
+import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.NestedProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.api.util.DimensionHelper;
 import org.mcuosmipcuter.orcc.soundvis.effects.Fader;
+import org.mcuosmipcuter.orcc.soundvis.effects.Mover;
 import org.mcuosmipcuter.orcc.soundvis.effects.Positioner;
 import org.mcuosmipcuter.orcc.soundvis.effects.Scaler;
 
@@ -51,6 +53,9 @@ public class Shutter implements SoundCanvas {
 	private Color color = Color.BLACK;
 	@UserProperty(description="color of the area")
 	private CLIP_SHAPE clipShape = CLIP_SHAPE.RECTANGLE;
+	@LimitedIntProperty(description = "limits" , minimum = 1, maximum = 36)
+	@UserProperty(description="rotate multiply the area")
+	private int multiPlyRotated = 1;
 	
 	private int width;
 	private int height;
@@ -94,19 +99,48 @@ public class Shutter implements SoundCanvas {
 		  }
 				  
 			
-			AffineTransform ats = scaler.scale(posInSlideDuration, (int)(frameTo - frameFrom));
-			//ats.concatenate(atp);
-			Area seeTrough = new Area(clip);
 
-			//seeTrough.transform(ats);
+
+			Area clipAreaInside = new Area(clip);
+			Area clipAreaRotated = new Area(clip);
+			AffineTransform ats = scaler.scale(posInSlideDuration, (int)(frameTo - frameFrom));
+			clipAreaInside.transform(ats);
+			clipAreaRotated.transform(ats);
 			
-			seeTrough.transform(ats);
-			AffineTransform atp = positioner.position(dimensionHelper, seeTrough.getBounds());
-			seeTrough.transform(atp);
-			//fillArea.exclusiveOr(seeTrough);
+			AffineTransform atp = positioner.position(dimensionHelper, clipAreaInside.getBounds());
+			
+			clipAreaInside.transform(atp);
+			clipAreaRotated.transform(atp);
+			System.err.println(clipAreaInside.getBounds());
+			System.err.println(clipAreaRotated.getBounds());
+			
+			int centerX = clipAreaInside.getBounds().x +  clipAreaInside.getBounds().width / 2;
+			int centerY = clipAreaInside.getBounds().y +  clipAreaInside.getBounds().height / 2;
+			
+			System.err.println(centerX + "-" + centerY);
+			
+			double theta = Math.PI / (double)multiPlyRotated ;
+			System.err.println(theta);
+//			tr.rotate((Math.PI /3.0)*4, centerX, centerY);
+//			clipAreaInside.transform(tr);
+			for(int i = 2; i <= multiPlyRotated; i++) {
+				AffineTransform tr = new AffineTransform();
+				tr.rotate(theta , centerX, centerY);
+				clipAreaRotated.transform(tr);
+				clipAreaInside.add(clipAreaRotated);
+				//clipAreaInside = clipAreaRotated;
+			}
+		
+			
+
+
+
+
 
 			Area fillArea = new Area(screen);
-			fillArea.subtract(seeTrough);
+			fillArea.subtract(clipAreaInside);
+
+
 			graphics2D.setColor(color);
 
 			//final AffineTransform saveAT = graphics2D.getTransform();
