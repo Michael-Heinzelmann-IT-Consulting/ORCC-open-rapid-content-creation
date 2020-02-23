@@ -33,6 +33,7 @@ import org.mcuosmipcuter.orcc.api.soundvis.PropertyListener;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.api.util.AmplitudeHelper;
+import org.mcuosmipcuter.orcc.soundvis.Context;
 import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
 
 /**
@@ -179,12 +180,25 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 	@Override
 	public void setFrameFrom(long frameFrom) {
 		this.frameFrom = frameFrom;
-		soundCanvas.setFrameRange(frameFrom, frameTo);
+		soundCanvas.setFrameRange(frameFrom, calculateFrameToConcrete(frameTo));
 	}
 	@Override
 	public void setFrameTo(long frameTo) {
-		this.frameTo = frameTo;
-		soundCanvas.setFrameRange(frameFrom, frameTo);
+		this.frameTo = calculateFrameToConcrete(frameTo);
+		soundCanvas.setFrameRange(frameFrom, this.frameTo);
+	}
+	private long calculateFrameToConcrete(long to) {
+		long frameToConcrete = to;
+		if (to == 0) {
+			AudioInputInfo audioInputInfo = Context.getAudioInput().getAudioInputInfo();
+			double audioLength = (double) audioInputInfo.getFrameLength();
+			double sampleRate = audioInputInfo.getAudioFormat().getSampleRate();
+			double numberOfSeconds = audioLength / sampleRate;
+
+			double frameRate = Context.getVideoOutputInfo().getFramesPerSecond();
+			frameToConcrete = (long) Math.floor(numberOfSeconds * frameRate);
+		}
+		return frameToConcrete;
 	}
 	@Override
 	public boolean isSelected() {

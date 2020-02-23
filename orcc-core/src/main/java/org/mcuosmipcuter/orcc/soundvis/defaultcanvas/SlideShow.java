@@ -40,6 +40,7 @@ import org.mcuosmipcuter.orcc.api.util.DimensionHelper;
 import org.mcuosmipcuter.orcc.soundvis.defaultcanvas.model.Slide;
 import org.mcuosmipcuter.orcc.soundvis.effects.Fader;
 import org.mcuosmipcuter.orcc.soundvis.effects.Mover;
+import org.mcuosmipcuter.orcc.soundvis.effects.Rotator;
 import org.mcuosmipcuter.orcc.util.IOUtil;
 
 
@@ -82,9 +83,9 @@ public class SlideShow implements SoundCanvas {
 	VideoOutputInfo videoOutputInfo;
 	AudioInputInfo audioInputInfo;
 	
-	@UserProperty(description="rotate dgrees per frame")
-	private int rotate = 0;
-	double rotatePosition;
+//	@UserProperty(description="rotate dgrees per frame")
+//	private int rotate = 0;
+//	double rotatePosition;
 	
 	@UserProperty(description="cout out")
 	private CLIP_SHAPE cutOut = CLIP_SHAPE.NONE;
@@ -110,56 +111,12 @@ public class SlideShow implements SoundCanvas {
 	private Fader fader = new Fader();
 	@NestedProperty(description = "moving in and out")
 	private Mover mover = new Mover();
-	
-//	@UserProperty(description="number of frames to fade in")
-//	private int fadeIn = 0;
-//	AlphaComposite ac  = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f);
-//	
-//	@UserProperty(description="number of frames to fade out")
-//	private int fadeOut = 0;
-//	
-//	@UserProperty(description="rule for composite in")
-//	private RULE compositeInRule = RULE.SRC_OVER;
-//	
-//	@UserProperty(description="rule for composite out")
-//	private RULE compositeOutRule = RULE.SRC_OVER;
-	
-//	public static enum RULE {
-//		CLEAR(1), SRC(2), DST(9), SRC_OVER(3), DST_OVER(4), SRC_IN(5), DST_IN(6), SRC_OUT(7), DST_OUT(8), SRC_ATOP(10),
-//		DST_ATOP(11), XOR(12);
-//
-//		private int number;
-//
-//		private RULE(int number) {
-//			this.number = number;
-//		}
-//		public int getNumber() {
-//			return this.number;
-//		}
-//	}
-//	@UserProperty(description="in move 0 means none")
-//	private int moveInXFrames;
-//	@UserProperty(description="move in x speed")
-//	private int moveInXSpeed;
-//	
-//	@UserProperty(description="in move 0 means none")
-//	private int moveOutXFrames;
-//	@UserProperty(description="move out x speed")
-//	private int moveOutXSpeed;
-//	
-//	@UserProperty(description="in move 0 means none")
-//	private int moveInYFrames;
-//	@UserProperty(description="move in y speed")
-//	private int moveInYSpeed;
-//	
-//	@UserProperty(description="in move 0 means none")
-//	private int moveOutYFrames;
-//	@UserProperty(description="move out y speed")
-//	private int moveOutYSpeed;
+	@NestedProperty(description = "rotate in and out")
+	private Rotator rotator = new Rotator();
 
 	private long frameFrom;
 	private long frameTo;
-	private long frameToConcrete;
+
 	private List<DisplayDuration<Slide>> currentShowing = new ArrayList<>(3);
 
 	@Override
@@ -244,34 +201,9 @@ public class SlideShow implements SoundCanvas {
 						currentScaleY = currentScale;
 					}
 				}
-				// adTo
-//				int currCenterX = centerX + duration.getDisplayObject().getPosition() * 15;
-//				int currCenterY = centerY + duration.getDisplayObject().getPosition() * 5;
-				// TODO
 				
 				float translateX =  ((float)(videoOutputInfo.getWidth() + dimensionHelper.realX(centerX) - (origW * scaleX))) / 2f ;
 				float translateY =    ((float)(videoOutputInfo.getHeight() + dimensionHelper.realY(centerY) -(origH * scaleY))) / 2f;
-//				
-//				if(moveInXFrames != 0 && posInSlideDuration <= Math.abs(moveInXFrames)) {
-//					int framesToGo = Math.abs(moveInXFrames) - posInSlideDuration;
-//					framesToGo = framesToGo > 0 ? framesToGo : 0;
-//					translateX = translateX -  framesToGo * moveInXSpeed;
-//				}
-//
-//				if(moveOutXFrames != 0 && posInSlideDuration > (numberOfFramesSlideIsVisible - Math.abs(moveOutXFrames))) {
-//					int movedFrames = posInSlideDuration - (numberOfFramesSlideIsVisible - Math.abs(moveOutXFrames));
-//					translateX = translateX +  movedFrames * moveOutXSpeed;
-//				}
-//				if(moveInYFrames != 0 && posInSlideDuration <= Math.abs(moveInYFrames)) {
-//					int framesToGo = Math.abs(moveInYFrames) - posInSlideDuration;
-//					framesToGo = framesToGo > 0 ? framesToGo : 0;
-//					translateY = translateY -  framesToGo * moveInYSpeed;
-//				}
-//
-//				if(moveOutYFrames != 0 && posInSlideDuration > (numberOfFramesSlideIsVisible - Math.abs(moveOutYFrames))) {
-//					int movedFrames = posInSlideDuration - (numberOfFramesSlideIsVisible - Math.abs(moveOutYFrames));
-//					translateY = translateY +  movedFrames * moveOutYSpeed;
-//				}
 
 				
 				float wShape = (float) (scaleToWidth ? dimensionHelper.realX(scaledWidth) * currentScaleX
@@ -303,29 +235,13 @@ public class SlideShow implements SoundCanvas {
 				if(!transformM.isIdentity()) {
 					transform.concatenate(transformM);
 				}
-				if(rotate != 0) {
-					double theta = Math.PI * rotate / 180;
-					rotatePosition = posInSlideDuration * theta;
-					transform.rotate(rotatePosition, wShape / 2 , hShape / 2);	
+				AffineTransform transformR = rotator.rotate(posInSlideDuration, numberOfFramesSlideIsVisible, (int)(wShape / 2), (int)(hShape / 2));
+				if(!transformR.isIdentity()) {
+					transform.concatenate(transformR);
 				}
 				transform.scale(scaleX, scaleY);
 				final Composite saveComposite = fader.fade(graphics2D, posInSlideDuration, numberOfFramesSlideIsVisible);
 
-//				final Composite saveComposite = graphics2D.getComposite();
-//				float transparency = 1.0f;
-//
-//				if(fadeIn != 0 && posInSlideDuration <= Math.abs(fadeIn)) {
-//					float fadeRate = 100f / (Math.abs(fadeIn) * 100f);
-//					transparency = posInSlideDuration * fadeRate;
-//					transparency = transparency < 0 ? 0 : (transparency > 1 ? 1f : transparency);
-//					graphics2D.setComposite(AlphaComposite.getInstance(compositeInRule.getNumber(), transparency));  
-//				}
-//				if(fadeOut != 0 && posInSlideDuration > (numberOfFramesSlideIsVisible - Math.abs(fadeOut))) {
-//					float fadeRate = 100f / (fadeOut * 100f);
-//					transparency = 1-( (numberOfFramesSlideIsVisible - Math.abs(fadeOut)) - posInSlideDuration - 1) * fadeRate;
-//					transparency = transparency < 0 ? 0 : (transparency > 1 ? 1f : transparency);
-//					graphics2D.setComposite(AlphaComposite.getInstance(compositeOutRule.getNumber(), transparency));  
-//				}
 				final AffineTransform saveAT = graphics2D.getTransform();
 				try {		
 					graphics2D.transform(transform);
@@ -344,21 +260,8 @@ public class SlideShow implements SoundCanvas {
 
 	private void updateSlides() {
 		if(audioInputInfo != null && slides != null) {
-			long to;
-			if (frameTo == 0) {
-				double audioLength = (double) audioInputInfo.getFrameLength();
-				double sampleRate = audioInputInfo.getAudioFormat().getSampleRate();
-				double numberOfSeconds = audioLength / sampleRate;
-
-				double frameRate = videoOutputInfo.getFramesPerSecond();
-				to = (long) Math.floor(numberOfSeconds * frameRate);
-				frameToConcrete = to;
-			} else {
-				to = frameTo;
-				frameToConcrete = frameTo;
-			}
 			if (numberOfFrames == 0) {
-				long frameRange = to - frameFrom;
+				long frameRange = frameTo - frameFrom;
 				numberOfFramesSlideIsVisible = (int) frameRange / slides.length; // even distribution, remainder depends
 																					// loop flag
 			} else {
@@ -379,6 +282,9 @@ public class SlideShow implements SoundCanvas {
 			if(mover.getMoveInYFrames() != 0) {
 				overLapBefore = overLapBefore < 0 ? Math.min(overLapBefore, mover.getMoveInYFrames()): mover.getMoveInYFrames();	
 			}
+			if(rotator.getRotateInFrames() != 0) {
+				overLapBefore = overLapBefore < 0 ? Math.min(overLapBefore, rotator.getRotateInFrames()): rotator.getRotateInFrames();
+			}
 			if(overLapBefore < 0) {
 				startFrame += overLapBefore;
 				numberOfFramesSlideIsVisible -= overLapBefore;
@@ -397,13 +303,18 @@ public class SlideShow implements SoundCanvas {
 			if(mover.getMoveOutYFrames() != 0) {
 				overLapAfter = overLapAfter > 0 ? Math.max(overLapAfter, mover.getMoveOutYFrames()) : mover.getMoveOutYFrames();
 			}
+			if(rotator.getRotateOutFrames() != 0) {
+				overLapAfter = overLapAfter > 0 ? Math.max(overLapAfter, rotator.getRotateOutFrames()) : rotator.getRotateOutFrames();
+			}
+
 			if(overLapAfter > 0) {
 				numberOfFramesSlideIsVisible += overLapAfter;
 			}
 			long durationTo = 0;
+			long frameToConcrete = frameTo;// - frameFrom < slides.length ? frameFrom + slides.length : frameTo;
 			
 			tl:
-			while(durationTo < frameToConcrete) {
+			while(durationTo < frameToConcrete && numberOfFramesSlideIsVisible > 0) {
 				
 				for(Slide slide : slides) {
 
@@ -414,8 +325,8 @@ public class SlideShow implements SoundCanvas {
 					durationTo = startFrame  + numberOfFramesSlideIsVisible - 1;
 					durationTo = durationTo < frameToConcrete ? durationTo : frameToConcrete;
 					duration.setTo(durationTo);
-					duration.setOverlapBefore(overLapBefore);
-					duration.setOverlapAfter(overLapAfter);
+					duration.setEffectDurationIn(overLapBefore);
+					duration.setEffectDurationOut(overLapAfter);
 					startFrame = startFrame + numberOfFramesSlideIsVisible + (overLapBefore < 0 ? overLapBefore : 0) - (overLapAfter > 0 ? overLapAfter : 0);
 					IOUtil.log(String.valueOf(duration));
 					timeLine.add(duration);
@@ -443,6 +354,9 @@ public class SlideShow implements SoundCanvas {
 	public void setFrameRange(long frameFrom, long frameTo){
 		this.frameFrom = frameFrom;
 		this.frameTo = frameTo;
+		if(slides != null && frameTo - frameFrom < slides.length) {
+			this.frameTo = frameFrom + slides.length;
+		}
 	}
 
 	@Override

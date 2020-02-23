@@ -19,13 +19,15 @@ package org.mcuosmipcuter.orcc.soundvis.effects;
 
 import java.awt.geom.AffineTransform;
 
+import org.mcuosmipcuter.orcc.api.soundvis.DisplayDuration;
+import org.mcuosmipcuter.orcc.api.soundvis.DisplayObject;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 
 /**
  * @author user
  *
  */
-public class Scaler {
+public class Scaler implements DisplayObject{
 	
 	public static enum SCALE_RULE {
 		HORIZONTAL, VERTICAL, BOTH
@@ -91,6 +93,24 @@ public class Scaler {
 
 		
 		return transform;
+	}
+
+
+	@Override
+	public DisplayDuration<?> getDisplayDuration(long frameFrom, long frameTo) {
+		DisplayDuration<Scaler> duration = new DisplayDuration<>();
+		duration.setDisplayObject(this);
+		duration.setFrom(frameFrom);
+		duration.setTo(frameTo);
+		duration.setEffectDurationIn(scaleIn);
+		duration.setEffectDurationOut(scaleOut);
+		return duration;
+	}
+
+
+	@Override
+	public String getDisplayText() {
+		return "Scaler";
 	}
 
 }

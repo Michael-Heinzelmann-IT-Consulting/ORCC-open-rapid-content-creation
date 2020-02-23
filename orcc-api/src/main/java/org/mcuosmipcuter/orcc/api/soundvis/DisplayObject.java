@@ -25,4 +25,5 @@ public interface DisplayObject {
 	default String getDisplayText() {
 		return null;
 	}
+	public DisplayDuration<?> getDisplayDuration(long frameFrom, long frameTo);
 }

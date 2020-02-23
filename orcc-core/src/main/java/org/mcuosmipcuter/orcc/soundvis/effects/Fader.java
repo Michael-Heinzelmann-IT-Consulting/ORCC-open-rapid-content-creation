@@ -21,10 +21,12 @@ import java.awt.AlphaComposite;
 import java.awt.Composite;
 import java.awt.Graphics2D;
 
+import org.mcuosmipcuter.orcc.api.soundvis.DisplayDuration;
+import org.mcuosmipcuter.orcc.api.soundvis.DisplayObject;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 
 
-public class Fader {
+public class Fader implements DisplayObject{
 	
 	public static enum RULE {
 		CLEAR(1), SRC(2), DST(9), SRC_OVER(3), DST_OVER(4), SRC_IN(5), DST_IN(6), SRC_OUT(7), DST_OUT(8), SRC_ATOP(10),
@@ -74,14 +76,29 @@ public class Fader {
 		return saveComposite;
 	}
 
+	@Override
+	public DisplayDuration<?> getDisplayDuration(long frameFrom, long frameTo) {
+		DisplayDuration<Fader> duration = new DisplayDuration<>();
+		duration.setDisplayObject(this);
+		duration.setFrom(frameFrom);
+		duration.setTo(frameTo);
+		duration.setEffectDurationIn(fadeIn);
+		duration.setEffectDurationOut(fadeOut);
+		return duration;
+	}
+
+	@Override
+	public String getDisplayText() {
+		return "Fader";
+	}
 
 	public int getFadeIn() {
 		return fadeIn;
 	}
 
-
 	public int getFadeOut() {
 		return fadeOut;
 	}
+	
 
 }

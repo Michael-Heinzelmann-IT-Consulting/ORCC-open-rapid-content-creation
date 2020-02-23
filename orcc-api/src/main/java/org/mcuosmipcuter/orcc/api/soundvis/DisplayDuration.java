@@ -69,13 +69,13 @@ public class DisplayDuration <T extends DisplayObject> {
 	public long getOverlapBefore() {
 		return overlapBefore;
 	}
-	public void setOverlapBefore(long overlapBefore) {
+	public void setEffectDurationIn(long overlapBefore) {
 		this.overlapBefore = overlapBefore;
 	}
 	public long getOverlapAfter() {
 		return overlapAfter;
 	}
-	public void setOverlapAfter(long overlapAfter) {
+	public void setEffectDurationOut(long overlapAfter) {
 		this.overlapAfter = overlapAfter;
 	}
 	@Override

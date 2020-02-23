@@ -19,6 +19,7 @@ package org.mcuosmipcuter.orcc.soundvis.defaultcanvas.model;
 
 import java.awt.Image;
 
+import org.mcuosmipcuter.orcc.api.soundvis.DisplayDuration;
 import org.mcuosmipcuter.orcc.api.soundvis.DisplayObject;
 
 /**
@@ -26,6 +27,7 @@ import org.mcuosmipcuter.orcc.api.soundvis.DisplayObject;
  *
  */
 public class Slide implements DisplayObject {
+
 	private Image image;
 	private String text;
 	private int position;
@@ -52,6 +54,16 @@ public class Slide implements DisplayObject {
 	@Override
 	public String getDisplayText() {
 		return "slide " + position;
+	}
+	@Override
+	public DisplayDuration<?> getDisplayDuration(long frameFrom, long frameTo) {
+		DisplayDuration<Slide> duration = new DisplayDuration<>();
+		duration.setDisplayObject(this);
+		duration.setFrom(frameFrom);
+		duration.setTo(frameTo);
+		duration.setEffectDurationIn(0);
+		duration.setEffectDurationOut(0);
+		return duration;
 	}
 	@Override
 	public String toString() {

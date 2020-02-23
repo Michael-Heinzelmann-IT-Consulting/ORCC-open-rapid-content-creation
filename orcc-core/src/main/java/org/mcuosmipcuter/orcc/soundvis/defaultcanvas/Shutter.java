@@ -28,6 +28,7 @@ import java.awt.geom.Area;
 import java.awt.geom.Ellipse2D;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
+import org.mcuosmipcuter.orcc.api.soundvis.DisplayDuration;
 import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.NestedProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
@@ -35,45 +36,50 @@ import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.api.util.DimensionHelper;
 import org.mcuosmipcuter.orcc.soundvis.effects.Fader;
-import org.mcuosmipcuter.orcc.soundvis.effects.Mover;
 import org.mcuosmipcuter.orcc.soundvis.effects.Positioner;
+import org.mcuosmipcuter.orcc.soundvis.effects.Rotator;
 import org.mcuosmipcuter.orcc.soundvis.effects.Scaler;
 
 /**
  * Displays a solid color
+ * 
  * @author Michael Heinzelmann
  */
 public class Shutter implements SoundCanvas {
-	
+
 	public static enum CLIP_SHAPE {
 		RECTANGLE, ELLIPSE, DIAMOND,
 	}
-	
-	@UserProperty(description="color of the area")
+
+	@UserProperty(description = "color of the area")
 	private Color color = Color.BLACK;
-	@UserProperty(description="color of the area")
+	@UserProperty(description = "color of the area")
 	private CLIP_SHAPE clipShape = CLIP_SHAPE.RECTANGLE;
-	@LimitedIntProperty(description = "limits" , minimum = 1, maximum = 36)
-	@UserProperty(description="rotate multiply the area")
+	@LimitedIntProperty(description = "limits", minimum = 1, maximum = 36)
+	@UserProperty(description = "rotate multiply the area")
 	private int multiPlyRotated = 1;
-	
+	@UserProperty(description = "add shapes xor")
+	private boolean multiplyXor;
+
 	private int width;
 	private int height;
 	Shape screen = new Rectangle(width, height);
-	
+
 	private DimensionHelper dimensionHelper;
 	private long frameFrom;
 	private long frameTo;
-	
+
 	Polygon diamond;
-	
-	
+
 	@NestedProperty(description = "x and y position")
 	Positioner positioner = new Positioner();
-	
+
+	@NestedProperty(description = "rotate in and out")
+	private Rotator rotator = new Rotator();
+
 	@NestedProperty(description = "scale in and out")
 	Scaler scaler = new Scaler();
-	
+
 	@NestedProperty(description = "fading in and out")
 	private Fader fader = new Fader();
 
@@ -82,89 +88,74 @@ public class Shutter implements SoundCanvas {
 	}
 
 	@Override
-	public void newFrame(long frameCount, Graphics2D graphics2D) {	
-		int posInSlideDuration = (int)(frameCount - frameFrom);
+	public void newFrame(long frameCount, Graphics2D graphics2D) {
+		int posInSlideDuration = (int) (frameCount - frameFrom);
+		int duration = (int) (frameTo - frameFrom);
 
-		  Shape clip;
-		  
-		  if(clipShape == CLIP_SHAPE.ELLIPSE) {
-			  clip = new Ellipse2D.Float(0, 0, width ,height);
-		  }
-		  else if(clipShape == CLIP_SHAPE.DIAMOND) {
-			  clip = diamond;
-			  
-		  }
-		  else {
-			  clip = new Rectangle(width, height);
-		  }
-				  
-			
+		Shape clip;
 
+		if (clipShape == CLIP_SHAPE.ELLIPSE) {
+			clip = new Ellipse2D.Float(0, 0, width, height);
+		} else if (clipShape == CLIP_SHAPE.DIAMOND) {
+			clip = diamond;
+		} else {
+			clip = new Rectangle(width, height);
+		}
 
-			Area clipAreaInside = new Area(clip);
-			Area clipAreaRotated = new Area(clip);
-			AffineTransform ats = scaler.scale(posInSlideDuration, (int)(frameTo - frameFrom));
-			clipAreaInside.transform(ats);
-			clipAreaRotated.transform(ats);
-			
-			AffineTransform atp = positioner.position(dimensionHelper, clipAreaInside.getBounds());
-			
-			clipAreaInside.transform(atp);
-			clipAreaRotated.transform(atp);
-			System.err.println(clipAreaInside.getBounds());
-			System.err.println(clipAreaRotated.getBounds());
-			
-			int centerX = clipAreaInside.getBounds().x +  clipAreaInside.getBounds().width / 2;
-			int centerY = clipAreaInside.getBounds().y +  clipAreaInside.getBounds().height / 2;
-			
-			System.err.println(centerX + "-" + centerY);
-			
-			double theta = Math.PI / (double)multiPlyRotated ;
-			System.err.println(theta);
-//			tr.rotate((Math.PI /3.0)*4, centerX, centerY);
-//			clipAreaInside.transform(tr);
-			for(int i = 2; i <= multiPlyRotated; i++) {
-				AffineTransform tr = new AffineTransform();
-				tr.rotate(theta , centerX, centerY);
-				clipAreaRotated.transform(tr);
-				clipAreaInside.add(clipAreaRotated);
-				//clipAreaInside = clipAreaRotated;
+		Area clipAreaInside = new Area(clip);
+
+		AffineTransform atsc = scaler.scale(posInSlideDuration, duration);
+		clipAreaInside.transform(atsc);
+
+		AffineTransform atp = positioner.position(dimensionHelper, clipAreaInside.getBounds());
+		clipAreaInside.transform(atp);
+
+		int centerX = clipAreaInside.getBounds().x + clipAreaInside.getBounds().width / 2;
+		int centerY = clipAreaInside.getBounds().y + clipAreaInside.getBounds().height / 2;
+
+		// System.err.println(centerX + "-" + centerY);
+		AffineTransform atr = rotator.rotate(posInSlideDuration, duration, centerX, centerY);
+		clipAreaInside.transform(atr);
+
+		double theta = Math.PI / (double) multiPlyRotated;
+
+		Area fillArea = new Area(screen);
+		fillArea.subtract(clipAreaInside);
+
+		for (int i = 2; i <= multiPlyRotated; i++) {
+			AffineTransform tr = new AffineTransform();
+			tr.rotate(theta, centerX, centerY);
+			clipAreaInside.transform(tr);
+			if (multiplyXor) {
+				fillArea.exclusiveOr(clipAreaInside);
+			} else {
+				fillArea.subtract(clipAreaInside);
 			}
-		
-			
+		}
 
+		graphics2D.setColor(color);
 
+		graphics2D.setClip(fillArea);
+		final Composite saveComposite = fader.fade(graphics2D, posInSlideDuration, (int) (frameTo - frameFrom));
 
+		// graphics2D.setPaint(new GrayFilter(false, 50).);
 
+		graphics2D.fillRect(0, 0, width, height);
+		// graphics2D.fill(fillArea);
 
-			Area fillArea = new Area(screen);
-			fillArea.subtract(clipAreaInside);
+		graphics2D.setClip(null);
+		graphics2D.setComposite(saveComposite);
 
-
-			graphics2D.setColor(color);
-
-			//final AffineTransform saveAT = graphics2D.getTransform();
-			graphics2D.setClip(fillArea);
-			final Composite saveComposite = fader.fade(graphics2D, posInSlideDuration, (int)(frameTo - frameFrom));
-			//graphics2D.transform(at);
-
-			graphics2D.fillRect(0, 0, width, height);
-			
-			//graphics2D.setTransform(new AffineTransform());
-			graphics2D.setClip(null);
-			graphics2D.setComposite(saveComposite);
-		
 	}
 
 	@Override
-	public void prepare(AudioInputInfo audioInputInfo,
-			VideoOutputInfo videoOutputInfo) {
+	public void prepare(AudioInputInfo audioInputInfo, VideoOutputInfo videoOutputInfo) {
 		width = videoOutputInfo.getWidth();
 		height = videoOutputInfo.getHeight();
-		dimensionHelper =  new DimensionHelper(videoOutputInfo);
+		dimensionHelper = new DimensionHelper(videoOutputInfo);
 		screen = new Rectangle(width, height);
-		diamond = new Polygon(new int[] {0, width / 2, width, width / 2}, new int[] {height / 2, height, height / 2, 0,}, 4);
-		//fillArea = new Area(screen);
+		diamond = new Polygon(new int[] { 0, width / 2, width, width / 2 },
+				new int[] { height / 2, height, height / 2, 0, }, 4);
 	}
 
 	@Override
@@ -175,14 +166,22 @@ public class Shutter implements SoundCanvas {
 	public void updateUI(int width, int height, Graphics2D graphics) {
 		graphics.setColor(color);
 		graphics.fillRect(0, 0, width, height);
-		if(color.getRed() > 245 && color.getGreen() > 245 && color.getBlue() > 245) {
+		if (color.getRed() > 245 && color.getGreen() > 245 && color.getBlue() > 245) {
 			graphics.setColor(Color.BLACK);
-			graphics.drawRect(0, 0, width -1, height - 1);
+			graphics.drawRect(0, 0, width - 1, height - 1);
 		}
 	}
-	public void setFrameRange(long frameFrom, long frameTo){
+
+	@Override
+	public void setFrameRange(long frameFrom, long frameTo) {
 		this.frameFrom = frameFrom;
 		this.frameTo = frameTo;
+	}
+
+	@Override
+	public DisplayDuration<?>[] getFrameFromTos() {
+		return new DisplayDuration<?>[] { scaler.getDisplayDuration(frameFrom, frameTo),
+				fader.getDisplayDuration(frameFrom, frameTo), rotator.getDisplayDuration(frameFrom, frameTo) };
 	}
 
 }

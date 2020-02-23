@@ -170,6 +170,8 @@ public abstract class Context {
 		if(audioInput != null) {
 			soundCanvasWrapper.prepare(audioInput.getAudioInputInfo(), videoOutputInfo);
 		}
+		soundCanvasWrapper.setFrameFrom(0);
+		soundCanvasWrapper.setFrameTo(0); // TODO frames without audio
 		soundCanvasList.add(soundCanvasWrapper);
 		notifyListeners(PropertyName.SoundCanvasAdded);
 	}
