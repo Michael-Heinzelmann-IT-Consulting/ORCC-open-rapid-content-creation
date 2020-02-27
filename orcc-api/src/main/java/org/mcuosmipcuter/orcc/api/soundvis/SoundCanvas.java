@@ -50,7 +50,8 @@ public interface SoundCanvas {
 	 * @param amplitudes amplitudes per audio channel - the values come as unsigned integers
 	 * with 0 as minimum and the maximum equal to the audio sample size (e.g. 2^16)
 	 */
-	public void nextSample(int[] amplitudes);
+	public default void nextSample(int[] amplitudes) {
+	}
 	/**
 	 * Video callback: we about to display the new frame, last chance for the canvas to 
 	 * change the graphics 
@@ -86,6 +87,9 @@ public interface SoundCanvas {
 	
 	public default DisplayDuration<?>[] getFrameFromTos(){
 		return new DisplayDuration[]{};
+	}
+	public default int getEditorColumns() {
+		return 3;
 	}
 	
 }

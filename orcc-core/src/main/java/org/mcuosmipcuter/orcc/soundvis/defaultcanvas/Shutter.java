@@ -84,10 +84,6 @@ public class Shutter implements SoundCanvas {
 	private Fader fader = new Fader();
 
 	@Override
-	public void nextSample(int[] amplitudes) {
-	}
-
-	@Override
 	public void newFrame(long frameCount, Graphics2D graphics2D) {
 		int posInSlideDuration = (int) (frameCount - frameFrom);
 		int duration = (int) (frameTo - frameFrom);

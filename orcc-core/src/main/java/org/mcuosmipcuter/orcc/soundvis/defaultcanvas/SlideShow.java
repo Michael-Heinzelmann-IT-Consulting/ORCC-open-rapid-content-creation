@@ -20,6 +20,7 @@ package org.mcuosmipcuter.orcc.soundvis.defaultcanvas;
 import java.awt.Color;
 import java.awt.Composite;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
@@ -40,6 +41,7 @@ import org.mcuosmipcuter.orcc.api.util.DimensionHelper;
 import org.mcuosmipcuter.orcc.soundvis.defaultcanvas.model.Slide;
 import org.mcuosmipcuter.orcc.soundvis.effects.Fader;
 import org.mcuosmipcuter.orcc.soundvis.effects.Mover;
+import org.mcuosmipcuter.orcc.soundvis.effects.Positioner;
 import org.mcuosmipcuter.orcc.soundvis.effects.Rotator;
 import org.mcuosmipcuter.orcc.util.IOUtil;
 
@@ -52,12 +54,6 @@ public class SlideShow implements SoundCanvas {
 	@TimedChange
 	@UserProperty(description="slides to show")
 	private Slide[] slides;
-	
-	@UserProperty(description="center x position")
-	private int centerX = 0;
-	
-	@UserProperty(description="center y position")
-	private int centerY = 0;
 	
 	@UserProperty(description="number of frames per image")
 	@LimitedIntProperty(minimum=0, description="cannot be negative")
@@ -83,10 +79,6 @@ public class SlideShow implements SoundCanvas {
 	VideoOutputInfo videoOutputInfo;
 	AudioInputInfo audioInputInfo;
 	
-//	@UserProperty(description="rotate dgrees per frame")
-//	private int rotate = 0;
-//	double rotatePosition;
-	
 	@UserProperty(description="cout out")
 	private CLIP_SHAPE cutOut = CLIP_SHAPE.NONE;
 	
@@ -107,6 +99,8 @@ public class SlideShow implements SoundCanvas {
 	public static enum CLIP_SHAPE {
 		NONE, ELLIPSE, CIRCLE, ROUND_RECTANGLE,
 	}
+	@NestedProperty(description = "x and y position")
+	Positioner positioner = new Positioner();
 	@NestedProperty(description = "fading in and out")
 	private Fader fader = new Fader();
 	@NestedProperty(description = "moving in and out")
@@ -118,11 +112,6 @@ public class SlideShow implements SoundCanvas {
 	private long frameTo;
 
 	private List<DisplayDuration<Slide>> currentShowing = new ArrayList<>(3);
-
-	@Override
-	public void nextSample(int[] amplitudes) {
-		
-	}
 
 	@Override
 	public void newFrame(long frameCount, Graphics2D graphics2D) {
@@ -201,9 +190,6 @@ public class SlideShow implements SoundCanvas {
 						currentScaleY = currentScale;
 					}
 				}
-				
-				float translateX =  ((float)(videoOutputInfo.getWidth() + dimensionHelper.realX(centerX) - (origW * scaleX))) / 2f ;
-				float translateY =    ((float)(videoOutputInfo.getHeight() + dimensionHelper.realY(centerY) -(origH * scaleY))) / 2f;
 
 				
 				float wShape = (float) (scaleToWidth ? dimensionHelper.realX(scaledWidth) * currentScaleX
@@ -230,7 +216,8 @@ public class SlideShow implements SoundCanvas {
 					}
 
 				}
-				AffineTransform transform = new AffineTransform(1, 0, 0, 1, translateX,translateY);
+
+				AffineTransform transform = positioner.position(dimensionHelper, new Rectangle(0, 0, (int)wShape, (int)hShape));
 				AffineTransform transformM = mover.move(posInSlideDuration, numberOfFramesSlideIsVisible);
 				if(!transformM.isIdentity()) {
 					transform.concatenate(transformM);

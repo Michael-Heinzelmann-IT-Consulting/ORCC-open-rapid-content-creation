@@ -106,6 +106,7 @@ public class Row extends JPanel {
 				gc.anchor = GridBagConstraints.LINE_START;
 		         gc.weightx = 1;
 				Set<JPanel> nestedProps = new LinkedHashSet<JPanel>();
+				int maxCols = soundCanvasWrapper.getSoundCanvas().getEditorColumns();
 				int c = 0;
 				for(final JPanel p : props) {
 //					if(p instanceof NestedPropertyPanel) {
@@ -114,7 +115,7 @@ public class Row extends JPanel {
 //					else {
 						c++;
 						//gc.gridx = c;
-						if(c == 3) {
+						if(c == maxCols) {
 							gc.gridwidth = GridBagConstraints.REMAINDER;
 							c = 0;
 						}
