@@ -106,13 +106,14 @@ public class Blinds implements SoundCanvas {
 
 	@Override
 	public void newFrame(long frameCount, Graphics2D graphics2D) {
-		int posInSlideDuration = (int) (frameCount - frameFrom);
+		int relFrameCount = (int) (frameCount - frameFrom);
+		int posInSlideDuration = relFrameCount;
 		int duration = (int) (frameTo - frameFrom);
 
 		if(repeat > 1) {
 			duration = repeatDurationFrames;
-			if(frameCount / repeatDurationFrames < repeat) {
-				posInSlideDuration = (int)frameCount % duration;
+			if(relFrameCount / repeatDurationFrames < repeat) {
+				posInSlideDuration = relFrameCount % duration;
 			}
 			else {
 				posInSlideDuration = repeatDurationFrames ;
@@ -147,7 +148,7 @@ public class Blinds implements SoundCanvas {
 			maxBladeWidth = Math.ceil(outlineScPos.width / numberVertical);
 		}
 		
-		double scaleY = openCloseHorizontal == OPEN_CLOSE.OPEN_IN_CLOSE_OUT ?  atscb.getScaleY() : 1.0 - atscb.getScaleY();
+		double scaleY = openCloseHorizontal == OPEN_CLOSE.OPEN_IN_CLOSE_OUT ?  1.0 - atscb.getScaleY() : atscb.getScaleY();
 		
 		
 		if (bladeShapeHorizontal == BLADE_SHAPE.ELLIPSE) {
@@ -156,7 +157,7 @@ public class Blinds implements SoundCanvas {
 			bladeHorizontal = new Rectangle2D.Double(outlineScPos.x, outlineScPos.y, outlineScPos.width, maxBladeHeight * scaleY);
 		}		
 
-		double scaleX = openCloseVertical == OPEN_CLOSE.OPEN_IN_CLOSE_OUT ? atscb.getScaleX() : 1.0 - atscb.getScaleX();
+		double scaleX = openCloseVertical == OPEN_CLOSE.OPEN_IN_CLOSE_OUT ?  1.0 - atscb.getScaleX() : atscb.getScaleX();
 		
 		if (bladeShapeVertical == BLADE_SHAPE.ELLIPSE) {
 			bladeVertical = new Ellipse2D.Double(outlineScPos.x, outlineScPos.y, maxBladeWidth * scaleX, outlineScPos.height);
@@ -238,7 +239,7 @@ public class Blinds implements SoundCanvas {
 		DisplayDuration<?>[]result = new DisplayDuration<?>[repeat * effects];
 		int c = 0;
 		for(int r = 0; r < repeat * effects; r+=effects) {
-			long end = repeat == 1 ? frameTo : frameFrom + repeatDurationFrames*(c+1);
+			long end = repeat == 1 ? frameTo : frameFrom + repeatDurationFrames*(c+1)-1;
 			result[r] = scalerBlinds.getDisplayDuration(frameFrom + repeatDurationFrames*c, end);
 			result[r + 1] = fader.getDisplayDuration(frameFrom+repeatDurationFrames*c, end);
 			c++;
