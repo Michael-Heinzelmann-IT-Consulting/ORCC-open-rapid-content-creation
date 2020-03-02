@@ -20,7 +20,6 @@ package org.mcuosmipcuter.orcc.soundvis.defaultcanvas;
 import java.awt.Color;
 import java.awt.Composite;
 import java.awt.Graphics2D;
-import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
@@ -38,7 +37,7 @@ import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.api.util.DimensionHelper;
 import org.mcuosmipcuter.orcc.soundvis.effects.Fader;
 import org.mcuosmipcuter.orcc.soundvis.effects.Positioner;
-import org.mcuosmipcuter.orcc.soundvis.effects.Rotator;
+import org.mcuosmipcuter.orcc.soundvis.effects.Repeater;
 import org.mcuosmipcuter.orcc.soundvis.effects.Scaler;
 
 /**
@@ -67,12 +66,15 @@ public class Blinds implements SoundCanvas {
 	@NestedProperty(description = "fading in and out")
 	private Fader fader = new Fader();
 	
-	@LimitedIntProperty(minimum=1, description="number cannot be lower than 1")
-	@UserProperty(description="number of repeat")
-	int repeat = 1;
-	@LimitedIntProperty(minimum=2, description="number cannot be lower than 2")
-	@UserProperty(description="number of repeat")
-	int repeatDurationFrames = 2;
+	@NestedProperty(description = "fading in and out")
+	private Repeater repeater = new Repeater();
+	
+//	@LimitedIntProperty(minimum=1, description="number cannot be lower than 1")
+//	@UserProperty(description="number of repeat")
+//	int repeat = 1;
+//	@LimitedIntProperty(minimum=2, description="number cannot be lower than 2")
+//	@UserProperty(description="number of repeat")
+//	int repeatDurationFrames = 2;
 
 	@LimitedIntProperty(minimum=0, description="number cannot be lower than 0")
 	@UserProperty(description="number of blinds horizontal")
@@ -106,25 +108,27 @@ public class Blinds implements SoundCanvas {
 
 	@Override
 	public void newFrame(long frameCount, Graphics2D graphics2D) {
-		int relFrameCount = (int) (frameCount - frameFrom);
-		int posInSlideDuration = relFrameCount;
-		int duration = (int) (frameTo - frameFrom);
-
-		if(repeat > 1) {
-			duration = repeatDurationFrames;
-			if(relFrameCount / repeatDurationFrames < repeat) {
-				posInSlideDuration = relFrameCount % duration;
-			}
-			else {
-				posInSlideDuration = repeatDurationFrames ;
-			}
-		}
+//		int relFrameCount = (int) (frameCount - frameFrom);
+//		int posInSlideDuration = relFrameCount;
+//		int duration = (int) (frameTo - frameFrom);
+//
+//		if(repeat > 1) {
+//			duration = repeatDurationFrames;
+//			if(relFrameCount / repeatDurationFrames < repeat) {
+//				posInSlideDuration = relFrameCount % duration;
+//			}
+//			else {
+//				posInSlideDuration = repeatDurationFrames ;
+//			}
+//		}
 		
+		int posInSlideDuration = repeater.repeat(frameFrom, frameTo, frameCount);
+		int repeatDurationFrames = repeater.getRepeatDurationFrames(frameFrom, frameTo);
 		
 		Area fillArea = new Area(screen);
 
 		
-		AffineTransform atsc = scalerOutline.scale(posInSlideDuration, duration);
+		AffineTransform atsc = scalerOutline.scale(posInSlideDuration, repeatDurationFrames);
 		fillArea.transform(atsc);
 		
 		AffineTransform atp = positioner.position(dimensionHelper, fillArea.getBounds());
@@ -132,7 +136,7 @@ public class Blinds implements SoundCanvas {
 		
 		Rectangle outlineScPos = fillArea.getBounds();
 
-		AffineTransform atscb = scalerBlinds.scale(posInSlideDuration, duration);
+		AffineTransform atscb = scalerBlinds.scale(posInSlideDuration, repeatDurationFrames);
 
 		Shape bladeHorizontal;
 		
@@ -172,7 +176,7 @@ public class Blinds implements SoundCanvas {
 		bladeAreaHorizontal.transform(transformH);
 		
 		graphics2D.setColor(colorHorizontal);
-		final Composite saveComposite = fader.fade(graphics2D, posInSlideDuration, (int) (frameTo - frameFrom));
+		final Composite saveComposite = fader.fade(graphics2D, posInSlideDuration, repeatDurationFrames);
 		
 		for (int i = 0; i < numberHorizontal; i++) {
 			graphics2D.fill(bladeAreaHorizontal);
@@ -236,12 +240,14 @@ public class Blinds implements SoundCanvas {
 	@Override
 	public DisplayDuration<?>[] getFrameFromTos() {
 		int effects = 2;
+		int repeat = repeater.getRepeat();
+		int repeatDurationFrames = repeater.getRepeatDurationFrames(frameFrom, frameTo);
 		DisplayDuration<?>[]result = new DisplayDuration<?>[repeat * effects];
 		int c = 0;
-		for(int r = 0; r < repeat * effects; r+=effects) {
-			long end = repeat == 1 ? frameTo : frameFrom + repeatDurationFrames*(c+1)-1;
-			result[r] = scalerBlinds.getDisplayDuration(frameFrom + repeatDurationFrames*c, end);
-			result[r + 1] = fader.getDisplayDuration(frameFrom+repeatDurationFrames*c, end);
+		for(int r = 0; r < repeat * effects; r += effects) {
+			long end = repeat == 1 ? frameTo : frameFrom + repeatDurationFrames * (c + 1) - 1;
+			result[r] = scalerBlinds.getDisplayDuration(frameFrom + repeatDurationFrames * c, end);
+			result[r + 1] = fader.getDisplayDuration(frameFrom + repeatDurationFrames * c, end);
 			c++;
 		}
 		return result;

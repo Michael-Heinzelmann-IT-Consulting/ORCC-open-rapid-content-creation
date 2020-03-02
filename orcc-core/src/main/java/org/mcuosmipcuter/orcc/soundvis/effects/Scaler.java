@@ -66,7 +66,7 @@ public class Scaler implements DisplayObject{
 		}
 		if(isScaleOut) {
 			float scaleRateOut = 100f / (Math.abs(scaleOut) * 100f);
-			currentScaleOut = (numberOfFramesSlideIsVisible - posInSlideDuration - 1) * scaleRateOut;
+			currentScaleOut = (numberOfFramesSlideIsVisible - posInSlideDuration) * scaleRateOut;
 		}
 		if(isScaleIn||isScaleOut) {
 			float currentScale;
