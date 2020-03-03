@@ -17,6 +17,8 @@
 */
 package org.mcuosmipcuter.orcc.soundvis.effects;
 
+import org.mcuosmipcuter.orcc.api.soundvis.DisplayDuration;
+import org.mcuosmipcuter.orcc.api.soundvis.DisplayObject;
 import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 
@@ -69,4 +71,18 @@ public class Repeater {
 		return repeat;
 	}
 
+	public DisplayDuration<?>[] getFrameFromTos(long frameFrom, long frameTo, DisplayObject ... dispayObjects) {
+		int effects = dispayObjects.length;
+		int repeatDurationFrames = getRepeatDurationFrames(frameFrom, frameTo);
+		DisplayDuration<?>[]result = new DisplayDuration<?>[repeat * effects];
+		int c = 0;
+		for(int r = 0; r < repeat * effects; r += effects) {
+			long end = repeat == 1 ? frameTo : frameFrom + repeatDurationFrames * (c + 1) - 1;
+			for(int j = 0; j < effects; j++) {
+				result[r + j] = dispayObjects[j].getDisplayDuration(frameFrom + repeatDurationFrames * c, end);
+			}
+			c++;
+		}
+		return result;
+	}
 }

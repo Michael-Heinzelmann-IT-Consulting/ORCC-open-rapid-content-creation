@@ -32,6 +32,7 @@ import java.lang.reflect.Field;
 import java.util.Calendar;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
+import org.mcuosmipcuter.orcc.api.soundvis.ChangesIcon;
 import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.MappedValue;
 import org.mcuosmipcuter.orcc.api.soundvis.NestedProperty;
@@ -66,6 +67,7 @@ public class Text implements SoundCanvas, PropertyListener {
 	@UserProperty(description="the font to use")
 	private MappedValue<String> fontName = FontStore.getDefaultFont();
 	
+	@ChangesIcon
 	@UserProperty(description="the text to display")
 	private String text = "ORCC rapid content creation\nfor entertainment, education\nand media production\n" + year + " " + user + " graphics by soundvis";
 	
@@ -80,6 +82,7 @@ public class Text implements SoundCanvas, PropertyListener {
 	@UserProperty(description="the text alignment of lines")
 	private TextAlign textAlign = TextAlign.LEFT;
 	
+	@ChangesIcon
 	@UserProperty(description="text color")
 	private Color textColor = Color.BLACK;
 	

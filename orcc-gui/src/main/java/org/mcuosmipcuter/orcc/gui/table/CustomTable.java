@@ -44,13 +44,12 @@ import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JSpinner.DefaultEditor;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.border.Border;
-import javax.swing.border.EtchedBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.mcuosmipcuter.orcc.api.soundvis.ChangesIcon;
 import org.mcuosmipcuter.orcc.api.soundvis.PropertyListener;
 import org.mcuosmipcuter.orcc.api.soundvis.TimedChange;
 import org.mcuosmipcuter.orcc.soundvis.Context;
@@ -271,7 +270,7 @@ public class CustomTable extends JPanel{
 				//System.err.println("updateUI name " + name);
 
 				Context.canvasPropertyWritten(name, soundCanvasWrapper.getSoundCanvas());
-				if(field.isAnnotationPresent(TimedChange.class)) {
+				if(field.isAnnotationPresent(TimedChange.class) || field.isAnnotationPresent(ChangesIcon.class)) {
 					System.err.println("Cust table after canvasPropertyWritten " + name);
 					//Context.beforePropertyUpdate(name);
 				

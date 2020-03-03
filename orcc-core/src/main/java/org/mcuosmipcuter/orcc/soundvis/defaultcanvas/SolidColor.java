@@ -22,6 +22,7 @@ import java.awt.Composite;
 import java.awt.Graphics2D;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
+import org.mcuosmipcuter.orcc.api.soundvis.ChangesIcon;
 import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.NestedProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
@@ -35,7 +36,7 @@ import org.mcuosmipcuter.orcc.soundvis.effects.Fader;
  * @author Michael Heinzelmann
  */
 public class SolidColor implements SoundCanvas {
-	
+	@ChangesIcon
 	@UserProperty(description="color of the area")
 	private Color color = Color.WHITE;
 	
