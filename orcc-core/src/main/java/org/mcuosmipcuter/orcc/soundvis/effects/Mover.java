@@ -19,9 +19,11 @@ package org.mcuosmipcuter.orcc.soundvis.effects;
 
 import java.awt.geom.AffineTransform;
 
+import org.mcuosmipcuter.orcc.api.soundvis.DisplayDuration;
+import org.mcuosmipcuter.orcc.api.soundvis.DisplayObject;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 
-public class Mover {
+public class Mover implements DisplayObject {
 	
 	@UserProperty(description="in move 0 means none")
 	private int moveInXFrames;
@@ -86,6 +88,19 @@ public class Mover {
 
 	public int getMoveOutYFrames() {
 		return moveOutYFrames;
+	}
+
+	@Override
+	public DisplayDuration<?> getDisplayDuration(long frameFrom, long frameTo) {
+		DisplayDuration<Mover> duration = new DisplayDuration<>();
+		duration.setDisplayObject(this);
+		duration.setFrom(frameFrom);
+		duration.setTo(frameTo);
+		int overLapBefore = Math.min(moveInXFrames, moveInYFrames);	
+		duration.setOverlapBefore(overLapBefore < 0 ? overLapBefore : Math.max(moveInXFrames, moveInYFrames));
+		int overLapAfter = Math.max(moveOutXFrames, moveOutYFrames);
+		duration.setOverlapAfter(overLapAfter > 0 ? overLapAfter : Math.min(moveOutXFrames, moveOutYFrames));
+		return duration;
 	}
 
 }

@@ -17,8 +17,12 @@
 */
 package org.mcuosmipcuter.orcc.soundvis.effects;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.mcuosmipcuter.orcc.api.soundvis.DisplayDuration;
 import org.mcuosmipcuter.orcc.api.soundvis.DisplayObject;
+import org.mcuosmipcuter.orcc.api.soundvis.DisplayUnit;
 import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 
@@ -35,24 +39,52 @@ public class Repeater {
 	@UserProperty(description="number of repeat")
 	int frames = 0;
 	
+	private DisplayObject[] dispayObjects;
 	
-	public int repeat(long frameFrom, long frameTo, long frameCount) {
+	
+	public Repeater(DisplayObject ...dispayObjects) {
+		this.dispayObjects = dispayObjects;
+	}
+
+	public DisplayUnit[] repeat(long frameFrom, long frameTo, long frameCount) {
 		int relFrameCount = (int) (frameCount - frameFrom);
 		int posInSlideDuration = relFrameCount;
 
 		int repeatDurationFrames = getRepeatDurationFrames(frameFrom, frameTo);
-		if(repeat > 1) {
+		
+		int oLapBef = 0;
+		int oLapAft = 0;
+		for(DisplayObject d : dispayObjects) {
+			oLapBef = (int) Math.min(oLapBef, d.getDisplayDuration(frameFrom, frameTo).getOverlapBefore());
+			oLapAft = (int) Math.max(oLapAft, d.getDisplayDuration(frameFrom, frameTo).getOverlapAfter());
+		}
+		int duration = repeatDurationFrames + Math.abs(oLapBef) + oLapAft;
+		List<DisplayUnit> units = new ArrayList<>();
+		for(int r = 0; r < repeat; r++) {
 			if(relFrameCount / repeatDurationFrames < repeat) {
-				posInSlideDuration = relFrameCount % repeatDurationFrames;
+				int start = repeatDurationFrames * r + oLapBef;
+				int end = start + duration;
+				
+				if(relFrameCount >= start && relFrameCount < end ) {
+					System.err.println(start + " * " + end + " = " + (relFrameCount - start));
+					DisplayUnit d = new DisplayUnit(relFrameCount - start, duration);
+					units.add(d);
+				}
+				else {
+					System.err.println(start + "  " + end);
+				}
+				
 			}
 			else {
-				posInSlideDuration = repeatDurationFrames ;
+				posInSlideDuration = duration;
 			}
 		}
-		return posInSlideDuration;
+		int currentPos = posInSlideDuration;
+		System.err.println(currentPos + " : " + duration);
+		return units.toArray(new DisplayUnit[] {});
 	}
 
-	public int getRepeatDurationFrames(long frameFrom, long frameTo) {
+	private int getRepeatDurationFrames(long frameFrom, long frameTo) {
 		int duration = (int) (frameTo - frameFrom);
 		int repeatDurationFrames;
 		if(frames == 0) {
@@ -64,14 +96,21 @@ public class Repeater {
 		if(repeatDurationFrames < 1) {
 			repeatDurationFrames = 1;
 		}
-		return repeatDurationFrames;
+		return repeatDurationFrames ;
 	}
 
 	public int getRepeat() {
 		return repeat;
 	}
 
-	public DisplayDuration<?>[] getFrameFromTos(long frameFrom, long frameTo, DisplayObject ... dispayObjects) {
+	public DisplayDuration<?>[] getFrameFromTos(long frameFrom, long frameTo) {
+		int oLapBef = 0;
+		int oLapAft = 0;
+		for(DisplayObject d : dispayObjects) {
+			oLapBef = (int) Math.min(oLapBef, d.getDisplayDuration(frameFrom, frameTo).getOverlapBefore());
+			oLapAft = (int) Math.max(oLapAft, d.getDisplayDuration(frameFrom, frameTo).getOverlapAfter());
+		}
+		//return repeatDurationFrames + Math.abs(oLapBef) + oLapAft;
 		int effects = dispayObjects.length;
 		int repeatDurationFrames = getRepeatDurationFrames(frameFrom, frameTo);
 		DisplayDuration<?>[]result = new DisplayDuration<?>[repeat * effects];
@@ -79,7 +118,11 @@ public class Repeater {
 		for(int r = 0; r < repeat * effects; r += effects) {
 			long end = repeat == 1 ? frameTo : frameFrom + repeatDurationFrames * (c + 1) - 1;
 			for(int j = 0; j < effects; j++) {
-				result[r + j] = dispayObjects[j].getDisplayDuration(frameFrom + repeatDurationFrames * c, end);
+				DisplayDuration<?> dd = dispayObjects[j].getDisplayDuration(frameFrom + repeatDurationFrames * c, end);
+				dd.setFrom(dd.getFrom() + oLapBef);
+				dd.setTo(dd.getTo() + oLapAft);
+				result[r + j] = dd;
+				////System.err.println(dd);
 			}
 			c++;
 		}

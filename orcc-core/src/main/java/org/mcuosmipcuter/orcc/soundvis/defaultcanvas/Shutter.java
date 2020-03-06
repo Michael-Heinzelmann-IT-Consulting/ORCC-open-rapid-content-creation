@@ -29,6 +29,7 @@ import java.awt.geom.Ellipse2D;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
 import org.mcuosmipcuter.orcc.api.soundvis.DisplayDuration;
+import org.mcuosmipcuter.orcc.api.soundvis.DisplayUnit;
 import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.NestedProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
@@ -85,13 +86,14 @@ public class Shutter implements SoundCanvas {
 	private Fader fader = new Fader();
 	
 	@NestedProperty(description = "repeating inside from and to")
-	private Repeater repeater = new Repeater();
+	private Repeater repeater = new Repeater(scaler, fader, rotator);
 
 	@Override
 	public void newFrame(long frameCount, Graphics2D graphics2D) {
 		
-		int posInSlideDuration = repeater.repeat(frameFrom, frameTo, frameCount);
-		int repeatDurationFrames = repeater.getRepeatDurationFrames(frameFrom, frameTo);
+//		int posInSlideDuration = repeater.repeat(frameFrom, frameTo, frameCount);
+//		int repeatDurationFrames = repeater.getRepeatDurationFrames(frameFrom, frameTo);
+		for(DisplayUnit displayUnit : repeater.repeat(frameFrom, frameTo, frameCount)) {
 
 		Shape clip;
 
@@ -105,7 +107,7 @@ public class Shutter implements SoundCanvas {
 
 		Area clipAreaInside = new Area(clip);
 
-		AffineTransform atsc = scaler.scale(posInSlideDuration, repeatDurationFrames);
+		AffineTransform atsc = scaler.scale(displayUnit.currentPosition, displayUnit.duration);
 		clipAreaInside.transform(atsc);
 
 		AffineTransform atp = positioner.position(dimensionHelper, clipAreaInside.getBounds());
@@ -115,7 +117,7 @@ public class Shutter implements SoundCanvas {
 		int centerY = clipAreaInside.getBounds().y + clipAreaInside.getBounds().height / 2;
 
 		// System.err.println(centerX + "-" + centerY);
-		AffineTransform atr = rotator.rotate(posInSlideDuration, repeatDurationFrames, centerX, centerY);
+		AffineTransform atr = rotator.rotate(displayUnit.currentPosition, displayUnit.duration, centerX, centerY);
 		clipAreaInside.transform(atr);
 
 		double theta = Math.PI / (double) multiPlyRotated;
@@ -137,7 +139,7 @@ public class Shutter implements SoundCanvas {
 		graphics2D.setColor(color);
 
 		graphics2D.setClip(fillArea);
-		final Composite saveComposite = fader.fade(graphics2D, posInSlideDuration, repeatDurationFrames);
+		final Composite saveComposite = fader.fade(graphics2D, displayUnit.currentPosition, displayUnit.duration);
 
 		// graphics2D.setPaint(new GrayFilter(false, 50).);
 
@@ -146,6 +148,7 @@ public class Shutter implements SoundCanvas {
 
 		graphics2D.setClip(null);
 		graphics2D.setComposite(saveComposite);
+		}
 
 	}
 
@@ -181,7 +184,7 @@ public class Shutter implements SoundCanvas {
 
 	@Override
 	public DisplayDuration<?>[] getFrameFromTos() {
-		return repeater.getFrameFromTos(frameFrom, frameTo, scaler, fader, rotator);
+		return repeater.getFrameFromTos(frameFrom, frameTo);
 				
 	}
 

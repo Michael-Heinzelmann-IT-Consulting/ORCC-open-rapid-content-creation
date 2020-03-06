@@ -298,7 +298,7 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 				layers[count][2] = free;
 				g.setColor(Color.YELLOW.brighter());
 				g.drawRoundRect(from, y + delta, to - from, b, 16, 16);
-				if(scw.isSelected()) {
+				if(scw.isEditorOpen()) {
 					DisplayDuration<?>[] fromTos = scw.getFrameFromTos();
 					if(fromTos.length > 0) {
 						//g.setColor(new Color(delta*100, false));
@@ -308,7 +308,7 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 							g.drawRoundRect(subFrom, y + delta, subTo - subFrom, b  + delta, 16, 16);
 							if(fromTos[i].getOverlapBefore() == 0 && fromTos[i].getOverlapAfter() == 0) {
 								g.drawRoundRect(subFrom, y + delta, subTo - subFrom, b  + delta, 16, 16);
-								g.drawString(fromTos[i].getDisplayObject().getDisplayText(), subFrom + 6, y + delta + 12);
+								//g.drawString(fromTos[i].getDisplayObject().getDisplayText(), subFrom + 6, y + delta + 12);
 							}
 							else {
 								int x1 = subFrom + (int)Math.abs(fromTos[i].getOverlapBefore())* samplesPerFrame / noOfSamples;
@@ -328,14 +328,14 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 								}
 								g.setColor(Color.ORANGE);
 								g.drawPolygon(xPoints, yPoints, nPoints);
-								g.drawString(fromTos[i].getDisplayObject().getDisplayText(), x1 + 6, y + delta + 12);
+								//g.drawString(fromTos[i].getDisplayObject().getDisplayText(), x1 + 6, y + delta + 12);
 							}
 							
 						}
 					}
-					else {
+					//else {
 						selectedCanvas = new Rectangle(from, y + delta, to - from, b);
-					}
+					//}
 
 				}
 				
@@ -344,7 +344,8 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 			}
 			if(selectedCanvas != null) {
 				g.setColor(selectedCanvasColor);
-				g.fillRoundRect(selectedCanvas.x, selectedCanvas.y, selectedCanvas.width, selectedCanvas.height, 16, 16);
+				//g.fillRoundRect(selectedCanvas.x, selectedCanvas.y, selectedCanvas.width, selectedCanvas.height, 16, 16);
+				//selectedCanvas = null;
 			}
 			
 			int strLength = g.getFontMetrics().stringWidth("00:00");

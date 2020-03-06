@@ -99,4 +99,6 @@ public interface SoundCanvasWrapper extends SoundCanvas, PropertyListener {
 	public void addPropertyChangeListener(PropertyListener propertyListener);
 	public void setIconImage(Image image);
 	public Image getIconImage();
+	boolean isEditorOpen();
+	void setEditorOpen(boolean editorOpen);
 }

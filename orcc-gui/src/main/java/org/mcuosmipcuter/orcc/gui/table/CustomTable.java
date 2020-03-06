@@ -339,7 +339,7 @@ public class CustomTable extends JPanel{
 			public void actionPerformed(ActionEvent arg0) {
 				row.toggleProperties();
 				expandButton.setText(row.isPanelVisible() ? " - " : " + ");
-				soundCanvasWrapper.setSelected(row.isPanelVisible());
+				soundCanvasWrapper.setEditorOpen(row.isPanelVisible());
 				row.revalidate();
 				CustomTable.this.revalidate();
 			}

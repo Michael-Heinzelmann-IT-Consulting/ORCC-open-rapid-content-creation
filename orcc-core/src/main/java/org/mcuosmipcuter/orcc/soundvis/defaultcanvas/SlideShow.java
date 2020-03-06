@@ -123,7 +123,7 @@ public class SlideShow implements SoundCanvas {
 				int posInSlideDuration = (int)(frameCount - duration.getFrom());
 				Area imageArea = new Area(new Rectangle(image.getWidth(), image.getHeight()));
 
-				AffineTransform transformS = scaler.scale(posInSlideDuration, posInSlideDuration);
+				AffineTransform transformS = scaler.scale(posInSlideDuration, numberOfFramesSlideIsVisible);
 				imageArea.transform(transformS);
 
 				AffineTransform transformP = positioner.position(dimensionHelper, imageArea.getBounds());
@@ -249,8 +249,8 @@ public class SlideShow implements SoundCanvas {
 					durationTo = startFrame  + numberOfFramesSlideIsVisible - 1;
 					durationTo = durationTo < frameTo ? durationTo : frameTo;
 					duration.setTo(durationTo);
-					duration.setEffectDurationIn(overLapBefore);
-					duration.setEffectDurationOut(overLapAfter);
+					duration.setOverlapBefore(overLapBefore);
+					duration.setOverlapAfter(overLapAfter);
 					startFrame = startFrame + numberOfFramesSlideIsVisible + (overLapBefore < 0 ? overLapBefore : 0) - (overLapAfter > 0 ? overLapAfter : 0);
 					IOUtil.log(String.valueOf(duration));
 					timeLine.add(duration);

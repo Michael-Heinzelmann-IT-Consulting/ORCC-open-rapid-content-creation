@@ -50,6 +50,7 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 	private long frameTo = 0;
 	private static Graphics2D devNullGraphics;
 	private boolean selected;
+	private boolean editorOpen;
 	private int repaintThreshold;
 	private boolean thresholdExceeded;
 	protected AmplitudeHelper amplitudeHelper;
@@ -260,6 +261,14 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 			return fromTos;
 		}
 		return SoundCanvasWrapper.super.getFrameFromTos();
+	}
+	@Override
+	public boolean isEditorOpen() {
+		return editorOpen;
+	}
+	@Override
+	public void setEditorOpen(boolean editorOpen) {
+		this.editorOpen = editorOpen;
 	}
 	
 }

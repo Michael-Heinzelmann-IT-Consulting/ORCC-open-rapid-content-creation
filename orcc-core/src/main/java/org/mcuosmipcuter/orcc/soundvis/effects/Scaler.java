@@ -102,8 +102,8 @@ public class Scaler implements DisplayObject{
 		duration.setDisplayObject(this);
 		duration.setFrom(frameFrom);
 		duration.setTo(frameTo);
-		duration.setEffectDurationIn(scaleIn);
-		duration.setEffectDurationOut(scaleOut);
+		duration.setOverlapBefore(scaleIn);
+		duration.setOverlapAfter(scaleOut);
 		return duration;
 	}
 

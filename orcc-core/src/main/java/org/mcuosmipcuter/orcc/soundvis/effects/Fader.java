@@ -82,8 +82,8 @@ public class Fader implements DisplayObject{
 		duration.setDisplayObject(this);
 		duration.setFrom(frameFrom);
 		duration.setTo(frameTo);
-		duration.setEffectDurationIn(fadeIn);
-		duration.setEffectDurationOut(fadeOut);
+		duration.setOverlapBefore(fadeIn);
+		duration.setOverlapAfter(fadeOut);
 		return duration;
 	}
 

@@ -61,8 +61,8 @@ public class Slide implements DisplayObject {
 		duration.setDisplayObject(this);
 		duration.setFrom(frameFrom);
 		duration.setTo(frameTo);
-		duration.setEffectDurationIn(0);
-		duration.setEffectDurationOut(0);
+		duration.setOverlapBefore(0);
+		duration.setOverlapAfter(0);
 		return duration;
 	}
 	@Override

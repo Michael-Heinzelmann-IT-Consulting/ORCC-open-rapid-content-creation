@@ -30,6 +30,7 @@ import java.awt.geom.Rectangle2D;
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
 import org.mcuosmipcuter.orcc.api.soundvis.ChangesIcon;
 import org.mcuosmipcuter.orcc.api.soundvis.DisplayDuration;
+import org.mcuosmipcuter.orcc.api.soundvis.DisplayUnit;
 import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.NestedProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
@@ -68,7 +69,7 @@ public class Blinds implements SoundCanvas {
 	private Fader fader = new Fader();
 	
 	@NestedProperty(description = "repeating inside from and to")
-	private Repeater repeater = new Repeater();
+	private Repeater repeater = new Repeater(scalerBlinds, fader);
 
 	@ChangesIcon
 	@LimitedIntProperty(minimum=0, description="number cannot be lower than 0")
@@ -107,13 +108,14 @@ public class Blinds implements SoundCanvas {
 	@Override
 	public void newFrame(long frameCount, Graphics2D graphics2D) {
 		
-		int posInSlideDuration = repeater.repeat(frameFrom, frameTo, frameCount);
-		int repeatDurationFrames = repeater.getRepeatDurationFrames(frameFrom, frameTo);
+//		int posInSlideDuration = repeater.repeat(frameFrom, frameTo, frameCount);
+//		int repeatDurationFrames = repeater.getRepeatDurationFrames(frameFrom, frameTo);
+		for(DisplayUnit displayUnit : repeater.repeat(frameFrom, frameTo, frameCount)) {
 		
 		Area fillArea = new Area(screen);
 
 		
-		AffineTransform atsc = scalerOutline.scale(posInSlideDuration, repeatDurationFrames);
+		AffineTransform atsc = scalerOutline.scale(displayUnit.currentPosition, displayUnit.duration);
 		fillArea.transform(atsc);
 		
 		AffineTransform atp = positioner.position(dimensionHelper, fillArea.getBounds());
@@ -121,7 +123,7 @@ public class Blinds implements SoundCanvas {
 		
 		Rectangle outlineScPos = fillArea.getBounds();
 
-		AffineTransform atscb = scalerBlinds.scale(posInSlideDuration, repeatDurationFrames);
+		AffineTransform atscb = scalerBlinds.scale(displayUnit.currentPosition, displayUnit.duration);
 
 		Shape bladeHorizontal;
 		
@@ -161,7 +163,7 @@ public class Blinds implements SoundCanvas {
 		bladeAreaHorizontal.transform(transformH);
 		
 		graphics2D.setColor(colorHorizontal);
-		final Composite saveComposite = fader.fade(graphics2D, posInSlideDuration, repeatDurationFrames);
+		final Composite saveComposite = fader.fade(graphics2D, displayUnit.currentPosition, displayUnit.duration);
 		
 		for (int i = 0; i < numberHorizontal; i++) {
 			graphics2D.fill(bladeAreaHorizontal);
@@ -191,6 +193,7 @@ public class Blinds implements SoundCanvas {
 
 		graphics2D.setClip(null);
 		graphics2D.setComposite(saveComposite);
+		}
 
 	}
 
@@ -234,7 +237,7 @@ public class Blinds implements SoundCanvas {
 
 	@Override
 	public DisplayDuration<?>[] getFrameFromTos() {
-		return repeater.getFrameFromTos(frameFrom, frameTo, scalerBlinds, fader);
+		return repeater.getFrameFromTos(frameFrom, frameTo);
 	}
 
 	@Override

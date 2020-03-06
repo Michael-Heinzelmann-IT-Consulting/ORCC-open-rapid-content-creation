@@ -33,6 +33,8 @@ import java.util.Calendar;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
 import org.mcuosmipcuter.orcc.api.soundvis.ChangesIcon;
+import org.mcuosmipcuter.orcc.api.soundvis.DisplayDuration;
+import org.mcuosmipcuter.orcc.api.soundvis.DisplayUnit;
 import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.MappedValue;
 import org.mcuosmipcuter.orcc.api.soundvis.NestedProperty;
@@ -45,6 +47,8 @@ import org.mcuosmipcuter.orcc.api.util.TextHelper;
 import org.mcuosmipcuter.orcc.soundvis.FontStore;
 import org.mcuosmipcuter.orcc.soundvis.effects.Fader;
 import org.mcuosmipcuter.orcc.soundvis.effects.Mover;
+import org.mcuosmipcuter.orcc.soundvis.effects.Positioner;
+import org.mcuosmipcuter.orcc.soundvis.effects.Repeater;
 import org.mcuosmipcuter.orcc.soundvis.effects.Shearer;
 import org.mcuosmipcuter.orcc.util.IOUtil;
 
@@ -102,6 +106,9 @@ public class Text implements SoundCanvas, PropertyListener {
 	@LimitedIntProperty(description="", minimum=0)
 	private boolean typing;
 	
+	@NestedProperty(description = "x and y position")
+	Positioner positioner = new Positioner();
+	
 	@UserProperty(description="frames per character")
 	private int modProgress = -1;
 	
@@ -116,6 +123,9 @@ public class Text implements SoundCanvas, PropertyListener {
 	@NestedProperty(description = "shear")
 	private Shearer ishearer = new Shearer();
 	
+	@NestedProperty(description = "repeating inside from and to")
+	private Repeater repeater = new Repeater(fader, mover);
+	
 	
 	VideoOutputInfo videoOutputInfo;
 	private DimensionHelper dimensionHelper;
@@ -129,13 +139,6 @@ public class Text implements SoundCanvas, PropertyListener {
 	private Stroke strokeX;
 	private Stroke strokeY;
 	
-	
-	/* (non-Javadoc)
-	 * @see org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas#nextSample(int[])
-	 */
-	@Override
-	public void nextSample(int[] amplitudes) {
-	}
 
 	/* (non-Javadoc)
 	 * @see org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas#newFrame(long)
@@ -146,7 +149,10 @@ public class Text implements SoundCanvas, PropertyListener {
 		if(text == null || text.length() == 0 || lines == null) {
 			return;
 		}
-		int posInSlideDuration = (int)(frameCount - frameFrom);
+//		int posInSlideDuration = repeater.repeat(frameFrom, frameTo, frameCount);
+//		int repeatDurationFrames = repeater.getRepeatDurationFrames(frameFrom, frameTo);
+		
+		
 		int xMargin = dimensionHelper.realX(leftRightMargin);
 		int topPixels = dimensionHelper.realY(topMargin);
 		int bottomPixels = dimensionHelper.realY(bottomAutoMargin);
@@ -185,7 +191,10 @@ public class Text implements SoundCanvas, PropertyListener {
 				}
 			}
 		}
-		
+		else {
+			font = font.deriveFont((float)fontSize);
+		}
+		for(DisplayUnit displayUnit : repeater.repeat(frameFrom, frameTo, frameCount)) {
 		graphics2d.setFont(font);
 		graphics2d.setColor(textColor);
 
@@ -201,10 +210,10 @@ public class Text implements SoundCanvas, PropertyListener {
 		int progessIdx;
 		if(modProgress != 0) {
 			if(modProgress > 0) {
-				progessIdx = posInSlideDuration * modProgress; // speedup
+				progessIdx = displayUnit.currentPosition * modProgress; // speedup
 			}
 			else {
-				progessIdx = posInSlideDuration / Math.abs(modProgress); // slowdown
+				progessIdx = displayUnit.currentPosition / Math.abs(modProgress); // slowdown
 			}
 		}
 		else {
@@ -262,13 +271,13 @@ public class Text implements SoundCanvas, PropertyListener {
 
 		int lineTop = topPixels + ascent;
 		int lineIdx = 0;
-		final Composite origComposite = fader.fade(graphics2d, posInSlideDuration, (int)(frameTo - frameFrom));
+		final Composite origComposite = fader.fade(graphics2d, displayUnit.currentPosition, displayUnit.duration);
 		
 		final AffineTransform saveTransfrom = graphics2d.getTransform();
 		
-		AffineTransform transform = shearer.shear(posInSlideDuration, (int)(frameTo - frameFrom));
-		transform.concatenate(mover.move(posInSlideDuration, (int)(frameTo - frameFrom)));
-
+		AffineTransform transform = shearer.shear(displayUnit.currentPosition, displayUnit.duration);
+		transform.concatenate(mover.move(displayUnit.currentPosition, displayUnit.duration));
+		transform.concatenate(positioner.position(dimensionHelper));
 
 		
 		if(!transform.isIdentity()) {
@@ -339,6 +348,7 @@ public class Text implements SoundCanvas, PropertyListener {
 		graphics2d.setComposite(origComposite);
 		saveTransfrom.setToIdentity();
 		graphics2d.setTransform(saveTransfrom);
+		}
 	}
 	
 	private void adjustTextModel() {
@@ -407,6 +417,11 @@ public class Text implements SoundCanvas, PropertyListener {
 	public void setFrameRange(long frameFrom, long frameTo){
 		this.frameFrom = frameFrom;
 		this.frameTo = frameTo;
+	}
+
+	@Override
+	public DisplayDuration<?>[] getFrameFromTos() {
+		return repeater.getFrameFromTos(frameFrom, frameTo);
 	}
 
 
