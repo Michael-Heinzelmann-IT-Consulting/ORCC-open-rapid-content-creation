@@ -22,8 +22,6 @@ package org.mcuosmipcuter.orcc.api.soundvis;
  *
  */
 public interface DisplayObject {
-	default String getDisplayText() {
-		return null;
-	}
+	public String getDisplayKey();
 	public DisplayDuration<?> getDisplayDuration(long frameFrom, long frameTo);
 }

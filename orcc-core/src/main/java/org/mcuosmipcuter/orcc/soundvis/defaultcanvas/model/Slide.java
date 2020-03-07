@@ -52,7 +52,7 @@ public class Slide implements DisplayObject {
 	}
 	
 	@Override
-	public String getDisplayText() {
+	public String getDisplayKey() {
 		return "slide " + position;
 	}
 	@Override

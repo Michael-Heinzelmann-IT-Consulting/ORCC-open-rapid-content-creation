@@ -283,6 +283,7 @@ public class PlayBackPanel extends JPanel implements Mixin{
 		}
 		if(progressPaintState == 2) {
 			timeLine.paintProgress();
+			timeLine.repaint();
 		}
 		
 	}

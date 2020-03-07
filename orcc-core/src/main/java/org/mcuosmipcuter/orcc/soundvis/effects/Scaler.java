@@ -109,8 +109,8 @@ public class Scaler implements DisplayObject{
 
 
 	@Override
-	public String getDisplayText() {
-		return "Scaler";
+	public String getDisplayKey() {
+		return "scaler";
 	}
 
 }

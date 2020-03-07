@@ -88,8 +88,8 @@ public class Fader implements DisplayObject{
 	}
 
 	@Override
-	public String getDisplayText() {
-		return "Fader";
+	public String getDisplayKey() {
+		return "fader";
 	}
 
 	public int getFadeIn() {

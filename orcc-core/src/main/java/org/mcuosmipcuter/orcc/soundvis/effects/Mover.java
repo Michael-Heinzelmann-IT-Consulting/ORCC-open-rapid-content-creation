@@ -103,4 +103,9 @@ public class Mover implements DisplayObject {
 		return duration;
 	}
 
+	@Override
+	public String getDisplayKey() {
+		return "mover";
+	}
+
 }

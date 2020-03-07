@@ -24,7 +24,9 @@ import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.JPanel;
 
@@ -63,6 +65,13 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 	private final static Color selectedCanvasColor = new Color(255, 255, 255, 200);
 	private final static Color canvasColor1 = new Color(146, 166, 176, 44);
 	private final static Color canvasColor2 = new Color(146, 176, 146, 44);
+	private final static Map<String, Color> effectColors = new HashMap<>();
+	static {
+		effectColors.put("mover", Color.ORANGE);
+		effectColors.put("fader", Color.DARK_GRAY);
+		effectColors.put("rotator", Color.RED);
+		effectColors.put("scaler", Color.BLUE);
+	}
 	
 	// flexible layout screen dependent
 	int widthToUse;
@@ -205,30 +214,33 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 			return;
 		}
 
-		int currentPos = (int)(samplePosition / noOfSamples);
-		if(paintProgressPos == currentPos) {
-			return;
-		}
+//		int currentPos = (int)(samplePosition / noOfSamples);
+//		if(paintProgressPos == currentPos) {
+//			return;
+//		}
+//
+//		Graphics g = getGraphics();
+//
+//		if(g == null) {
+//			return;
+//		}
+//		g.setColor(Color.ORANGE);
+//		int x1 = margin + 1 + currentPos;
+//		g.drawLine(x1, 0, x1, heightToUse);
+//
+//		g.setColor(Color.BLACK);
+//
+//		if(paintProgressPos > currentPos) {
+//			paintProgressPos = currentPos > 1 ? currentPos - 1 : 0;
+//		}
+//		final int listLength = superSampleData.getList().length;
+//		for(int pos = paintProgressPos + 1; pos <= currentPos && pos < listLength; pos++) {
+//			SuperSample s = superSampleData.getList()[pos];
+//			int x = margin + 1 + pos;
+//			g.drawLine(x, heightToUse /2 - s.getMax() / divY, x, heightToUse / 2 - s.getMin() / divY);
+//		}
 
-		Graphics g = getGraphics();
-
-		if(g == null) {
-			return;
-		}
-
-		g.setColor(Color.BLACK);
-
-		if(paintProgressPos > currentPos) {
-			paintProgressPos = currentPos > 1 ? currentPos - 1 : 0;
-		}
-		final int listLength = superSampleData.getList().length;
-		for(int pos = paintProgressPos + 1; pos <= currentPos && pos < listLength; pos++) {
-			SuperSample s = superSampleData.getList()[pos];
-			int x = margin + 1 + pos;
-			g.drawLine(x, heightToUse /2 - s.getMax() / divY, x, heightToUse / 2 - s.getMin() / divY);
-		}
-
-		paintProgressPos = currentPos;
+//		paintProgressPos = currentPos;
 	}
 	@Override
 	protected void paintComponent(Graphics g) {
@@ -244,20 +256,27 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 			
 			final int h = heightToUse;
 			final int w = widthToUse;
-			int b = h / currentCanvasList.size();
+			int closed = (int)currentCanvasList.stream().filter(sc -> !sc.isEditorOpen()).count();
+			int cB = 3;
+			int rem = h - closed * cB;
+			int open = currentCanvasList.size() - closed;
+			int oB = open > 0 ? rem / open : 0;
+			//int b = h / currentCanvasList.size();
 			int x = margin + 1;
-			g.setColor(Color.BLACK);
-			g.setXORMode(Color.GRAY);
+			g.setColor(Color.WHITE);
+			//g.setXORMode(Color.GRAY);
 
 			for(SuperSample s : superSampleData.getList()) {
 				g.drawLine(x, h /2 - s.getMax() / divY, x, h / 2 - s.getMin() / divY);
 				if(samplePosition >= pos && samplePosition <= pos + s.getNoOfSamples()) {
-					g.setColor(Color.WHITE);
+					g.setColor(Color.LIGHT_GRAY);
 				}
 				x++;
 				pos += s.getNoOfSamples();
 			}
-			
+			int currentPos = (int)(samplePosition / noOfSamples);
+			g.setColor(Color.ORANGE);
+			g.drawLine(margin + currentPos, 0, margin + currentPos, heightToUse);
 			g.setColor(Color.BLACK);
 			g.drawLine(selectPos, 0, selectPos, h);
 			g.drawString(String.valueOf(selectFrame), selectPos + 1, 16);
@@ -271,6 +290,7 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 			Rectangle selectedCanvas = null;
 			
 			for(SoundCanvasWrapper scw : currentCanvasList) {
+				int b = scw.isEditorOpen() ? oB : cB;
 				final long longFrom = scw.getFrameFrom();
 				final long longTo = scw.getFrameTo();
 				final int from = margin + (int)(longFrom * samplesPerFrame / noOfSamples);
@@ -326,7 +346,7 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 									yPoints = new int[] {y+b/2, y+delta +1, y+delta+1 , y+b/2, y+ b, y+b };
 									nPoints = 6;
 								}
-								g.setColor(Color.ORANGE);
+								g.setColor(effectColors.get(fromTos[i].getDisplayObject().getDisplayKey()));
 								g.drawPolygon(xPoints, yPoints, nPoints);
 								//g.drawString(fromTos[i].getDisplayObject().getDisplayText(), x1 + 6, y + delta + 12);
 							}

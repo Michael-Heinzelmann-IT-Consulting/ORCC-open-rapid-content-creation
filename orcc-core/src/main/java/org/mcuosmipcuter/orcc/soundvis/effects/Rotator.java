@@ -64,8 +64,8 @@ public class Rotator implements DisplayObject {
 
 
 	@Override
-	public String getDisplayText() {
-		return "Rotator";
+	public String getDisplayKey() {
+		return "rotator";
 	}
 
 
