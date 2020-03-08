@@ -21,6 +21,7 @@ import java.awt.geom.AffineTransform;
 
 import org.mcuosmipcuter.orcc.api.soundvis.DisplayDuration;
 import org.mcuosmipcuter.orcc.api.soundvis.DisplayObject;
+import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 
 /**
@@ -29,66 +30,84 @@ import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
  */
 public class Scaler implements DisplayObject{
 	
-	public static enum SCALE_RULE {
-		HORIZONTAL, VERTICAL, BOTH
-	}
-	@UserProperty(description="max size x")
-	private int maxScaleXPercent = 100;
-	@UserProperty(description="max size y")
-	private int maxScaleYPercent = 100;
+	@UserProperty(description="begin size x")
+	private int begScaleXPercent = 0;
+	@UserProperty(description="begin size y")
+	private int begScaleYPercent = 0;
+	
+	@UserProperty(description="mid size x")
+	private int midScaleXPercent = 100;
+	@UserProperty(description="mid size y")
+	private int midScaleYPercent = 100;
+	
+	@UserProperty(description="end size x")
+	private int endScaleXPercent = 0;
+	@UserProperty(description="end size y")
+	private int endScaleYPercent = 0;
 	
 	@UserProperty(description="in scale 0 means none")
 	private int scaleIn;
-	@UserProperty(description="direction rule to scale in")
-	private SCALE_RULE scaleRuleIn = SCALE_RULE.BOTH;
+	@LimitedIntProperty(minimum = 0, description = "only positive integers")
+	@UserProperty(description="delay in scaling 0 means scale from the beginning")
+	private int lateIn;
 	
 	@UserProperty(description="in scale 0 means none")
 	private int scaleOut;
-	@UserProperty(description="direction rule to scale out")
-	private SCALE_RULE scaleRuleOut = SCALE_RULE.BOTH;
+	@LimitedIntProperty(maximum = 0, description = "only negative integers")
+	@UserProperty(description="early out scaling 0 means scale to the end")
+	private int earlyOut;
 	
 	
 	
 	public AffineTransform scale(int posInSlideDuration, int numberOfFramesSlideIsVisible) {
 		AffineTransform transform = new AffineTransform();
 
-		float scaleX = maxScaleXPercent / 100f;
-		float scaleY = maxScaleYPercent / 100f;
+		float begScaleX = begScaleXPercent / 100f;
+		float begScaleY = begScaleYPercent / 100f;
+		float midScaleX = midScaleXPercent / 100f;
+		float midScaleY = midScaleYPercent / 100f;		
+		float endScaleX = endScaleXPercent / 100f;
+		float endScaleY = endScaleYPercent / 100f;
 		float currentScaleIn = 1;
 		float currentScaleOut = 1;
 
-		boolean isScaleIn = scaleIn != 0 && posInSlideDuration <= Math.abs(scaleIn);
-		boolean isScaleOut = scaleOut != 0 && posInSlideDuration > (numberOfFramesSlideIsVisible - Math.abs(scaleOut));
+		boolean isScalingIn = scaleIn != 0 && posInSlideDuration > lateIn && posInSlideDuration <= Math.abs(scaleIn);
+		boolean isScalingOut = scaleOut != 0 && posInSlideDuration < (numberOfFramesSlideIsVisible + earlyOut) && posInSlideDuration > (numberOfFramesSlideIsVisible - Math.abs(scaleOut));
 		
-		if(isScaleIn) {
-			float scaleRateIn = 100f / (Math.abs(scaleIn) * 100f);
-			currentScaleIn = posInSlideDuration * scaleRateIn;
+		if(isScalingIn) {
+			float scaleRateIn = 100f / ((Math.abs(scaleIn) - lateIn) * 100f);
+			currentScaleIn =   (posInSlideDuration - lateIn) * scaleRateIn;
 		}
-		if(isScaleOut) {
-			float scaleRateOut = 100f / (Math.abs(scaleOut) * 100f);
-			currentScaleOut = (numberOfFramesSlideIsVisible - posInSlideDuration) * scaleRateOut;
+		if(isScalingOut) {
+			float scaleRateOut = 100f / ((Math.abs(scaleOut) + earlyOut) * 100f);
+			currentScaleOut = (numberOfFramesSlideIsVisible + earlyOut - posInSlideDuration) * scaleRateOut;
 		}
-		if(isScaleIn||isScaleOut) {
-			float currentScale;
-			SCALE_RULE scaleRule;
-			if(currentScaleIn < currentScaleOut) {
-				scaleRule = scaleRuleIn;
-				currentScale = currentScaleIn;
-			}
-			else {
-				scaleRule = scaleRuleOut;
-				currentScale = currentScaleOut;
-			}					
-			if(scaleRule == SCALE_RULE.HORIZONTAL || scaleRule == SCALE_RULE.BOTH) {
-				scaleX *= currentScale;
-			}
-			if(scaleRule == SCALE_RULE.VERTICAL || scaleRule == SCALE_RULE.BOTH) {
-				scaleY *= currentScale;
-			}
-			transform.scale(scaleX, scaleY);
+		if(isScalingIn) {
+			float scaleRangeX = midScaleX - begScaleX;
+			float scaleRangeY = midScaleY - begScaleY;					
+			scaleRangeX *= currentScaleIn;		
+			scaleRangeY *= currentScaleIn;
+			
+			transform.scale(begScaleX + scaleRangeX, begScaleY + scaleRangeY);
+		}
+		else if(isScalingOut) {
+			float scaleRangeX = midScaleX - endScaleX;
+			float scaleRangeY = midScaleY - endScaleY;				
+			scaleRangeX *= currentScaleOut;		
+			scaleRangeY *= currentScaleOut;
+			
+			transform.scale(endScaleX + scaleRangeX, endScaleY + scaleRangeY);
 		}
 		else {
-			transform.scale(maxScaleXPercent / 100f, maxScaleYPercent / 100f);
+			if(posInSlideDuration <= lateIn) {
+				transform.scale(begScaleXPercent / 100f, begScaleYPercent / 100f);
+			}
+			else if(posInSlideDuration >= (numberOfFramesSlideIsVisible + earlyOut)) {
+				transform.scale(endScaleXPercent / 100f, endScaleYPercent / 100f);
+			}
+			else {
+				transform.scale(midScaleXPercent / 100f, midScaleYPercent / 100f);
+			}
 		}
 
 		
