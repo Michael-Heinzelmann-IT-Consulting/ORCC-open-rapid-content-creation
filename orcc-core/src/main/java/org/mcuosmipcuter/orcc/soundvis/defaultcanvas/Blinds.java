@@ -115,7 +115,7 @@ public class Blinds implements SoundCanvas {
 		Area fillArea = new Area(screen);
 
 		
-		AffineTransform atsc = scalerOutline.scale(displayUnit.currentPosition, displayUnit.duration);
+		AffineTransform atsc = scalerOutline.scale(displayUnit.currentPosition, displayUnit.duration, fillArea.getBounds().width, fillArea.getBounds().height);
 		fillArea.transform(atsc);
 		
 		AffineTransform atp = positioner.position(dimensionHelper, fillArea.getBounds());
@@ -123,7 +123,7 @@ public class Blinds implements SoundCanvas {
 		
 		Rectangle outlineScPos = fillArea.getBounds();
 
-		AffineTransform atscb = scalerBlinds.scale(displayUnit.currentPosition, displayUnit.duration);
+		AffineTransform atscb = scalerBlinds.scale(displayUnit.currentPosition, displayUnit.duration, fillArea.getBounds().width, fillArea.getBounds().height);
 
 		Shape bladeHorizontal;
 		

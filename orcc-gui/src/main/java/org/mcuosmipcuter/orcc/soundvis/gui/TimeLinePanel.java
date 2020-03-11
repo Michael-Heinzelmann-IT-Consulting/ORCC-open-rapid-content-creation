@@ -325,18 +325,28 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 						for(int i = 0; i < fromTos.length; i++) {
 							int subFrom = margin +  (int)fromTos[i].getFrom()* samplesPerFrame / noOfSamples;
 							int subTo = margin + (int)(fromTos[i].getTo() +1)* samplesPerFrame / noOfSamples;
-							g.drawRoundRect(subFrom, y + delta, subTo - subFrom, b  + delta, 16, 16);
+							//g.drawRoundRect(subFrom, y + delta, subTo - subFrom, b  + delta, 16, 16);
 							if(fromTos[i].getOverlapBefore() == 0 && fromTos[i].getOverlapAfter() == 0) {
-								g.drawRoundRect(subFrom, y + delta, subTo - subFrom, b  + delta, 16, 16);
+								//g.drawRoundRect(subFrom, y + delta, subTo - subFrom, b  + delta, 16, 16);
 								//g.drawString(fromTos[i].getDisplayObject().getDisplayText(), subFrom + 6, y + delta + 12);
 							}
 							else {
 								int x1 = subFrom + (int)Math.abs(fromTos[i].getOverlapBefore())* samplesPerFrame / noOfSamples;
 								int x2 = subTo - (int)Math.abs(fromTos[i].getOverlapAfter())* samplesPerFrame / noOfSamples;
+
 								int[]xPoints;
 								int[]yPoints;
 								int nPoints;
-								if(x1 != 0 && x2 == 0) {
+								if(fromTos[i].getEffectX() != null && fromTos[i].getEffectY() != null) {
+									xPoints = fromTos[i].getEffectX();
+									yPoints = fromTos[i].getEffectY();
+									nPoints = fromTos[i].getEffectX().length;
+									for(int j = 0; j < xPoints.length; j++) {
+										xPoints[j] =  margin + xPoints[j] *  samplesPerFrame / noOfSamples;
+										yPoints[j] =  delta + y + (int)(b * .05) + (int)(yPoints[j] / 100f * (b * .90));
+									}
+								}
+								else if(x1 != 0 && x2 == 0) {
 									xPoints = new int[] {subFrom, x1, subTo, subTo, x1};
 									yPoints = new int[] {y+b, y , y , y+ b + b/2 + delta, y+b + b/2 + delta};
 									nPoints = 5;

@@ -35,7 +35,18 @@ public class DisplayDuration <T extends DisplayObject> {
 	private long overlapBefore;
 	private long overlapAfter;
 	private T displayObject;
-
+	private int[] effectX;
+	private int[] effectY;
+	
+	
+	public DisplayDuration() {
+		
+	}
+	public DisplayDuration(T displayObject, int[] effectX, int[] effectY) {
+		this.displayObject = displayObject;
+		this.effectX = effectX;
+		this.effectY = effectY;
+	}
 	public boolean contains(long frame) {
 		return frame >= from && frame <= to;
 	}
@@ -77,6 +88,12 @@ public class DisplayDuration <T extends DisplayObject> {
 	}
 	public void setOverlapAfter(long overlapAfter) {
 		this.overlapAfter = overlapAfter;
+	}
+	public int[] getEffectX() {
+		return effectX;
+	}
+	public int[] getEffectY() {
+		return effectY;
 	}
 	@Override
 	public String toString() {

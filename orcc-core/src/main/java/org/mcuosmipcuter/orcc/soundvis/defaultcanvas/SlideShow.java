@@ -123,7 +123,7 @@ public class SlideShow implements SoundCanvas {
 				int posInSlideDuration = (int)(frameCount - duration.getFrom());
 				Area imageArea = new Area(new Rectangle(image.getWidth(), image.getHeight()));
 
-				AffineTransform transformS = scaler.scale(posInSlideDuration, numberOfFramesSlideIsVisible);
+				AffineTransform transformS = scaler.scale(posInSlideDuration, numberOfFramesSlideIsVisible, imageArea.getBounds().width, imageArea.getBounds().height);
 				imageArea.transform(transformS);
 
 				AffineTransform transformP = positioner.position(dimensionHelper, imageArea.getBounds());

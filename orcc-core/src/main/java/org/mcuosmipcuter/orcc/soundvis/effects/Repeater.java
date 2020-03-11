@@ -62,12 +62,12 @@ public class Repeater {
 		List<DisplayUnit> units = new ArrayList<>();
 		for(int r = 0; r < repeat; r++) {
 			if(relFrameCount / repeatDurationFrames < repeat) {
-				int start = repeatDurationFrames * r + oLapBef;
-				int end = start + duration;
+				int start = repeatDurationFrames * r + oLapBef + 1;
+				int end = start + duration - 1;
 				
-				if(relFrameCount >= start && relFrameCount < end ) {
-					System.err.println(start + " * " + end + " = " + (relFrameCount - start));
-					DisplayUnit d = new DisplayUnit(relFrameCount - start, duration);
+				if(relFrameCount >= start && relFrameCount <= end ) {
+					System.err.println(start + " * " + end + " = " + (relFrameCount - start + 1));
+					DisplayUnit d = new DisplayUnit(relFrameCount - start + 1, duration);
 					units.add(d);
 				}
 				else {

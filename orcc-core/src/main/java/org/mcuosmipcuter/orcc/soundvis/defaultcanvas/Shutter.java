@@ -107,7 +107,7 @@ public class Shutter implements SoundCanvas {
 
 		Area clipAreaInside = new Area(clip);
 
-		AffineTransform atsc = scaler.scale(displayUnit.currentPosition, displayUnit.duration);
+		AffineTransform atsc = scaler.scale(displayUnit.currentPosition, displayUnit.duration, clipAreaInside.getBounds().width, clipAreaInside.getBounds().height);
 		clipAreaInside.transform(atsc);
 
 		AffineTransform atp = positioner.position(dimensionHelper, clipAreaInside.getBounds());

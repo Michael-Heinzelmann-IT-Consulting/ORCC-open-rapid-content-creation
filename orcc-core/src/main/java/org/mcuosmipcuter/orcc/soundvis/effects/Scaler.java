@@ -18,6 +18,7 @@
 package org.mcuosmipcuter.orcc.soundvis.effects;
 
 import java.awt.geom.AffineTransform;
+import java.util.Arrays;
 
 import org.mcuosmipcuter.orcc.api.soundvis.DisplayDuration;
 import org.mcuosmipcuter.orcc.api.soundvis.DisplayObject;
@@ -59,7 +60,7 @@ public class Scaler implements DisplayObject{
 	
 	
 	
-	public AffineTransform scale(int posInSlideDuration, int numberOfFramesSlideIsVisible) {
+	public AffineTransform scale(int posInSlideDuration, int numberOfFramesSlideIsVisible, int width, int height) {
 		AffineTransform transform = new AffineTransform();
 
 		float begScaleX = begScaleXPercent / 100f;
@@ -71,8 +72,8 @@ public class Scaler implements DisplayObject{
 		float currentScaleIn = 1;
 		float currentScaleOut = 1;
 
-		boolean isScalingIn = scaleIn != 0 && posInSlideDuration > lateIn && posInSlideDuration <= Math.abs(scaleIn);
-		boolean isScalingOut = scaleOut != 0 && posInSlideDuration < (numberOfFramesSlideIsVisible + earlyOut) && posInSlideDuration > (numberOfFramesSlideIsVisible - Math.abs(scaleOut));
+		boolean isScalingIn = scaleIn != 0 && posInSlideDuration >= lateIn && posInSlideDuration <= Math.abs(scaleIn);
+		boolean isScalingOut = scaleOut != 0 && posInSlideDuration <= (numberOfFramesSlideIsVisible + earlyOut) && posInSlideDuration >= (numberOfFramesSlideIsVisible - Math.abs(scaleOut));
 		
 		if(isScalingIn) {
 			float scaleRateIn = 100f / ((Math.abs(scaleIn) - lateIn) * 100f);
@@ -80,7 +81,7 @@ public class Scaler implements DisplayObject{
 		}
 		if(isScalingOut) {
 			float scaleRateOut = 100f / ((Math.abs(scaleOut) + earlyOut) * 100f);
-			currentScaleOut = (numberOfFramesSlideIsVisible + earlyOut - posInSlideDuration) * scaleRateOut;
+			currentScaleOut = (numberOfFramesSlideIsVisible + earlyOut - posInSlideDuration + 1) * scaleRateOut;
 		}
 		if(isScalingIn) {
 			float scaleRangeX = midScaleX - begScaleX;
@@ -109,20 +110,63 @@ public class Scaler implements DisplayObject{
 				transform.scale(midScaleXPercent / 100f, midScaleYPercent / 100f);
 			}
 		}
-
-		
+		if(transform.getScaleX() < 0) {
+			transform.translate(-width , 1);
+		}
+		if(transform.getScaleY() < 0) {
+			transform.translate(1, -height);
+		}
 		return transform;
 	}
 
 
 	@Override
 	public DisplayDuration<?> getDisplayDuration(long frameFrom, long frameTo) {
-		DisplayDuration<Scaler> duration = new DisplayDuration<>();
+		DisplayDuration<Scaler> duration = new DisplayDuration<>(this, new int[12], new int[12]);
 		duration.setDisplayObject(this);
 		duration.setFrom(frameFrom);
 		duration.setTo(frameTo);
 		duration.setOverlapBefore(scaleIn);
 		duration.setOverlapAfter(scaleOut);
+		int[] x = duration.getEffectX();
+		int from = (int) frameFrom;
+		int to = (int) frameTo + 1;
+		x[0] = scaleIn > 0 ? from : from + scaleIn;
+		x[11] = x[0];
+		x[1] = x[0] + lateIn;
+		x[10] = x[1];
+		x[2] = x[0] + Math.abs(scaleIn);
+		x[9] = x[2];
+		
+		x[5] = scaleOut < 0 ? to : to + scaleOut;
+		x[6] = x[5];
+		x[4] = x[5] + earlyOut; 
+		x[7] = x[4];
+		x[3] = x[5] - Math.abs(scaleOut);
+		x[8] = x[3];
+		
+		int maxBeg = Math.max(Math.abs(begScaleXPercent), Math.abs(begScaleYPercent));
+		int maxMid = Math.max(Math.abs(midScaleXPercent), Math.abs(midScaleYPercent));
+		int maxEnd = Math.max(Math.abs(endScaleXPercent), Math.abs(endScaleYPercent));
+		int overallMax = Math.max(Math.max(maxBeg,maxMid), maxEnd);
+		int yFactor = 100 / overallMax;
+		
+		int[] y = duration.getEffectY();
+		y[0] = 50 - (begScaleXPercent   / 2);
+		y[1] = y[0];
+		y[2] = 50 - (midScaleXPercent  / 2);
+		y[3] = y[2];
+		y[4] = 50 - (endScaleXPercent  / 2);
+		y[5] = y[4];
+		y[6] = 50 + (endScaleYPercent  / 2);
+		y[7] = y[6];
+		y[8] = 50 + (midScaleYPercent  / 2);
+		y[9] = y[8];
+		y[10] = 50 + (begScaleYPercent  / 2);
+		y[11] = y[10];
+		//System.err.println(x[0] + ", " + x[1] + ", " + x[2] + ", " + x[3] + ", " + x[4] + ", " + x[5] + ", " + x[6] + ", " +x[7] + ", " +x[8] + ", " +x[9] + ", " + x[10] + ", " + x[11] );
+		//System.err.println(y[0] + ", " + y[1] + ", " + y[2] + ", " + y[3] + ", " + y[4] + ", " + y[5] + ", " + y[6] + ", " +y[7] + ", " +y[8] + ", " +y[9] + ", " + y[10] + ", " + y[11] );
+ 		//System.err.println(frameFrom + "<->" + frameTo);
 		return duration;
 	}
 
