@@ -18,6 +18,7 @@
 */
 package org.mcuosmipcuter.orcc.api.soundvis;
 
+
 /**
  * @author Michael Heinzelmann
  *<br/>
@@ -42,10 +43,49 @@ public class DisplayDuration <T extends DisplayObject> {
 	public DisplayDuration() {
 		
 	}
-	public DisplayDuration(T displayObject, int[] effectX, int[] effectY) {
+	public DisplayDuration(T displayObject, EffectShape effectShape) {
 		this.displayObject = displayObject;
-		this.effectX = effectX;
-		this.effectY = effectY;
+		this.effectX = new int[12];
+		this.effectY = new int[12];
+		
+		this.from = effectShape.from;
+		this.to = effectShape.to;
+		this.overlapBefore = effectShape.overlapBefore;
+		this.overlapAfter = effectShape.overlapAfter;
+		int[] x = effectX;
+		int from = (int) effectShape.from;
+		int to = (int) effectShape.to + 1;
+		x[0] = effectShape.overlapBefore > 0 ? from : from + effectShape.overlapBefore;
+		x[11] = x[0];
+		x[1] = x[0] + effectShape.lateIn;
+		x[10] = x[1];
+		x[2] = x[0] + Math.abs(effectShape.overlapBefore);
+		x[9] = x[2];
+		
+		x[5] = effectShape.overlapAfter < 0 ? to : to + effectShape.overlapAfter;
+		x[6] = x[5];
+		x[4] = x[5] + effectShape.earlyOut; 
+		x[7] = x[4];
+		x[3] = x[5] - Math.abs(effectShape.overlapAfter);
+		x[8] = x[3];
+		
+		int[] y = effectY;
+		y[0] = 50 - (effectShape.begValueXPercent   / 2);
+		y[1] = y[0];
+		y[2] = 50 - (effectShape.midValueXPercent  / 2);
+		y[3] = y[2];
+		y[4] = 50 - (effectShape.endValueXPercent  / 2);
+		y[5] = y[4];
+		y[6] = 50 + (effectShape.endValueYPercent  / 2);
+		y[7] = y[6];
+		y[8] = 50 + (effectShape.midValueYPercent  / 2);
+		y[9] = y[8];
+		y[10] = 50 + (effectShape.begValueYPercent  / 2);
+		y[11] = y[10];
+		//System.err.println(x[0] + ", " + x[1] + ", " + x[2] + ", " + x[3] + ", " + x[4] + ", " + x[5] + ", " + x[6] + ", " +x[7] + ", " +x[8] + ", " +x[9] + ", " + x[10] + ", " + x[11] );
+		//System.err.println(y[0] + ", " + y[1] + ", " + y[2] + ", " + y[3] + ", " + y[4] + ", " + y[5] + ", " + y[6] + ", " +y[7] + ", " +y[8] + ", " +y[9] + ", " + y[10] + ", " + y[11] );
+ 		//System.err.println(frameFrom + "<->" + frameTo);
+
 	}
 	public boolean contains(long frame) {
 		return frame >= from && frame <= to;
