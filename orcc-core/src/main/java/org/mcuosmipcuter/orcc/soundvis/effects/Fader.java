@@ -57,7 +57,7 @@ public class Fader implements DisplayObject{
 	private RULE outRule = RULE.SRC_OVER;
 	
 	@NestedProperty(description = "x and y position")
-	Positioner positioner = new Positioner();
+	private Positioner positioner = new Positioner();
 	
 	
 	public Composite fade(Graphics2D graphics2D, int posInSlideDuration, int numberOfFramesSlideIsVisible) {

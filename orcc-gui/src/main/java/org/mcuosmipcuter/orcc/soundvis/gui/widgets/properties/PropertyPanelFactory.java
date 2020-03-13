@@ -72,11 +72,25 @@ public class PropertyPanelFactory {
 			if(field.isAnnotationPresent(NestedProperty.class)) {
 				 
 				Set<PropertyPanel<?>> props  = new LinkedHashSet<>();
-				Object nested = getValue(field, soundCanvas);
-				for(Field nestedField : nested.getClass().getDeclaredFields()) {
+				Object nestedValue = getValue(field, soundCanvas);
+				for(Field nestedField : nestedValue.getClass().getDeclaredFields()) {
 					if(nestedField.isAnnotationPresent(UserProperty.class)) {
-						props.add(getPropertyPanel(nestedField, nested, soundCanvasWrapper));
+						props.add(getPropertyPanel(nestedField, nestedValue, soundCanvasWrapper));
 						//result.add(getPropertyPanel(nestedField, nested, soundCanvasWrapper));
+
+					}
+					if(nestedField.isAnnotationPresent(NestedProperty.class)) {
+						Object nested2 = getValue(nestedField, nestedValue);
+						System.err.println(nestedValue);
+						for(Field nested2Field : nested2.getClass().getDeclaredFields()) {
+							//props.add(getPropertyPanel(nested2Field, nested2, soundCanvasWrapper));
+							//System.err.println(nested2Field);
+							if(nested2Field.isAnnotationPresent(UserProperty.class)) {
+								props.add(getPropertyPanel(nested2Field, nested2, soundCanvasWrapper));
+								//result.add(getPropertyPanel(nestedField, nested, soundCanvasWrapper));
+
+							}
+						}
 					}
 						
 				}
@@ -147,6 +161,7 @@ public class PropertyPanelFactory {
 	@SuppressWarnings("unchecked")
 	private static <T> T  getValue(Field field, Object soundCanvas) {
 		try {
+			field.setAccessible(true);
 			return (T)field.get(soundCanvas);
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
