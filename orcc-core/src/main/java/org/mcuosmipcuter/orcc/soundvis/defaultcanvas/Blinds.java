@@ -69,7 +69,7 @@ public class Blinds implements SoundCanvas {
 	private Fader fader = new Fader();
 	
 	@NestedProperty(description = "repeating inside from and to")
-	private Repeater repeater = new Repeater(scalerBlinds, fader);
+	private Repeater repeater = new Repeater(scalerOutline, scalerBlinds, fader);
 
 	@ChangesIcon
 	@LimitedIntProperty(minimum=0, description="number cannot be lower than 0")

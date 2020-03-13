@@ -23,6 +23,7 @@ import java.awt.Graphics2D;
 
 import org.mcuosmipcuter.orcc.api.soundvis.DisplayDuration;
 import org.mcuosmipcuter.orcc.api.soundvis.DisplayObject;
+import org.mcuosmipcuter.orcc.api.soundvis.NestedProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 
 
@@ -54,6 +55,9 @@ public class Fader implements DisplayObject{
 	
 	@UserProperty(description="rule for composite out")
 	private RULE outRule = RULE.SRC_OVER;
+	
+	@NestedProperty(description = "x and y position")
+	Positioner positioner = new Positioner();
 	
 	
 	public Composite fade(Graphics2D graphics2D, int posInSlideDuration, int numberOfFramesSlideIsVisible) {
