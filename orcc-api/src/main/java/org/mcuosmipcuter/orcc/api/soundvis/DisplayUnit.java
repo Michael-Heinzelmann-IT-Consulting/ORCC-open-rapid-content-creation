@@ -33,13 +33,16 @@ package org.mcuosmipcuter.orcc.api.soundvis;
 public class DisplayUnit {
 	public final int currentPosition;
 	public final int duration;
-	public DisplayUnit(int currentPosition, int duration) {
+	public final int index;
+	public DisplayUnit(int currentPosition, int duration, int index) {
 		this.currentPosition = currentPosition;
 		this.duration = duration;
+		this.index = index;
 	}
 	@Override
 	public String toString() {
-		return "DisplayUnit [currentPosition=" + currentPosition + ", duration=" + duration + "]";
+		return "DisplayUnit [currentPosition=" + currentPosition + ", duration=" + duration + ", index=" + index + "]";
 	}
+
 	
 }

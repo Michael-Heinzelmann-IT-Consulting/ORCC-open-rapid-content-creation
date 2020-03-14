@@ -37,11 +37,13 @@ public @interface LimitedIntProperty {
 	 * @return the allowed maximum
 	 */
 	int maximum() default Integer.MAX_VALUE;
+	String maxGetterMethod() default "";
 	/**
 	 * minimum value for the integer property
 	 * @return the allowed minimum
 	 */
 	int minimum() default Integer.MIN_VALUE;
+	String minGetterMethod() default "";
 	/**
 	 * Step size to increment decrement the value 
 	 * from the initial value (assignment in code)

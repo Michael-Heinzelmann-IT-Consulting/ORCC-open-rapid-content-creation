@@ -20,6 +20,7 @@ package org.mcuosmipcuter.orcc.soundvis.gui.widgets.properties;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -33,6 +34,7 @@ import org.mcuosmipcuter.orcc.api.soundvis.TimedChange;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
 import org.mcuosmipcuter.orcc.soundvis.defaultcanvas.model.Slide;
+import org.mcuosmipcuter.orcc.util.IOUtil;
 
 
 /**
@@ -126,7 +128,24 @@ public class PropertyPanelFactory {
 				LimitedIntProperty l = field.getAnnotation(LimitedIntProperty.class);
 				Integer integer = getValue(field, valueOwner);
 				int value = integer != null ? integer.intValue() : 0;
-				i = new IntegerPropertyPanel(soundCanvasWrapper, valueOwner, timed, value, l.minimum(), l.maximum(), l.stepSize());
+				int minimum = l.minimum();
+				if(l.minGetterMethod().length() > 0 ) {
+					try {
+						minimum = (Integer)valueOwner.getClass().getDeclaredMethod(l.minGetterMethod()).invoke(valueOwner);
+					} catch (Exception ex) {
+						IOUtil.log(ex.getMessage());
+					}
+				}
+				int maximum = l.maximum();
+				if(l.minGetterMethod().length() > 0 ) {
+					try {
+						maximum = (Integer)valueOwner.getClass().getDeclaredMethod(l.maxGetterMethod()).invoke(valueOwner);
+					} catch (Exception ex) {
+						IOUtil.log(ex.getMessage());
+					}
+				}
+
+				i = new IntegerPropertyPanel(soundCanvasWrapper, valueOwner, timed, value, minimum, maximum, l.stepSize());
 			}
 			else {
 				i = new IntegerPropertyPanel(soundCanvasWrapper, valueOwner, timed);

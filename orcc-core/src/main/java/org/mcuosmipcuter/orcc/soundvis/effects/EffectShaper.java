@@ -24,55 +24,84 @@ import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 
 public class EffectShaper {
-	@UserProperty(description="begin size x")
-	private int begValueXPercent = 0;
-	@UserProperty(description="begin size y")
-	private int begValueYPercent = 0;
 	
-	@UserProperty(description="mid size x")
-	private int midValueXPercent = 100;
-	@UserProperty(description="mid size y")
-	private int midValueYPercent = 100;
+	EffectShape initial = new EffectShape(0, 0, 0, 0, 0, 100, 0);
+	private int minValues = Integer.MIN_VALUE;
+	private int maxValues = Integer.MAX_VALUE;
 	
-	@UserProperty(description="end size x")
-	private int endValueXPercent = 0;
-	@UserProperty(description="end size y")
-	private int endValueYPercent = 0;
+	@LimitedIntProperty(description = "configurable", minGetterMethod = "getMinValues", maxGetterMethod = "getMaxValues")
+	@UserProperty(description="begin value x")
+	private int begValueXPercent = initial.begValueXPercent;
+	@LimitedIntProperty(description = "configurable", minGetterMethod = "getMinValues", maxGetterMethod = "getMaxValues")
+	@UserProperty(description="begin value y")
+	private int begValueYPercent = initial.begValueYPercent;
 	
-	@UserProperty(description="in scale 0 means none")
-	private int framesIn;
+	@LimitedIntProperty(description = "configurable", minGetterMethod = "getMinValues", maxGetterMethod = "getMaxValues")
+	@UserProperty(description="mid value x")
+	private int midValueXPercent = initial.midValueXPercent;
+	@LimitedIntProperty(description = "configurable", minGetterMethod = "getMinValues", maxGetterMethod = "getMaxValues")
+	@UserProperty(description="mid value y")
+	private int midValueYPercent = initial.midValueYPercent;
+	
+	@LimitedIntProperty(description = "configurable", minGetterMethod = "getMinValues", maxGetterMethod = "getMaxValues")
+	@UserProperty(description="end value x")
+	private int endValueXPercent = initial.endValueXPercent;
+	@LimitedIntProperty(description = "configurable", minGetterMethod = "getMinValues", maxGetterMethod = "getMaxValues")
+	@UserProperty(description="end value y")
+	private int endValueYPercent = initial.endValueYPercent;
+	
+	@UserProperty(description="slope in frames")
+	private int framesIn = initial.framesIn;
 	@LimitedIntProperty(minimum = 0, description = "only positive integers")
-	@UserProperty(description="delay in scaling 0 means scale from the beginning")
-	private int beginFrames;
+	@UserProperty(description="static in frames")
+	private int beginFrames = initial.beginFrames;
 	
-	@UserProperty(description="in scale 0 means none")
-	private int framesOut;
+	@UserProperty(description="slope out frames")
+	private int framesOut = initial.framesOut;
 	@LimitedIntProperty(maximum = 0, description = "only negative integers")
-	@UserProperty(description="early out scaling 0 means scale to the end")
-	private int endFrames;
+	@UserProperty(description="static out frames")
+	private int endFrames = initial.endFrames;
 	
+	
+	public EffectShaper() {
+		
+	}
+	public EffectShaper(EffectShape initial, int minValues, int maxValues) {
+		this.initial = initial;
+		this.minValues = minValues;
+		this.maxValues = maxValues;
+	}
 
+	public int getMinValues() {
+		return minValues;
+	}
+	public int getMaxValues() {
+		return maxValues;
+	}
 	public void currentValues(int posInSlideDuration, int numberOfFramesSlideIsVisible, BiConsumer<Float, Float> valueConsumer) {
+		currentValues(posInSlideDuration, numberOfFramesSlideIsVisible, valueConsumer, getEffectShape());
+	}
+	protected void currentValues(int posInSlideDuration, int numberOfFramesSlideIsVisible, BiConsumer<Float, Float> valueConsumer, EffectShape current) {
 
-		float begScaleX = begValueXPercent / 100f;
-		float begScaleY = begValueYPercent / 100f;
-		float midScaleX = midValueXPercent / 100f;
-		float midScaleY = midValueYPercent / 100f;		
-		float endScaleX = endValueXPercent / 100f;
-		float endScaleY = endValueYPercent / 100f;
+		float begScaleX = current.begValueXPercent / 100f;
+		float begScaleY = current.begValueYPercent / 100f;
+		float midScaleX = current.midValueXPercent / 100f;
+		float midScaleY = current.midValueYPercent / 100f;		
+		float endScaleX = current.endValueXPercent / 100f;
+		float endScaleY = current.endValueYPercent / 100f;
 		float currentScaleIn = 1;
 		float currentScaleOut = 1;
 
-		boolean isScalingIn = framesIn != 0 && posInSlideDuration > beginFrames && posInSlideDuration <= Math.abs(framesIn);
-		boolean isScalingOut = framesOut != 0 && posInSlideDuration < (numberOfFramesSlideIsVisible + endFrames) && posInSlideDuration >= (numberOfFramesSlideIsVisible - Math.abs(framesOut));
+		boolean isScalingIn = current.framesIn != 0 && posInSlideDuration > current.beginFrames && posInSlideDuration <= Math.abs(current.framesIn);
+		boolean isScalingOut = current.framesOut != 0 && posInSlideDuration < (numberOfFramesSlideIsVisible + current.endFrames) && posInSlideDuration >= (numberOfFramesSlideIsVisible - Math.abs(current.framesOut));
 		
 		if(isScalingIn) {
-			float scaleRateIn = 100f / ((Math.abs(framesIn) - beginFrames) * 100f);
-			currentScaleIn =   (posInSlideDuration - beginFrames) * scaleRateIn;
+			float scaleRateIn = 100f / ((Math.abs(current.framesIn) - current.beginFrames) * 100f);
+			currentScaleIn =   (posInSlideDuration - current.beginFrames) * scaleRateIn;
 		}
 		if(isScalingOut) {
-			float scaleRateOut = 100f / ((Math.abs(framesOut) + endFrames) * 100f);
-			currentScaleOut = (numberOfFramesSlideIsVisible + endFrames - posInSlideDuration + 1) * scaleRateOut;
+			float scaleRateOut = 100f / ((Math.abs(current.framesOut) + current.endFrames) * 100f);
+			currentScaleOut = (numberOfFramesSlideIsVisible + current.endFrames - posInSlideDuration + 1) * scaleRateOut;
 		}
 		if(isScalingIn) {
 			float scaleRangeX = midScaleX - begScaleX;
@@ -92,21 +121,21 @@ public class EffectShaper {
 			valueConsumer.accept(endScaleX + scaleRangeX, endScaleY + scaleRangeY);
 		}
 		else {
-			if(posInSlideDuration <= beginFrames) {
-				valueConsumer.accept(begValueXPercent / 100f, begValueYPercent / 100f);
+			if(posInSlideDuration <= current.beginFrames) {
+				valueConsumer.accept(current.begValueXPercent / 100f, current.begValueYPercent / 100f);
 			}
-			else if(posInSlideDuration >= (numberOfFramesSlideIsVisible + endFrames)) {
-				valueConsumer.accept(endValueXPercent / 100f, endValueYPercent / 100f);
+			else if(current.framesOut != 0 && posInSlideDuration >= (numberOfFramesSlideIsVisible + current.endFrames)) {
+				valueConsumer.accept(current.endValueXPercent / 100f, current.endValueYPercent / 100f);
 			}
 			else {
-				valueConsumer.accept(midValueXPercent / 100f, midValueYPercent / 100f);
+				valueConsumer.accept(current.midValueXPercent / 100f, current.midValueYPercent / 100f);
 			}
 		}
 
 	}
 	
-	public EffectShape getEffectShape(long frameFrom, long frameTo) {
-		EffectShape effectShape = new EffectShape(frameFrom, frameTo, framesIn, framesOut, beginFrames, endFrames,
+	public EffectShape getEffectShape() {
+		EffectShape effectShape = new EffectShape(framesIn, framesOut, beginFrames, endFrames,
 				begValueXPercent, begValueYPercent, midValueXPercent, midValueYPercent, endValueXPercent,
 				endValueYPercent);
 

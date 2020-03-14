@@ -60,20 +60,26 @@ public class Repeater {
 		}
 		int duration = repeatDurationFrames + Math.abs(oLapBef) + oLapAft;
 		List<DisplayUnit> units = new ArrayList<>();
+		int index = 0;
 		for(int r = 0; r < repeat; r++) {
-			if(relFrameCount / repeatDurationFrames < repeat) {
+			if(relFrameCount  <= frameTo + oLapAft) {
 				int start = repeatDurationFrames * r + oLapBef + 1;
 				int end = start + duration - 1;
-				
+
 				if(relFrameCount >= start && relFrameCount <= end ) {
 					System.err.println(start + " * " + end + " = " + (relFrameCount - start + 1));
-					DisplayUnit d = new DisplayUnit(relFrameCount - start + 1, duration);
+					if(index >= repeat ) {
+						index = 0;
+					}
+					DisplayUnit d = new DisplayUnit(relFrameCount - start + 1, duration, index);
 					units.add(d);
+					index++;
 				}
 				else {
 					System.err.println(start + "  " + end);
+					index++;
 				}
-				
+
 			}
 			else {
 				posInSlideDuration = duration;
@@ -97,10 +103,6 @@ public class Repeater {
 			repeatDurationFrames = 1;
 		}
 		return repeatDurationFrames ;
-	}
-
-	public int getRepeat() {
-		return repeat;
 	}
 
 	public DisplayDuration<?>[] getFrameFromTos(long frameFrom, long frameTo) {
@@ -128,4 +130,14 @@ public class Repeater {
 		}
 		return result;
 	}
+
+	public void setFrames(int frames) {
+		this.frames = frames;
+	}
+
+	public void setRepeat(int repeat) {
+		this.repeat = repeat;
+	}
+	
+	
 }

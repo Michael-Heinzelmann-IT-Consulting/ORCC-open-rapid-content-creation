@@ -18,27 +18,24 @@
 package org.mcuosmipcuter.orcc.api.soundvis;
 
 public class EffectShape {
-	public final long from;
-	public final long to;
-	public final int overlapBefore;
-	public final int overlapAfter;
-	public final int lateIn;
-	public final int earlyOut;
+
+	public final int framesIn;
+	public final int framesOut;
+	public final int beginFrames;
+	public final int endFrames;
 	public final int begValueXPercent;
 	public final int begValueYPercent;
 	public final int midValueXPercent;
 	public final int midValueYPercent;
 	public final int endValueXPercent;
 	public final int endValueYPercent;
-	public EffectShape(long from, long to, int overlapBefore, int overlapAfter, int lateIn, int earlyOut,
+	public EffectShape(int overlapBefore, int overlapAfter, int lateIn, int earlyOut,
 			int begValueXPercent, int begValueYPercent, int midValueXPercent, int midValueYPercent,
 			int endValueXPercent, int endValueYPercent) {
-		this.from = from;
-		this.to = to;
-		this.overlapBefore = overlapBefore;
-		this.overlapAfter = overlapAfter;
-		this.lateIn = lateIn;
-		this.earlyOut = earlyOut;
+		this.framesIn = overlapBefore;
+		this.framesOut = overlapAfter;
+		this.beginFrames = lateIn;
+		this.endFrames = earlyOut;
 		this.begValueXPercent = begValueXPercent;
 		this.begValueYPercent = begValueYPercent;
 		this.midValueXPercent = midValueXPercent;
@@ -47,8 +44,8 @@ public class EffectShape {
 		this.endValueYPercent = endValueYPercent;
 	}
 
-	public EffectShape(long from, long to, int overlapBefore, int overlapAfter, int lateIn, int earlyOut,
+	public EffectShape(int overlapBefore, int overlapAfter, int lateIn, int earlyOut,
 			int begValuePercent, int midValuePercent, int endValuePercent) {
-		this(from, to, overlapBefore, overlapAfter, lateIn, earlyOut, begValuePercent, begValuePercent, midValuePercent, midValuePercent, endValuePercent, endValuePercent);
+		this(overlapBefore, overlapAfter, lateIn, earlyOut, begValuePercent, begValuePercent, midValuePercent, midValuePercent, endValuePercent, endValuePercent);
 	}
 }

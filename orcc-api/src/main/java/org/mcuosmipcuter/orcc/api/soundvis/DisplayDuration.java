@@ -43,30 +43,30 @@ public class DisplayDuration <T extends DisplayObject> {
 	public DisplayDuration() {
 		
 	}
-	public DisplayDuration(T displayObject, EffectShape effectShape) {
+	public DisplayDuration(T displayObject, long frameFrom, long frameTo, EffectShape effectShape) {
 		this.displayObject = displayObject;
 		this.effectX = new int[12];
 		this.effectY = new int[12];
 		
-		this.from = effectShape.from;
-		this.to = effectShape.to;
-		this.overlapBefore = effectShape.overlapBefore;
-		this.overlapAfter = effectShape.overlapAfter;
+		this.from = frameFrom;
+		this.to = frameTo;
+		this.overlapBefore = effectShape.framesIn;
+		this.overlapAfter = effectShape.framesOut;
 		int[] x = effectX;
-		int from = (int) effectShape.from;
-		int to = (int) effectShape.to + 1;
-		x[0] = effectShape.overlapBefore > 0 ? from : from + effectShape.overlapBefore;
+		int from = (int) frameFrom;
+		int to = (int) frameTo + 1;
+		x[0] = effectShape.framesIn > 0 ? from : from + effectShape.framesIn;
 		x[11] = x[0];
-		x[1] = x[0] + effectShape.lateIn;
+		x[1] = x[0] + effectShape.beginFrames;
 		x[10] = x[1];
-		x[2] = x[0] + Math.abs(effectShape.overlapBefore);
+		x[2] = x[0] + Math.abs(effectShape.framesIn);
 		x[9] = x[2];
 		
-		x[5] = effectShape.overlapAfter < 0 ? to : to + effectShape.overlapAfter;
+		x[5] = effectShape.framesOut < 0 ? to : to + effectShape.framesOut;
 		x[6] = x[5];
-		x[4] = x[5] + effectShape.earlyOut; 
+		x[4] = x[5] + effectShape.endFrames; 
 		x[7] = x[4];
-		x[3] = x[5] - Math.abs(effectShape.overlapAfter);
+		x[3] = x[5] - Math.abs(effectShape.framesOut);
 		x[8] = x[3];
 		
 		int[] y = effectY;

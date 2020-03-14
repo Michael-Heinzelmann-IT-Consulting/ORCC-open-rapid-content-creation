@@ -27,13 +27,13 @@ public class Rotator implements DisplayObject {
 	
 	@UserProperty(description="in rotate 0 means none")
 	private int rotateInFrames;
-	@UserProperty(description="rotate in x speed")
+	@UserProperty(description="rotate in speed")
 	private int rotateInSpeed;
 	
 	
 	@UserProperty(description="in move 0 means none")
 	private int rotateOutFrames;
-	@UserProperty(description="move out x speed")
+	@UserProperty(description="rotate out speed")
 	private int rotateOutSpeed;
 	
 	
