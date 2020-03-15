@@ -45,7 +45,7 @@ public class Rotator implements DisplayObject {
 			
 			theta = Math.PI * rotateInSpeed / 180;
 			double beginRotation = Math.abs(rotateInFrames) * -theta;
-			//rotatePosition = posInSlideDuration * theta;
+
 			rotatePosition = beginRotation + posInSlideDuration * theta;
 			transform.rotate(rotatePosition, centerX , centerY);
 		}

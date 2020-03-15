@@ -327,7 +327,7 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 							int subTo = margin + (int)(fromTos[i].getTo() +1)* samplesPerFrame / noOfSamples;
 							//g.drawRoundRect(subFrom, y + delta, subTo - subFrom, b  + delta, 16, 16);
 							if(fromTos[i].getOverlapBefore() == 0 && fromTos[i].getOverlapAfter() == 0) {
-								//g.drawRoundRect(subFrom, y + delta, subTo - subFrom, b  + delta, 16, 16);
+								g.drawRoundRect(subFrom, y + delta, subTo - subFrom, b  + delta, 16, 16);
 								//g.drawString(fromTos[i].getDisplayObject().getDisplayText(), subFrom + 6, y + delta + 12);
 							}
 							else {

@@ -64,12 +64,22 @@ public class EffectShaper {
 	
 	
 	public EffectShaper() {
-		
 	}
 	public EffectShaper(EffectShape initial, int minValues, int maxValues) {
 		this.initial = initial;
 		this.minValues = minValues;
 		this.maxValues = maxValues;
+
+		this.begValueXPercent = initial.begValueXPercent;
+		this.begValueYPercent = initial.begValueYPercent;
+		this.midValueXPercent = initial.midValueXPercent;
+		this.midValueYPercent = initial.midValueYPercent;
+		this.endValueXPercent = initial.endValueXPercent;
+		this.endValueYPercent = initial.endValueYPercent;
+		this.framesIn = initial.framesIn;
+		this.beginFrames = initial.beginFrames;
+		this.framesOut = initial.framesOut;
+		this.endFrames = initial.endFrames;
 	}
 
 	public int getMinValues() {
@@ -109,7 +119,6 @@ public class EffectShaper {
 			scaleRangeX *= currentScaleIn;		
 			scaleRangeY *= currentScaleIn;
 			
-			//transform.scale(begScaleX + scaleRangeX, begScaleY + scaleRangeY);
 			valueConsumer.accept(begScaleX + scaleRangeX, begScaleY + scaleRangeY);
 		}
 		else if(isScalingOut) {

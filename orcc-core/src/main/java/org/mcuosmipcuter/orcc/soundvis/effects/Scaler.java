@@ -18,15 +18,12 @@
 package org.mcuosmipcuter.orcc.soundvis.effects;
 
 import java.awt.geom.AffineTransform;
-import java.util.Arrays;
 import java.util.function.BiConsumer;
 
 import org.mcuosmipcuter.orcc.api.soundvis.DisplayDuration;
 import org.mcuosmipcuter.orcc.api.soundvis.DisplayObject;
 import org.mcuosmipcuter.orcc.api.soundvis.EffectShape;
-import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.NestedProperty;
-import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 
 /**
  * @author user

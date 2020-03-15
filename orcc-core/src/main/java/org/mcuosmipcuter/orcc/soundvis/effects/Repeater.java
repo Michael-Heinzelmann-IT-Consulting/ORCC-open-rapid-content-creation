@@ -25,6 +25,7 @@ import org.mcuosmipcuter.orcc.api.soundvis.DisplayObject;
 import org.mcuosmipcuter.orcc.api.soundvis.DisplayUnit;
 import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
+import org.mcuosmipcuter.orcc.util.IOUtil;
 
 /**
  * @author user
@@ -47,9 +48,8 @@ public class Repeater {
 	}
 
 	public DisplayUnit[] repeat(long frameFrom, long frameTo, long frameCount) {
+		
 		int relFrameCount = (int) (frameCount - frameFrom);
-		int posInSlideDuration = relFrameCount;
-
 		int repeatDurationFrames = getRepeatDurationFrames(frameFrom, frameTo);
 		
 		int oLapBef = 0;
@@ -67,7 +67,7 @@ public class Repeater {
 				int end = start + duration - 1;
 
 				if(relFrameCount >= start && relFrameCount <= end ) {
-					System.err.println(start + " * " + end + " = " + (relFrameCount - start + 1));
+					IOUtil.log(start + " * " + end + " = " + (relFrameCount - start + 1));
 					if(index >= repeat ) {
 						index = 0;
 					}
@@ -76,17 +76,11 @@ public class Repeater {
 					index++;
 				}
 				else {
-					System.err.println(start + "  " + end);
 					index++;
 				}
 
 			}
-			else {
-				posInSlideDuration = duration;
-			}
 		}
-		int currentPos = posInSlideDuration;
-		System.err.println(currentPos + " : " + duration);
 		return units.toArray(new DisplayUnit[] {});
 	}
 
@@ -112,7 +106,6 @@ public class Repeater {
 			oLapBef = (int) Math.min(oLapBef, d.getDisplayDuration(frameFrom, frameTo).getOverlapBefore());
 			oLapAft = (int) Math.max(oLapAft, d.getDisplayDuration(frameFrom, frameTo).getOverlapAfter());
 		}
-		//return repeatDurationFrames + Math.abs(oLapBef) + oLapAft;
 		int effects = dispayObjects.length;
 		int repeatDurationFrames = getRepeatDurationFrames(frameFrom, frameTo);
 		DisplayDuration<?>[]result = new DisplayDuration<?>[repeat * effects];
@@ -124,7 +117,6 @@ public class Repeater {
 				dd.setFrom(dd.getFrom() + oLapBef);
 				dd.setTo(dd.getTo() + oLapAft);
 				result[r + j] = dd;
-				////System.err.println(dd);
 			}
 			c++;
 		}

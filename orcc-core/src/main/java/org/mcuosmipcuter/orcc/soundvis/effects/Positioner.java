@@ -42,8 +42,6 @@ public class Positioner {
 			float translateX =  ((float)(dimensionHelper.getVideoWidth() + dimensionHelper.realX(centerX) - width)) / 2f ;
 			float translateY =    ((float)(dimensionHelper.getVideoHeight() + dimensionHelper.realY(centerY) - height )) / 2f;
 			transform.translate(translateX, translateY);
-			//outline.translate((int)translateX, (int)translateY);
-			
 		return transform;
 	}
 

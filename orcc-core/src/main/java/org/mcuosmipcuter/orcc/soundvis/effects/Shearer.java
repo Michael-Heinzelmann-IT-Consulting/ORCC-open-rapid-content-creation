@@ -18,8 +18,10 @@
 package org.mcuosmipcuter.orcc.soundvis.effects;
 
 import java.awt.geom.AffineTransform;
+import java.util.function.BiConsumer;
 
-import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
+import org.mcuosmipcuter.orcc.api.soundvis.EffectShape;
+import org.mcuosmipcuter.orcc.api.soundvis.NestedProperty;
 
 /**
  * @author user
@@ -27,16 +29,18 @@ import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
  */
 public class Shearer {
 	
-	@UserProperty(description="")
-	private int shearX;
-	@UserProperty(description="")
-	private int shearY;
+	@NestedProperty(description = "shaer effects")
+	EffectShaper effectShaper = new EffectShaper(new EffectShape(0, 0, 0, 0, 0, 0, 0), Integer.MIN_VALUE, Integer.MAX_VALUE);
 	
 	public AffineTransform shear(int posInSlideDuration, int numberOfFramesSlideIsVisible) {
 		AffineTransform transform = new AffineTransform();
-		if(shearX != 0 || shearY != 0) {		
-			transform.shear((double)shearX/100, (double)shearY/100);
-		}		
+		
+		effectShaper.currentValues(posInSlideDuration, numberOfFramesSlideIsVisible, new BiConsumer<Float, Float>() {
+			@Override
+			public void accept(Float x, Float y) {
+				transform.shear(x, y);
+			}		
+		});
 		return transform;
 	}
 

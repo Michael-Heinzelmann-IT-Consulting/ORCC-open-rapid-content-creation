@@ -27,8 +27,6 @@ import java.awt.geom.Area;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
 import org.mcuosmipcuter.orcc.api.soundvis.DisplayDuration;
@@ -47,7 +45,6 @@ import org.mcuosmipcuter.orcc.soundvis.effects.Positioner;
 import org.mcuosmipcuter.orcc.soundvis.effects.Repeater;
 import org.mcuosmipcuter.orcc.soundvis.effects.Rotator;
 import org.mcuosmipcuter.orcc.soundvis.effects.Scaler;
-import org.mcuosmipcuter.orcc.util.IOUtil;
 
 
 /**
@@ -65,15 +62,10 @@ public class SlideShow implements SoundCanvas {
 	@UserProperty(description="number of frames per image")
 	@LimitedIntProperty(minimum=0, description="cannot be negative")
 	private int repeat = 0;
-
-
-//	@UserProperty(description="loop image sequence")
-//	private boolean loop = true;
 	
 	private DimensionHelper dimensionHelper;
 
 	private java.awt.Image iconImage;
-	private List<DisplayDuration<Slide>> timeLine = new ArrayList<>();
 
 	VideoOutputInfo videoOutputInfo;
 	AudioInputInfo audioInputInfo;
@@ -97,7 +89,6 @@ public class SlideShow implements SoundCanvas {
 	private Mover mover = new Mover();
 	@NestedProperty(description = "rotate in and out")
 	private Rotator rotator = new Rotator();
-	
 	@NestedProperty(description = "scale in and out")
 	Scaler scaler = new Scaler();
 	
@@ -105,8 +96,6 @@ public class SlideShow implements SoundCanvas {
 
 	private long frameFrom;
 	private long frameTo;
-
-	private List<DisplayDuration<Slide>> currentShowing = new ArrayList<>(3);
 
 	@Override
 	public void newFrame(long frameCount, Graphics2D graphics2D) {
@@ -117,29 +106,16 @@ public class SlideShow implements SoundCanvas {
 
 			repeater.setRepeat(repeat==0 ? slides.length : repeat);
 			repeater.setFrames(numberOfFrames);
-//			currentShowing.clear();
-//			for(DisplayDuration<Slide> displayDuration: timeLine) {
-//				if(displayDuration.contains(frameCount)) {
-//					currentShowing.add(displayDuration);
-//				}
-//			}
-//			
-//			for(DisplayDuration<Slide> duration : currentShowing) {	
+
 			for(DisplayUnit displayUnit : repeater.repeat(frameFrom, frameTo, frameCount)) {
 
-//				if(! (duration.getDisplayObject().getImage() instanceof BufferedImage)) {
-//					continue; // TODO non image slides
-//				}
 				if(! (slides[displayUnit.index % slides.length].getImage() instanceof BufferedImage)) {
 					continue; // TODO non image slides
 				}
 
-//				BufferedImage image = (BufferedImage) duration.getDisplayObject().getImage();
 				BufferedImage image = (BufferedImage) slides[displayUnit.index % slides.length].getImage();
 				final AffineTransform saveAT = graphics2D.getTransform();
-//				int posInSlideDuration = (int)(frameCount - duration.getFrom());
-				
-				
+
 				Area imageArea = new Area(new Rectangle(image.getWidth(), image.getHeight()));
 
 				AffineTransform transformS = scaler.scale(displayUnit.currentPosition, displayUnit.duration, imageArea.getBounds().width, imageArea.getBounds().height);
@@ -202,88 +178,10 @@ public class SlideShow implements SoundCanvas {
 	private void updateSlides() {
 		if(audioInputInfo != null && slides != null) {
 			if (numberOfFrames == 0) {
-				long frameRange = frameTo - frameFrom;
-				//numberOfFramesSlideIsVisible = (int) frameRange / slides.length; // even distribution, remainder depends
 				repeater.setRepeat(slides.length);
 			} else {
-				//numberOfFramesSlideIsVisible = numberOfFrames;
 				repeater.setFrames(numberOfFrames);
 			}
-//			timeLine.clear();
-//			long startFrame = frameFrom;
-//			int overLapBefore = 0;
-////			if(fader.getFadeIn() != 0) {
-////				overLapBefore = fader.getFadeIn();	
-////			}
-//			int scaleIn = (int)scaler.getDisplayDuration(overLapBefore, startFrame).getOverlapBefore();
-//			if(scaleIn != 0) {
-//				overLapBefore = overLapBefore < 0 ? Math.min(overLapBefore, scaleIn): scaleIn;	
-//			}
-//			if(mover.getMoveInXFrames() != 0) {
-//				overLapBefore = overLapBefore < 0 ? Math.min(overLapBefore, mover.getMoveInXFrames()): mover.getMoveInXFrames();	
-//			}
-//			if(mover.getMoveInYFrames() != 0) {
-//				overLapBefore = overLapBefore < 0 ? Math.min(overLapBefore, mover.getMoveInYFrames()): mover.getMoveInYFrames();	
-//			}
-//			if(rotator.getRotateInFrames() != 0) {
-//				overLapBefore = overLapBefore < 0 ? Math.min(overLapBefore, rotator.getRotateInFrames()): rotator.getRotateInFrames();
-//			}
-//			if(overLapBefore < 0) {
-//				startFrame += overLapBefore;
-//				numberOfFramesSlideIsVisible -= overLapBefore;
-//			}
-//			
-//			int overLapAfter = 0;
-////			if(fader.getFadeOut() != 0 ) {
-////				overLapAfter = fader.getFadeOut();
-////			}
-//			int scaleOut = (int)scaler.getDisplayDuration(overLapAfter, startFrame).getOverlapAfter();
-//			if(scaleOut != 0) {
-//				overLapAfter = overLapAfter > 0 ? Math.max(overLapAfter, scaleOut) : scaleOut;
-//			}
-//			if(mover.getMoveOutXFrames() != 0) {
-//				overLapAfter = overLapAfter > 0 ? Math.max(overLapAfter, mover.getMoveOutXFrames()) : mover.getMoveOutXFrames();
-//			}
-//			if(mover.getMoveOutYFrames() != 0) {
-//				overLapAfter = overLapAfter > 0 ? Math.max(overLapAfter, mover.getMoveOutYFrames()) : mover.getMoveOutYFrames();
-//			}
-//			if(rotator.getRotateOutFrames() != 0) {
-//				overLapAfter = overLapAfter > 0 ? Math.max(overLapAfter, rotator.getRotateOutFrames()) : rotator.getRotateOutFrames();
-//			}
-//
-//			if(overLapAfter > 0) {
-//				numberOfFramesSlideIsVisible += overLapAfter;
-//			}
-//			
-//			long durationTo = 0;
-//			
-//			tl:
-//			while(durationTo < frameTo && numberOfFramesSlideIsVisible > 0) {
-//				
-//				for(Slide slide : slides) {
-//
-//					DisplayDuration<Slide> duration = new DisplayDuration<>();
-//					duration.setDisplayObject(slide);
-//					duration.setFrom(startFrame);
-//					
-//					durationTo = startFrame  + numberOfFramesSlideIsVisible - 1;
-//					durationTo = durationTo < frameTo ? durationTo : frameTo;
-//					duration.setTo(durationTo);
-//					duration.setOverlapBefore(overLapBefore);
-//					duration.setOverlapAfter(overLapAfter);
-//					startFrame = startFrame + numberOfFramesSlideIsVisible + (overLapBefore < 0 ? overLapBefore : 0) - (overLapAfter > 0 ? overLapAfter : 0);
-//					IOUtil.log(String.valueOf(duration));
-//					timeLine.add(duration);
-//					if(startFrame + overLapBefore >= frameTo) {
-//						break tl;
-//					}
-//				}
-//				if(!loop) {
-//					break;
-//				}
-//				
-//			}
-//			IOUtil.log(String.valueOf(timeLine));
 		}
 	}
 	@Override
@@ -321,11 +219,7 @@ public class SlideShow implements SoundCanvas {
 
 	@Override
 	public DisplayDuration<?>[] getFrameFromTos() {
-//		if(timeLine != null && slides != null && numberOfFramesSlideIsVisible > 0) {
-//			return timeLine.toArray(new DisplayDuration<?>[] {});
-//		}
 		return repeater.getFrameFromTos(frameFrom, frameTo);
-		//return SoundCanvas.super.getFrameFromTos();
 	}
 
 }

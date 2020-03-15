@@ -47,39 +47,15 @@ public class Fader implements DisplayObject{
 	@NestedProperty(description = "shape effects")
 	EffectShaperSimple effectShaper = new EffectShaperSimple(new EffectShape(0, 0, 0, 0, 0, 100, 0), 0, 100);
 	
-//	@UserProperty(description="number of frames to fade in")
-//	private int fadeIn = 0;
-	
 	AlphaComposite ac  = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f);
 	@UserProperty(description="rule for composite in")
 	private RULE rule = RULE.SRC_OVER;
-	
-//	@UserProperty(description="rule for composite in")
-//	private RULE inRule = RULE.SRC_OVER;
-	
-//	@UserProperty(description="number of frames to fade out")
-//	private int fadeOut = 0;
-	
-//	@UserProperty(description="rule for composite out")
-//	private RULE outRule = RULE.SRC_OVER;
 	
 	
 	public Composite fade(Graphics2D graphics2D, int posInSlideDuration, int numberOfFramesSlideIsVisible) {
 		
 		final Composite saveComposite = graphics2D.getComposite();
-//		float transparency = 1.0f;
-//		
-//		if(fadeIn != 0 && posInSlideDuration <= Math.abs(fadeIn)) {
-//			float fadeRate = 100f / (Math.abs(fadeIn) * 100f);
-//			transparency = posInSlideDuration * fadeRate;
-//			transparency = transparency < 0 ? 0 : (transparency > 1 ? 1f : transparency);
-//			graphics2D.setComposite(AlphaComposite.getInstance(inRule.getNumber(), transparency));  
-//		}
-//		if(fadeOut != 0 && posInSlideDuration > (numberOfFramesSlideIsVisible - Math.abs(fadeOut))) {
-//			float fadeRate = 100f / (fadeOut * 100f);
-//			transparency = 1-( (numberOfFramesSlideIsVisible - Math.abs(fadeOut)) - posInSlideDuration - 1) * fadeRate;
-			effectShaper.currentValues(posInSlideDuration, numberOfFramesSlideIsVisible, new Consumer<Float>() {
-				
+			effectShaper.currentValues(posInSlideDuration, numberOfFramesSlideIsVisible, new Consumer<Float>() {				
 				@Override
 				public void accept(Float transparency) {
 					transparency = transparency < 0 ? 0 : (transparency > 1 ? 1f : transparency);
@@ -93,12 +69,6 @@ public class Fader implements DisplayObject{
 
 	@Override
 	public DisplayDuration<?> getDisplayDuration(long frameFrom, long frameTo) {
-//		DisplayDuration<Fader> duration = new DisplayDuration<>();
-//		duration.setDisplayObject(this);
-//		duration.setFrom(frameFrom);
-//		duration.setTo(frameTo);
-//		duration.setOverlapBefore(fadeIn);
-//		duration.setOverlapAfter(fadeOut);
 		EffectShape effectShape = effectShaper.getEffectShape();
 		DisplayDuration<Fader> duration = new DisplayDuration<>(this, frameFrom, frameTo, effectShape);
 		return duration;
@@ -108,14 +78,5 @@ public class Fader implements DisplayObject{
 	public String getDisplayKey() {
 		return "fader";
 	}
-
-//	public int getFadeIn() {
-//		return fadeIn;
-//	}
-//
-//	public int getFadeOut() {
-//		return fadeOut;
-//	}
 	
-
 }
