@@ -20,6 +20,8 @@ package org.mcuosmipcuter.orcc.soundvis.effects;
 import java.awt.geom.AffineTransform;
 import java.util.function.BiConsumer;
 
+import org.mcuosmipcuter.orcc.api.soundvis.DisplayDuration;
+import org.mcuosmipcuter.orcc.api.soundvis.DisplayObject;
 import org.mcuosmipcuter.orcc.api.soundvis.EffectShape;
 import org.mcuosmipcuter.orcc.api.soundvis.NestedProperty;
 
@@ -27,7 +29,7 @@ import org.mcuosmipcuter.orcc.api.soundvis.NestedProperty;
  * @author user
  *
  */
-public class Shearer {
+public class Shearer implements DisplayObject {
 	
 	@NestedProperty(description = "shaer effects")
 	EffectShaper effectShaper = new EffectShaper(new EffectShape(0, 0, 0, 0, 0, 0, 0), Integer.MIN_VALUE, Integer.MAX_VALUE);
@@ -42,6 +44,18 @@ public class Shearer {
 			}		
 		});
 		return transform;
+	}
+
+	@Override
+	public String getDisplayKey() {
+		return "shearer";
+	}
+
+	@Override
+	public DisplayDuration<?> getDisplayDuration(long frameFrom, long frameTo) {
+		EffectShape effectShape = effectShaper.getEffectShape();
+		DisplayDuration<Shearer> duration = new DisplayDuration<>(this, frameFrom, frameTo, effectShape);
+		return duration;
 	}
 
 }

@@ -71,6 +71,7 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 		effectColors.put("fader", Color.DARK_GRAY);
 		effectColors.put("rotator", Color.RED);
 		effectColors.put("scaler", Color.BLUE);
+		effectColors.put("shearer", Color.GREEN);
 	}
 	
 	// flexible layout screen dependent
@@ -125,17 +126,17 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 					selectPos = margin;
 				}
 				int pixel = selectPos - margin;
-				selectFrame = pixel * noOfSamples / samplesPerFrame;
+				selectFrame = pixel * noOfSamples / samplesPerFrame + 1;
 				repaint();
 			}
 
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				int pixel = selectPos - margin;
-				final long frame = pixel * noOfSamples / samplesPerFrame;
+				final long frame = pixel * noOfSamples / samplesPerFrame + 1;
 				long f = frame - preRunFrames;
-				if(f < 0) {
-					f = 0;
+				if(f < 1) {
+					f = 1;
 				}
 				if(Context.getAppState() == AppState.READY) {
 					Context.setSongPositionPointer(f);
@@ -172,8 +173,8 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 					setInputOutputData();
 					selectPos = margin;
 					samplePosition = 0;
-					selectFrame = 0;
-					Context.setSongPositionPointer(0);
+					selectFrame = 1;
+					Context.setSongPositionPointer(1);
 				}
 				if( Context.PropertyName.SoundCanvasList == propertyName ||
 					Context.PropertyName.SoundCanvasAdded == propertyName || 

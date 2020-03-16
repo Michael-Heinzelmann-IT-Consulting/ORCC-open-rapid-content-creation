@@ -126,7 +126,7 @@ public class Text implements SoundCanvas, PropertyListener {
 	private Shearer ishearer = new Shearer();
 
 	@NestedProperty(description = "repeating inside from and to")
-	private Repeater repeater = new Repeater(fader, mover);
+	private Repeater repeater = new Repeater(fader, mover, shearer, ishearer);
 
 	VideoOutputInfo videoOutputInfo;
 	private DimensionHelper dimensionHelper;
@@ -309,7 +309,7 @@ public class Text implements SoundCanvas, PropertyListener {
 					FontRenderContext frx = graphics2d.getFontRenderContext();
 					GlyphVector gv = font.createGlyphVector(frx, lineToUse);
 
-					AffineTransform glyphTx = ishearer.shear(0, 0);
+					AffineTransform glyphTx = ishearer.shear(displayUnit.currentPosition, displayUnit.duration);
 					// glyphTx.quadrantRotate(1);
 					for (int i = 0; i < lineToUse.length(); i++) {
 						gv.setGlyphTransform(i, glyphTx);
