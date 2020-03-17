@@ -107,7 +107,7 @@ public class EffectShaper {
 		
 		if(isScalingIn) {
 			float scaleRateIn = 100f / ((Math.abs(current.framesIn) - current.beginFrames) * 100f);
-			currentScaleIn =   (posInSlideDuration - current.beginFrames) * scaleRateIn;
+			currentScaleIn =   (posInSlideDuration - current.beginFrames - 1) * scaleRateIn;
 		}
 		if(isScalingOut) {
 			float scaleRateOut = 100f / ((Math.abs(current.framesOut) + current.endFrames) * 100f);
