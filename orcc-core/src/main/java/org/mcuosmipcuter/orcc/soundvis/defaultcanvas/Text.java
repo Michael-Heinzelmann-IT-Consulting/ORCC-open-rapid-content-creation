@@ -316,11 +316,11 @@ public class Text implements SoundCanvas, PropertyListener {
 					FontRenderContext frx = graphics2d.getFontRenderContext();
 					GlyphVector gv = font.createGlyphVector(frx, lineToUse);
 
-					AffineTransform glyphTx = ishearer.shear(displayUnit.currentPosition, displayUnit.duration);
+
 
 					for (int i = 0; i < lineToUse.length(); i++) {
 						Rectangle2D go = gv.getGlyphOutline(i).getBounds2D();
-
+						AffineTransform glyphTx = ishearer.shear(displayUnit.currentPosition, displayUnit.duration);
 						AffineTransform glyphTxR = iRotator.rotate(displayUnit.currentPosition, 
 								displayUnit.duration, (int)go.getWidth()/2, (int)
 								go.getCenterY());
