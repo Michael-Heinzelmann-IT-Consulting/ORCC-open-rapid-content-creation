@@ -27,6 +27,7 @@ import java.awt.Stroke;
 import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphVector;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.lang.reflect.Field;
 import java.util.Calendar;
@@ -49,6 +50,7 @@ import org.mcuosmipcuter.orcc.soundvis.effects.Fader;
 import org.mcuosmipcuter.orcc.soundvis.effects.Mover;
 import org.mcuosmipcuter.orcc.soundvis.effects.Positioner;
 import org.mcuosmipcuter.orcc.soundvis.effects.Repeater;
+import org.mcuosmipcuter.orcc.soundvis.effects.Rotator;
 import org.mcuosmipcuter.orcc.soundvis.effects.Shearer;
 import org.mcuosmipcuter.orcc.util.IOUtil;
 
@@ -124,9 +126,12 @@ public class Text implements SoundCanvas, PropertyListener {
 	private Shearer shearer = new Shearer();
 	@NestedProperty(description = "shear")
 	private Shearer ishearer = new Shearer();
+	
+	@NestedProperty(description = "rotate glyph in and out")
+	private Rotator iRotator = new Rotator();
 
 	@NestedProperty(description = "repeating inside from and to")
-	private Repeater repeater = new Repeater(fader, mover, shearer, ishearer);
+	private Repeater repeater = new Repeater(fader, mover, shearer, ishearer, iRotator);
 
 	VideoOutputInfo videoOutputInfo;
 	private DimensionHelper dimensionHelper;
@@ -310,10 +315,18 @@ public class Text implements SoundCanvas, PropertyListener {
 					GlyphVector gv = font.createGlyphVector(frx, lineToUse);
 
 					AffineTransform glyphTx = ishearer.shear(displayUnit.currentPosition, displayUnit.duration);
-					// glyphTx.quadrantRotate(1);
+				
 					for (int i = 0; i < lineToUse.length(); i++) {
+						Rectangle2D go = gv.getGlyphOutline(i).getBounds2D();
+
+						AffineTransform glyphTxR = iRotator.rotate(displayUnit.currentPosition, 
+								displayUnit.duration, (int)go.getWidth()/2, (int)
+								go.getCenterY());
+
+						glyphTx.concatenate(glyphTxR);
 						gv.setGlyphTransform(i, glyphTx);
 
+			
 					}
 					graphics2d.drawGlyphVector(gv, leftMargin, lineTop);
 					// graphics2d.drawString(lineToUse, leftMargin, lineTop);
