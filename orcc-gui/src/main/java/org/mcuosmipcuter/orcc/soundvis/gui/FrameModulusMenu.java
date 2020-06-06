@@ -22,58 +22,43 @@ import java.awt.event.ActionListener;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 import javax.swing.JRadioButtonMenuItem;
 
-import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
-import org.mcuosmipcuter.orcc.soundvis.Context;
+import org.mcuosmipcuter.orcc.soundvis.RealtimeSettings;
 
 /**
- * Specialized menu to show the canvas class names
+ * Specialized menu showing video frame reduction
  * @author Michael Heinzelmann
  */
-public class FrameRateMenu extends JMenu {
+public class FrameModulusMenu extends JMenu{
 
 	private static final long serialVersionUID = 1L;
-	
-	private int[] frameRates = new int[] {12,24, 25, 30, 60};
 
+	private int[] reductions = new int[]{1, 2, 4, 8, 16};
+	
 	/**
-	 * Same constructor as for standard menus
+	 * New menu
 	 * @param title menu title
+	 * @param initialreduction initial reduction
+	 * @param realtimeSettings
 	 */
-	public FrameRateMenu(String title, final int initialFrameRate) {
+	public FrameModulusMenu(String title, final int initialreduction, final RealtimeSettings realtimeSettings) {
 		super(title);
 		ButtonGroup group = new ButtonGroup();
-		for(final int frameRate : frameRates) {
-			final JRadioButtonMenuItem item = new JRadioButtonMenuItem(frameRate + " fps");
+		for(final int reduction : reductions) {
+			final String text = reduction == 1 ? "none" : reduction + " frames";
+			final JMenuItem item = new JRadioButtonMenuItem(text);
 			item.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
-					try {
-						Context.setOutputFrameRate(frameRate);
-					} catch (Exception ex) {
-						throw new RuntimeException(ex);
-					}
+					realtimeSettings.setVideoRefresh(reduction);
 				}
 			});
-			if(frameRate == initialFrameRate) {
+			if(reduction == initialreduction) {
 				item.setSelected(true);
 			}
 			group.add(item);
 			add(item);
-		}
-	}
-
-	/**
-	 * Check and set the frame rates according to audio input
-	 * @param audioInputInfo
-	 */
-	public void checkFrameRatesEnabled(AudioInputInfo audioInputInfo) {
-		float sampleRate = audioInputInfo.getAudioFormat().getSampleRate();
-		int pos = 0;
-		for(int frameRate : frameRates) {
-			boolean isWorkingFrameRate = sampleRate % frameRate == 0;
-			getItem(pos).setEnabled(isWorkingFrameRate);
-			pos++;
 		}
 	}
 }

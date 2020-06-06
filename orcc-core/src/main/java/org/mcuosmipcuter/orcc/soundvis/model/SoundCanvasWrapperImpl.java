@@ -190,7 +190,7 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 	}
 	private long calculateFrameToConcrete(long to) {
 		long frameToConcrete = to;
-		if (to == 0) {
+		if (to == 0 && Context.getAudioInput() != null) {
 			AudioInputInfo audioInputInfo = Context.getAudioInput().getAudioInputInfo();
 			double audioLength = (double) audioInputInfo.getFrameLength();
 			double sampleRate = audioInputInfo.getAudioFormat().getSampleRate();

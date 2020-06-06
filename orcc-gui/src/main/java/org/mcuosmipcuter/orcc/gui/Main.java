@@ -54,6 +54,7 @@ import org.mcuosmipcuter.orcc.soundvis.PlayPauseStopHolder;
 import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
 import org.mcuosmipcuter.orcc.soundvis.gui.AboutBox;
 import org.mcuosmipcuter.orcc.soundvis.gui.CanvasClassMenu;
+import org.mcuosmipcuter.orcc.soundvis.gui.FrameModulusMenu;
 import org.mcuosmipcuter.orcc.soundvis.gui.FrameRateMenu;
 import org.mcuosmipcuter.orcc.soundvis.gui.GraphPanel;
 import org.mcuosmipcuter.orcc.soundvis.gui.PlayBackPanel;
@@ -221,7 +222,7 @@ public class Main {
 			}
 		}
 		final JInternalFrame playBackFrame = new JInternalFrame("Audio Timeline");
-		final JInternalFrame graphicFrame = new JInternalFrame("Video", false, false, true, false);
+		final JInternalFrame graphicFrame = new JInternalFrame("Video", true, false, true, false);
 		final JDesktopPane deskTop = new JDesktopPane();
 		deskTop.setDesktopManager(new CustomDeskTopManager(playBackFrame, graphicFrame));
 		deskTop.setVisible(true);
@@ -344,6 +345,7 @@ public class Main {
 			viewMenu.add(new ZoomMenu("zoom", 0.0f, graphicPanel));
 			graphicPanel.setZoomFactor(0.0f);
 			graphicPanel.setOpaque(true);
+			viewMenu.add(new FrameModulusMenu("realtime framerate reduction", 1, graphicPanel));
 			
 			deskTop.add(graphicFrame);
 			{

@@ -43,6 +43,7 @@ public class ResolutionMenu extends JMenu{
 			new int[] {480, 360},
 			new int[] {640, 480},
 			new int[] {720, 576},
+			new int[] {960, 540},
 			new int[] {1280, 720},
 			new int[] {1920, 1080}
 	};

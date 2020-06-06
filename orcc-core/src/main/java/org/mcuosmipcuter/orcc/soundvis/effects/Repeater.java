@@ -63,15 +63,15 @@ public class Repeater {
 		int index = 0;
 		for(int r = 0; r < repeat; r++) {
 			if(relFrameCount  <= frameTo + oLapAft) {
-				int start = repeatDurationFrames * r + oLapBef + 1;
+				int start = repeatDurationFrames * r + oLapBef;
 				int end = start + duration - 1;
 
 				if(relFrameCount >= start && relFrameCount <= end ) {
-					IOUtil.log(start + " * " + end + " = " + (relFrameCount - start + 1));
+					//IOUtil.log(start + " * " + end + " = " + (relFrameCount - start));
 					if(index >= repeat ) {
 						index = 0;
 					}
-					DisplayUnit d = new DisplayUnit(relFrameCount - start + 1, duration, index);
+					DisplayUnit d = new DisplayUnit(relFrameCount - start, duration, index);
 					units.add(d);
 					index++;
 				}

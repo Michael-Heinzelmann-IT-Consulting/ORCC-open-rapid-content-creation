@@ -21,10 +21,16 @@ package org.mcuosmipcuter.orcc.soundvis;
  * Object that supports a zoom functionality
  * @author Michael Heinzelmann
  */
-public interface Zoomable {
+public interface RealtimeSettings {
 	/**
 	 * Sets the zoom where 1.0f means original size
 	 * @param zoomFactor float factor
 	 */
 	public void setZoomFactor(float zoomFactor);
+	
+	/**
+	 * Reduce the refresh rate by modulus
+	 * @param reductionModulus
+	 */
+	public void setVideoRefresh(int reductionModulus);
 }

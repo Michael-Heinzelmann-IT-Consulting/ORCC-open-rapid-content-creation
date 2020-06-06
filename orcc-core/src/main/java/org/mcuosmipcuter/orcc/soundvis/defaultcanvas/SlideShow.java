@@ -163,7 +163,6 @@ public class SlideShow implements SoundCanvas {
 					graphics2D.setClip(clip);
 					graphics2D.transform(transformP);
 					graphics2D.transform(transformS);
-
 					graphics2D.drawImage(image, 0, 0, null, null);
 				}
 				finally {
@@ -178,7 +177,7 @@ public class SlideShow implements SoundCanvas {
 	private void updateSlides() {
 		if(audioInputInfo != null && slides != null) {
 			if (numberOfFrames == 0) {
-				repeater.setRepeat(slides.length);
+				repeater.setRepeat(repeat==0 ? slides.length : repeat);
 			} else {
 				repeater.setFrames(numberOfFrames);
 			}

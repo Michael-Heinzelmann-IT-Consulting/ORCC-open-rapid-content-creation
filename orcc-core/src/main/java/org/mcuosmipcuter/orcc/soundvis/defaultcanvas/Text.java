@@ -127,12 +127,14 @@ public class Text implements SoundCanvas, PropertyListener {
 	@NestedProperty(description = "shear")
 	private Shearer ishearer = new Shearer();
 	
+	@NestedProperty(description = "rotate text in and out")
+	private Rotator rotator = new Rotator();
 	@NestedProperty(description = "rotate glyph in and out")
 	private Rotator iRotator = new Rotator();
 
 	@NestedProperty(description = "repeating inside from and to")
 
-	private Repeater repeater = new Repeater(fader, mover, shearer, ishearer, iRotator);
+	private Repeater repeater = new Repeater(fader, mover, shearer, ishearer, rotator, iRotator);
 
 
 	VideoOutputInfo videoOutputInfo;
@@ -280,6 +282,7 @@ public class Text implements SoundCanvas, PropertyListener {
 			AffineTransform transform = shearer.shear(displayUnit.currentPosition, displayUnit.duration);
 			transform.concatenate(mover.move(displayUnit.currentPosition, displayUnit.duration));
 			transform.concatenate(positioner.position(dimensionHelper));
+			transform.concatenate(rotator.rotate(displayUnit.currentPosition, displayUnit.duration, (videoOutputInfo.getWidth()) / 2, (videoOutputInfo.getHeight() ) / 2));
 
 			if (!transform.isIdentity()) {
 				graphics2d.setTransform(transform);

@@ -25,7 +25,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JRadioButtonMenuItem;
 
-import org.mcuosmipcuter.orcc.soundvis.Zoomable;
+import org.mcuosmipcuter.orcc.soundvis.RealtimeSettings;
 
 /**
  * Specialized menu showing video resolution
@@ -43,7 +43,7 @@ public class ZoomMenu extends JMenu{
 	 * @param initialWidth initial width of the video
 	 * @param initialHeight initial height of the video
 	 */
-	public ZoomMenu(String title, final float initialZoom, final Zoomable zoomable) {
+	public ZoomMenu(String title, final float initialZoom, final RealtimeSettings zoomable) {
 		super(title);
 		ButtonGroup group = new ButtonGroup();
 		for(final float zoom : zooms) {

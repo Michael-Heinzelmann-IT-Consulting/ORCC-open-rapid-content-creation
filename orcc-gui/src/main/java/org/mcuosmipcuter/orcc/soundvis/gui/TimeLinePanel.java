@@ -126,17 +126,17 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 					selectPos = margin;
 				}
 				int pixel = selectPos - margin;
-				selectFrame = pixel * noOfSamples / samplesPerFrame + 1;
+				selectFrame = pixel * noOfSamples / samplesPerFrame;
 				repaint();
 			}
 
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				int pixel = selectPos - margin;
-				final long frame = pixel * noOfSamples / samplesPerFrame + 1;
+				final long frame = pixel * noOfSamples / samplesPerFrame;
 				long f = frame - preRunFrames;
-				if(f < 1) {
-					f = 1;
+				if(f < 0) {
+					f = 0;
 				}
 				if(Context.getAppState() == AppState.READY) {
 					Context.setSongPositionPointer(f);

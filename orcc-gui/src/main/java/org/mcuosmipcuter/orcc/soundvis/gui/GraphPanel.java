@@ -41,7 +41,7 @@ import org.mcuosmipcuter.orcc.soundvis.Context.PropertyName;
 import org.mcuosmipcuter.orcc.soundvis.Mixin;
 import org.mcuosmipcuter.orcc.soundvis.Renderer;
 import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
-import org.mcuosmipcuter.orcc.soundvis.Zoomable;
+import org.mcuosmipcuter.orcc.soundvis.RealtimeSettings;
 import org.mcuosmipcuter.orcc.soundvis.threads.ProgressPainterThread;
 
 
@@ -51,7 +51,7 @@ import org.mcuosmipcuter.orcc.soundvis.threads.ProgressPainterThread;
  * support head less rendering.
  * @author Michael Heinzelmann
  */
-public class GraphPanel extends JPanel implements Renderer, Zoomable {
+public class GraphPanel extends JPanel implements Renderer, RealtimeSettings {
 
 	private static final long serialVersionUID = 1L;
 	private Mixin mixin;
@@ -62,6 +62,9 @@ public class GraphPanel extends JPanel implements Renderer, Zoomable {
 	
 	private float zoomFactor = 0.5f;
 	private boolean autoZoom;
+	int reductionModulus = 1;
+	int backupReductionModulus = 1;
+	
 
 	ProgressPainterThread progressPainterThread = new ProgressPainterThread();
 	private boolean updating;
@@ -158,6 +161,12 @@ public class GraphPanel extends JPanel implements Renderer, Zoomable {
 	public void start(AudioInputInfo audioInputInfo, VideoOutputInfo videoOutputInfo)  {
 		frameImage = new BufferedImage(videoOutputInfo.getWidth(), videoOutputInfo.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
 		graphics = frameImage.createGraphics();
+		if(Context.getAppState() == AppState.EXPORTING) {
+			reductionModulus = 1; // always use original frame rate
+		}
+		else {
+			reductionModulus = backupReductionModulus; // reset
+		}
 		//graphics.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 		//graphics.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_SPEED);
 		//graphics.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_SPEED);
@@ -210,17 +219,19 @@ public class GraphPanel extends JPanel implements Renderer, Zoomable {
 
 	@Override
 	public void newFrame(long frameCount, boolean sendPost) {
-		for(SoundCanvas soundCanvas : soundCanvasArray) {
-			soundCanvas.newFrame(frameCount, graphics);
-			if(sendPost) {
-				soundCanvas.postFrame();
+		if(frameCount < 2 || frameCount % reductionModulus == 0) {
+			for(SoundCanvas soundCanvas : soundCanvasArray) {
+				soundCanvas.newFrame(frameCount, graphics);
+				if(sendPost) {
+					soundCanvas.postFrame();
+				}
 			}
-		}
-		if(frameCount > Context.getSongPositionPointer()) {
-			this.repaint();
-		}
-		if(mixin != null) {
-			mixin.newFrame(frameCount, sendPost);
+			if(frameCount > Context.getSongPositionPointer()) {
+				this.repaint();
+			}
+			if(mixin != null) {
+				mixin.newFrame(frameCount, sendPost);
+			}
 		}
 	}
 
@@ -255,6 +266,12 @@ public class GraphPanel extends JPanel implements Renderer, Zoomable {
 			this.zoomFactor = zoomFactor;
 			autoZoom = false;
 		}
+	}
+
+	@Override
+	public void setVideoRefresh(int reductionModulus) {
+		this.reductionModulus = reductionModulus;
+		this.backupReductionModulus = reductionModulus;
 	}
 
 }
