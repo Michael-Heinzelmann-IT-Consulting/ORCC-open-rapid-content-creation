@@ -22,6 +22,10 @@ package org.mcuosmipcuter.orcc.soundvis;
  * @author Michael Heinzelmann
  */
 public interface RealtimeSettings {
+	
+	public interface SettingsListener {
+		void update(String description);
+	}
 	/**
 	 * Sets the zoom where 1.0f means original size
 	 * @param zoomFactor float factor
@@ -33,4 +37,10 @@ public interface RealtimeSettings {
 	 * @param reductionModulus
 	 */
 	public void setVideoRefresh(int reductionModulus);
+	
+	/**
+	 * add listener for updates
+	 * @param settingsListener
+	 */
+	public void addSettingsListener(SettingsListener settingsListener);
 }

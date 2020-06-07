@@ -51,6 +51,7 @@ import org.mcuosmipcuter.orcc.soundvis.Context.Listener;
 import org.mcuosmipcuter.orcc.soundvis.Context.PropertyName;
 import org.mcuosmipcuter.orcc.soundvis.PlayPauseStop;
 import org.mcuosmipcuter.orcc.soundvis.PlayPauseStopHolder;
+import org.mcuosmipcuter.orcc.soundvis.RealtimeSettings.SettingsListener;
 import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
 import org.mcuosmipcuter.orcc.soundvis.gui.AboutBox;
 import org.mcuosmipcuter.orcc.soundvis.gui.CanvasClassMenu;
@@ -63,6 +64,7 @@ import org.mcuosmipcuter.orcc.soundvis.gui.ZoomMenu;
 import org.mcuosmipcuter.orcc.soundvis.gui.listeners.FileDialogActionListener;
 import org.mcuosmipcuter.orcc.soundvis.gui.listeners.FileDialogActionListener.CallBack;
 import org.mcuosmipcuter.orcc.soundvis.gui.listeners.StopActionListener;
+import org.mcuosmipcuter.orcc.soundvis.gui.widgets.GraphicsJInternalFrame;
 import org.mcuosmipcuter.orcc.soundvis.gui.widgets.TimeLabel;
 import org.mcuosmipcuter.orcc.soundvis.util.ExportUtil;
 import org.mcuosmipcuter.orcc.util.IOUtil;
@@ -222,7 +224,7 @@ public class Main {
 			}
 		}
 		final JInternalFrame playBackFrame = new JInternalFrame("Audio Timeline");
-		final JInternalFrame graphicFrame = new JInternalFrame("Video", true, false, true, false);
+		final GraphicsJInternalFrame graphicFrame = new GraphicsJInternalFrame("Video", true, false, true, false);
 		final JDesktopPane deskTop = new JDesktopPane();
 		deskTop.setDesktopManager(new CustomDeskTopManager(playBackFrame, graphicFrame));
 		deskTop.setVisible(true);
@@ -346,6 +348,15 @@ public class Main {
 			graphicPanel.setZoomFactor(0.0f);
 			graphicPanel.setOpaque(true);
 			viewMenu.add(new FrameModulusMenu("realtime framerate reduction", 1, graphicPanel));
+			graphicPanel.addSettingsListener(new SettingsListener() {
+				
+				@Override
+				public void update(String description) {
+					graphicFrame.setRealtimeTitle(description);
+					
+				}
+			});
+
 			
 			deskTop.add(graphicFrame);
 			{
@@ -365,7 +376,7 @@ public class Main {
 								+ "x" + Context.getVideoOutputInfo().getHeight() + "p  @"
 								+ Context.getVideoOutputInfo().getFramesPerSecond() + "fps | " +
 								Context.getSoundCanvasList();
-						graphicFrame.setTitle(title);
+						graphicFrame.setOutputTitle(title);
 					}
 				}
 			});

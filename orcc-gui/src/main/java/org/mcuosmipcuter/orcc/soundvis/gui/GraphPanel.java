@@ -22,11 +22,12 @@ import java.awt.Color;
 import java.awt.Composite;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.RenderingHints;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.List;
 
 import javax.swing.JPanel;
 
@@ -39,9 +40,9 @@ import org.mcuosmipcuter.orcc.soundvis.Context.AppState;
 import org.mcuosmipcuter.orcc.soundvis.Context.Listener;
 import org.mcuosmipcuter.orcc.soundvis.Context.PropertyName;
 import org.mcuosmipcuter.orcc.soundvis.Mixin;
+import org.mcuosmipcuter.orcc.soundvis.RealtimeSettings;
 import org.mcuosmipcuter.orcc.soundvis.Renderer;
 import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
-import org.mcuosmipcuter.orcc.soundvis.RealtimeSettings;
 import org.mcuosmipcuter.orcc.soundvis.threads.ProgressPainterThread;
 
 
@@ -56,6 +57,7 @@ public class GraphPanel extends JPanel implements Renderer, RealtimeSettings {
 	private static final long serialVersionUID = 1L;
 	private Mixin mixin;
 	private SoundCanvasWrapper[] soundCanvasArray; // canvas list as array to work with
+	private List<SettingsListener> settingsListeners = new ArrayList<>();
 	
 	private BufferedImage frameImage;
 	private Graphics2D graphics;
@@ -266,12 +268,26 @@ public class GraphPanel extends JPanel implements Renderer, RealtimeSettings {
 			this.zoomFactor = zoomFactor;
 			autoZoom = false;
 		}
+		updateSettingListeners();
 	}
 
 	@Override
 	public void setVideoRefresh(int reductionModulus) {
 		this.reductionModulus = reductionModulus;
 		this.backupReductionModulus = reductionModulus;
+		updateSettingListeners();
 	}
 
+	private void updateSettingListeners() {
+		String settingsString = "frame reduction: " + (reductionModulus == 1 ? "none" : "" + reductionModulus)
+		+ " zoom: " + zoomFactor;
+		for(SettingsListener sl : settingsListeners) {
+			sl.update(settingsString);
+		}
+	}
+
+	@Override
+	public void addSettingsListener(SettingsListener settingsListener) {
+		settingsListeners.add(settingsListener);
+	}
 }
