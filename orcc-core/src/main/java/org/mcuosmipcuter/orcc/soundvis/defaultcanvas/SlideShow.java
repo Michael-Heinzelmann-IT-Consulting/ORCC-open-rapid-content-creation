@@ -102,7 +102,7 @@ public class SlideShow implements SoundCanvas {
 		
 
 
-		if(slides != null && frameCount >= frameFrom && (frameCount <= frameTo || frameTo ==0)) {
+		if(slides != null && slides.length > 0 && frameCount >= frameFrom && (frameCount <= frameTo || frameTo ==0)) {
 
 			repeater.setRepeat(repeat==0 ? slides.length : repeat);
 			repeater.setFrames(numberOfFrames);
@@ -176,7 +176,7 @@ public class SlideShow implements SoundCanvas {
 
 	private void updateSlides() {
 		if(audioInputInfo != null && slides != null) {
-			if (numberOfFrames == 0) {
+			if (numberOfFrames == 0 && slides.length > 0) {
 				repeater.setRepeat(repeat==0 ? slides.length : repeat);
 			} else {
 				repeater.setFrames(numberOfFrames);

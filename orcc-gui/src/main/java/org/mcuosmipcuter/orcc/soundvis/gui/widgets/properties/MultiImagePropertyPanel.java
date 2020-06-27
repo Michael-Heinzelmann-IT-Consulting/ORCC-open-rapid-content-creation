@@ -25,6 +25,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Image;
+import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -144,6 +145,7 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 
 	private JPanel imagebar = new JPanel();
 	Popup popup = null;
+	Popup editPopup = null;
 	boolean isPopupShowing;
 	private Slide selectedSlide;
 
@@ -176,7 +178,7 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 		scrollPane = new JScrollPane(imagebar);
 		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		valueSelect.add(scrollPane);
-		valueSelect.setPreferredSize(new Dimension(500, 240));
+		valueSelect.setPreferredSize(new Dimension(500, 480));
 
 		editButton.addActionListener(new ActionListener() {
 
@@ -212,6 +214,114 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 		editButton.setEnabled(true);
 		isPopupShowing = false;
 	}
+	
+	private void showSlideEditPopup(JButton ib, Slide slide){
+		Point loc = ib.getLocationOnScreen();
+		JPanel editPanel = new JPanel();	
+		JButton moveLeftButton = new JButton("< move left");
+		editPanel.add(moveLeftButton);
+		moveLeftButton.setEnabled(slide.getPosition() > 1);
+		JButton moveRightButton = new JButton("move right >");
+		editPanel.add(moveRightButton);
+		moveRightButton.setEnabled(getCurrentValue() != null && slide.getPosition() < getCurrentValue().length);
+		JButton removeButton = new JButton("remove");
+		editPanel.add(removeButton);
+		editPopup = PopupFactory.getSharedInstance().getPopup(ib, editPanel, loc.x, loc.y);
+		moveLeftButton.addActionListener(new ActionListener() {	
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				hideSlideEditPopup();
+				moveSlide(slide, -1);
+			}
+		});
+		moveRightButton.addActionListener(new ActionListener() {	
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				hideSlideEditPopup();
+				moveSlide(slide, 1);
+			}
+		});
+		removeButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				hideSlideEditPopup();
+				removeSlide(slide);
+			}
+		});		
+		editPopup.show();
+	}
+	private void hideSlideEditPopup() {
+		if(editPopup != null) {
+			editPopup.hide();
+			editPopup = null;
+		}
+		
+	}
+	
+	private void removeSlide(Slide slide) {
+		Slide[] currentValue = getCurrentValue();
+		if(currentValue == null || currentValue.length == 0) {
+			IOUtil.log("No slides to remove!");
+			return;
+		}
+		int positionToRemove = -1;
+		for(Slide s : currentValue) {
+			if(s == slide) {
+				positionToRemove = s.getPosition();
+			}
+		}
+		if(positionToRemove == -1) {
+			IOUtil.log("slide " + slide + " not found!");
+			return;
+		}
+		IOUtil.log("removing position " + positionToRemove);
+		Slide[] newValue = new Slide[currentValue.length - 1];
+		int idx = 0;
+		for(Slide s : currentValue) {
+			if(s != slide) {
+				newValue[idx] = s;
+				idx++;
+			}
+		}
+		setNewValue(newValue);
+	}
+	private void moveSlide(Slide slide, int step) {
+		Slide[] currentValue = getCurrentValue();
+		if(currentValue == null || currentValue.length == 0) {
+			IOUtil.log("No slides to remove!");
+			return;
+		}
+		int oldIdx = -1;
+		int idx = 0;
+		for(Slide s : currentValue) {
+			if(s == slide) {
+				oldIdx = idx;
+			}
+			idx++;
+		}
+		if(oldIdx == -1) {
+			IOUtil.log("slide " + slide + " not found!");
+			return;
+		}
+		int newIdx = oldIdx + step;
+		IOUtil.log("moving position " + oldIdx + " to " + newIdx);
+		Slide[] newValue = new Slide[currentValue.length];
+		int i = 0;
+		for(Slide s : currentValue) {
+			if(i == newIdx) {
+				newValue[i] = slide;
+			}
+			else if(i == oldIdx) {
+				newValue[i] = currentValue[newIdx];
+			}
+			else {
+				newValue[i] = s;
+			}
+			i++;
+		}
+		setNewValue(newValue);
+	}
+	
 
 	@Override
 	public void setCurrentValue(Slide[] currentValue) {
@@ -237,7 +347,7 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 			int rows = (currentValue.length + 1) / COLS;
 			rows = (currentValue.length + 1) % COLS == 0 ? rows : rows + 1;
 			gc.gridheight = rows;
-
+			
 			final Set<JButton> jbuttons = new HashSet<JButton>();
 			for (final Slide slide : currentValue) {
 				JButton ib = new JButton() {
@@ -282,6 +392,12 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 						ib.setToolTipText("insert here");
 						System.err.println("ib " + System.identityHashCode(ib));
 						System.err.println(e.getX());
+						if(e.getButton() == MouseEvent.BUTTON3) {
+							showSlideEditPopup(ib, slide);
+						}
+						else {
+							hideSlideEditPopup();
+						}
 					}
 				});
 				ib.addMouseMotionListener(new MouseMotionListener() {
