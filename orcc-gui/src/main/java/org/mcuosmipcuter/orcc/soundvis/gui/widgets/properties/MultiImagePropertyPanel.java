@@ -21,11 +21,11 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Image;
-import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -35,7 +35,7 @@ import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import javax.imageio.ImageIO;
@@ -49,6 +49,7 @@ import javax.swing.PopupFactory;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.border.LineBorder;
 
+import org.mcuosmipcuter.orcc.api.util.TextHelper;
 import org.mcuosmipcuter.orcc.soundvis.Context;
 import org.mcuosmipcuter.orcc.soundvis.ImageStore;
 import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
@@ -95,6 +96,7 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 					slides[i] = new Slide();
 					IOUtil.log(System.currentTimeMillis() + " reading image " + i);
 					Context.progressUpdate(" loading image " + i);
+					slides[i].setText(selectedFiles[i].getName());
 
 					BufferedImage image;
 					Image fromStore = ImageStore.getImage(selectedFiles[i]);
@@ -103,7 +105,7 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 					} else {
 						try {
 							image = ImageIO.read(selectedFiles[i]);
-							slides[i].setImage(image);
+							slides[i].setImage(image != null ? image : createPlaceHolderImage(selectedFiles[i]));
 							ImageStore.addImage(selectedFiles[i], image);
 						} catch (IOException ex) {
 							throw new RuntimeException(ex);
@@ -147,7 +149,8 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 	Popup popup = null;
 	Popup editPopup = null;
 	boolean isPopupShowing;
-	private Slide selectedSlide;
+	final Set<JButton> jbuttons = new LinkedHashSet<JButton>();
+
 
 	/**
 	 * Constructor
@@ -163,7 +166,7 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 		addFileButton.setFont(getFont().deriveFont(48.0f));
 
 		imagebar.setBackground(Color.BLACK);
-		imagebar.setPreferredSize(new Dimension(480, 220));
+		//imagebar.setPreferredSize(new Dimension(480, 220));
 		JButton close = new JButton("close");
 		close.addActionListener(new ActionListener() {
 
@@ -173,20 +176,18 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 				hidePopup();
 			}
 		});
-		imagebar.setPreferredSize(new Dimension(40, 12));
+		//imagebar.setPreferredSize(new Dimension(40, 12));
 		valueSelect.add(close, BorderLayout.NORTH);
 		scrollPane = new JScrollPane(imagebar);
 		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		valueSelect.add(scrollPane);
-		valueSelect.setPreferredSize(new Dimension(500, 480));
+		valueSelect.setPreferredSize(new Dimension(500, 120));
 
 		editButton.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				showPopup();
-//				JOptionPane.showConfirmDialog(null, valueSelect, "set value for slides", 
-//						JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);	
 			}
 		});
 
@@ -218,10 +219,10 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 	private void showSlideEditPopup(JButton ib, Slide slide){
 		Point loc = ib.getLocationOnScreen();
 		JPanel editPanel = new JPanel();	
-		JButton moveLeftButton = new JButton("< move left");
+		JButton moveLeftButton = new JButton("< move");
 		editPanel.add(moveLeftButton);
 		moveLeftButton.setEnabled(slide.getPosition() > 1);
-		JButton moveRightButton = new JButton("move right >");
+		JButton moveRightButton = new JButton("move >");
 		editPanel.add(moveRightButton);
 		moveRightButton.setEnabled(getCurrentValue() != null && slide.getPosition() < getCurrentValue().length);
 		JButton removeButton = new JButton("remove");
@@ -320,6 +321,10 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 			i++;
 		}
 		setNewValue(newValue);
+		int bidx = 0;
+		for(JButton jb : jbuttons) {
+			jb.setSelected(bidx++ == newIdx);
+		}
 	}
 	
 
@@ -333,6 +338,7 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 		}
 		super.setCurrentValue(currentValue);
 		imagebar.removeAll();
+		jbuttons.clear();
 		JPanel images = new JPanel();
 		GridBagLayout gridbag = new GridBagLayout();
 		images.setLayout(gridbag);
@@ -347,8 +353,7 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 			int rows = (currentValue.length + 1) / COLS;
 			rows = (currentValue.length + 1) % COLS == 0 ? rows : rows + 1;
 			gc.gridheight = rows;
-			
-			final Set<JButton> jbuttons = new HashSet<JButton>();
+			valueSelect.setPreferredSize(new Dimension(500, rows * (80 + 6) + 6));
 			for (final Slide slide : currentValue) {
 				JButton ib = new JButton() {
 					private static final long serialVersionUID = 1L;
@@ -365,7 +370,6 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 				ib.addActionListener(new ActionListener() {
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						selectedSlide = slide;
 						jbuttons.stream().forEach(jb -> jb.setSelected(jb == e.getSource()));
 					}
 				});
@@ -389,7 +393,7 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 					}
 					@Override
 					public void mouseClicked(MouseEvent e) {
-						ib.setToolTipText("insert here");
+						ib.setToolTipText(slide.getText());
 						System.err.println("ib " + System.identityHashCode(ib));
 						System.err.println(e.getX());
 						if(e.getButton() == MouseEvent.BUTTON3) {
@@ -439,7 +443,9 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 		gc.gridwidth = col == COLS ? GridBagConstraints.REMAINDER : 1; // end row
 		gridbag.setConstraints(addFileButton, gc);
 		images.add(addFileButton, gc);
+
 		imagebar.add(images, BorderLayout.LINE_START);
+		
 
 		imagebar.revalidate();
 		if (isPopupShowing) {
@@ -449,5 +455,16 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 
 		this.repaint();
 	}
+	private BufferedImage createPlaceHolderImage(File file) {
+		int width = Context.getVideoOutputInfo().getWidth();
+		int height = Context.getVideoOutputInfo().getHeight();
+		BufferedImage placeholderImage = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
+		Graphics2D graphics = placeholderImage.createGraphics();
+		graphics.setColor(Color.WHITE);
+		graphics.fillRect(0, 0, width, height);
 
+		TextHelper.writeText(file.getName(), graphics, height / 10, Color.BLUE, width, height / 2);
+		
+		return placeholderImage;
+	}
 }
