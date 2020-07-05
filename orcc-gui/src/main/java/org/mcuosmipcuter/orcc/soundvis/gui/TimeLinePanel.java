@@ -39,11 +39,11 @@ import org.mcuosmipcuter.orcc.soundvis.Context;
 import org.mcuosmipcuter.orcc.soundvis.Context.AppState;
 import org.mcuosmipcuter.orcc.soundvis.Context.Listener;
 import org.mcuosmipcuter.orcc.soundvis.Context.PropertyName;
+import org.mcuosmipcuter.orcc.soundvis.model.SuperSample;
 import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
 import org.mcuosmipcuter.orcc.soundvis.threads.SubSampleThread;
 import org.mcuosmipcuter.orcc.soundvis.threads.SubSampleThread.CallBack;
-import org.mcuosmipcuter.orcc.soundvis.threads.SubSampleThread.SuperSample;
-import org.mcuosmipcuter.orcc.soundvis.threads.SubSampleThread.SuperSampleData;
+import org.mcuosmipcuter.orcc.soundvis.threads.SuperSampleData;
 
 /**
  * Panel that displays the timeline and the waveform and sets the song position pointer.

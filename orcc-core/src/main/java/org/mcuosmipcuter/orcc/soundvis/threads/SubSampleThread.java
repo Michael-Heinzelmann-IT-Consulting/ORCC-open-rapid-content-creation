@@ -25,6 +25,7 @@ import javax.sound.sampled.AudioInputStream;
 
 import org.mcuosmipcuter.orcc.soundvis.AudioInput;
 import org.mcuosmipcuter.orcc.soundvis.DecodingCallback;
+import org.mcuosmipcuter.orcc.soundvis.model.SuperSample;
 import org.mcuosmipcuter.orcc.soundvis.util.ByteArrayLinearDecoder;
 import org.mcuosmipcuter.orcc.util.IOUtil;
 
@@ -46,84 +47,6 @@ public class SubSampleThread extends Thread {
 		public void finishedSampling(SuperSampleData superSampleData);
 	}
 	
-	/**
-	 * Sample data structure
-	 * @author Michael Heinzelmann
-	 */
-	public static class SuperSample {
-		
-		public SuperSample(int min, int max, int noOfSamples) {
-			this.min = min;
-			this.max = max;
-			this.noOfSamples = noOfSamples;
-		}
-		private final int min;
-		private final int max;
-		private final int noOfSamples;
-		
-		/**
-		 * Get the minimum aggregated
-		 * @return the minimum
-		 */
-		public int getMin() {
-			return min;
-		}
-
-		/**
-		 * Get the maximum aggregated
-		 * @return the maximum
-		 */
-		public int getMax() {
-			return max;
-		}
-
-		/**
-		 * Get the number of samples that have been aggregated
-		 * @return
-		 */
-		public int getNoOfSamples() {
-			return noOfSamples;
-		}
-
-		@Override
-		public String toString() {
-			return "SuperSample [min=" + min + ", max=" + max
-					+ ", noOfSamples=" + noOfSamples + "]";
-		}
-		
-	}
-	/**
-	 * Represents the complete wave with meta information
-	 * @author Michael Heinzelmann
-	 */
-	public static class SuperSampleData {
-		private SuperSample[] list;
-		private int overallMin;
-		private int overallMax;
-		/**
-		 * Get the list of samples, an array for performance reasons
-		 * @return the array
-		 */
-		public SuperSample[] getList() {
-			return list;
-		}
-		/**
-		 * Meta information about the overall minimum
-		 * @return the minimum overall
-		 */
-		public int getOverallMin() {
-			return overallMin;
-		}
-		/**
-		 * Meta information about the overall maximum
-		 * @return the maximum overall
-		 */
-		public int getOverallMax() {
-			return overallMax;
-		}
-		
-	}
-	
 	private final AudioInput ai;
 	private final int noOfSamples;
 	private final CallBack callBack;
@@ -143,8 +66,8 @@ public class SubSampleThread extends Thread {
 	@Override
 	public void run() {	
 
-		final SuperSampleData superSampleData = new SuperSampleData();
-		final List<SuperSample> list = new ArrayList<SubSampleThread.SuperSample>();
+		final List<SuperSample> list = new ArrayList<SuperSample>();
+		int[] overalls = new int[2];
 		
 		AudioInputStream ais = ai.getAudioStream();
 		try {
@@ -155,6 +78,7 @@ public class SubSampleThread extends Thread {
 				int counter;
 				int max = 0;
 				int min = Integer.MAX_VALUE;
+
 				@Override
 				public boolean nextSample(int[] amplitudes, byte[] rawData, long sampleCount) {
 					counter++;
@@ -172,11 +96,11 @@ public class SubSampleThread extends Thread {
 						int signedMax = max - sampleCenter;
 						SuperSample superSample = new SuperSample(signedMin, signedMax, counter);
 						list.add(superSample);
-						if(signedMin < superSampleData.overallMin) {
-							superSampleData.overallMin = signedMin;
+						if(signedMin < overalls[0]) {
+							overalls[0] = signedMin;
 						}
-						if(signedMax > superSampleData.overallMax) {
-							superSampleData.overallMax = signedMax;
+						if(signedMax > overalls[1]) {
+							overalls[1] = signedMax;
 						}
 						counter = 0;
 						min = Integer.MAX_VALUE;
@@ -186,8 +110,8 @@ public class SubSampleThread extends Thread {
 				}
 
 			});
-			superSampleData.list = list.toArray(new SuperSample[0]);
-			callBack.finishedSampling(superSampleData);
+
+			callBack.finishedSampling(new SuperSampleData(list.toArray(new SuperSample[0]), overalls[0], overalls[1]));
 			
 		} catch (IOException ex) {
 			throw new RuntimeException(ex);

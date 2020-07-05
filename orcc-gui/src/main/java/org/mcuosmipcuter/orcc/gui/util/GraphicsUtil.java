@@ -18,9 +18,12 @@
 package org.mcuosmipcuter.orcc.gui.util;
 
 import java.awt.Component;
-import java.awt.GraphicsEnvironment;
+import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
+
+import org.mcuosmipcuter.orcc.util.IOUtil;
 
 /**
  * @author user
@@ -52,5 +55,62 @@ public class GraphicsUtil {
 			System.err.println("dx: " + dx + " dy:" + dy);
 		}
 		return frame;
+	}
+	public static Image getScaledInstanceKeepRatio(Image image, int size, int hints){
+		float ratio = image.getWidth(null) == 0 ? 1f : (float)image.getHeight(null) / (float)image.getWidth(null);
+		int w;
+		int h;
+		if(ratio < 1) {
+			w = size;
+			h = Math.round( size * ratio);
+		}
+		else {
+			w = Math.round( size / ratio);
+			h = size;
+		}
+		return image.getScaledInstance(w, h, hints);
+		
+	}
+	
+	public static BufferedImage rotateClockwise(BufferedImage img) {
+
+		if (img == null) {
+			IOUtil.log("WARN: image null, returning null");
+			return null;
+		}
+		int width = img.getWidth(null);
+		int height = img.getHeight(null);
+		IOUtil.log("image w: " + width + " h: " + height);
+
+		BufferedImage newImage = new BufferedImage(height, width, img.getType());
+
+		for (int w = 0; w < width; w++) {
+			for (int h = 0; h < height; h++) {
+				newImage.setRGB(height - 1 - h, w, img.getRGB(w, h));
+			}
+		}
+
+		return newImage;
+	}
+	
+	public static BufferedImage mirrorX(BufferedImage img) {
+
+		if (img == null) {
+			IOUtil.log("WARN: image null, returning null");
+			return null;
+		}
+		int width = img.getWidth(null);
+		int height = img.getHeight(null);
+		IOUtil.log("image w: " + width + " h: " + height);
+
+		BufferedImage newImage = new BufferedImage(width, height, img.getType());
+		for (int h = 0; h < height; h++) {
+			for (int w = 0; w < width; w++) {
+				newImage.setRGB(w, h, img.getRGB(width - 1 - w, h));
+			}
+		}
+
+		return newImage;
+
 	}
 }

@@ -17,7 +17,7 @@
 */
 package org.mcuosmipcuter.orcc.soundvis;
 
-import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.lang.ref.SoftReference;
 import java.util.HashMap;
@@ -34,12 +34,26 @@ import org.mcuosmipcuter.orcc.util.IOUtil;
 public class ImageStore {
 	
 	public static class Key{
-		private long lastModified; //  to detect changes
-		private String absolutePath; 
+		private final long lastModified; //  to detect changes
+		private final String absolutePath;
+		private final int quadrantRotation;
+		private final boolean mirrored;
 		
-		private Key(long lastModified, String absolutePath) {
+		public Key(File imageFile) {
+			this(imageFile.lastModified(), imageFile.getAbsolutePath(), 0, false);
+		}
+
+		public Key(long lastModified, String absolutePath, int quadrantRotation, boolean mirrored) {
 			this.lastModified = lastModified;
 			this.absolutePath = absolutePath;
+			this.quadrantRotation = quadrantRotation;
+			this.mirrored = mirrored;
+		}
+
+		@Override
+		public String toString() {
+			return "Key [lastModified=" + lastModified + ", absolutePath=" + absolutePath + ", quadrantRotation="
+					+ quadrantRotation + ", mirrored=" + mirrored + "]";
 		}
 
 		@Override
@@ -48,12 +62,9 @@ public class ImageStore {
 			int result = 1;
 			result = prime * result + ((absolutePath == null) ? 0 : absolutePath.hashCode());
 			result = prime * result + (int) (lastModified ^ (lastModified >>> 32));
+			result = prime * result + (mirrored ? 1231 : 1237);
+			result = prime * result + quadrantRotation;
 			return result;
-		}
-
-		@Override
-		public String toString() {
-			return "Key [lastModified=" + lastModified + ", absolutePath=" + absolutePath + "]";
 		}
 
 		@Override
@@ -72,29 +83,52 @@ public class ImageStore {
 				return false;
 			if (lastModified != other.lastModified)
 				return false;
+			if (mirrored != other.mirrored)
+				return false;
+			if (quadrantRotation != other.quadrantRotation)
+				return false;
 			return true;
 		}
+
+		public long getLastModified() {
+			return lastModified;
+		}
+
+		public String getAbsolutePath() {
+			return absolutePath;
+		}
+
+		public int getQuadrantRotation() {
+			return quadrantRotation;
+		}
+
+		public boolean isMirrored() {
+			return mirrored;
+		}
+
 
 		
 	}
 	
-	private static Map<Key, SoftReference<Image>> store = new HashMap<Key, SoftReference<Image>>();
+	private static Map<Key, SoftReference<BufferedImage>> store = new HashMap<Key, SoftReference<BufferedImage>>();
 	public static boolean contains(Key key) {
 		return store.containsKey(key);
 	}
-	public static Image getImage(File imageFile) {
+	public static BufferedImage getImage(Key key) {
 
-		Key key = new Key(imageFile.lastModified(), imageFile.getAbsolutePath());
-		SoftReference<Image> ref = store.get(key);
+		//Key key = new Key(imageFile.lastModified(), imageFile.getAbsolutePath());
+		SoftReference<BufferedImage> ref = store.get(key);
 		if(ref != null) {
-			IOUtil.log(key + " ######## " + ref.get());
+			IOUtil.log("*hit for " + key + " image " + ref.get());
+		}
+		else {
+			IOUtil.log("miss for " + key);
 		}
 		return ref != null ? ref.get() : null;
 	}
-
-	public static Key addImage(File imageFile, Image image) {
-		Key key = new Key(imageFile.lastModified(), imageFile.getAbsolutePath());
-		store.put(key, new SoftReference<Image>(image));
-		return key;
+	
+	public static void addImage(Key key, BufferedImage image) {
+		store.put(key, new SoftReference<BufferedImage>(image));
 	}
+
 }

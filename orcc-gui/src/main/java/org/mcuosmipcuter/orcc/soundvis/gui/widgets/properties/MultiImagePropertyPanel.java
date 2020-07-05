@@ -21,6 +21,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -50,8 +51,10 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.border.LineBorder;
 
 import org.mcuosmipcuter.orcc.api.util.TextHelper;
+import org.mcuosmipcuter.orcc.gui.util.GraphicsUtil;
 import org.mcuosmipcuter.orcc.soundvis.Context;
 import org.mcuosmipcuter.orcc.soundvis.ImageStore;
+import org.mcuosmipcuter.orcc.soundvis.ImageStore.Key;
 import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
 import org.mcuosmipcuter.orcc.soundvis.defaultcanvas.model.Slide;
 import org.mcuosmipcuter.orcc.soundvis.gui.listeners.FileDialogActionListener;
@@ -86,7 +89,7 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 			chooser.setMultiSelectionEnabled(true);
 			IOUtil.log(System.currentTimeMillis() + " chooser return " + e);
 			Context.beforePropertyUpdate(name);
-			// TODO image thumbnails chooser.setFileView(fileView);
+
 			int returnVal = chooser.showDialog(null, "select files");
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 
@@ -99,14 +102,18 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 					slides[i].setText(selectedFiles[i].getName());
 
 					BufferedImage image;
-					Image fromStore = ImageStore.getImage(selectedFiles[i]);
+					Key key = new Key(selectedFiles[i]); // the original not rotated and not mirror
+					Image fromStore = ImageStore.getImage(key);
 					if (fromStore instanceof BufferedImage) {
-						slides[i].setImage(fromStore);
+						slides[i].setImage(key, fromStore);
 					} else {
 						try {
 							image = ImageIO.read(selectedFiles[i]);
-							slides[i].setImage(image != null ? image : createPlaceHolderImage(selectedFiles[i]));
-							ImageStore.addImage(selectedFiles[i], image);
+							if(image == null) {
+								image = createPlaceHolderImage(selectedFiles[i]);
+							}
+							slides[i].setImage(key, image);
+							ImageStore.addImage(key, image);
 						} catch (IOException ex) {
 							throw new RuntimeException(ex);
 						}
@@ -172,7 +179,7 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO edit commit
+				hideSlideEditPopup();
 				hidePopup();
 			}
 		});
@@ -217,16 +224,94 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 	}
 	
 	private void showSlideEditPopup(JButton ib, Slide slide){
+		hideSlideEditPopup(); // hide/remove others
 		Point loc = ib.getLocationOnScreen();
 		JPanel editPanel = new JPanel();	
+		GridBagLayout gridbag = new GridBagLayout();
+		editPanel.setLayout(gridbag);
+		GridBagConstraints gc = new GridBagConstraints();
+		gc.gridwidth = 2;
+		gc.gridheight = 3;
+	
 		JButton moveLeftButton = new JButton("< move");
-		editPanel.add(moveLeftButton);
+		gridbag.setConstraints(moveLeftButton, gc);
+		editPanel.add(moveLeftButton, gc);
 		moveLeftButton.setEnabled(slide.getPosition() > 1);
+		
+		gc.gridwidth = GridBagConstraints.REMAINDER;
+		
 		JButton moveRightButton = new JButton("move >");
-		editPanel.add(moveRightButton);
+		gridbag.setConstraints(moveRightButton, gc);
+		editPanel.add(moveRightButton, gc);
 		moveRightButton.setEnabled(getCurrentValue() != null && slide.getPosition() < getCurrentValue().length);
+		
+		
+		JPanel imagePanel = new JPanel() {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void paint(Graphics g) {
+				
+				super.paint(g);
+				Image image = slide.getImage();
+				g.drawImage(GraphicsUtil.getScaledInstanceKeepRatio(image, 300, Image.SCALE_FAST), 10, 10, null);
+				setToolTipText(slide.getText() + ": " + image.getHeight(null) + " x " + image.getWidth(null));
+			}};
+		imagePanel.setPreferredSize(new Dimension(320, 320));
+		imagePanel.setBackground(Color.BLACK);
+		gridbag.setConstraints(imagePanel, gc);
+		
+		editPanel.add(imagePanel, gc);
+
+		JButton rotateButton = new JButton("rotate");
+		gridbag.setConstraints(rotateButton, gc);
+		editPanel.add(rotateButton, gc);	
+		
+		rotateButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Key oldKey = slide.getKey();
+				int newRotation = (oldKey.getQuadrantRotation() + 1) % 4;
+				Key newKey = new Key(oldKey.getLastModified(), oldKey.getAbsolutePath(), newRotation, oldKey.isMirrored());
+				BufferedImage newImage = ImageStore.getImage(newKey);
+				if(newImage == null) {
+					BufferedImage oldImage = ImageStore.getImage(oldKey);
+					newImage = GraphicsUtil.rotateClockwise(oldImage);
+					ImageStore.addImage(newKey, newImage);
+				}		
+				slide.setImage(newKey, newImage);
+				hideSlideEditPopup();
+			}
+		});
+		
+		JButton mirrorButton = new JButton("mirror");
+		gridbag.setConstraints(mirrorButton, gc);
+		editPanel.add(mirrorButton, gc);	
+		
+		mirrorButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Key oldKey = slide.getKey();
+				boolean newMirror = ! oldKey.isMirrored();
+				Key newKey = new Key(oldKey.getLastModified(), oldKey.getAbsolutePath(), oldKey.getQuadrantRotation(), newMirror);
+				BufferedImage newImage = ImageStore.getImage(newKey);
+				if(newImage == null) {
+					BufferedImage oldImage = ImageStore.getImage(oldKey);
+					newImage = GraphicsUtil.mirrorX(oldImage);
+					ImageStore.addImage(newKey, newImage);
+				}		
+				slide.setImage(newKey, newImage);
+				hideSlideEditPopup();
+			}
+		});
+		
+
 		JButton removeButton = new JButton("remove");
-		editPanel.add(removeButton);
+		gridbag.setConstraints(removeButton, gc);
+		editPanel.add(removeButton, gc);
+		
 		editPopup = PopupFactory.getSharedInstance().getPopup(ib, editPanel, loc.x, loc.y);
 		moveLeftButton.addActionListener(new ActionListener() {	
 			@Override
@@ -250,6 +335,7 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 			}
 		});		
 		editPopup.show();
+		
 	}
 	private void hideSlideEditPopup() {
 		if(editPopup != null) {
@@ -353,7 +439,7 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 			int rows = (currentValue.length + 1) / COLS;
 			rows = (currentValue.length + 1) % COLS == 0 ? rows : rows + 1;
 			gc.gridheight = rows;
-			valueSelect.setPreferredSize(new Dimension(500, rows * (80 + 6) + 6));
+			valueSelect.setPreferredSize(new Dimension(500, rows * (80 + 20) + 6));
 			for (final Slide slide : currentValue) {
 				JButton ib = new JButton() {
 					private static final long serialVersionUID = 1L;
@@ -419,7 +505,7 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 				ib.setBorder(new LineBorder(Color.BLACK, 2));
 				ImageIcon icon = new ImageIcon(slide.getImage().getScaledInstance(80, 80, Image.SCALE_FAST));
 
-				ib.setMaximumSize(new Dimension(80, 80));
+				//ib.setMaximumSize(new Dimension(80, 80));
 				ib.setPreferredSize(new Dimension(80, 80));
 				// ib.setIcon(new ImageIcon(image.getScaledInstance(80, 80, Image.SCALE_FAST)));
 				ib.setIcon(icon);
