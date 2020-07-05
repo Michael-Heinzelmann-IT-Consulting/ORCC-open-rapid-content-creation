@@ -21,6 +21,7 @@ import java.awt.Image;
 
 import org.mcuosmipcuter.orcc.api.soundvis.DisplayDuration;
 import org.mcuosmipcuter.orcc.api.soundvis.DisplayObject;
+import org.mcuosmipcuter.orcc.soundvis.ImageStore.Key;
 
 /**
  * @author Michael Heinzelmann
@@ -31,11 +32,13 @@ public class Slide implements DisplayObject {
 	private Image image;
 	private String text;
 	private int position;
+	private Key key;
 
 	public Image getImage() {
 		return image;
 	}
-	public void setImage(Image image) {
+	public void setImage(Key key, Image image) {
+		this.key = key;
 		this.image = image;
 	}
 	public String getText() {
@@ -51,6 +54,10 @@ public class Slide implements DisplayObject {
 		this.position = position;
 	}
 	
+	
+	public Key getKey() {
+		return key;
+	}
 	@Override
 	public String getDisplayKey() {
 		return "slide " + position;
