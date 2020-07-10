@@ -25,7 +25,6 @@ import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
 import org.mcuosmipcuter.orcc.api.soundvis.ChangesIcon;
 import org.mcuosmipcuter.orcc.api.soundvis.DisplayDuration;
 import org.mcuosmipcuter.orcc.api.soundvis.DisplayUnit;
-import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.NestedProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
@@ -47,9 +46,7 @@ public class SolidColor implements SoundCanvas {
 	
 	private int width;
 	private int height;
-//	@LimitedIntProperty(description = "min 1", minimum = 1)
-//	@UserProperty(description="color of the area")
-//	private int modulus = 1;
+
 	private long frameFrom;
 	private long frameTo;
 	
@@ -66,12 +63,10 @@ public class SolidColor implements SoundCanvas {
 	@Override
 	public void newFrame(long frameCount, Graphics2D graphics2D) {	
 		for(DisplayUnit displayUnit : repeater.repeat(frameFrom, frameTo, frameCount)) {
-//		if(frameCount % modulus == 0 || frameCount == 1) {
 			graphics2D.setColor(color);
 			Composite origComposite = fader.fade(graphics2D, displayUnit.currentPosition, displayUnit.duration);
 			graphics2D.fillRect(0, 0, width, height);
 			graphics2D.setComposite(origComposite);
-//		}
 		}
 	}
 
