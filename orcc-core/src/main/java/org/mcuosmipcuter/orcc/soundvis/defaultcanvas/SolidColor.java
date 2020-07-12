@@ -29,7 +29,6 @@ import org.mcuosmipcuter.orcc.api.soundvis.NestedProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
-import org.mcuosmipcuter.orcc.api.util.AmplitudeHelper;
 import org.mcuosmipcuter.orcc.soundvis.effects.Fader;
 import org.mcuosmipcuter.orcc.soundvis.effects.Repeater;
 
@@ -41,8 +40,6 @@ public class SolidColor implements SoundCanvas {
 	@ChangesIcon
 	@UserProperty(description="color of the area")
 	private Color color = Color.WHITE;
-	
-	protected AmplitudeHelper amplitudeHelper;
 	
 	private int width;
 	private int height;
@@ -75,7 +72,6 @@ public class SolidColor implements SoundCanvas {
 			VideoOutputInfo videoOutputInfo) {
 		width = videoOutputInfo.getWidth();
 		height = videoOutputInfo.getHeight();
-		amplitudeHelper = new AmplitudeHelper(audioInputInfo);
 	}
 
 	@Override

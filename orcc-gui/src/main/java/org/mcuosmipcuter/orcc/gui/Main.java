@@ -66,6 +66,7 @@ import org.mcuosmipcuter.orcc.soundvis.gui.listeners.FileDialogActionListener.Ca
 import org.mcuosmipcuter.orcc.soundvis.gui.listeners.StopActionListener;
 import org.mcuosmipcuter.orcc.soundvis.gui.widgets.GraphicsJInternalFrame;
 import org.mcuosmipcuter.orcc.soundvis.gui.widgets.TimeLabel;
+import org.mcuosmipcuter.orcc.soundvis.threads.SaveThread;
 import org.mcuosmipcuter.orcc.soundvis.util.ExportUtil;
 import org.mcuosmipcuter.orcc.util.IOUtil;
 
@@ -383,6 +384,9 @@ public class Main {
 
 
 		}
+		SaveThread saveThread = new SaveThread();
+		Context.addListener(saveThread);
+		saveThread.start();
 		
 		org.mcuosmipcuter.orcc.gui.Configuration.stage2(args);
 		
