@@ -300,6 +300,7 @@ public class CustomTable extends JPanel{
 		SpinnerNumberModel modelFrom = new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1);
 		final JSpinner fromFrame = new JSpinner(modelFrom);
 		fromFrame.setToolTipText("from");
+		fromFrame.setValue(soundCanvasWrapper.getFrameFrom());
 		fromFrame.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent arg0) {
 				soundCanvasWrapper.setFrameFrom(((Number)fromFrame.getValue()).longValue());
@@ -317,6 +318,7 @@ public class CustomTable extends JPanel{
 		SpinnerNumberModel modelTo = new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1);
 		final JSpinner toFrame = new JSpinner(modelTo);
 		toFrame.setToolTipText("to");
+		toFrame.setValue(soundCanvasWrapper.getFrameTo());
 		toFrame.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent arg0) {
 				soundCanvasWrapper.setFrameTo(((Number)toFrame.getValue()).longValue());
@@ -348,6 +350,7 @@ public class CustomTable extends JPanel{
 		SpinnerNumberModel modelTransparency = new SpinnerNumberModel(100, 0, 100, 1);
 		final JSpinner transparency = new JSpinner(modelTransparency);
 		transparency.setToolTipText("repaint transparency");
+		transparency.setValue(soundCanvasWrapper.getTransparency());
 		transparency.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent arg0) {
 				soundCanvasWrapper.setTransparency((((Number)transparency.getValue()).intValue()));
@@ -357,6 +360,7 @@ public class CustomTable extends JPanel{
 		SpinnerNumberModel modelThreshold = new SpinnerNumberModel(0, 0, 100, 1);
 		final JSpinner threshold = new JSpinner(modelThreshold);
 		threshold.setToolTipText("repaint threshold");
+		threshold.setValue(soundCanvasWrapper.getRepaintThreshold());		
 		threshold.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent arg0) {
 				soundCanvasWrapper.setRepaintThreshold(((((Number)threshold.getValue()).intValue())));
