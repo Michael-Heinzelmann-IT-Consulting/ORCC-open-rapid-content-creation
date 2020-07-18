@@ -17,6 +17,7 @@
 */
 package org.mcuosmipcuter.orcc.soundvis;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedSet;
@@ -124,7 +125,7 @@ public abstract class Context {
 	 *  Gets the video output info object
 	 * @return the video output info, never null, there is a default of 25fps 1920x1080
 	 */
-	public static synchronized VideoOutputInfo getVideoOutputInfo() {
+	public static VideoOutputInfo getVideoOutputInfo() {
 		return videoOutputInfo;
 	}
 	
@@ -163,15 +164,23 @@ public abstract class Context {
 	 * @throws InstantiationException
 	 * @throws IllegalAccessException
 	 * @throws ClassNotFoundException
+	 * @throws SecurityException 
+	 * @throws NoSuchMethodException 
+	 * @throws InvocationTargetException 
+	 * @throws IllegalArgumentException 
 	 */
-	public static synchronized  void addCanvas(String canvasClassName) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
-		SoundCanvas soundCanvas = (SoundCanvas) Class.forName(canvasClassName).newInstance();
+	public static synchronized  void addCanvas(String canvasClassName) throws InstantiationException, IllegalAccessException, ClassNotFoundException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
+		SoundCanvas soundCanvas = (SoundCanvas) Class.forName(canvasClassName).getDeclaredConstructor((Class<?>[])null).newInstance((Object[])null);
 		SoundCanvasWrapper soundCanvasWrapper = new SoundCanvasWrapperImpl(soundCanvas);
 		if(audioInput != null) {
 			soundCanvasWrapper.prepare(audioInput.getAudioInputInfo(), videoOutputInfo);
 		}
 		soundCanvasWrapper.setFrameFrom(0);
 		soundCanvasWrapper.setFrameTo(0); // TODO frames without audio
+		soundCanvasList.add(soundCanvasWrapper);
+		notifyListeners(PropertyName.SoundCanvasAdded);
+	}
+	public static synchronized  void addCanvasWrapper(SoundCanvasWrapper soundCanvasWrapper) {
 		soundCanvasList.add(soundCanvasWrapper);
 		notifyListeners(PropertyName.SoundCanvasAdded);
 	}
@@ -222,7 +231,7 @@ public abstract class Context {
 	 * Full path to the video export file
 	 * @return the file full path or null if no file is set
 	 */
-	public static synchronized String getExportFileName() {
+	public static String getExportFileName() {
 		return exportFileName;
 	}
 	/**
@@ -252,14 +261,14 @@ public abstract class Context {
 	 * Gets the current {@link SoundCanvas} instance
 	 * @return the instance or null if none is set
 	 */
-	public static synchronized List<SoundCanvasWrapper> getSoundCanvasList() {
+	public static List<SoundCanvasWrapper> getSoundCanvasList() {
 		return soundCanvasList;	
 	}
 	/**
 	 * Returns the application state
 	 * @return the state
 	 */
-	public static synchronized AppState getAppState() {
+	public static AppState getAppState() {
 		return appState;
 	}
 	/**

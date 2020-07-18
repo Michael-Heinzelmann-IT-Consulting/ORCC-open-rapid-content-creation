@@ -66,6 +66,7 @@ import org.mcuosmipcuter.orcc.soundvis.gui.listeners.FileDialogActionListener.Ca
 import org.mcuosmipcuter.orcc.soundvis.gui.listeners.StopActionListener;
 import org.mcuosmipcuter.orcc.soundvis.gui.widgets.GraphicsJInternalFrame;
 import org.mcuosmipcuter.orcc.soundvis.gui.widgets.TimeLabel;
+import org.mcuosmipcuter.orcc.soundvis.persistence.Session;
 import org.mcuosmipcuter.orcc.soundvis.threads.SaveThread;
 import org.mcuosmipcuter.orcc.soundvis.util.ExportUtil;
 import org.mcuosmipcuter.orcc.util.IOUtil;
@@ -140,6 +141,14 @@ public class Main {
 					= new FileDialogActionListener(null, openAudioCallback, "open as audio input");
 				openAudio.addActionListener(importActionListener);
 				fileMenu.addSeparator();
+				
+				JMenuItem restore = new JMenuItem("restore last session");
+				fileMenu.add(restore);
+				restore.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent arg0) {
+						Session.restoreSession();
+					}
+				});
 				
 				JMenuItem exit = new JMenuItem("exit");
 				fileMenu.add(exit);

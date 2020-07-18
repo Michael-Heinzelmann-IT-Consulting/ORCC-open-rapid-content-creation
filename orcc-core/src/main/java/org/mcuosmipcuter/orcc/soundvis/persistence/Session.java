@@ -17,50 +17,85 @@
 */
 package org.mcuosmipcuter.orcc.soundvis.persistence;
 
+import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Field;
+import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
-import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
+import org.mcuosmipcuter.orcc.soundvis.AudioInput.Type;
 import org.mcuosmipcuter.orcc.soundvis.Context;
 import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
 import org.mcuosmipcuter.orcc.util.IOUtil;
 
-public class Session {
+public class Session implements Serializable {
+	
+	/**
+	 * versioning
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	public static boolean restoreSession() {
+		File file = new File("latest_session.xml");
+		IOUtil.log("restore from: " + file.getAbsolutePath());
+		try (FileInputStream fis = new FileInputStream(file);
+				XMLDecoder in = new XMLDecoder(fis);) {
+			PersistentSession persistentSession = (PersistentSession) in.readObject();
+			Type inputType = persistentSession.getAudioInputType();
+			switch(inputType) {
+			case FILE:
+					Context.setAudioFromFile(persistentSession.getAudioInputName());
+					break;
+				case STREAM:
+					Context.setAudioFromClasspath(persistentSession.getAudioInputName());
+					break;
+				default:
+					throw new IllegalArgumentException();
+			}
+			
+			Context.setOutputDimension(persistentSession.getVideoOutPutWidth(), persistentSession.getVideoOutPutHeight());
+			Context.setOutputFrameRate(persistentSession.getVideoOutPutFrames());
+			
+			for(PersistentSoundCanvasWrapper psw : persistentSession.getSoundCanvasList()) {
+				Context.addCanvasWrapper(psw.restore());
+			}
+		} catch (Exception e) {
+			IOUtil.log("restore failed: " + e.getMessage());
+			e.printStackTrace();
+			return false;
+		}
+		return true;
+	}
+	
+	
 	public static void saveSession() throws IllegalArgumentException, IllegalAccessException {
+
 		List<SoundCanvasWrapper> appObjects = Context.getSoundCanvasList();
 		
-		List<PersistentObject> persistentObjects = new ArrayList<PersistentObject>();
+		List<PersistentSoundCanvasWrapper> persistentWrappers = new ArrayList<PersistentSoundCanvasWrapper>();
 		
 		for(SoundCanvasWrapper sw : appObjects) {
-			SoundCanvas sc = sw.getSoundCanvas();
-			PersistentObject po = new PersistentObject();
-			Map<String, Object> persistentProperties = new HashMap<String, Object>();
-			po.setDelegate(sc.getClass());
-			for(Field field : sc.getClass().getDeclaredFields()) {
-				if(field.isAnnotationPresent(UserProperty.class)) {
-					field.setAccessible(true);
-					Object value = field.get(sc);
-					persistentProperties.put(field.getName(), value);
-				}
-			}
-			po.setPersistentProperties(persistentProperties);
-			persistentObjects.add(po);
+			PersistentSoundCanvasWrapper psw = new PersistentSoundCanvasWrapper(sw);
+			persistentWrappers.add(psw);
 		}
 
+			PersistentSession persistentSession = new PersistentSession();
+			persistentSession.setSoundCanvasList(persistentWrappers);
+			persistentSession.setAudioInputType(Context.getAudioInput().getType());
+			persistentSession.setAudioInputName(Context.getAudioInput().getName());
+			persistentSession.setVideoOutPutFrames(Context.getVideoOutputInfo().getFramesPerSecond());
+			persistentSession.setVideoOutPutHeight(Context.getVideoOutputInfo().getHeight());
+			persistentSession.setVideoOutPutWidth(Context.getVideoOutputInfo().getWidth());
 		
 		File file = new File("latest_session.xml");
 
 		try (FileOutputStream out = new FileOutputStream(file); 
 				XMLEncoder encoder = new XMLEncoder(out)) {
-			encoder.writeObject(persistentObjects);
+			encoder.writeObject(persistentSession);
 			encoder.flush();
 			IOUtil.log("saved: " + file.getAbsolutePath());
 		} catch (IOException e) {

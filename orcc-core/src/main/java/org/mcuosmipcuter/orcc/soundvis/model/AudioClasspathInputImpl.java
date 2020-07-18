@@ -18,7 +18,6 @@
 package org.mcuosmipcuter.orcc.soundvis.model;
 
 import java.io.BufferedInputStream;
-import java.io.FileInputStream;
 import java.io.InputStream;
 
 import javax.sound.sampled.AudioFormat;
@@ -30,7 +29,7 @@ import org.mcuosmipcuter.orcc.soundvis.AudioInput;
 import org.mcuosmipcuter.orcc.util.IOUtil;
 
 /**
- * Implementation of a file based audio input
+ * Implementation of a classpath based audio input
  * @author Michael Heinzelmann
  */
 public class AudioClasspathInputImpl implements AudioInput {
