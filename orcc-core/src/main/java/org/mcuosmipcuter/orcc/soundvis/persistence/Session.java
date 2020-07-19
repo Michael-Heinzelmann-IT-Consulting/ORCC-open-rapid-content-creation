@@ -27,6 +27,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.mcuosmipcuter.orcc.api.soundvis.MappedValue;
 import org.mcuosmipcuter.orcc.soundvis.AudioInput.Type;
 import org.mcuosmipcuter.orcc.soundvis.Context;
 import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
@@ -95,6 +96,7 @@ public class Session implements Serializable {
 
 		try (FileOutputStream out = new FileOutputStream(file); 
 				XMLEncoder encoder = new XMLEncoder(out)) {
+			encoder.setPersistenceDelegate(MappedValue.class, new MappedValuePersistenceDelegate());
 			encoder.writeObject(persistentSession);
 			encoder.flush();
 			IOUtil.log("saved: " + file.getAbsolutePath());

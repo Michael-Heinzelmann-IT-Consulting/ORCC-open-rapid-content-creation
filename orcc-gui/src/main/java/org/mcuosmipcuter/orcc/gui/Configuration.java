@@ -126,6 +126,7 @@ public abstract class Configuration {
 		if(stage < 2) {
 			throw new IllegalStateException("stage 1 required, but is " + stage);
 		}
+		FontStore.init();
 		
 		boolean restoredSession = Session.restoreSession();
 		if(!restoredSession) {
@@ -163,8 +164,6 @@ public abstract class Configuration {
 		// set a dummy control to get volume setup
 		FloatControl dummy = new FloatControl(FloatControl.Type.MASTER_GAIN, -80, 6, 1, 1, 0, "dB"){};
 		Context.setVolumeControl(dummy);
-		
-		FontStore.init();
 		
 		stage = 3;
 	}

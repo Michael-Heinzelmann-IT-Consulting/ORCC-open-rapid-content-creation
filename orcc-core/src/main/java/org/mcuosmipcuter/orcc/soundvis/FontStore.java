@@ -24,6 +24,7 @@ import java.util.TreeMap;
 import java.util.function.Supplier;
 
 import org.mcuosmipcuter.orcc.api.soundvis.MappedValue;
+import org.mcuosmipcuter.orcc.util.IOUtil;
 
 /**
  * @author Michael Heinzelmann
@@ -32,6 +33,7 @@ public class FontStore {
 	
 	private static Font[] fonts;
 	private static TreeMap<MappedValue<String>, Font> logicalFontNamesAlphabetically = new TreeMap<MappedValue<String>, Font>();
+	private static Supplier<Set<MappedValue<String>>> all;
 	
 	public static Set<MappedValue<String>> getAll()  {
 		return logicalFontNamesAlphabetically.keySet();
@@ -39,16 +41,15 @@ public class FontStore {
 
 	public static void init() {
 		fonts = GraphicsEnvironment.getLocalGraphicsEnvironment().getAllFonts();
-		Supplier<Set<MappedValue<String>>> all = new Supplier<Set<MappedValue<String>>>() {
+		all = new Supplier<Set<MappedValue<String>>>() {
 			@Override
 			public Set<MappedValue<String>> get() {
 				return logicalFontNamesAlphabetically.keySet();
 			}
 		};
 		for(Font font : fonts) {
-			logicalFontNamesAlphabetically.put(new MappedValue<String>(font.getName(), font.getFontName(), all), font);
+			logicalFontNamesAlphabetically.put(getMappedValue(font.getName(), font.getFontName()), font);
 		}
-		//System.err.println(logicalFontNamesAlphabetically);
 	}
 	public static Font getFontByMappedValue(MappedValue<String> mappedValue) {
 		return logicalFontNamesAlphabetically.get(mappedValue);
@@ -56,11 +57,14 @@ public class FontStore {
 	public static MappedValue<String> getDefaultFont(){
 		for(MappedValue<String> mv : logicalFontNamesAlphabetically.keySet()) {
 			if("Helvetica".equals(mv.getValue())) {
-				System.err.println(mv);
+				IOUtil.log("found default font: " + mv);
 				return mv;
 			}
 		}
 		return null;
-		//return logicalFontNamesAlphabetically.keySet().stream().findFirst().filter(v -> "Helvetica".equals(v.getValue())).orElse(null);
+	}
+	
+	public static MappedValue<String> getMappedValue(String value, String displayname){
+		return new MappedValue<String>(value, displayname, all, FontStore.class, "getMappedValue");
 	}
 }

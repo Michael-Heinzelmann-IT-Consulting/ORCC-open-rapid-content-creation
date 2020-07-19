@@ -29,11 +29,15 @@ public class  MappedValue <V extends Comparable<V>> implements Comparable<Mapped
 	private final V value;
 	private final String displayString;
 	private final Supplier<Set<MappedValue<V>>> getAll;
+	private Class<?> factoryClass;
+	private String factoryMethod;
 	
-	public MappedValue(V value, String displayString, Supplier<Set<MappedValue<V>>> getAll) {
+	public MappedValue(V value, String displayString, Supplier<Set<MappedValue<V>>> getAll, Class<?> factoryClass, String factoryMethod) {
 		this.value = value;
 		this.displayString = displayString;
 		this.getAll = getAll;
+		this.factoryClass = factoryClass;
+		this.factoryMethod = factoryMethod;
 	}
 	public V getValue() {
 		return value;
@@ -44,10 +48,12 @@ public class  MappedValue <V extends Comparable<V>> implements Comparable<Mapped
 	public Set<MappedValue<V>> getAll() {
 		return getAll.get();
 	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + ((factoryClass == null) ? 0 : factoryClass.hashCode());
 		result = prime * result + ((value == null) ? 0 : value.hashCode());
 		return result;
 	}
@@ -60,6 +66,11 @@ public class  MappedValue <V extends Comparable<V>> implements Comparable<Mapped
 		if (getClass() != obj.getClass())
 			return false;
 		MappedValue other = (MappedValue) obj;
+		if (factoryClass == null) {
+			if (other.factoryClass != null)
+				return false;
+		} else if (!factoryClass.equals(other.factoryClass))
+			return false;
 		if (value == null) {
 			if (other.value != null)
 				return false;
@@ -75,6 +86,12 @@ public class  MappedValue <V extends Comparable<V>> implements Comparable<Mapped
 	public String toString() {
 		// TODO return "MappedValue [value=" + value + ", displayString=" + displayString + "]";
 		return displayString;
+	}
+	public Class<?> getFactoryClass() {
+		return factoryClass;
+	}
+	public String getFactoryMethod() {
+		return factoryMethod;
 	}
 	
 }
