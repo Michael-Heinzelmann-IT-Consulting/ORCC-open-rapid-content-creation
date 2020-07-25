@@ -19,9 +19,12 @@ package org.mcuosmipcuter.orcc.soundvis;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.lang.ref.SoftReference;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.imageio.ImageIO;
 
 import org.mcuosmipcuter.orcc.util.IOUtil;
 
@@ -125,6 +128,23 @@ public class ImageStore {
 			IOUtil.log("miss for " + key);
 		}
 		return ref != null ? ref.get() : null;
+	}
+	public static BufferedImage getOrLoadImage(Key key) {
+		BufferedImage fromStore = getImage(key);
+		if (fromStore != null) {
+			return fromStore;
+		} else {
+			try {
+				File imageFile = new File(key.getAbsolutePath());
+				BufferedImage image = ImageIO.read(imageFile);
+				if(image != null) {
+					addImage(key, image);
+				}
+				return image;
+			} catch (IOException ex) {
+				throw new RuntimeException(ex);
+			}
+		}
 	}
 	
 	public static void addImage(Key key, BufferedImage image) {

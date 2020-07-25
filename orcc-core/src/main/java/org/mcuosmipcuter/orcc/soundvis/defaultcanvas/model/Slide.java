@@ -18,9 +18,11 @@
 package org.mcuosmipcuter.orcc.soundvis.defaultcanvas.model;
 
 import java.awt.Image;
+import java.beans.Transient;
 
 import org.mcuosmipcuter.orcc.api.soundvis.DisplayDuration;
 import org.mcuosmipcuter.orcc.api.soundvis.DisplayObject;
+import org.mcuosmipcuter.orcc.soundvis.ImageStore;
 import org.mcuosmipcuter.orcc.soundvis.ImageStore.Key;
 
 /**
@@ -33,7 +35,9 @@ public class Slide implements DisplayObject {
 	private String text;
 	private int position;
 	private Key key;
+	
 
+	@Transient
 	public Image getImage() {
 		return image;
 	}
@@ -53,8 +57,15 @@ public class Slide implements DisplayObject {
 	public void setPosition(int position) {
 		this.position = position;
 	}
-	
-	
+	public void setKey(Key key) {
+		if(image == null) {
+			image = ImageStore.getOrLoadImage(key);
+		}
+		else {
+			throw new IllegalStateException("image already set!");
+		}
+		this.key = key;
+	}
 	public Key getKey() {
 		return key;
 	}
@@ -72,6 +83,7 @@ public class Slide implements DisplayObject {
 		duration.setOverlapAfter(0);
 		return duration;
 	}
+
 	@Override
 	public String toString() {
 		return "Slide [image=" + System.identityHashCode(image) + ", text=" + text + ", position=" + position + "]";

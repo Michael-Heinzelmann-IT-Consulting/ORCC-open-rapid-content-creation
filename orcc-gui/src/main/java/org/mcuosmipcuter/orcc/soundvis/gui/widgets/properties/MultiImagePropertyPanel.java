@@ -35,11 +35,9 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -103,20 +101,13 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 
 					BufferedImage image;
 					Key key = new Key(selectedFiles[i]); // the original not rotated and not mirror
-					Image fromStore = ImageStore.getImage(key);
+					Image fromStore = ImageStore.getOrLoadImage(key);
 					if (fromStore instanceof BufferedImage) {
 						slides[i].setImage(key, fromStore);
 					} else {
-						try {
-							image = ImageIO.read(selectedFiles[i]);
-							if(image == null) {
-								image = createPlaceHolderImage(selectedFiles[i]);
-							}
-							slides[i].setImage(key, image);
-							ImageStore.addImage(key, image);
-						} catch (IOException ex) {
-							throw new RuntimeException(ex);
-						}
+						image = createPlaceHolderImage(selectedFiles[i]);							
+						slides[i].setImage(key, image);
+						ImageStore.addImage(key, image);
 					}
 				}
 				IOUtil.log(System.currentTimeMillis() + " before setNewValue " + e);

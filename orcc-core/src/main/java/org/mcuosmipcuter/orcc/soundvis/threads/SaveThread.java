@@ -17,16 +17,10 @@
 */
 package org.mcuosmipcuter.orcc.soundvis.threads;
 
-import java.beans.XMLEncoder;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.List;
 
 import org.mcuosmipcuter.orcc.soundvis.Context;
 import org.mcuosmipcuter.orcc.soundvis.Context.PropertyName;
-import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
 import org.mcuosmipcuter.orcc.soundvis.persistence.Session;
 import org.mcuosmipcuter.orcc.util.IOUtil;
 
@@ -63,7 +57,7 @@ public class SaveThread extends Thread implements Context.Listener{
 	public void saveLatestSession(){		
 		try {
 			Session.saveSession();
-		} catch (IllegalArgumentException | IllegalAccessException e) {
+		} catch (IllegalArgumentException | IllegalAccessException | IOException e) {
 			e.printStackTrace();
 		}
 		

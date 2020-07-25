@@ -410,6 +410,11 @@ public class Main {
 				return;
 			}
 		}
+		try {
+			Session.saveSession();
+		} catch (Throwable t) {
+			t.printStackTrace();
+		}
 		System.exit(0);
 	}
 }

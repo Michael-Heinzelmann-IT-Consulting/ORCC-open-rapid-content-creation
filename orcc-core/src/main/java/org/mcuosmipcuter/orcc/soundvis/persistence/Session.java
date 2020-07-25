@@ -17,6 +17,7 @@
 */
 package org.mcuosmipcuter.orcc.soundvis.persistence;
 
+
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
 import java.io.File;
@@ -24,12 +25,15 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.mcuosmipcuter.orcc.api.soundvis.MappedValue;
 import org.mcuosmipcuter.orcc.soundvis.AudioInput.Type;
 import org.mcuosmipcuter.orcc.soundvis.Context;
+import org.mcuosmipcuter.orcc.soundvis.ImageStore.Key;
 import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
 import org.mcuosmipcuter.orcc.util.IOUtil;
 
@@ -73,7 +77,7 @@ public class Session implements Serializable {
 	}
 	
 	
-	public static void saveSession() throws IllegalArgumentException, IllegalAccessException {
+	public static void saveSession() throws IllegalArgumentException, IllegalAccessException, IOException {
 
 		List<SoundCanvasWrapper> appObjects = Context.getSoundCanvasList();
 		
@@ -93,10 +97,14 @@ public class Session implements Serializable {
 			persistentSession.setVideoOutPutWidth(Context.getVideoOutputInfo().getWidth());
 		
 		File file = new File("latest_session.xml");
+		if(file.exists()) {
+			Files.move(file.toPath(), file.toPath().resolveSibling("latest_session_bu.xml"), StandardCopyOption.REPLACE_EXISTING);
+		}
 
 		try (FileOutputStream out = new FileOutputStream(file); 
 				XMLEncoder encoder = new XMLEncoder(out)) {
 			encoder.setPersistenceDelegate(MappedValue.class, new MappedValuePersistenceDelegate());
+			encoder.setPersistenceDelegate(Key.class, new KeyPersistenceDelegate());
 			encoder.writeObject(persistentSession);
 			encoder.flush();
 			IOUtil.log("saved: " + file.getAbsolutePath());
