@@ -138,6 +138,9 @@ public class ImageStore {
 				File imageFile = new File(key.getAbsolutePath());
 				BufferedImage image = ImageIO.read(imageFile);
 				if(image != null) {
+					if(key.quadrantRotation != 0) {
+						image = quadrantRotate(image, key.quadrantRotation);
+					}
 					addImage(key, image);
 				}
 				return image;
@@ -150,5 +153,56 @@ public class ImageStore {
 	public static void addImage(Key key, BufferedImage image) {
 		store.put(key, new SoftReference<BufferedImage>(image));
 	}
+	public static BufferedImage quadrantRotate(BufferedImage origImage, int quadrant) {
 
+		if (origImage == null) {
+			IOUtil.log("WARN: image null, returning null");
+			return null;
+		}
+		
+		int origWidth = origImage.getWidth(null);
+		int origHeight = origImage.getHeight(null);
+		IOUtil.log("image w: " + origWidth + " h: " + origHeight);
+		
+		int q = quadrant % 4;
+		
+		q = q < 0 ? 4 - q : q;
+		
+		if(q == 0) {
+			return origImage;
+		}
+		
+		int newWidth = q == 2 ? origWidth : origHeight;
+		int newHeight = q == 2 ? origHeight : origWidth;
+
+
+		BufferedImage newImage = new BufferedImage(newWidth, newHeight, origImage.getType());
+
+		for (int origX = 0; origX < origWidth; origX++) {
+			for (int origY = 0; origY < origHeight; origY++) {
+				int rgb = origImage.getRGB(origX, origY);
+				int newX;
+				int newY;
+				switch(q) {
+				case 1:
+					newX = origHeight - 1 - origY;
+					newY = origX;
+					break;
+				case 2:
+					newX = origWidth - 1 - origX;
+					newY = origHeight - 1 - origY;
+					break;
+				case 3:
+					newX = origY;
+					newY = origWidth - 1 - origX;
+					break;
+					default:
+						throw new IllegalStateException();
+				}
+				newImage.setRGB(newX, newY, rgb);
+			}
+		}
+
+		return newImage;
+	}
 }

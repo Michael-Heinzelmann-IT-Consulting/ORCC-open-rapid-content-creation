@@ -268,7 +268,8 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 				BufferedImage newImage = ImageStore.getImage(newKey);
 				if(newImage == null) {
 					BufferedImage oldImage = ImageStore.getImage(oldKey);
-					newImage = GraphicsUtil.rotateClockwise(oldImage);
+					//newImage = GraphicsUtil.rotateClockwise(oldImage);
+					newImage = ImageStore.quadrantRotate(oldImage, 1);
 					ImageStore.addImage(newKey, newImage);
 				}		
 				slide.setImage(newKey, newImage);
