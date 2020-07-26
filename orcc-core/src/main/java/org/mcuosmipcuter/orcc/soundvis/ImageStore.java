@@ -26,6 +26,7 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 
+import org.mcuosmipcuter.orcc.soundvis.util.ImageUtil;
 import org.mcuosmipcuter.orcc.util.IOUtil;
 
 /**
@@ -139,7 +140,10 @@ public class ImageStore {
 				BufferedImage image = ImageIO.read(imageFile);
 				if(image != null) {
 					if(key.quadrantRotation != 0) {
-						image = quadrantRotate(image, key.quadrantRotation);
+						image = ImageUtil.quadrantRotate(image, key.quadrantRotation);
+					}
+					if(key.mirrored) {
+						image = ImageUtil.mirrorY(image);
 					}
 					addImage(key, image);
 				}
@@ -153,56 +157,30 @@ public class ImageStore {
 	public static void addImage(Key key, BufferedImage image) {
 		store.put(key, new SoftReference<BufferedImage>(image));
 	}
-	public static BufferedImage quadrantRotate(BufferedImage origImage, int quadrant) {
-
-		if (origImage == null) {
-			IOUtil.log("WARN: image null, returning null");
-			return null;
+	
+	public static BufferedImage transformImage(Key oldKey, Key newKey) {
+		BufferedImage newImage = getImage(newKey);
+		if(newImage != null) {
+			return newImage;
 		}
-		
-		int origWidth = origImage.getWidth(null);
-		int origHeight = origImage.getHeight(null);
-		IOUtil.log("image w: " + origWidth + " h: " + origHeight);
-		
-		int q = quadrant % 4;
-		
-		q = q < 0 ? 4 - q : q;
-		
-		if(q == 0) {
-			return origImage;
-		}
-		
-		int newWidth = q == 2 ? origWidth : origHeight;
-		int newHeight = q == 2 ? origHeight : origWidth;
-
-
-		BufferedImage newImage = new BufferedImage(newWidth, newHeight, origImage.getType());
-
-		for (int origX = 0; origX < origWidth; origX++) {
-			for (int origY = 0; origY < origHeight; origY++) {
-				int rgb = origImage.getRGB(origX, origY);
-				int newX;
-				int newY;
-				switch(q) {
-				case 1:
-					newX = origHeight - 1 - origY;
-					newY = origX;
-					break;
-				case 2:
-					newX = origWidth - 1 - origX;
-					newY = origHeight - 1 - origY;
-					break;
-				case 3:
-					newX = origY;
-					newY = origWidth - 1 - origX;
-					break;
-					default:
-						throw new IllegalStateException();
-				}
-				newImage.setRGB(newX, newY, rgb);
+		else {
+			BufferedImage oldImage = getImage(oldKey);
+			if(oldImage == null) {
+				IOUtil.log("returnin null, old key not stored " + oldKey);
+				return null;
 			}
-		}
-
-		return newImage;
+			if(newKey.equals(oldKey)) {
+				return oldImage;
+			}
+			if(oldKey.quadrantRotation != newKey.quadrantRotation) {
+				newImage = ImageUtil.quadrantRotate(oldImage, newKey.quadrantRotation);
+			}
+			if(oldKey.mirrored != newKey.mirrored) {
+				newImage = ImageUtil.mirrorY(oldImage);
+			}
+			addImage(newKey, newImage);
+			return newImage;
+		}	
 	}
+
 }

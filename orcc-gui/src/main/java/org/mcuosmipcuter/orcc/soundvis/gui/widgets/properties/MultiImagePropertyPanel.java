@@ -265,15 +265,10 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 				Key oldKey = slide.getKey();
 				int newRotation = (oldKey.getQuadrantRotation() + 1) % 4;
 				Key newKey = new Key(oldKey.getLastModified(), oldKey.getAbsolutePath(), newRotation, oldKey.isMirrored());
-				BufferedImage newImage = ImageStore.getImage(newKey);
-				if(newImage == null) {
-					BufferedImage oldImage = ImageStore.getImage(oldKey);
-					//newImage = GraphicsUtil.rotateClockwise(oldImage);
-					newImage = ImageStore.quadrantRotate(oldImage, 1);
-					ImageStore.addImage(newKey, newImage);
-				}		
+				BufferedImage newImage = ImageStore.transformImage(oldKey, newKey);	
 				slide.setImage(newKey, newImage);
 				hideSlideEditPopup();
+				setNewValue(currentValue);
 			}
 		});
 		
@@ -288,14 +283,10 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 				Key oldKey = slide.getKey();
 				boolean newMirror = ! oldKey.isMirrored();
 				Key newKey = new Key(oldKey.getLastModified(), oldKey.getAbsolutePath(), oldKey.getQuadrantRotation(), newMirror);
-				BufferedImage newImage = ImageStore.getImage(newKey);
-				if(newImage == null) {
-					BufferedImage oldImage = ImageStore.getImage(oldKey);
-					newImage = GraphicsUtil.mirrorX(oldImage);
-					ImageStore.addImage(newKey, newImage);
-				}		
+				BufferedImage newImage = ImageStore.transformImage(oldKey, newKey);	
 				slide.setImage(newKey, newImage);
 				hideSlideEditPopup();
+				setNewValue(currentValue);
 			}
 		});
 		
