@@ -26,12 +26,13 @@ import javax.swing.JMenuItem;
 import javax.swing.JRadioButtonMenuItem;
 
 import org.mcuosmipcuter.orcc.soundvis.Context;
+import org.mcuosmipcuter.orcc.soundvis.Context.PropertyName;
 
 /**
  * Specialized menu showing video resolution
  * @author Michael Heinzelmann
  */
-public class ResolutionMenu extends JMenu{
+public class ResolutionMenu extends JMenu implements Context.Listener{
 
 	private static final long serialVersionUID = 1L;
 
@@ -69,6 +70,18 @@ public class ResolutionMenu extends JMenu{
 			}
 			group.add(item);
 			add(item);
+		}
+	}
+
+	@Override
+	public void contextChanged(PropertyName propertyName) {
+		if(PropertyName.VideoDimension.equals(propertyName)) {
+			int w = Context.getVideoOutputInfo().getWidth();
+			int h = Context.getVideoOutputInfo().getHeight();
+			int c = 0;
+			for(final int [] r : resolutions) {
+				getItem(c++).setSelected(r[0] == w && r[1] == h);
+			}
 		}
 	}
 }

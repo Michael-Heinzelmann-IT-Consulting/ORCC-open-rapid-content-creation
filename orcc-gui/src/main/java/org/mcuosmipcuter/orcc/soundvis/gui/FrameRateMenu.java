@@ -26,12 +26,13 @@ import javax.swing.JRadioButtonMenuItem;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
 import org.mcuosmipcuter.orcc.soundvis.Context;
+import org.mcuosmipcuter.orcc.soundvis.Context.PropertyName;
 
 /**
  * Specialized menu to show the canvas class names
  * @author Michael Heinzelmann
  */
-public class FrameRateMenu extends JMenu {
+public class FrameRateMenu extends JMenu  implements Context.Listener{
 
 	private static final long serialVersionUID = 1L;
 	
@@ -74,6 +75,17 @@ public class FrameRateMenu extends JMenu {
 			boolean isWorkingFrameRate = sampleRate % frameRate == 0;
 			getItem(pos).setEnabled(isWorkingFrameRate);
 			pos++;
+		}
+	}
+	
+	@Override
+	public void contextChanged(PropertyName propertyName) {
+		if(PropertyName.VideoFrameRate.equals(propertyName)) {
+			int f = Context.getVideoOutputInfo().getFramesPerSecond();
+			int c = 0;
+			for(final int  frameRate : frameRates) {
+				getItem(c++).setSelected(frameRate == f);
+			}
 		}
 	}
 }

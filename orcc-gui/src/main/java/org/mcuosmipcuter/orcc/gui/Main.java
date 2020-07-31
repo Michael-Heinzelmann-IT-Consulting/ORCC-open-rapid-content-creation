@@ -335,10 +335,13 @@ public class Main {
 				graphicMenuBar.add(configMenu);
 
 				VideoOutputInfo v = Context.getVideoOutputInfo();
-				configMenu.add(new ResolutionMenu("video size", v.getWidth(), v.getHeight()));
+				ResolutionMenu resolutions = new ResolutionMenu("video size", v.getWidth(), v.getHeight());
+				configMenu.add(resolutions);
+				Context.addListener(resolutions);
 				final FrameRateMenu frameRates = new FrameRateMenu("frame rate", v.getFramesPerSecond());
 				configMenu.addSeparator();
 				configMenu.add(frameRates);
+				Context.addListener(frameRates);
 
 				// context listener for menu enabling
 				Context.addListener(new Listener() {
