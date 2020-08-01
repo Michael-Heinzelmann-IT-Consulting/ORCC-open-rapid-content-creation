@@ -17,7 +17,13 @@
 */
 package org.mcuosmipcuter.orcc.soundvis.persistence;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
 import java.util.Map;
+
+import org.mcuosmipcuter.orcc.api.soundvis.NestedProperty;
+import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 
 /**
  * Bean conforming class to delegate to/from others that are not
@@ -51,7 +57,47 @@ public class PersistentObject {
 	public void setPersistentProperties(Map<String, Object> persistentProperties) {
 		this.persistentProperties = persistentProperties;
 	}
+	
+	public static PersistentObject createTo(Object object) throws IllegalArgumentException, IllegalAccessException {
+		Map<String, Object> persistentProperties = new HashMap<String, Object>();
+		PersistentObject po = new PersistentObject();
+		po.setDelegate(object.getClass());
+		for(Field field : object.getClass().getDeclaredFields()) {
+			field.setAccessible(true);
+			Object value = field.get(object);
+			if(field.isAnnotationPresent(UserProperty.class)) {
+				persistentProperties.put(field.getName(), value);
+			}
+			if(field.isAnnotationPresent(NestedProperty.class)) {
+				PersistentObject proxy = createTo(value);
+				persistentProperties.put(field.getName(), proxy);
+			}
+		}
+		po.setPersistentProperties(persistentProperties);
+		return po;
+	}
 
+	public void mergeInto(Object object) throws NoSuchFieldException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException {
+		for(Map.Entry<String, Object> entry : persistentProperties.entrySet()) {
+			Field field = object.getClass().getDeclaredField(entry.getKey());
+			field.setAccessible(true);
+			Object value;
+			if(entry.getValue() instanceof PersistentObject) {
+				PersistentObject persistentObject = (PersistentObject)entry.getValue();
+				if(field.get(object) == null ) {
+					value = delegate.getDeclaredConstructor((Class<?>[])null).newInstance((Object[])null);
+					field.set(object, value);
+				}
+
+				persistentObject.mergeInto(field.get(object));
+				
+			}
+			else {
+				value = entry.getValue();
+				field.set(object, value);
+			}
+		}
+	}
 
 
 }

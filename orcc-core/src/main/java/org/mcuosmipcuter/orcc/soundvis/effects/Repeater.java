@@ -25,7 +25,6 @@ import org.mcuosmipcuter.orcc.api.soundvis.DisplayObject;
 import org.mcuosmipcuter.orcc.api.soundvis.DisplayUnit;
 import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
-import org.mcuosmipcuter.orcc.util.IOUtil;
 
 /**
  * @author user
@@ -41,7 +40,6 @@ public class Repeater {
 	int frames = 0;
 	
 	private DisplayObject[] dispayObjects;
-	
 	
 	public Repeater(DisplayObject ...dispayObjects) {
 		this.dispayObjects = dispayObjects;
@@ -130,6 +128,7 @@ public class Repeater {
 	public void setRepeat(int repeat) {
 		this.repeat = repeat;
 	}
+
 	
 	
 }

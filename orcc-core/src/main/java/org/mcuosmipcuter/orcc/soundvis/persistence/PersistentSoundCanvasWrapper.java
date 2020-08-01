@@ -19,11 +19,9 @@ package org.mcuosmipcuter.orcc.soundvis.persistence;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
-import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
 import org.mcuosmipcuter.orcc.soundvis.model.SoundCanvasWrapperImpl;
 
@@ -60,17 +58,7 @@ public class PersistentSoundCanvasWrapper {
 		this.xor = s.isXor();
 		
 		SoundCanvas sc = s.getSoundCanvas();
-		soundCanvas = new PersistentObject();
-		Map<String, Object> persistentProperties = new HashMap<String, Object>();
-		soundCanvas.setDelegate(sc.getClass());
-		for(Field field : sc.getClass().getDeclaredFields()) {
-			if(field.isAnnotationPresent(UserProperty.class)) {
-				field.setAccessible(true);
-				Object value = field.get(sc);
-				persistentProperties.put(field.getName(), value);
-			}
-		}
-		soundCanvas.setPersistentProperties(persistentProperties);
+		soundCanvas =  PersistentObject.createTo(sc);
 	}
 	
 	public SoundCanvasWrapper restore() throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, NoSuchFieldException {
@@ -78,7 +66,14 @@ public class PersistentSoundCanvasWrapper {
 		for(Map.Entry<String, Object> entry : soundCanvas.getPersistentProperties().entrySet()) {
 			Field field = sc.getClass().getDeclaredField(entry.getKey());
 			field.setAccessible(true);
-			field.set(sc, entry.getValue());
+			if(entry.getValue() instanceof PersistentObject) {
+				PersistentObject persistentObject = (PersistentObject)entry.getValue();
+				persistentObject.mergeInto(field.get(sc));
+			}
+			else {
+				field.set(sc, entry.getValue());
+			}
+			
 		}
 		
 		SoundCanvasWrapper soundCanvasWrapper = new SoundCanvasWrapperImpl(sc);
