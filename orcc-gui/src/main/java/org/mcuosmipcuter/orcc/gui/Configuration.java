@@ -17,6 +17,7 @@
 */
 package org.mcuosmipcuter.orcc.gui;
 
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -121,14 +122,14 @@ public abstract class Configuration {
 	 * Setting up canvas to use, audio (currently only in dev mode) and creating a dummy volume control
 	 * @param args you should pass the ones from main
 	 */
-	public static synchronized void stage2(String[] args) {	
+	public static synchronized void stage2(String[] args, List<String> reportList) {	
 		
 		if(stage < 2) {
 			throw new IllegalStateException("stage 1 required, but is " + stage);
 		}
 		FontStore.init();
 		
-		boolean restoredSession = Session.restoreSession();
+		boolean restoredSession = Session.restoreSession(reportList);
 		if(!restoredSession) {
 			if(usrMode.startsWith("dev")) {
 				// file defaults

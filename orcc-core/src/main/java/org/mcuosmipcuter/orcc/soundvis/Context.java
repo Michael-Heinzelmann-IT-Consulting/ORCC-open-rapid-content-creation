@@ -19,6 +19,7 @@ package org.mcuosmipcuter.orcc.soundvis;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -42,7 +43,7 @@ public abstract class Context {
 	 * @author Michael Heinzelmann
 	 */
 	public enum PropertyName {
-		AudioInputInfo, VideoDimension, SoundCanvasAdded, SoundCanvasRemoved, SoundCanvasList, ExportFileName, 
+		AudioInputInfo, VideoDimension, SoundCanvasAdded, SoundCanvasRemoved, SoundCanvasList, SoundCanvasListCleared, ExportFileName, 
 		CanvasClassNames, AppState, SongPositionPointer, VideoFrameRate, VolumeControl, FullPreRun, SoundCanvasProperty, BeforeSoundCanvasProperty, SoundCanvasPropertyCancelled
 	}
 	/**
@@ -192,6 +193,19 @@ public abstract class Context {
 		soundCanvasList.remove(soundCanvas);
 		notifyListeners(PropertyName.SoundCanvasRemoved);
 	}
+	/**
+	 * Removes the all canvas from the list and notifies listeners
+	 * @param soundCanvas the canvas to remove
+	 */
+	public static synchronized void clearCanvasList() {
+		Iterator<SoundCanvasWrapper> iter = soundCanvasList.iterator();
+		while(iter.hasNext()) {
+			iter.next();
+			iter.remove();	
+		}
+		notifyListeners(PropertyName.SoundCanvasListCleared);
+	}
+		
 	
 	/**
 	 * Replaces the current list with the new one and notifies listeners

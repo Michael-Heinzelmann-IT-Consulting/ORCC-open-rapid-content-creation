@@ -18,6 +18,7 @@
 package org.mcuosmipcuter.orcc.soundvis.persistence;
 
 
+import java.beans.ExceptionListener;
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
 import java.io.File;
@@ -44,11 +45,21 @@ public class Session implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	public static boolean restoreSession() {
+	public static boolean restoreSession(List<String> reportList) {
 		File file = new File("latest_session.xml");
+		return loadSession(file, reportList);
+	}
+	public static boolean loadSession(File file, List<String> reportList) {
+		
 		IOUtil.log("restore from: " + file.getAbsolutePath());
 		try (FileInputStream fis = new FileInputStream(file);
 				XMLDecoder in = new XMLDecoder(fis);) {
+			in.setExceptionListener(new ExceptionListener() {		
+				@Override
+				public void exceptionThrown(Exception e) {
+					reportList.add( e.getClass().getName() + " " + e.getMessage());
+				}
+			});
 			PersistentSession persistentSession = (PersistentSession) in.readObject();
 			Type inputType = persistentSession.getAudioInputType();
 			switch(inputType) {
@@ -64,15 +75,17 @@ public class Session implements Serializable {
 			
 			Context.setOutputDimension(persistentSession.getVideoOutPutWidth(), persistentSession.getVideoOutPutHeight());
 			Context.setOutputFrameRate(persistentSession.getVideoOutPutFrames());
-			
+			Context.clearCanvasList();
 			for(PersistentSoundCanvasWrapper psw : persistentSession.getSoundCanvasList()) {
 				Context.addCanvasWrapper(psw.restore());
 			}
 		} catch (Exception e) {
-			IOUtil.log("restore failed: " + e.getMessage());
+			IOUtil.log("load session failed: " + e.getMessage());
 			e.printStackTrace();
+			reportList.add(e.getMessage());
 			return false;
 		}
+		
 		return true;
 	}
 	

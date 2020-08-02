@@ -53,13 +53,14 @@ import org.mcuosmipcuter.orcc.api.soundvis.ChangesIcon;
 import org.mcuosmipcuter.orcc.api.soundvis.PropertyListener;
 import org.mcuosmipcuter.orcc.api.soundvis.TimedChange;
 import org.mcuosmipcuter.orcc.soundvis.Context;
+import org.mcuosmipcuter.orcc.soundvis.Context.PropertyName;
 import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
 
 /**
  * Custom table for GUI handling of the soundvis canvas layers
  * @author Michael Heinzelmann
  */
-public class CustomTable extends JPanel{
+public class CustomTable extends JPanel implements Context.Listener{
 
 	private static final long serialVersionUID = 1L;
 	
@@ -448,5 +449,17 @@ public class CustomTable extends JPanel{
 	 */
 	public void setListener(CustomTableListener customTableListener) {
 		tableListener = customTableListener;
+	}
+	@Override
+	public void contextChanged(PropertyName propertyName) {
+		if( Context.PropertyName.SoundCanvasListCleared == propertyName) {
+				for(Component c : getComponents()) {
+					if(c instanceof Row) {
+						remove(c);
+					}
+				}
+				repaint();
+			}
+		
 	}
 }

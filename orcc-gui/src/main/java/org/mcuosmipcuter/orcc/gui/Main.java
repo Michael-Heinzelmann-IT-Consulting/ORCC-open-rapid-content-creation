@@ -26,6 +26,7 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowStateListener;
 import java.io.File;
 import java.lang.Thread.UncaughtExceptionHandler;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.sound.sampled.AudioFormat;
@@ -141,15 +142,19 @@ public class Main {
 					= new FileDialogActionListener(null, openAudioCallback, "open as audio input");
 				openAudio.addActionListener(importActionListener);
 				fileMenu.addSeparator();
-				
-				JMenuItem restore = new JMenuItem("restore last session");
-				fileMenu.add(restore);
-				restore.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent arg0) {
-						Session.restoreSession();
+				CallBack openSessionCallback = new CallBack() {
+					public void fileSelected(File file) {
+						List<String> reportList = new ArrayList<String>();
+						Session.loadSession(file, reportList);
 					}
-				});
+				};
+				fileMenu.addSeparator();
+				JMenuItem restore = new JMenuItem("open session");
+				fileMenu.add(restore);
+				FileDialogActionListener openSessionActionListener = new FileDialogActionListener(null, openSessionCallback, "open session");
+				restore.addActionListener(openSessionActionListener);
 				
+				fileMenu.addSeparator();
 				JMenuItem exit = new JMenuItem("exit");
 				fileMenu.add(exit);
 				exit.addActionListener(new ActionListener() {
@@ -293,6 +298,7 @@ public class Main {
 			propertiesFrame.setJMenuBar(layersMenuBar);
 			final CustomTable propTable = new CustomTable();
 			propTable.setListener(playBackPanel.getCustomTableListener());
+			Context.addListener(propTable);
 			
 	        JPanel container = new JPanel();
 	        container.setOpaque(true);
@@ -396,11 +402,19 @@ public class Main {
 
 
 		}
+
+		List<String> reportList = new ArrayList<String>();
+		org.mcuosmipcuter.orcc.gui.Configuration.stage2(args, reportList);
+		if(!reportList.isEmpty()) {
+			StringBuilder messages = new StringBuilder("Errors during session restore:");
+			for(String m : reportList) {
+				messages.append("\n" + m);
+			}
+			JOptionPane.showMessageDialog(null, messages.toString());
+		}
 		SaveThread saveThread = new SaveThread();
 		Context.addListener(saveThread);
 		saveThread.start();
-		
-		org.mcuosmipcuter.orcc.gui.Configuration.stage2(args);
 		
 	}
 	
