@@ -48,6 +48,7 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 	private boolean enabled = true;
 	private long frameFrom = 0;
 	private long frameTo = 0;
+	private boolean frameToAuto = true;
 	private static Graphics2D devNullGraphics;
 	private boolean selected;
 	private boolean editorOpen;
@@ -185,19 +186,14 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 	}
 	@Override
 	public void setFrameTo(long frameTo) {
+		this.frameToAuto = frameTo == 0;
 		this.frameTo = calculateFrameToConcrete(frameTo);
 		soundCanvas.setFrameRange(frameFrom, this.frameTo);
 	}
 	private long calculateFrameToConcrete(long to) {
 		long frameToConcrete = to;
-		if (to == 0 && Context.getAudioInput() != null) {
-			AudioInputInfo audioInputInfo = Context.getAudioInput().getAudioInputInfo();
-			double audioLength = (double) audioInputInfo.getFrameLength();
-			double sampleRate = audioInputInfo.getAudioFormat().getSampleRate();
-			double numberOfSeconds = audioLength / sampleRate;
-
-			double frameRate = Context.getVideoOutputInfo().getFramesPerSecond();
-			frameToConcrete = (long) Math.floor(numberOfSeconds * frameRate);
+		if (to == 0) {
+			frameToConcrete = Context.getMaxFrame();
 		}
 		return frameToConcrete;
 	}
@@ -269,6 +265,10 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 	@Override
 	public void setEditorOpen(boolean editorOpen) {
 		this.editorOpen = editorOpen;
+	}
+	@Override
+	public boolean isFrameToAuto() {
+		return frameToAuto;
 	}
 	
 }

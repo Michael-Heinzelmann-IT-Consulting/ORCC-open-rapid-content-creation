@@ -36,6 +36,7 @@ public class SaveThread extends Thread implements Context.Listener{
 	public SaveThread() {
 	}
 	
+	long latestTouchCounter;
 	
 
 	@Override
@@ -43,8 +44,12 @@ public class SaveThread extends Thread implements Context.Listener{
 		while(this.getState().equals(State.RUNNABLE)){
 			try {
 				sleep(60000); // TODO config
-				IOUtil.log("save ...");
-				saveLatestSession();
+				long newCounter = Context.getTouchCounter();
+				if(newCounter != latestTouchCounter) {
+					IOUtil.log("save ...");
+					saveLatestSession();
+				}
+				latestTouchCounter = newCounter;
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}

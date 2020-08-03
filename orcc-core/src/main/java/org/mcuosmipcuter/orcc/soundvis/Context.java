@@ -26,6 +26,7 @@ import java.util.TreeSet;
 
 import javax.sound.sampled.FloatControl;
 
+import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.soundvis.model.AudioClasspathInputImpl;
@@ -68,6 +69,18 @@ public abstract class Context {
 		}
 	}
 	
+	private static long touchCounter;
+	
+	public static long touch() {
+		System.err.println("touch - ! - ");
+		return ++touchCounter;
+	}
+	
+	public static long getTouchCounter() {
+		return touchCounter;
+	}
+
+
 	// listener list
 	private static List<Listener> listeners = new ArrayList<Listener>();
 	
@@ -95,12 +108,14 @@ public abstract class Context {
 			//System.err.println("#73 " + System.currentTimeMillis());
 		}
 		//System.err.println("#73 notifyListeners " + System.currentTimeMillis());
+		touch();
 	}
 	private static void notifyListeners(String msg) {
 		for(Listener listener : listeners) {
 			//System.err.println("listener: " + listener + " " + propertyName);
 			listener.progress(msg);
 		}
+		touch();
 	}
 	
 	// static fields
@@ -347,5 +362,18 @@ public abstract class Context {
 	}
 	public static void cancelPropertyUpdate(String name) {
 		notifyListeners(PropertyName.SoundCanvasPropertyCancelled);
+	}
+	public static long getMaxFrame() {
+		long frameToConcrete = 0;
+		if (audioInput != null) {
+			AudioInputInfo audioInputInfo = audioInput.getAudioInputInfo();
+			double audioLength = (double) audioInputInfo.getFrameLength();
+			double sampleRate = audioInputInfo.getAudioFormat().getSampleRate();
+			double numberOfSeconds = audioLength / sampleRate;
+
+			double frameRate = videoOutputInfo.getFramesPerSecond();
+			frameToConcrete = (long) Math.floor(numberOfSeconds * frameRate);
+		}
+		return frameToConcrete;
 	}
 }

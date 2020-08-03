@@ -295,6 +295,7 @@ public class CustomTable extends JPanel implements Context.Listener{
 			public void actionPerformed(ActionEvent e) {
 				soundCanvasWrapper.setVisible(showCheckBox.isSelected());
 				showCheckBox.setText(showCheckBox.isSelected() ? "on" : "off");
+				Context.touch();
 			}
 		});
 		
@@ -306,31 +307,33 @@ public class CustomTable extends JPanel implements Context.Listener{
 			public void stateChanged(ChangeEvent arg0) {
 				soundCanvasWrapper.setFrameFrom(((Number)fromFrame.getValue()).longValue());
 				tableListener.frameSet();
-				
+				Context.touch();
 			}
 		});
 		((DefaultEditor)fromFrame.getEditor()).getTextField().addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
 				if(e.getClickCount() >= 2) {
 					fromFrame.setValue(tableListener.getFrameSelected());
+					Context.touch();
 				}
 			}
 		});
 		SpinnerNumberModel modelTo = new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1);
 		final JSpinner toFrame = new JSpinner(modelTo);
 		toFrame.setToolTipText("to");
-		toFrame.setValue(soundCanvasWrapper.getFrameTo());
+		toFrame.setValue(soundCanvasWrapper.isFrameToAuto() ? 0 : soundCanvasWrapper.getFrameTo());
 		toFrame.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent arg0) {
 				soundCanvasWrapper.setFrameTo(((Number)toFrame.getValue()).longValue());
 				tableListener.frameSet();
-				
+				Context.touch();
 			}
 		});
 		((DefaultEditor)toFrame.getEditor()).getTextField().addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
 				if(e.getClickCount() >= 2) {
 					toFrame.setValue(tableListener.getFrameSelected());
+					Context.touch();
 				}
 			}
 		});
@@ -345,6 +348,7 @@ public class CustomTable extends JPanel implements Context.Listener{
 				soundCanvasWrapper.setEditorOpen(row.isPanelVisible());
 				row.revalidate();
 				CustomTable.this.revalidate();
+				Context.touch();
 			}
 		});
 		
@@ -355,6 +359,7 @@ public class CustomTable extends JPanel implements Context.Listener{
 		transparency.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent arg0) {
 				soundCanvasWrapper.setTransparency((((Number)transparency.getValue()).intValue()));
+				Context.touch();
 			}
 		});
 		
@@ -365,6 +370,7 @@ public class CustomTable extends JPanel implements Context.Listener{
 		threshold.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent arg0) {
 				soundCanvasWrapper.setRepaintThreshold(((((Number)threshold.getValue()).intValue())));
+				Context.touch();
 			}
 		});
 		final JCheckBox xorCheckBox = new JCheckBox("std", soundCanvasWrapper.isXor());
@@ -373,6 +379,7 @@ public class CustomTable extends JPanel implements Context.Listener{
 			public void actionPerformed(ActionEvent e) {
 				soundCanvasWrapper.setXor(xorCheckBox.isSelected());
 				xorCheckBox.setText(xorCheckBox.isSelected() ? "xor" : "std");
+				Context.touch();
 			}
 		});
 		
@@ -450,16 +457,28 @@ public class CustomTable extends JPanel implements Context.Listener{
 	public void setListener(CustomTableListener customTableListener) {
 		tableListener = customTableListener;
 	}
+	
 	@Override
 	public void contextChanged(PropertyName propertyName) {
-		if( Context.PropertyName.SoundCanvasListCleared == propertyName) {
-				for(Component c : getComponents()) {
-					if(c instanceof Row) {
-						remove(c);
+		if (Context.PropertyName.SoundCanvasListCleared == propertyName) {
+			for (Component c : getComponents()) {
+				if (c instanceof Row) {
+					remove(c);
+				}
+			}
+			repaint();
+		}
+		if (PropertyName.AudioInputInfo.equals(propertyName) || PropertyName.VideoFrameRate.equals(propertyName)) {
+			for (Component c : getComponents()) {
+				if (c instanceof Row) {
+					SoundCanvasWrapper soundCanvasWrapper = ((Row) c).getSoundCanvasWrapper();
+					if (soundCanvasWrapper.isFrameToAuto()) {
+						soundCanvasWrapper.setFrameTo(0);
+						tableListener.frameSet();
 					}
 				}
-				repaint();
 			}
-		
+		}
+
 	}
 }

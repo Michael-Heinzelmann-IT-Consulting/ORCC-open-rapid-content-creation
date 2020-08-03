@@ -312,6 +312,7 @@ public class Main {
 				Context.addListener(new Listener() {	
 					@Override
 					public void contextChanged(PropertyName propertyName) {
+						System.err.println("event " + propertyName);
 						if(PropertyName.SoundCanvasAdded.equals(propertyName)) {
 							List<SoundCanvasWrapper> list = Context.getSoundCanvasList();
 							
