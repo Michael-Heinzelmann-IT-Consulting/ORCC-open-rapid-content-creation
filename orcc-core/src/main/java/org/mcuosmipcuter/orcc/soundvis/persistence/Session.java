@@ -40,6 +40,8 @@ import org.mcuosmipcuter.orcc.util.IOUtil;
 
 public class Session implements Serializable {
 	
+	public final static String FILE_EXTENSION = ".xml";
+	
 	/**
 	 * versioning
 	 */
@@ -89,8 +91,15 @@ public class Session implements Serializable {
 		return true;
 	}
 	
-	
-	public static void saveSession() throws IllegalArgumentException, IllegalAccessException, IOException {
+	public static void saveDefaultSession() throws IllegalArgumentException, IllegalAccessException, IOException {
+		File file = new File("latest_session.xml");
+		if(file.exists()) {
+			Files.move(file.toPath(), file.toPath().resolveSibling("latest_session_bu.xml"), StandardCopyOption.REPLACE_EXISTING);
+		}
+		saveSession(file);
+	}
+
+	public static void saveSession(File file) throws IllegalArgumentException, IllegalAccessException, IOException {
 
 		List<SoundCanvasWrapper> appObjects = Context.getSoundCanvasList();
 		
@@ -101,18 +110,13 @@ public class Session implements Serializable {
 			persistentWrappers.add(psw);
 		}
 
-			PersistentSession persistentSession = new PersistentSession();
-			persistentSession.setSoundCanvasList(persistentWrappers);
-			persistentSession.setAudioInputType(Context.getAudioInput().getType());
-			persistentSession.setAudioInputName(Context.getAudioInput().getName());
-			persistentSession.setVideoOutPutFrames(Context.getVideoOutputInfo().getFramesPerSecond());
-			persistentSession.setVideoOutPutHeight(Context.getVideoOutputInfo().getHeight());
-			persistentSession.setVideoOutPutWidth(Context.getVideoOutputInfo().getWidth());
-		
-		File file = new File("latest_session.xml");
-		if(file.exists()) {
-			Files.move(file.toPath(), file.toPath().resolveSibling("latest_session_bu.xml"), StandardCopyOption.REPLACE_EXISTING);
-		}
+		PersistentSession persistentSession = new PersistentSession();
+		persistentSession.setSoundCanvasList(persistentWrappers);
+		persistentSession.setAudioInputType(Context.getAudioInput().getType());
+		persistentSession.setAudioInputName(Context.getAudioInput().getName());
+		persistentSession.setVideoOutPutFrames(Context.getVideoOutputInfo().getFramesPerSecond());
+		persistentSession.setVideoOutPutHeight(Context.getVideoOutputInfo().getHeight());
+		persistentSession.setVideoOutPutWidth(Context.getVideoOutputInfo().getWidth());
 
 		try (FileOutputStream out = new FileOutputStream(file); 
 				XMLEncoder encoder = new XMLEncoder(out)) {

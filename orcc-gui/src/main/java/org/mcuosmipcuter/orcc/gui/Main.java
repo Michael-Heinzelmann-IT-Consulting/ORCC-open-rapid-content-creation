@@ -25,6 +25,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowStateListener;
 import java.io.File;
+import java.io.IOException;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +45,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.gui.table.CustomTable;
+import org.mcuosmipcuter.orcc.gui.util.ExtensionsFileFilter;
 import org.mcuosmipcuter.orcc.soundvis.AppLogicException;
 import org.mcuosmipcuter.orcc.soundvis.AudioInput;
 import org.mcuosmipcuter.orcc.soundvis.Context;
@@ -141,18 +143,59 @@ public class Main {
 				FileDialogActionListener importActionListener 
 					= new FileDialogActionListener(null, openAudioCallback, "open as audio input");
 				openAudio.addActionListener(importActionListener);
-				fileMenu.addSeparator();
+				
 				CallBack openSessionCallback = new CallBack() {
 					public void fileSelected(File file) {
 						List<String> reportList = new ArrayList<String>();
 						Session.loadSession(file, reportList);
+						Context.setSessionPath(file.getAbsolutePath());
 					}
 				};
 				fileMenu.addSeparator();
-				JMenuItem restore = new JMenuItem("open session");
-				fileMenu.add(restore);
+				JMenuItem openSession = new JMenuItem("open session");
+				fileMenu.add(openSession);
 				FileDialogActionListener openSessionActionListener = new FileDialogActionListener(null, openSessionCallback, "open session");
-				restore.addActionListener(openSessionActionListener);
+				openSessionActionListener.setFileFilter(new ExtensionsFileFilter(Session.FILE_EXTENSION));
+				openSession.addActionListener(openSessionActionListener);
+				
+				CallBack saveSessionAsCallback = new CallBack() {
+					public void fileSelected(File file) {
+						try {
+							Session.saveSession(file);
+							Context.setSessionPath(file.getAbsolutePath());
+						} catch (IllegalArgumentException | IllegalAccessException | IOException e) {
+							throw new RuntimeException(e);
+						}
+					}
+				};
+				fileMenu.addSeparator();
+				JMenuItem saveSessionAs = new JMenuItem("save session as");
+				fileMenu.add(saveSessionAs);
+				FileDialogActionListener saveSessionAsActionListener = new FileDialogActionListener(null, saveSessionAsCallback, "save session");
+				saveSessionAsActionListener.setFileFilter(new ExtensionsFileFilter(Session.FILE_EXTENSION));
+				saveSessionAsActionListener.setForcedExtension(Session.FILE_EXTENSION);
+				saveSessionAs.addActionListener(saveSessionAsActionListener);
+				
+				fileMenu.addSeparator();
+				JMenuItem saveSession = new JMenuItem("save session");
+				fileMenu.add(saveSession);
+
+				saveSession.addActionListener(new ActionListener() {
+					
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						if(Context.getSessionPath() != null) {
+							try {
+								Session.saveSession(new File(Context.getSessionPath()));
+							} catch (IllegalArgumentException | IllegalAccessException | IOException e1) {
+								throw new RuntimeException(e1);
+							}
+						}
+						else {
+							saveSessionAsActionListener.actionPerformed(e);
+						}
+					}
+				});
 				
 				fileMenu.addSeparator();
 				JMenuItem exit = new JMenuItem("exit");
@@ -273,7 +316,7 @@ public class Main {
 			
 			playBackFrame.setSize(deskTop.getWidth(), playBackH);
 			playBackFrame.setVisible(true);
-			//playBackPanel.init();
+
 			Context.addListener(new Listener() {		
 				@Override
 				public void contextChanged(PropertyName propertyName) {
@@ -429,7 +472,7 @@ public class Main {
 			}
 		}
 		try {
-			Session.saveSession();
+			Session.saveDefaultSession();
 		} catch (Throwable t) {
 			t.printStackTrace();
 		}

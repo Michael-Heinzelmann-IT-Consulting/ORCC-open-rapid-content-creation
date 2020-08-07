@@ -23,6 +23,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 
 import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileFilter;
 
 /**
  * action listener that brings up a file dialog and calls back if a file was selected.
@@ -36,6 +37,8 @@ public class FileDialogActionListener implements ActionListener {
 	private final CallBack callBack;
 	private final String buttonText;
 	private final JFileChooser chooser = new JFileChooser();
+	FileFilter fileFilter;
+	String forcedExtension;
 
 	/**
 	 * New listener
@@ -51,11 +54,30 @@ public class FileDialogActionListener implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-	
+		if(fileFilter != null) {
+			chooser.setFileFilter(fileFilter);
+		}
+		
         int returnVal = chooser.showDialog(owner, buttonText);
         if(returnVal == JFileChooser.APPROVE_OPTION) {
-        	callBack.fileSelected(chooser.getSelectedFile());
+			File fileToUse = chooser.getSelectedFile();
+			if(forcedExtension != null && !fileToUse.getAbsolutePath().endsWith(forcedExtension)) {
+				fileToUse = new File(fileToUse.getAbsolutePath() + forcedExtension);
+			}
+        	callBack.fileSelected(fileToUse);
         }
+	}
+
+	public void setFileFilter(FileFilter fileFilter) {
+		this.fileFilter = fileFilter;
+	}
+
+	public String getForcedExtension() {
+		return forcedExtension;
+	}
+
+	public void setForcedExtension(String forcedExtension) {
+		this.forcedExtension = forcedExtension;
 	}
 
 }

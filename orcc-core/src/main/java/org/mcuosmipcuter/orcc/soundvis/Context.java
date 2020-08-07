@@ -80,6 +80,15 @@ public abstract class Context {
 		return touchCounter;
 	}
 
+	private static String sessionPath;
+
+	public static String getSessionPath() {
+		return sessionPath;
+	}
+
+	public static void setSessionPath(String sessionPath) {
+		Context.sessionPath = sessionPath;
+	}
 
 	// listener list
 	private static List<Listener> listeners = new ArrayList<Listener>();
