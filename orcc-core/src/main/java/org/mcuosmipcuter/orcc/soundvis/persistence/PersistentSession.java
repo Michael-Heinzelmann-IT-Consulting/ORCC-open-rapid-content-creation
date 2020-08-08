@@ -35,6 +35,7 @@ public class PersistentSession implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 	
+	private String sessionPath;
 	private List<PersistentSoundCanvasWrapper> soundCanvasList = new ArrayList<PersistentSoundCanvasWrapper>();
 	private AudioInput.Type audioInputType;
 	private String audioInputName;
@@ -47,6 +48,14 @@ public class PersistentSession implements Serializable {
 	 */
 	public PersistentSession() {
 		// bean
+	}
+	
+	public String getSessionPath() {
+		return sessionPath;
+	}
+
+	public void setSessionPath(String sessionPath) {
+		this.sessionPath = sessionPath;
 	}
 
 	public List<PersistentSoundCanvasWrapper> getSoundCanvasList() {

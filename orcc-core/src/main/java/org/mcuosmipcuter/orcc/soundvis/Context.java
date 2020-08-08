@@ -44,8 +44,9 @@ public abstract class Context {
 	 * @author Michael Heinzelmann
 	 */
 	public enum PropertyName {
-		AudioInputInfo, VideoDimension, SoundCanvasAdded, SoundCanvasRemoved, SoundCanvasList, SoundCanvasListCleared, ExportFileName, 
-		CanvasClassNames, AppState, SongPositionPointer, VideoFrameRate, VolumeControl, FullPreRun, SoundCanvasProperty, BeforeSoundCanvasProperty, SoundCanvasPropertyCancelled
+		AudioInputInfo, VideoDimension, SoundCanvasAdded, SoundCanvasRemoved, SoundCanvasList, SoundCanvasListCleared,
+		ExportFileName, CanvasClassNames, AppState, SongPositionPointer, VideoFrameRate, VolumeControl, FullPreRun,
+		SoundCanvasProperty, BeforeSoundCanvasProperty, SoundCanvasPropertyCancelled, SessionChanged;
 	}
 	/**
 	 * Enumeration of application states
@@ -72,22 +73,26 @@ public abstract class Context {
 	private static long touchCounter;
 	
 	public static long touch() {
-		System.err.println("touch - ! - ");
+		//System.err.println("touch - ! - ");
 		return ++touchCounter;
 	}
 	
 	public static long getTouchCounter() {
 		return touchCounter;
 	}
+	
+	private static SessionToken sessionToken = new SessionToken(null);
 
-	private static String sessionPath;
-
-	public static String getSessionPath() {
-		return sessionPath;
+	public static SessionToken getSessionToken() {
+		return sessionToken;
 	}
 
-	public static void setSessionPath(String sessionPath) {
-		Context.sessionPath = sessionPath;
+	public static void setSessionToken(SessionToken sessionToken) {
+		if(sessionToken == null) {
+			throw new IllegalArgumentException("sessionToken null not allowed!");
+		}
+		Context.sessionToken = sessionToken;
+		notifyListeners(PropertyName.SessionChanged);
 	}
 
 	// listener list

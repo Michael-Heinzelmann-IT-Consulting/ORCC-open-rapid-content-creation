@@ -25,7 +25,6 @@ import javax.sound.sampled.FloatControl;
 import javax.swing.UIManager;
 
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
-import org.mcuosmipcuter.orcc.soundvis.AppLogicException;
 import org.mcuosmipcuter.orcc.soundvis.Context;
 import org.mcuosmipcuter.orcc.soundvis.FontStore;
 import org.mcuosmipcuter.orcc.soundvis.persistence.Session;
@@ -131,36 +130,7 @@ public abstract class Configuration {
 		
 		boolean restoredSession = Session.restoreSession(reportList);
 		if(!restoredSession) {
-			if(usrMode.startsWith("dev")) {
-				// file defaults
-				try {
-					if(args.length > 2) {
-							Context.setAudioFromFile(args[2]);
-					}
-				} catch (AppLogicException ex) {
-					throw new RuntimeException(ex);
-				}
-				// default canvas
-				if(args.length > 4) {
-					try {
-						Context.addCanvas(args[4]);
-					} catch (Exception ex) {
-						throw new RuntimeException(ex);
-					} 
-				}
-	
-				if(args.length > 3) {
-					Context.setExportFileName(args[3]);
-				}
-			}
-			else {
-				try {
-					Context.setAudioFromClasspath("/silence_pcm_16bit_wav_30s.wav");
-					Context.addCanvas("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.SolidColor");
-				} catch (Exception ex) {
-					throw new RuntimeException(ex);
-				} 
-			}
+			Session.newSession();
 		}
 		// set a dummy control to get volume setup
 		FloatControl dummy = new FloatControl(FloatControl.Type.MASTER_GAIN, -80, 6, 1, 1, 0, "dB"){};

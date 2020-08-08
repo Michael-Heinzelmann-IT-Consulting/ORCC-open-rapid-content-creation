@@ -15,6 +15,7 @@ public class GraphicsJInternalFrame extends JInternalFrame {
 	 */
 	private static final long serialVersionUID = -3579630003636142706L;
 	private String realtimeTitle;
+	private String inputTitle;
 	private String outputTitle;
 	
 	
@@ -22,19 +23,32 @@ public class GraphicsJInternalFrame extends JInternalFrame {
 	public GraphicsJInternalFrame(String string, boolean b, boolean c, boolean d, boolean e) {
 		super(string, b, c, d, e);
 	}
+	
 	public String getRealtimeTitle() {
 		return realtimeTitle;
 	}
+	private void setTitle() {
+		setTitle("[" + inputTitle + "] " + realtimeTitle + " " + outputTitle);
+	}
 	public void setRealtimeTitle(String realtimeTitle) {
 		this.realtimeTitle = realtimeTitle;
-		setTitle(realtimeTitle + " " + outputTitle);
+		setTitle();
 	}
+	
 	public String getOutputTitle() {
 		return outputTitle;
 	}
 	public void setOutputTitle(String outputTitle) {
 		this.outputTitle = outputTitle;
-		setTitle(realtimeTitle + " " + outputTitle);
+		setTitle();
+	}
+	
+	public String getInputTitle() {
+		return inputTitle;
+	}
+	public void setInputTitle(String inputTitle) {
+		this.inputTitle = inputTitle;
+		setTitle();
 	}
 
 

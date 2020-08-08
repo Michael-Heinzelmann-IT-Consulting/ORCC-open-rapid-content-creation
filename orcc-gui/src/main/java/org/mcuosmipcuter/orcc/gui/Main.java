@@ -55,6 +55,7 @@ import org.mcuosmipcuter.orcc.soundvis.Context.PropertyName;
 import org.mcuosmipcuter.orcc.soundvis.PlayPauseStop;
 import org.mcuosmipcuter.orcc.soundvis.PlayPauseStopHolder;
 import org.mcuosmipcuter.orcc.soundvis.RealtimeSettings.SettingsListener;
+import org.mcuosmipcuter.orcc.soundvis.SessionToken;
 import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
 import org.mcuosmipcuter.orcc.soundvis.gui.AboutBox;
 import org.mcuosmipcuter.orcc.soundvis.gui.CanvasClassMenu;
@@ -128,8 +129,10 @@ public class Main {
 			
 			JMenu fileMenu = new JMenu("File");
 			mb.add(fileMenu);
+			JMenuItem openSession = new JMenuItem("open session");
+			JMenuItem openAudio = new JMenuItem("open audio");
 			{
-				JMenuItem openAudio = new JMenuItem("open audio");
+				
 				fileMenu.add(openAudio);
 				CallBack openAudioCallback = new CallBack() {
 					public void fileSelected(File file) {
@@ -146,13 +149,12 @@ public class Main {
 				
 				CallBack openSessionCallback = new CallBack() {
 					public void fileSelected(File file) {
-						List<String> reportList = new ArrayList<String>();
-						Session.loadSession(file, reportList);
-						Context.setSessionPath(file.getAbsolutePath());
+							List<String> reportList = new ArrayList<String>();
+							Session.loadSession(file, reportList);
 					}
 				};
 				fileMenu.addSeparator();
-				JMenuItem openSession = new JMenuItem("open session");
+				
 				fileMenu.add(openSession);
 				FileDialogActionListener openSessionActionListener = new FileDialogActionListener(null, openSessionCallback, "open session");
 				openSessionActionListener.setFileFilter(new ExtensionsFileFilter(Session.FILE_EXTENSION));
@@ -161,8 +163,7 @@ public class Main {
 				CallBack saveSessionAsCallback = new CallBack() {
 					public void fileSelected(File file) {
 						try {
-							Session.saveSession(file);
-							Context.setSessionPath(file.getAbsolutePath());
+							Session.saveSession(file, file.getAbsolutePath());
 						} catch (IllegalArgumentException | IllegalAccessException | IOException e) {
 							throw new RuntimeException(e);
 						}
@@ -184,9 +185,10 @@ public class Main {
 					
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						if(Context.getSessionPath() != null) {
+						if(Context.getSessionToken().isNamed()) {
 							try {
-								Session.saveSession(new File(Context.getSessionPath()));
+								File file = new File(Context.getSessionToken().getFullPath());
+								Session.saveSession(file, file.getAbsolutePath());
 							} catch (IllegalArgumentException | IllegalAccessException | IOException e1) {
 								throw new RuntimeException(e1);
 							}
@@ -206,6 +208,19 @@ public class Main {
 					}
 				});
 			}
+			JMenu newMenu = new JMenu("New");
+			
+			mb.add(newMenu);
+			JMenuItem newSession = new JMenuItem("session");
+			newSession.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					if(allowSessionOpenRoutine()) {
+						Session.newSession();
+					}
+				}
+			});
+			newMenu.add(newSession);
 			
 			final JMenu exportMenu = new JMenu("Export");
 			final JMenuItem exportStart = new JMenuItem("start");
@@ -250,6 +265,9 @@ public class Main {
 							exportMenu.setEnabled(Context.getAppState() == AppState.READY || Context.getAppState() == AppState.EXPORTING);
 							exportStart.setEnabled(Context.getAppState() != AppState.EXPORTING);
 							exportStop.setEnabled(Context.getAppState() == AppState.EXPORTING);
+							openAudio.setEnabled(Context.getAppState() == AppState.READY);
+							openSession.setEnabled(Context.getAppState() == AppState.READY);
+							newSession.setEnabled(Context.getAppState() == AppState.READY);
 						}
 					}
 				});
@@ -431,6 +449,10 @@ public class Main {
 			
 			Context.addListener(new Listener() {
 				public void contextChanged(PropertyName propertyName) {
+					if(PropertyName.SessionChanged.equals(propertyName)) {
+						String inputTitle = Context.getSessionToken().isNamed() ? Context.getSessionToken().getFullPath() : "unnamed session";
+						graphicFrame.setInputTitle(inputTitle);
+					}
 					if(PropertyName.SoundCanvasAdded.equals(propertyName)||
 							PropertyName.SoundCanvasRemoved.equals(propertyName)||
 							PropertyName.VideoDimension.equals(propertyName) || 
@@ -461,7 +483,19 @@ public class Main {
 		saveThread.start();
 		
 	}
-	
+	private static boolean allowSessionOpenRoutine() {
+		if (!Context.getSessionToken().isNamed() || Session.saveCascadeDefault()) {
+			String message = "Do you want to continue ?";
+			int res = JOptionPane.showOptionDialog(null,
+					message, "session not saved!",
+					JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null,
+					new String[] { "yes", "no" }, "no");
+			if(res == JOptionPane.NO_OPTION) {
+				return false;
+			}
+		}
+		return true;
+	}
 	private static void exitRoutine() {
 		if(Context.getAppState() != AppState.READY) {
 			int res = JOptionPane.showOptionDialog(null, "Confirm exit in state " 
@@ -471,8 +505,37 @@ public class Main {
 				return;
 			}
 		}
+
 		try {
-			Session.saveDefaultSession();
+//			SessionToken st = Context.getSessionToken();
+//			File original = st.isNamed() ? new File(Context.getSessionToken().getFullPath()) : null;
+//			File defaultFile = Session.saveDefaultSession();
+//
+//			if (original != null) {
+//				File reference = Session.getReferenceFile();
+//				if (! FileUtil.binaryCompare(reference, defaultFile)) {
+			if (Session.saveCascadeDefault()) {
+					int res = JOptionPane.showOptionDialog(null,
+							"save named session " + Context.getSessionToken().getFullPath(), "Do you want to save ?",
+							JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null,
+							new String[] { "yes", "no", "cancel" }, "cancel");
+					if (res == JOptionPane.OK_OPTION) {
+						File file = new File(Context.getSessionToken().getFullPath());
+						try {
+							Session.saveSession(file, file.getAbsolutePath());
+						} catch (IllegalArgumentException | IllegalAccessException | IOException e) {
+							e.printStackTrace();
+						}
+					}
+					if(res == JOptionPane.NO_OPTION) {
+						Context.setSessionToken(new SessionToken(null)); // detach
+						Session.saveDefaultSession();
+					}
+					if(res == JOptionPane.CANCEL_OPTION) {
+						return;
+					}
+				
+			}
 		} catch (Throwable t) {
 			t.printStackTrace();
 		}
