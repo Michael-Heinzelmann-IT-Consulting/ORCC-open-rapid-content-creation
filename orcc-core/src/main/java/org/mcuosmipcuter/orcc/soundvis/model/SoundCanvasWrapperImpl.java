@@ -131,6 +131,11 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 		maxBefore = max;
 		max = 0;
 	}
+	private void touchSession(Object obj) {
+		// TODO maybe undo manager
+		Context.touchSession();
+		//IOUtil.log("touch session " + obj);
+	}
 
 	@Override
 	public void prepare(AudioInputInfo audioInputInfo,
@@ -151,6 +156,7 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 	@Override
 	public void setVisible(boolean enabled) {
 		this.enabled = enabled;
+		touchSession("setVisible " + enabled);
 	}
 	@Override
 	public SoundCanvas getSoundCanvas() {
@@ -183,12 +189,14 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 	public void setFrameFrom(long frameFrom) {
 		this.frameFrom = frameFrom;
 		soundCanvas.setFrameRange(frameFrom, calculateFrameToConcrete(frameTo));
+		touchSession("setFrameFrom " + frameFrom);
 	}
 	@Override
 	public void setFrameTo(long frameTo) {
 		this.frameToAuto = frameTo == 0;
 		this.frameTo = calculateFrameToConcrete(frameTo);
 		soundCanvas.setFrameRange(frameFrom, this.frameTo);
+		touchSession("setFrameTo " + frameTo);
 	}
 	private long calculateFrameToConcrete(long to) {
 		long frameToConcrete = to;
@@ -212,6 +220,7 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 	@Override
 	public void setRepaintThreshold(int repaintThreshold) {
 		this.repaintThreshold = repaintThreshold;
+		touchSession("setRepaintThreshold " + repaintThreshold);
 	}
 	@Override
 	public boolean isXor() {
@@ -220,10 +229,12 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 	@Override
 	public void setXor(boolean xor) {
 		this.xor = xor;
+		touchSession("setXor " + xor);
 	}
 	@Override
 	public void setTransparency(int transparency) {
 		this.transparency = transparency;
+		touchSession("setTransparency " + transparency);
 	}
 	@Override
 	public int getTransparency() {
@@ -237,6 +248,7 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 		for(PropertyListener pl : propertyListeners) {
 			pl.propertyWritten(field);
 		}
+		touchSession("propertyWritten " + field);
 	}
 	@Override
 	public void addPropertyChangeListener(PropertyListener propertyListener) {

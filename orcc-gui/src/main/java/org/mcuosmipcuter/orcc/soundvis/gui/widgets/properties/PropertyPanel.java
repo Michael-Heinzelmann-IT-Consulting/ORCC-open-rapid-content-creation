@@ -28,7 +28,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
-import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.TimedChange;
 import org.mcuosmipcuter.orcc.soundvis.Context;
 import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
@@ -101,6 +100,9 @@ public abstract  class PropertyPanel <T> extends JPanel {
 		GridBagConstraints gc = new GridBagConstraints();
 		gc.gridwidth = GridBagConstraints.REMAINDER; //end row
 		add(c, BorderLayout.EAST);
+	}
+	protected void activate() {
+		// for setup listeners etc.
 	}
 	/* (non-Javadoc)
 	 * @see java.awt.Component#getName()

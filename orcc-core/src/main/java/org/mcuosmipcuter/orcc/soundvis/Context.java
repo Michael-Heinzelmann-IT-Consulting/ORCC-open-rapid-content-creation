@@ -33,6 +33,7 @@ import org.mcuosmipcuter.orcc.soundvis.model.AudioClasspathInputImpl;
 import org.mcuosmipcuter.orcc.soundvis.model.AudioFileInputImpl;
 import org.mcuosmipcuter.orcc.soundvis.model.SoundCanvasWrapperImpl;
 import org.mcuosmipcuter.orcc.soundvis.model.VideoOutputInfoImpl;
+import org.mcuosmipcuter.orcc.util.IOUtil;
 
 /**
  * Static context object for the soundvis application = playing audio and generating saving video
@@ -72,8 +73,11 @@ public abstract class Context {
 	
 	private static long touchCounter;
 	
+	/**
+	 * user is doing something
+	 * @return
+	 */
 	public static long touch() {
-		//System.err.println("touch - ! - ");
 		return ++touchCounter;
 	}
 	
@@ -92,7 +96,17 @@ public abstract class Context {
 			throw new IllegalArgumentException("sessionToken null not allowed!");
 		}
 		Context.sessionToken = sessionToken;
+		IOUtil.log("setSessionToken " + sessionToken);
 		notifyListeners(PropertyName.SessionChanged);
+	}
+	
+	public static boolean touchSession() {
+		boolean prev = sessionToken.isChanged();
+		sessionToken.setChanged(true);
+		if(!prev) {
+			notifyListeners(PropertyName.SessionChanged);
+		}
+		return prev == false;
 	}
 
 	// listener list

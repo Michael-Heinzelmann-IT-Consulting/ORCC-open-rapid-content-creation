@@ -42,7 +42,7 @@ public class BooleanPropertyPanel extends PropertyPanel<Boolean> {
 		check.addChangeListener(new ChangeListener() {
 			boolean checked = check.isSelected();
 			public void stateChanged(ChangeEvent e) {
-				if(checked != check.isSelected()) {
+				if(check.isEnabled() && checked != check.isSelected()) {
 					setNewValue(check.isSelected());
 				}
 				checked = check.isSelected();
@@ -51,9 +51,16 @@ public class BooleanPropertyPanel extends PropertyPanel<Boolean> {
 	}
 	@Override
 	public void setCurrentValue(Boolean currentValue) {
-		super.setCurrentValue(currentValue);
-		check.setSelected(currentValue);
-		this.repaint();
+		final boolean enabled = check.isEnabled();
+		try {
+			check.setEnabled(false);
+			super.setCurrentValue(currentValue);
+			check.setSelected(currentValue);
+			this.repaint();
+		}
+		finally {
+			check.setEnabled(enabled);
+		}
 	}
 
 }

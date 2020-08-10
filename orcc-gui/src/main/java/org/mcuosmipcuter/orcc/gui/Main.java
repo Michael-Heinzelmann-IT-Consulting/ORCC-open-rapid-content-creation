@@ -150,7 +150,7 @@ public class Main {
 				CallBack openSessionCallback = new CallBack() {
 					public void fileSelected(File file) {
 							List<String> reportList = new ArrayList<String>();
-							Session.loadSession(file, reportList);
+							Session.userLoadSession(file, reportList);
 					}
 				};
 				fileMenu.addSeparator();
@@ -158,12 +158,19 @@ public class Main {
 				fileMenu.add(openSession);
 				FileDialogActionListener openSessionActionListener = new FileDialogActionListener(null, openSessionCallback, "open session");
 				openSessionActionListener.setFileFilter(new ExtensionsFileFilter(Session.FILE_EXTENSION));
-				openSession.addActionListener(openSessionActionListener);
+				openSession.addActionListener(new ActionListener() {				
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						if(allowSessionOpenRoutine()) {
+							openSessionActionListener.actionPerformed(e);
+						}	
+					}
+				});
 				
 				CallBack saveSessionAsCallback = new CallBack() {
 					public void fileSelected(File file) {
 						try {
-							Session.saveSession(file, file.getAbsolutePath());
+							Session.userSaveSession(file);
 						} catch (IllegalArgumentException | IllegalAccessException | IOException e) {
 							throw new RuntimeException(e);
 						}
@@ -188,7 +195,7 @@ public class Main {
 						if(Context.getSessionToken().isNamed()) {
 							try {
 								File file = new File(Context.getSessionToken().getFullPath());
-								Session.saveSession(file, file.getAbsolutePath());
+								Session.userSaveSession(file);
 							} catch (IllegalArgumentException | IllegalAccessException | IOException e1) {
 								throw new RuntimeException(e1);
 							}
@@ -373,7 +380,6 @@ public class Main {
 				Context.addListener(new Listener() {	
 					@Override
 					public void contextChanged(PropertyName propertyName) {
-						System.err.println("event " + propertyName);
 						if(PropertyName.SoundCanvasAdded.equals(propertyName)) {
 							List<SoundCanvasWrapper> list = Context.getSoundCanvasList();
 							
@@ -451,7 +457,8 @@ public class Main {
 				public void contextChanged(PropertyName propertyName) {
 					if(PropertyName.SessionChanged.equals(propertyName)) {
 						String inputTitle = Context.getSessionToken().isNamed() ? Context.getSessionToken().getFullPath() : "unnamed session";
-						graphicFrame.setInputTitle(inputTitle);
+						String changed = Context.getSessionToken().isChanged() ? " * " :"";
+						graphicFrame.setInputTitle(inputTitle + changed);
 					}
 					if(PropertyName.SoundCanvasAdded.equals(propertyName)||
 							PropertyName.SoundCanvasRemoved.equals(propertyName)||
@@ -484,7 +491,7 @@ public class Main {
 		
 	}
 	private static boolean allowSessionOpenRoutine() {
-		if (!Context.getSessionToken().isNamed() || Session.saveCascadeDefault()) {
+		if (Context.getSessionToken().needsSave()) {
 			String message = "Do you want to continue ?";
 			int res = JOptionPane.showOptionDialog(null,
 					message, "session not saved!",
@@ -507,34 +514,29 @@ public class Main {
 		}
 
 		try {
-//			SessionToken st = Context.getSessionToken();
-//			File original = st.isNamed() ? new File(Context.getSessionToken().getFullPath()) : null;
-//			File defaultFile = Session.saveDefaultSession();
-//
-//			if (original != null) {
-//				File reference = Session.getReferenceFile();
-//				if (! FileUtil.binaryCompare(reference, defaultFile)) {
-			if (Session.saveCascadeDefault()) {
-					int res = JOptionPane.showOptionDialog(null,
-							"save named session " + Context.getSessionToken().getFullPath(), "Do you want to save ?",
-							JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null,
-							new String[] { "yes", "no", "cancel" }, "cancel");
-					if (res == JOptionPane.OK_OPTION) {
-						File file = new File(Context.getSessionToken().getFullPath());
-						try {
-							Session.saveSession(file, file.getAbsolutePath());
-						} catch (IllegalArgumentException | IllegalAccessException | IOException e) {
-							e.printStackTrace();
-						}
+			SessionToken st = Context.getSessionToken();
+			if (st.isDefault()) {
+				Session.saveDefaultSession();
+			} else if (st.needsSave()) {
+				int res = JOptionPane.showOptionDialog(null,
+						"save named session " + Context.getSessionToken().getFullPath(), "Do you want to save ?",
+						JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null,
+						new String[] { "yes", "no", "cancel" }, "cancel");
+				if (res == JOptionPane.OK_OPTION) {
+					File file = new File(Context.getSessionToken().getFullPath());
+					try {
+						Session.userSaveSession(file);
+					} catch (IllegalArgumentException | IllegalAccessException | IOException e) {
+						e.printStackTrace();
 					}
-					if(res == JOptionPane.NO_OPTION) {
-						Context.setSessionToken(new SessionToken(null)); // detach
-						Session.saveDefaultSession();
-					}
-					if(res == JOptionPane.CANCEL_OPTION) {
-						return;
-					}
-				
+				}
+				if (res == JOptionPane.NO_OPTION) {
+					Session.saveDefaultSession();
+				}
+				if (res == JOptionPane.CANCEL_OPTION) {
+					return;
+				}
+
 			}
 		} catch (Throwable t) {
 			t.printStackTrace();

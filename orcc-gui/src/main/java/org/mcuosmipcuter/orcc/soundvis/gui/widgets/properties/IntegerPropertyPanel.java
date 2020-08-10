@@ -22,7 +22,6 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
 
 
@@ -35,6 +34,7 @@ public class IntegerPropertyPanel extends PropertyPanel<Integer> {
 	private static final long serialVersionUID = 1L;
 
 	private JSpinner jSpinner = new JSpinner();
+	final boolean timed;
 	
 	/**
 	 * Constructor with all relevant values
@@ -49,14 +49,7 @@ public class IntegerPropertyPanel extends PropertyPanel<Integer> {
 		SpinnerNumberModel model = new SpinnerNumberModel(value, minimum, maximum, stepSize);
 		jSpinner = new JSpinner(model);
 		add(jSpinner);
-		ChangeListener cl = new ChangeListener() {
-			
-			@Override
-			public void stateChanged(ChangeEvent e) {
-				setNewValue((Integer)jSpinner.getValue());
-			}
-		};
-		jSpinner.addChangeListener(timed ? new TimedChangeListener(cl) : cl);
+		this.timed = timed;
 	}
 	/**
 	 * Constructor with a canvas, all other values will be default
@@ -70,6 +63,17 @@ public class IntegerPropertyPanel extends PropertyPanel<Integer> {
 	public void setCurrentValue(Integer currentValue) {
 		super.setCurrentValue(currentValue);
 		jSpinner.setValue(currentValue);
+	}
+	@Override
+	protected void activate() {
+		ChangeListener cl = new ChangeListener() {
+			
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				setNewValue((Integer)jSpinner.getValue());
+			}
+		};
+		jSpinner.addChangeListener(timed ? new TimedChangeListener(cl) : cl);
 	}
 	
 }
