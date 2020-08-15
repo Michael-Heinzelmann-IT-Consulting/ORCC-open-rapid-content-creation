@@ -29,21 +29,27 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
 import javax.swing.JPanel;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.api.util.TextHelper;
+import org.mcuosmipcuter.orcc.soundvis.AudioInput;
 import org.mcuosmipcuter.orcc.soundvis.Context;
 import org.mcuosmipcuter.orcc.soundvis.Context.AppState;
 import org.mcuosmipcuter.orcc.soundvis.Context.Listener;
 import org.mcuosmipcuter.orcc.soundvis.Context.PropertyName;
+import org.mcuosmipcuter.orcc.soundvis.DecodingCallback;
 import org.mcuosmipcuter.orcc.soundvis.Mixin;
 import org.mcuosmipcuter.orcc.soundvis.RealtimeSettings;
 import org.mcuosmipcuter.orcc.soundvis.Renderer;
 import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
 import org.mcuosmipcuter.orcc.soundvis.threads.ProgressPainterThread;
+import org.mcuosmipcuter.orcc.soundvis.util.ByteArrayLinearDecoder;
+import org.mcuosmipcuter.orcc.util.IOUtil;
 
 
 /**
@@ -144,15 +150,47 @@ public class GraphPanel extends JPanel implements Renderer, RealtimeSettings {
 
 		soundCanvasArray = Context.getSoundCanvasList().toArray(new SoundCanvasWrapper[0]);
 
-		for(SoundCanvas soundCanvas : soundCanvasArray) {
-			if(prepare) {
+		for (SoundCanvas soundCanvas : soundCanvasArray) {
+			if (prepare) {
 				soundCanvas.prepare(Context.getAudioInput().getAudioInputInfo(), Context.getVideoOutputInfo());
 			}
-			if(Context.getAppState() != AppState.PLAYING && Context.getAppState() != AppState.EXPORTING) {
-				soundCanvas.newFrame(Context.getSongPositionPointer(), graphics);
+//			if(Context.getAppState() != AppState.PLAYING && Context.getAppState() != AppState.EXPORTING) {
+//				soundCanvas.newFrame(Context.getSongPositionPointer(), graphics);
+//			}
+		}
+		if (Context.getAppState() != AppState.PLAYING && Context.getAppState() != AppState.EXPORTING) {
+			AudioInput audioInput = Context.getAudioInput();
+			AudioFormat format = audioInput.getAudioInputInfo().getAudioFormat();
+			final long samplesPerFrame = (int) format.getSampleRate()
+					/ Context.getVideoOutputInfo().getFramesPerSecond();
+
+			try (AudioInputStream ais = audioInput.getAudioStream();) {
+				final long startCount = Context.getPreRun(ais, format);
+				ByteArrayLinearDecoder.decodeLinear(ais, new DecodingCallback() {
+					long frameCount = 0;
+
+					@Override
+					public boolean nextSample(int[] amplitudes, byte[] rawData, long sampleCount) {
+						boolean cont = GraphPanel.this.nextSample(amplitudes, rawData, startCount + frameCount);
+						if (sampleCount % samplesPerFrame == 0) {
+							frameCount++;
+							for (SoundCanvas soundCanvas : soundCanvasArray) {
+								soundCanvas.newFrame(startCount + frameCount, graphics);
+								if(cont) {
+									soundCanvas.postFrame();
+								}
+							}
+							if((startCount + frameCount) >= Context.getSongPositionPointer()) {
+								return false;
+							}
+						}
+						return cont;
+					}
+				});
+			} catch (Exception ex) {
+				IOUtil.log("" + ex);
 			}
 		}
-
 		repaint();
 	}
 
@@ -221,13 +259,14 @@ public class GraphPanel extends JPanel implements Renderer, RealtimeSettings {
 
 	@Override
 	public void newFrame(long frameCount, boolean sendPost) {
-		if(frameCount < 2 || frameCount % reductionModulus == 0) {
+
 			for(SoundCanvas soundCanvas : soundCanvasArray) {
 				soundCanvas.newFrame(frameCount, graphics);
 				if(sendPost) {
 					soundCanvas.postFrame();
 				}
 			}
+			if(frameCount < 2 || frameCount % reductionModulus == 0) {
 			if(frameCount > Context.getSongPositionPointer()) {
 				this.repaint();
 			}

@@ -17,6 +17,7 @@
 */
 package org.mcuosmipcuter.orcc.soundvis;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -24,9 +25,12 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.FloatControl;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
+import org.mcuosmipcuter.orcc.api.soundvis.ExtendedFrameHistory;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.soundvis.model.AudioClasspathInputImpl;
@@ -403,5 +407,35 @@ public abstract class Context {
 			frameToConcrete = (long) Math.floor(numberOfSeconds * frameRate);
 		}
 		return frameToConcrete;
+	}
+	
+	public static long getPreRun(AudioInputStream ais, AudioFormat format) throws IOException {
+		
+		int chunkSize =  format.getFrameSize();
+		int samplesPerFrame = (int)format.getSampleRate() / Context.getVideoOutputInfo().getFramesPerSecond();
+		long preRun = 1;
+		for(SoundCanvasWrapper s : soundCanvasList) {
+			int f = s.getSoundCanvas() instanceof ExtendedFrameHistory ? ((ExtendedFrameHistory)s.getSoundCanvas()).getCurrentHistoryFrameSize() : 1;
+			IOUtil.log(s + " getPreRunFrames() = " + f);
+			if(f > preRun) {
+				preRun = f;
+			}
+		}
+		final long frameStart = Context.getSongPositionPointer() - preRun >= 0 ? Context.getSongPositionPointer() - preRun : 0;
+		
+		if( frameStart >= 0) {	
+			long byteStart = frameStart * samplesPerFrame * chunkSize;
+			long count = 0;
+			while(count < byteStart  && ais.available() > 0) {
+				int step = count < byteStart - samplesPerFrame * chunkSize ? samplesPerFrame * chunkSize : chunkSize;
+				long skipped = ais.skip( step);
+				count += skipped;
+			}
+			if(count != byteStart) {
+				IOUtil.log("WARNING did not reach correct start pos in stream: count " + count + "  vs. " + byteStart + " ");
+			}
+
+		}
+		return frameStart;
 	}
 }
