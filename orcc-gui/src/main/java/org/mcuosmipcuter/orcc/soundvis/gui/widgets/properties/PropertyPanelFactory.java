@@ -50,7 +50,7 @@ public class PropertyPanelFactory {
 	 * @return the panel set, can be empty if the canvas has no editable properties
 	 */
 	public static Set<JPanel> getCanvasPanels(SoundCanvasWrapper soundCanvasWrapper)  {
-		@SuppressWarnings({ "unchecked", "rawtypes" })
+
 		Set<JPanel> result = new LinkedHashSet<>();
 		
 		SoundCanvas soundCanvas = soundCanvasWrapper.getSoundCanvas();
@@ -78,23 +78,16 @@ public class PropertyPanelFactory {
 				for(Field nestedField : nestedValue.getClass().getDeclaredFields()) {
 					if(nestedField.isAnnotationPresent(UserProperty.class)) {
 						props.add(getPropertyPanel(nestedField, nestedValue, soundCanvasWrapper));
-						//result.add(getPropertyPanel(nestedField, nested, soundCanvasWrapper));
-
 					}
 					if(nestedField.isAnnotationPresent(NestedProperty.class)) {
 						Object nested2 = getValue(nestedField, nestedValue);
 						System.err.println(nestedValue);
 						for(Field nested2Field : nested2.getClass().getDeclaredFields()) {
-							//props.add(getPropertyPanel(nested2Field, nested2, soundCanvasWrapper));
-							//System.err.println(nested2Field);
 							if(nested2Field.isAnnotationPresent(UserProperty.class)) {
 								props.add(getPropertyPanel(nested2Field, nested2, soundCanvasWrapper));
-								//result.add(getPropertyPanel(nestedField, nested, soundCanvasWrapper));
-
 							}
 						}
-					}
-						
+					}	
 				}
 				result.add(new NestedPropertyPanel(props, soundCanvasWrapper.getDisplayName(), field.getName()));
 				
@@ -173,6 +166,7 @@ public class PropertyPanelFactory {
 		if(MappedValue.class.equals(type)) {
 			Object value = getValue(field, valueOwner);
 			Set vs = ((MappedValue)value).getAll();
+			@SuppressWarnings("unchecked")
 			Set<MappedValue<?>> values = vs;
 			return new MappedValuePropertyPanel(soundCanvasWrapper, valueOwner, values, value);
 		}
