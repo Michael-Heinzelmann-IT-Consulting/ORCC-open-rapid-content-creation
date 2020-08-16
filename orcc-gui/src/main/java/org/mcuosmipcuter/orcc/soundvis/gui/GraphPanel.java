@@ -173,16 +173,17 @@ public class GraphPanel extends JPanel implements Renderer, RealtimeSettings {
 					public boolean nextSample(int[] amplitudes, byte[] rawData, long sampleCount) {
 						boolean cont = GraphPanel.this.nextSample(amplitudes, rawData, startCount + frameCount);
 						if (sampleCount % samplesPerFrame == 0) {
-							frameCount++;
+							long fn = startCount + frameCount;
 							for (SoundCanvas soundCanvas : soundCanvasArray) {
-								soundCanvas.newFrame(startCount + frameCount, graphics);
+								soundCanvas.newFrame(fn, graphics);
 								if(cont) {
 									soundCanvas.postFrame();
 								}
 							}
-							if((startCount + frameCount) >= Context.getSongPositionPointer()) {
+							if(fn >= Context.getSongPositionPointer()) {
 								return false;
 							}
+							frameCount++;
 						}
 						return cont;
 					}

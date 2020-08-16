@@ -39,8 +39,8 @@ import org.mcuosmipcuter.orcc.soundvis.Context;
 import org.mcuosmipcuter.orcc.soundvis.Context.AppState;
 import org.mcuosmipcuter.orcc.soundvis.Context.Listener;
 import org.mcuosmipcuter.orcc.soundvis.Context.PropertyName;
-import org.mcuosmipcuter.orcc.soundvis.model.SuperSample;
 import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
+import org.mcuosmipcuter.orcc.soundvis.model.SuperSample;
 import org.mcuosmipcuter.orcc.soundvis.threads.SubSampleThread;
 import org.mcuosmipcuter.orcc.soundvis.threads.SubSampleThread.CallBack;
 import org.mcuosmipcuter.orcc.soundvis.threads.SuperSampleData;
@@ -68,7 +68,7 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 	private final static Map<String, Color> effectColors = new HashMap<>();
 	static {
 		effectColors.put("mover", Color.ORANGE);
-		effectColors.put("fader", Color.DARK_GRAY);
+		effectColors.put("fader", Color.CYAN);
 		effectColors.put("rotator", Color.RED);
 		effectColors.put("scaler", Color.BLUE);
 		effectColors.put("shearer", Color.GREEN);

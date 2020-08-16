@@ -106,12 +106,18 @@ public class EffectShaper {
 		boolean isScalingOut = current.framesOut != 0 && posInSlideDuration < (numberOfFramesSlideIsVisible + current.endFrames) && posInSlideDuration >= (numberOfFramesSlideIsVisible - Math.abs(current.framesOut));
 		
 		if(isScalingIn) {
-			float scaleRateIn = 100f / ((Math.abs(current.framesIn) - current.beginFrames) * 100f);
-			currentScaleIn =   (posInSlideDuration - current.beginFrames) * scaleRateIn;
+			float distanceIn = ((Math.abs(current.framesIn) - current.beginFrames) * 100f);
+			if(distanceIn != 0) {
+				float scaleRateIn = 100f / distanceIn;
+				currentScaleIn =   (posInSlideDuration - current.beginFrames) * scaleRateIn;
+			}
 		}
 		if(isScalingOut) {
-			float scaleRateOut = 100f / ((Math.abs(current.framesOut) + current.endFrames) * 100f);
-			currentScaleOut = (numberOfFramesSlideIsVisible + current.endFrames - posInSlideDuration + 1) * scaleRateOut;
+			float distanceOut = ((Math.abs(current.framesOut) + current.endFrames) * 100f);
+			if(distanceOut != 0) {
+				float scaleRateOut = 100f / distanceOut;
+				currentScaleOut = (numberOfFramesSlideIsVisible + current.endFrames - posInSlideDuration + 1) * scaleRateOut;
+			}
 		}
 		if(isScalingIn) {
 			float scaleRangeX = midScaleX - begScaleX;
@@ -130,10 +136,10 @@ public class EffectShaper {
 			valueConsumer.accept(endScaleX + scaleRangeX, endScaleY + scaleRangeY);
 		}
 		else {
-			if(posInSlideDuration <= current.beginFrames) {
+			if(posInSlideDuration < current.beginFrames) {
 				valueConsumer.accept(current.begValueXPercent / 100f, current.begValueYPercent / 100f);
 			}
-			else if(current.framesOut != 0 && posInSlideDuration >= (numberOfFramesSlideIsVisible + current.endFrames)) {
+			else if(posInSlideDuration >= (numberOfFramesSlideIsVisible + current.endFrames)) {
 				valueConsumer.accept(current.endValueXPercent / 100f, current.endValueYPercent / 100f);
 			}
 			else {
