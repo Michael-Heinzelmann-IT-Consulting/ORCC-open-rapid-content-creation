@@ -149,8 +149,26 @@ public class Tiles implements SoundCanvas, ExtendedFrameHistory {
 
 	@Override
 	public void updateUI(int width, int height, Graphics2D graphics) {
-		// TODO Auto-generated method stub
+		int tX = width / 10;
+		int tY = height / 5;
+		int sz = tX * tY;
+		int x = 0;
+		int y = 0;
 		
+		for(int i = 0; i < sz; i++) {
+			int r = fixedRed == -1 ? 127 : fixedRed;
+			int g = fixedGreen == -1 ? 127 : fixedGreen;
+			int b = fixedBlue == -1 ? 127 : fixedBlue;
+			Color c = new Color(r, g, b);
+			double rand = Math.random();
+			graphics.setColor(rand > 0.5 ? c : c.brighter());
+			graphics.fillRect(x, y, tileX, tileY);
+			x += tX;
+			if(x >= width) {
+				x = 0;
+				y += tY;
+			}
+		}
 	}
 
 	@Override
