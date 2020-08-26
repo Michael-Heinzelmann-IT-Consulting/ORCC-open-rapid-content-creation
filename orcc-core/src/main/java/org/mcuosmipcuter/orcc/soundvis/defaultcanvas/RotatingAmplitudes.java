@@ -191,6 +191,7 @@ public class RotatingAmplitudes implements SoundCanvas, ExtendedFrameHistory {
 		}
 		degrees = 0;
 		deque.clear();
+		max = 0;
 	}
 
 	@Override

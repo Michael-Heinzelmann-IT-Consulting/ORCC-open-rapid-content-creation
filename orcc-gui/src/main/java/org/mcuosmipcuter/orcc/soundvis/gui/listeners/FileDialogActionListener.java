@@ -33,12 +33,16 @@ public class FileDialogActionListener implements ActionListener {
 	public interface CallBack {
 		public void fileSelected(File file);
 	}
+	public interface PreSelectCallBack {
+		public File preSelected();
+	}
 	private final Component owner;
 	private final CallBack callBack;
 	private final String buttonText;
 	private final JFileChooser chooser = new JFileChooser();
-	FileFilter fileFilter;
-	String forcedExtension;
+	private FileFilter fileFilter;
+	private String forcedExtension;
+	private PreSelectCallBack preSelectCallBack;
 
 	/**
 	 * New listener
@@ -56,6 +60,9 @@ public class FileDialogActionListener implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		if(fileFilter != null) {
 			chooser.setFileFilter(fileFilter);
+		}
+		if(preSelectCallBack != null) {
+			chooser.setSelectedFile(preSelectCallBack.preSelected());
 		}
 		
         int returnVal = chooser.showDialog(owner, buttonText);
@@ -79,5 +86,10 @@ public class FileDialogActionListener implements ActionListener {
 	public void setForcedExtension(String forcedExtension) {
 		this.forcedExtension = forcedExtension;
 	}
+
+	public void setPreSelectCallBack(PreSelectCallBack preSelectCallBack) {
+		this.preSelectCallBack = preSelectCallBack;
+	}
+
 
 }

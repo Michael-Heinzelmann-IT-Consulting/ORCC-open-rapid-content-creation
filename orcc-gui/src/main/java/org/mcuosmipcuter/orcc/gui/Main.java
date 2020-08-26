@@ -67,6 +67,7 @@ import org.mcuosmipcuter.orcc.soundvis.gui.ResolutionMenu;
 import org.mcuosmipcuter.orcc.soundvis.gui.ZoomMenu;
 import org.mcuosmipcuter.orcc.soundvis.gui.listeners.FileDialogActionListener;
 import org.mcuosmipcuter.orcc.soundvis.gui.listeners.FileDialogActionListener.CallBack;
+import org.mcuosmipcuter.orcc.soundvis.gui.listeners.FileDialogActionListener.PreSelectCallBack;
 import org.mcuosmipcuter.orcc.soundvis.gui.listeners.StopActionListener;
 import org.mcuosmipcuter.orcc.soundvis.gui.widgets.GraphicsJInternalFrame;
 import org.mcuosmipcuter.orcc.soundvis.gui.widgets.TimeLabel;
@@ -232,6 +233,7 @@ public class Main {
 			final JMenu exportMenu = new JMenu("Export");
 			final JMenuItem exportStart = new JMenuItem("start");
 			final JMenuItem exportStop = new JMenuItem("stop");
+			final JMenuItem exportFrameImage = new JMenuItem("frame as image");
 			mb.add(exportMenu);
 			{
 				CallBack exportVideo = new CallBack() {
@@ -258,10 +260,36 @@ public class Main {
 				};
 				FileDialogActionListener exportActionListener = new FileDialogActionListener(frame, exportVideo, "set as export file");
 				exportStart.addActionListener(exportActionListener);
+				
+				CallBack exportFrameImageCallback= new CallBack() {
+					public void fileSelected(File file) {
+						if(file.exists()) {
+							int res = JOptionPane.showConfirmDialog(null, file + " exists, are you sure you want to overwrite it ?", "", JOptionPane.OK_CANCEL_OPTION);
+							if(res != JOptionPane.OK_OPTION) {
+								return;
+							}
+						}
+
+						// TODO
+						System.err.println("export frame");
+					}
+				};
+				FileDialogActionListener exportFrameActionListener = new FileDialogActionListener(frame, exportFrameImageCallback, "set as export image file");
+				exportFrameActionListener.setPreSelectCallBack(new PreSelectCallBack() {				
+					@Override
+					public File preSelected() {
+						String preselected = "frame" + Context.getSongPositionPointer();
+						return new File(preselected);
+					}
+				});
+				exportFrameImage.addActionListener(exportFrameActionListener);
+				
 				if(ExportUtil.isExportEnabled()) {
 					exportMenu.add(exportStart);
 					exportMenu.addSeparator();
 					exportMenu.add(exportStop);
+					exportMenu.addSeparator();
+					exportMenu.add(exportFrameImage);
 				}
 				else {
 					exportMenu.add(new JMenuItem("not enabled"));
