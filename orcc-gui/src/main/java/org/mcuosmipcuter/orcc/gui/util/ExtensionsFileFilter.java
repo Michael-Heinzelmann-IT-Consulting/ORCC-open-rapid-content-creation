@@ -37,5 +37,16 @@ public class ExtensionsFileFilter extends FileFilter {
 	public String getDescription() {
 		return description;
 	}
+	
+	/**
+	 * If used as a single filter the extension is returned
+	 * @return the single extension or null
+	 */
+	public String getSingleExtension() {
+		if(extensions.length == 1) {
+			return extensions[0];
+		}
+		return null;
+	}
 
 }

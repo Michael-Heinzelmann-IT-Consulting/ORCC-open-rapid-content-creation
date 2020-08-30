@@ -25,6 +25,8 @@ import java.io.File;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 
+import org.mcuosmipcuter.orcc.gui.util.ExtensionsFileFilter;
+
 /**
  * action listener that brings up a file dialog and calls back if a file was selected.
  * @author Michael Heinzelmann
@@ -64,12 +66,14 @@ public class FileDialogActionListener implements ActionListener {
 		if(preSelectCallBack != null) {
 			chooser.setSelectedFile(preSelectCallBack.preSelected());
 		}
-		
         int returnVal = chooser.showDialog(owner, buttonText);
         if(returnVal == JFileChooser.APPROVE_OPTION) {
 			File fileToUse = chooser.getSelectedFile();
-			if(forcedExtension != null && !fileToUse.getAbsolutePath().endsWith(forcedExtension)) {
-				fileToUse = new File(fileToUse.getAbsolutePath() + forcedExtension);
+			String filterExtension = chooser.getFileFilter() instanceof ExtensionsFileFilter ? 
+					((ExtensionsFileFilter)chooser.getFileFilter()).getSingleExtension() : null;
+			String forcedExtensionToUse = forcedExtension != null ? forcedExtension : filterExtension;
+			if(forcedExtensionToUse != null && !fileToUse.getAbsolutePath().endsWith(forcedExtensionToUse)) {
+				fileToUse = new File(fileToUse.getAbsolutePath() + forcedExtensionToUse);
 			}
         	callBack.fileSelected(fileToUse);
         }
@@ -89,6 +93,9 @@ public class FileDialogActionListener implements ActionListener {
 
 	public void setPreSelectCallBack(PreSelectCallBack preSelectCallBack) {
 		this.preSelectCallBack = preSelectCallBack;
+	}
+	public void addChoosableFilter(FileFilter fileFilter) {
+		chooser.addChoosableFileFilter(fileFilter);
 	}
 
 

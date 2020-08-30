@@ -24,12 +24,14 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowStateListener;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.imageio.ImageIO;
 import javax.sound.sampled.AudioFormat;
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
@@ -269,12 +271,21 @@ public class Main {
 								return;
 							}
 						}
-
-						// TODO
-						System.err.println("export frame");
+						BufferedImage image = graphicPanel.getFrameImage();
+						try {
+							String name = file.getName();
+							int idx = name.length() - 3;
+							String type = idx > 0 ? name.substring(idx) : "jpg";
+							ImageIO.write(image, type, file);
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
 					}
 				};
 				FileDialogActionListener exportFrameActionListener = new FileDialogActionListener(frame, exportFrameImageCallback, "set as export image file");
+				exportFrameActionListener.addChoosableFilter(new ExtensionsFileFilter(".jpg"));
+				exportFrameActionListener.addChoosableFilter(new ExtensionsFileFilter(".png"));
+				exportFrameActionListener.addChoosableFilter(new ExtensionsFileFilter(".gif"));
 				exportFrameActionListener.setPreSelectCallBack(new PreSelectCallBack() {				
 					@Override
 					public File preSelected() {
