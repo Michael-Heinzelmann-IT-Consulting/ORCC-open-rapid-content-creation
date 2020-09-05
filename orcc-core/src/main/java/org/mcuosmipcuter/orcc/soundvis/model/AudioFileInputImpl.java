@@ -18,6 +18,7 @@
 package org.mcuosmipcuter.orcc.soundvis.model;
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 
 import javax.sound.sampled.AudioFormat;
@@ -25,7 +26,9 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
+import org.mcuosmipcuter.orcc.api.soundvis.AudioLayout;
 import org.mcuosmipcuter.orcc.soundvis.AudioInput;
+import org.mcuosmipcuter.orcc.soundvis.SoundReader;
 import org.mcuosmipcuter.orcc.util.IOUtil;
 
 /**
@@ -34,6 +37,7 @@ import org.mcuosmipcuter.orcc.util.IOUtil;
  */
 public class AudioFileInputImpl implements AudioInput {
 	
+	private byte[] data; // optional expansion area for compressed input
 	private final AudioInputInfo audioInputInfo;
 	private final String audioFileName;
 	
@@ -45,24 +49,40 @@ public class AudioFileInputImpl implements AudioInput {
 	 * @param audioFileName the full path to the audio file
 	 */
 	public AudioFileInputImpl(String audioFileName) {
-		FileInputStream fis = null;
-		AudioInputStream ais = null;
-		try{
-			fis = new FileInputStream(audioFileName);
-			BufferedInputStream buf = new BufferedInputStream(fis);
-			ais = AudioSystem.getAudioInputStream(buf);
-			AudioFormat audioFormat = ais.getFormat();
-			long frameLength = ais.getFrameLength();
-			audioInputInfo = new AudioInputInfoImpl(audioFormat, frameLength);
-			this.audioFileName = audioFileName;
+		this.audioFileName = audioFileName;
+		long frameLength;
+		AudioInputInfo audioInputInfoTemp = null;
+		try {
+			SoundReader sr = (SoundReader) Class.forName("org.mcuosmipcuter.orcc.ert.humble_video.AudiImportHelper")
+					.getDeclaredConstructor().newInstance();
+
+			byte[] data = sr.readSound(audioFileName);
+			this.data = data;
+
+			frameLength = data.length / 4;
+			AudioFormat audioFormat = new AudioFormat(22050, 16, 2, true, false); // from humble
+			audioInputInfoTemp = new AudioInputInfoImpl(audioFormat, frameLength, AudioLayout.COMPRESSED);
+		} catch (Exception e) {
+			IOUtil.log("could not open as audio input: " + e.getMessage());
+
+			FileInputStream fis = null;
+			AudioInputStream ais = null;
+			try {
+				fis = new FileInputStream(audioFileName);
+				BufferedInputStream buf = new BufferedInputStream(fis);
+				ais = AudioSystem.getAudioInputStream(buf);
+				AudioFormat audioFormat = ais.getFormat();
+				frameLength = ais.getFrameLength();
+				audioInputInfoTemp = new AudioInputInfoImpl(audioFormat, frameLength, AudioLayout.LINEAR);
+			} catch (Exception ex) {
+				throw new RuntimeException(ex);
+			} finally {
+				IOUtil.safeClose(fis);
+				IOUtil.safeClose(ais);
+			}
+
 		}
-		catch(Exception ex) {
-			throw new RuntimeException(ex);
-		}
-		finally {
-			IOUtil.safeClose(fis);
-			IOUtil.safeClose(ais);
-		}
+		this.audioInputInfo = audioInputInfoTemp;
 	}
 
 	/**
@@ -83,6 +103,11 @@ public class AudioFileInputImpl implements AudioInput {
 	 */
 	@Override
 	public AudioInputStream getAudioStream() {
+		if(audioInputInfo.getLayout() == AudioLayout.COMPRESSED) {
+			ByteArrayInputStream bis = new ByteArrayInputStream(data);
+			AudioInputStream ais = new AudioInputStream(bis, audioInputInfo.getAudioFormat(), audioInputInfo.getFrameLength());
+			return ais;
+		}
 		FileInputStream fis;
 		try {
 			fis = new FileInputStream(audioFileName);

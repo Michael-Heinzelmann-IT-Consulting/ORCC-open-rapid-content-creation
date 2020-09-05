@@ -25,6 +25,7 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
+import org.mcuosmipcuter.orcc.api.soundvis.AudioLayout;
 import org.mcuosmipcuter.orcc.soundvis.AudioInput;
 import org.mcuosmipcuter.orcc.util.IOUtil;
 
@@ -55,7 +56,7 @@ public class AudioClasspathInputImpl implements AudioInput {
 			ais = AudioSystem.getAudioInputStream(buf);
 			AudioFormat audioFormat = ais.getFormat();
 			long frameLength = ais.getFrameLength();
-			audioInputInfo = new AudioInputInfoImpl(audioFormat, frameLength);
+			audioInputInfo = new AudioInputInfoImpl(audioFormat, frameLength, AudioLayout.LINEAR);
 			this.audioResourcePath = audioResourcePath;
 		}
 		catch(Exception ex) {

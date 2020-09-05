@@ -30,11 +30,14 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.FloatControl;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
+import org.mcuosmipcuter.orcc.api.soundvis.AudioLayout;
+import org.mcuosmipcuter.orcc.api.soundvis.AudioOutputInfo;
 import org.mcuosmipcuter.orcc.api.soundvis.ExtendedFrameHistory;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.soundvis.model.AudioClasspathInputImpl;
 import org.mcuosmipcuter.orcc.soundvis.model.AudioFileInputImpl;
+import org.mcuosmipcuter.orcc.soundvis.model.AudioOutputInfoImpl;
 import org.mcuosmipcuter.orcc.soundvis.model.SoundCanvasWrapperImpl;
 import org.mcuosmipcuter.orcc.soundvis.model.VideoOutputInfoImpl;
 import org.mcuosmipcuter.orcc.util.IOUtil;
@@ -51,7 +54,7 @@ public abstract class Context {
 	public enum PropertyName {
 		AudioInputInfo, VideoDimension, SoundCanvasAdded, SoundCanvasRemoved, SoundCanvasList, SoundCanvasListCleared,
 		ExportFileName, CanvasClassNames, AppState, SongPositionPointer, VideoFrameRate, VolumeControl, FullPreRun,
-		SoundCanvasProperty, BeforeSoundCanvasProperty, SoundCanvasPropertyCancelled, SessionChanged;
+		SoundCanvasProperty, BeforeSoundCanvasProperty, SoundCanvasPropertyCancelled, SessionChanged, AudioOutputInfo;
 	}
 	/**
 	 * Enumeration of application states
@@ -157,6 +160,7 @@ public abstract class Context {
 	private static String exportFileName;
 	private static AudioInput audioInput;
 	private static VideoOutputInfoImpl videoOutputInfo = new VideoOutputInfoImpl(25, 1920, 1080);
+	private static AudioOutputInfo audioOutputInfo = new AudioOutputInfoImpl(AudioLayout.COMPRESSED);
 	private static long songPositionPointer;
 	private static FloatControl volumeControl;
 	private static boolean fullPreRun;
@@ -167,6 +171,15 @@ public abstract class Context {
 	 */
 	public static AudioInput getAudioInput() {
 		return audioInput;
+	}
+
+	public static AudioOutputInfo getAudioOutputInfo() {
+		return audioOutputInfo;
+	}
+	
+	public static void setAudioOutputLayout(AudioLayout audioLayout) {
+		audioOutputInfo = new AudioOutputInfoImpl(audioLayout);
+		notifyListeners(PropertyName.AudioOutputInfo);
 	}
 
 	/**

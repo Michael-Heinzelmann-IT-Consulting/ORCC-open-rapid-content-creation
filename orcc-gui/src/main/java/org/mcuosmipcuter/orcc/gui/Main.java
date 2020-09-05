@@ -60,6 +60,7 @@ import org.mcuosmipcuter.orcc.soundvis.RealtimeSettings.SettingsListener;
 import org.mcuosmipcuter.orcc.soundvis.SessionToken;
 import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
 import org.mcuosmipcuter.orcc.soundvis.gui.AboutBox;
+import org.mcuosmipcuter.orcc.soundvis.gui.AudioOutputLayoutMenu;
 import org.mcuosmipcuter.orcc.soundvis.gui.CanvasClassMenu;
 import org.mcuosmipcuter.orcc.soundvis.gui.FrameModulusMenu;
 import org.mcuosmipcuter.orcc.soundvis.gui.FrameRateMenu;
@@ -389,7 +390,7 @@ public class Main {
 						final AudioFormat audioFormat = audioInput.getAudioInputInfo().getAudioFormat();
 						TimeLabel tl = new TimeLabel();
 						tl.update(audioInput.getAudioInputInfo().getFrameLength(), audioFormat.getSampleRate());
-						playBackFrame.setTitle(audioInput.getName() + " | " + ((int)audioFormat.getSampleRate()) + " HZ | " + audioFormat.getSampleSizeInBits() + " bit | length " + tl.getText());
+						playBackFrame.setTitle(audioInput.getAudioInputInfo().getLayout() + ": " +audioInput.getName() + " | " + ((int)audioFormat.getSampleRate()) + " HZ | " + audioFormat.getSampleSizeInBits() + " bit | length " + tl.getText());
 					}
 				}
 			});
@@ -451,6 +452,12 @@ public class Main {
 				ResolutionMenu resolutions = new ResolutionMenu("video size", v.getWidth(), v.getHeight());
 				configMenu.add(resolutions);
 				Context.addListener(resolutions);
+				
+				AudioOutputLayoutMenu audioOutputLayoutMenu = new AudioOutputLayoutMenu("audio output");
+				configMenu.addSeparator();
+				configMenu.add(audioOutputLayoutMenu);
+				Context.addListener(audioOutputLayoutMenu);
+				
 				final FrameRateMenu frameRates = new FrameRateMenu("frame rate", v.getFramesPerSecond());
 				configMenu.addSeparator();
 				configMenu.add(frameRates);

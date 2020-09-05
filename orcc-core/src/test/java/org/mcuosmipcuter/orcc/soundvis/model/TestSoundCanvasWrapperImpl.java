@@ -27,12 +27,13 @@ import java.util.List;
 
 import javax.sound.sampled.AudioFormat;
 
-import junit.framework.TestCase;
-
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
+import org.mcuosmipcuter.orcc.api.soundvis.AudioLayout;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
+
+import junit.framework.TestCase;
 
 /**
  * @author Michael Heinzelmann
@@ -47,7 +48,7 @@ public class TestSoundCanvasWrapperImpl extends TestCase {
 	@Override
 	protected void setUp() throws Exception {
 		AudioFormat audioFormat = new AudioFormat(44100, SAMPLESIZE_BITS, 2, false, false);
-		AudioInputInfo audioInputInfo = new AudioInputInfoImpl(audioFormat, 1000L);
+		AudioInputInfo audioInputInfo = new AudioInputInfoImpl(audioFormat, 1000L, AudioLayout.LINEAR);
 		VideoOutputInfo videoOutputInfo = new VideoOutputInfoImpl(30, 480, 600);
 		myInvocationHandler = new MyInvocationHandler();
 		SoundCanvas mockSoundCanvas = createMock(myInvocationHandler);

@@ -1,6 +1,6 @@
 /**
 *   ORCC rapid content creation for entertainment, education and media production
-*   Copyright (C) 2012 Michael Heinzelmann, Michael Heinzelmann IT-Consulting
+*   Copyright (C) 2020 Michael Heinzelmann, Michael Heinzelmann IT-Consulting
 *
 *   This program is free software: you can redistribute it and/or modify
 *   it under the terms of the GNU General Public License as published by
@@ -15,34 +15,26 @@
 *   You should have received a copy of the GNU General Public License
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package org.mcuosmipcuter.orcc.api.soundvis;
+package org.mcuosmipcuter.orcc.soundvis.model;
 
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioInputStream;
-
+import org.mcuosmipcuter.orcc.api.soundvis.AudioLayout;
+import org.mcuosmipcuter.orcc.api.soundvis.AudioOutputInfo;
 
 /**
- * Provides information about the audio input
  * @author Michael Heinzelmann
  */
-public interface AudioInputInfo {
+public class AudioOutputInfoImpl implements AudioOutputInfo {
+	private final AudioLayout audioLayout;
 	/**
-	 * Info about the format of the audio
-	 * @see {@link AudioFormat}
-	 * @return the format
+	 * output with layout
 	 */
-	public AudioFormat getAudioFormat();
+	public AudioOutputInfoImpl(AudioLayout audioLayout) {
+		this.audioLayout = audioLayout;
+	}
 
-	/**
-	 * Info about the length of the audio expressed in samples,
-	 * this is also the number of times {@link SoundCanvas#nextSample(int[])} will be called.
-	 * @see {@link AudioInputStream#getFrameLength()}
-	 * @return length in audio frames (samples)
-	 */
-	public long getFrameLength();
+	@Override
+	public AudioLayout getLayOut() {
+		return audioLayout;
+	}
 
-	/**
-	 * @return the {@link AudioLayout}
-	 */
-	AudioLayout getLayout();
 }

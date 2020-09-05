@@ -22,6 +22,7 @@ import java.awt.image.BufferedImage;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 
+import org.mcuosmipcuter.orcc.api.soundvis.AudioLayout;
 import org.mcuosmipcuter.orcc.soundvis.AudioInput;
 import org.mcuosmipcuter.orcc.soundvis.Context;
 import org.mcuosmipcuter.orcc.soundvis.Context.AppState;
@@ -35,8 +36,11 @@ import org.mcuosmipcuter.orcc.util.IOUtil;
 import io.humble.video.AudioChannel.Layout;
 import io.humble.video.AudioFormat.Type;
 import io.humble.video.Codec;
+import io.humble.video.Decoder;
+import io.humble.video.Demuxer;
+import io.humble.video.DemuxerStream;
 import io.humble.video.Encoder;
-import io.humble.video.MediaAudio;
+import io.humble.video.MediaDescriptor;
 import io.humble.video.MediaPacket;
 import io.humble.video.MediaPicture;
 import io.humble.video.Muxer;
@@ -57,6 +61,7 @@ public class ExportThread extends Thread implements PlayPauseStop {
 
 	// snapshot of context
 	private final int framesPerSecond = Context.getVideoOutputInfo().getFramesPerSecond();
+	private final boolean compressAudio = Context.getAudioOutputInfo().getLayOut() == AudioLayout.COMPRESSED;
 	private final int width = Context.getVideoOutputInfo().getWidth();
 	private final int height = Context.getVideoOutputInfo().getHeight();
 
@@ -80,6 +85,7 @@ public class ExportThread extends Thread implements PlayPauseStop {
 		Context.setAppState(AppState.EXPORTING);
 
 		Muxer muxer = null;
+		Demuxer demuxer = null;
 		AudioInputStream ais = null;
 
 		try {
@@ -96,47 +102,106 @@ public class ExportThread extends Thread implements PlayPauseStop {
 			String formatName = Context.getExportFileName().endsWith(".mp4") ? "mov" : null;
 			muxer = Muxer.make(Context.getExportFileName(), null, formatName);
 			final Muxer muxerPointer = muxer;
+			
 			System.err.println("my MuxerFormat " + muxer.getFormat());
 			
 			final MuxerFormat videoFormat = muxer.getFormat();
-			final Codec videoCodec;
-			String vCName = Context.getExportFileName().endsWith(".mp4") ? "mpeg4" : "libx264";
-			String videoCodecname = vCName;
-			String audioCodecName =  "libmp3lame"; ////"pcm_s16be";//
-			Type sampleFormat = Type.SAMPLE_FMT_S16P;//Type.SAMPLE_FMT_S16P for mp3
+			
+			//// -------------------------------------------------------------------------------
+			//Decoder audioDecoder = AudiImportHelper.getDecoder(audioInput.getName());
+			  Decoder audioDecoder = null;
+			  
+			  // if output should be compressed and input is already compressed do decode instead of encode
+			  if(compressAudio && Context.getAudioInput().getAudioInputInfo().getLayout() == AudioLayout.COMPRESSED) {
+			  	try {
+			    /*
+			     * Start by creating a container object, in this case a demuxer since
+			     * we are reading, to get audio data from.
+			     */
+			    demuxer = Demuxer.make();
+			    
 
-			videoCodec = Codec.findEncodingCodecByName(videoCodecname);
+			    /*
+			     * Open the demuxer with the filename passed on.
+			     */
+			    demuxer.open(audioInput.getName(), null, false, true, null, null);
 
-			for (Codec codec : Codec.getInstalledCodecs()) {
-				if (codec.getSupportedAudioSampleRates().size() >= 0) {
-					try {
-//						 System.err.println(codec.getName() + ":" + codec.getLongName() + ":" +
-//						 codec.getIDAsInt() + ":" + codec.getSupportedAudioSampleRates()+ " - " +
-//						 codec.getSupportedAudioFormats());
-					} catch (Throwable t) {
-						System.err.println(t.getMessage());
+			    /*
+			     * Query how many streams the call to open found
+			     */
+			    int numStreams = demuxer.getNumStreams();
+
+			    /*
+			     * Iterate through the streams to find the first audio stream
+			     */
+			    int audioStreamId = -1;
+			    
+			    for(int i = 0; i < numStreams; i++)
+			    {
+			      final DemuxerStream stream = demuxer.getStream(i);
+			      final Decoder decoder = stream.getDecoder();
+			      if (decoder != null && decoder.getCodecType() == MediaDescriptor.Type.MEDIA_AUDIO) {
+			        audioStreamId = i;
+			        audioDecoder = decoder;
+			        // stop at the first one.
+			        break;
+			      }
+			    }
+			    if (audioStreamId == -1)
+			      throw new RuntimeException("could not find audio stream in container: "+audioInput.getName());
+			  	}
+			  	catch(Exception ex) {
+			  		ex.printStackTrace();
+			  		
+			  	}
+
+			  }
+			final AudioExportHelper audioExportHelper;
+			if(audioDecoder == null) {
+				String audioCodecName = compressAudio ? "libmp3lame" : "pcm_s16be";///////// "libmp3lame"; ////"pcm_s16be";//
+				Type sampleFormat = compressAudio ? Type.SAMPLE_FMT_S16P : Type.SAMPLE_FMT_S16;//Type.SAMPLE_FMT_S16P for mp3
+	
+				for (Codec codec : Codec.getInstalledCodecs()) {
+					if (codec.getSupportedAudioSampleRates().size() >= 0) {
+						try {
+	//						 System.err.println(codec.getName() + ":" + codec.getLongName() + ":" +
+	//						 codec.getIDAsInt() + ":" + codec.getSupportedAudioSampleRates()+ " - " +
+	//						 codec.getSupportedAudioFormats());
+						} catch (Throwable t) {
+							System.err.println(t.getMessage());
+						}
 					}
 				}
+	
+				Codec audioCodec = Codec.findEncodingCodecByName(audioCodecName);
+				System.err.println("SupportedAudioSampleRates " + audioCodec.getSupportedAudioSampleRates());
+				System.err.println("SupportedVideoFrameRates " + audioCodec.getSupportedVideoFrameRates());
+				System.err.println("getSupportedProfile(0) " + audioCodec.getSupportedProfile(0));
+				System.err.println("SupportedAudioFormats " + audioCodec.getSupportedAudioFormats());
+				final Encoder audioEncoder = Encoder.make(audioCodec);
+				audioEncoder.setSampleFormat(sampleFormat);
+				if (videoFormat.getFlag(MuxerFormat.Flag.GLOBAL_HEADER)) {
+					audioEncoder.setFlag(Encoder.Flag.FLAG_GLOBAL_HEADER, true);
+				}
+				int sr = (int) audioFormat.getSampleRate();
+				audioEncoder.setSampleRate(sr);
+				audioEncoder.setChannels(2);
+				audioEncoder.setChannelLayout(Layout.CH_LAYOUT_STEREO);
+				audioEncoder.open(null, null);
+				muxer.addNewStream(audioEncoder);
+				audioExportHelper = new AudioExportHelper(audioEncoder, muxer);
+			}
+			else {
+				 audioExportHelper = null;
+			        if (muxer.getFormat().getFlag(MuxerFormat.Flag.GLOBAL_HEADER))
+			        	audioDecoder.setFlag(Decoder.Flag.FLAG_GLOBAL_HEADER, true);
+				 audioDecoder.open(null, null);
+				 muxer.addNewStream(audioDecoder);
 			}
 
-			Codec audioCodec = Codec.findEncodingCodecByName(audioCodecName);
-			System.err.println("SupportedAudioSampleRates " + audioCodec.getSupportedAudioSampleRates());
-			System.err.println("SupportedVideoFrameRates " + audioCodec.getSupportedVideoFrameRates());
-			System.err.println("getSupportedProfile(0) " + audioCodec.getSupportedProfile(0));
-			System.err.println("SupportedAudioFormats " + audioCodec.getSupportedAudioFormats());
-			final Encoder audioEncoder = Encoder.make(audioCodec);
-			audioEncoder.setSampleFormat(sampleFormat);
-			if (videoFormat.getFlag(MuxerFormat.Flag.GLOBAL_HEADER)) {
-				audioEncoder.setFlag(Encoder.Flag.FLAG_GLOBAL_HEADER, true);
-			}
-			int sr = (int) audioFormat.getSampleRate();
-			audioEncoder.setSampleRate(sr);
-			audioEncoder.setChannels(2);
-			audioEncoder.setChannelLayout(Layout.CH_LAYOUT_STEREO);
-			audioEncoder.open(null, null);
-			muxer.addNewStream(audioEncoder);
-			final AudioExportHelper audioExportHelper = new AudioExportHelper(audioEncoder, muxer);
-
+			String vCName = Context.getExportFileName().endsWith(".mp4") ? "mpeg4" : "libx264";
+			String videoCodecname = vCName;
+			final Codec videoCodec = Codec.findEncodingCodecByName(videoCodecname);
 			final Encoder videoEncoder = Encoder.make(videoCodec);
 			videoEncoder.setWidth(width);
 			videoEncoder.setHeight(height);
@@ -166,6 +231,21 @@ public class ExportThread extends Thread implements PlayPauseStop {
 
 
 			final MediaPacket videoPacket = MediaPacket.make();
+			final MediaPacket audioPacket;
+			if(audioDecoder != null) {
+				audioPacket = MediaPacket.make();
+				// write the whole audio at once
+			    while(demuxer.read(audioPacket) >= 0) {
+
+			        if (audioPacket.isComplete()) {
+			          muxer.write(audioPacket, true);
+			        }
+			      }
+			    IOUtil.log("audio input written to output.");
+			}
+			else {
+				audioPacket = null;
+			}
 
 			ByteArrayLinearDecoder.decodeLinear(ais, new DecodingCallback() {
 
@@ -175,7 +255,9 @@ public class ExportThread extends Thread implements PlayPauseStop {
 				public boolean nextSample(int[] amplitudes, byte[] rawData, long sampleCount) {
 
 					boolean cont = renderer.nextSample(amplitudes, rawData, 0 * samplesPerFrame + sampleCount);
-					audioExportHelper.append4ByteData(rawData, sampleCount);
+					if(audioExportHelper != null) {
+						audioExportHelper.append4ByteData(rawData, sampleCount);
+					}
 
 					if (sampleCount % samplesPerFrame == 0) {
 
@@ -203,7 +285,9 @@ public class ExportThread extends Thread implements PlayPauseStop {
 
 				@Override
 				public void finished() {
-					audioExportHelper.flush();
+					if(audioExportHelper != null) {
+						audioExportHelper.flush();
+					}
 				}
 			});
 
@@ -214,8 +298,10 @@ public class ExportThread extends Thread implements PlayPauseStop {
 					muxer.write(videoPacket, false);
 				}
 			} while (videoPacket.isComplete());
-
+			if(audioExportHelper != null) {
 				audioExportHelper.flush();
+			}
+			
 //			MediaPacket audioPacket = MediaPacket.make();
 //			do {
 //				audioEncoder.encode(audioPacket, null);
@@ -231,6 +317,13 @@ public class ExportThread extends Thread implements PlayPauseStop {
 			if (muxer != null) {
 				try {
 					muxer.close();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+			if(demuxer != null) {
+				try {
+					demuxer.close();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

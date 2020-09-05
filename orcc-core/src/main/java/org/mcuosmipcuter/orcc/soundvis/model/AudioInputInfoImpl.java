@@ -20,6 +20,7 @@ package org.mcuosmipcuter.orcc.soundvis.model;
 import javax.sound.sampled.AudioFormat;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
+import org.mcuosmipcuter.orcc.api.soundvis.AudioLayout;
 
 /**
  * Bean implementation of {@link AudioInputInfo}
@@ -29,10 +30,12 @@ public class AudioInputInfoImpl implements AudioInputInfo {
 	
 	private final AudioFormat audioFormat;
 	private final long frameLength;
+	private final AudioLayout layout;
 	
-	public AudioInputInfoImpl(AudioFormat audioFormat, long frameLength) {
+	public AudioInputInfoImpl(AudioFormat audioFormat, long frameLength, AudioLayout layout) {
 		this.audioFormat = audioFormat;
 		this.frameLength = frameLength;
+		this.layout = layout;
 	}
 
 	@Override
@@ -43,6 +46,11 @@ public class AudioInputInfoImpl implements AudioInputInfo {
 	@Override
 	public long getFrameLength() {
 		return frameLength;
+	}
+
+	@Override
+	public AudioLayout getLayout() {
+		return layout;
 	}
 
 }
