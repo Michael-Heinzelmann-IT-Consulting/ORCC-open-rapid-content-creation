@@ -26,6 +26,7 @@ import javax.swing.UIManager;
 
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.soundvis.Context;
+import org.mcuosmipcuter.orcc.soundvis.Context.AppState;
 import org.mcuosmipcuter.orcc.soundvis.FontStore;
 import org.mcuosmipcuter.orcc.soundvis.persistence.Session;
 import org.mcuosmipcuter.orcc.util.ClassPathExplodedDirLoader;
@@ -135,7 +136,7 @@ public abstract class Configuration {
 		// set a dummy control to get volume setup
 		FloatControl dummy = new FloatControl(FloatControl.Type.MASTER_GAIN, -80, 6, 1, 1, 0, "dB"){};
 		Context.setVolumeControl(dummy);
-		
+		Context.setAppState(AppState.READY);
 		stage = 3;
 	}
 }

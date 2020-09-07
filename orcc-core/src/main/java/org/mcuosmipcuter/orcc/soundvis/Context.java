@@ -61,7 +61,7 @@ public abstract class Context {
 	 * @author Michael Heinzelmann
 	 */
 	public enum AppState {
-		READY, PLAYING, PAUSED, EXPORTING
+		INIT, READY, PLAYING, PAUSED, EXPORTING
 	}
 	/**
 	 * Listener to this context for asynchronous communication
@@ -154,7 +154,7 @@ public abstract class Context {
 	}
 	
 	// static fields
-	private static AppState appState = AppState.READY;
+	private static AppState appState = AppState.INIT;
 	private static List<SoundCanvasWrapper> soundCanvasList = new ArrayList<SoundCanvasWrapper>();
 	private static SortedSet<String> canvasClassNames = new TreeSet<String>();
 	private static String exportFileName;

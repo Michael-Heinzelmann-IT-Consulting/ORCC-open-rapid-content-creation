@@ -124,6 +124,7 @@ public class Session implements Serializable {
 		
 	}
 	private static void setUpApplication(PersistentSession persistentSession) throws AppLogicException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, NoSuchFieldException {
+		Context.setOutputDimension(persistentSession.getVideoOutPutWidth(), persistentSession.getVideoOutPutHeight());
 		Type inputType = persistentSession.getAudioInputType();
 		switch(inputType) {
 		case FILE:
@@ -135,9 +136,8 @@ public class Session implements Serializable {
 			default:
 				throw new IllegalArgumentException();
 		}
-		
-		Context.setOutputDimension(persistentSession.getVideoOutPutWidth(), persistentSession.getVideoOutPutHeight());
 		Context.setOutputFrameRate(persistentSession.getVideoOutPutFrames());
+		
 		Context.clearCanvasList();
 		for(PersistentSoundCanvasWrapper psw : persistentSession.getSoundCanvasList()) {
 			Context.addCanvasWrapper(psw.restore());
