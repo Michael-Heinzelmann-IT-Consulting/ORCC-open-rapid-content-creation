@@ -128,6 +128,7 @@ public class PlayBackPanel extends JPanel implements Mixin{
 		setBorder(new LineBorder(Color.WHITE, 5));
 		jProgressBar.setMaximum(100);
 		jProgressBar.setStringPainted(true);
+		Context.addListener(frameCountlabel);
 		frameCountlabel.reset();
 		timeLabel.reset();
 		stateLabel.setText(String.valueOf(Context.getAppState()));

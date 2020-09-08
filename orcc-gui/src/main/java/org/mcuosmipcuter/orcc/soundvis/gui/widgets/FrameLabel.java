@@ -17,27 +17,72 @@
 */
 package org.mcuosmipcuter.orcc.soundvis.gui.widgets;
 
+
+import java.awt.Color;
+
 import javax.swing.JLabel;
+
+import org.mcuosmipcuter.orcc.soundvis.Context;
+import org.mcuosmipcuter.orcc.soundvis.Context.AppState;
+import org.mcuosmipcuter.orcc.soundvis.Context.Listener;
+import org.mcuosmipcuter.orcc.soundvis.Context.PropertyName;
 
 /**
  * Label to display the frame numbers
  * @author Michael Heinzelmann
  */
-public class FrameLabel extends JLabel {
+public class FrameLabel extends JLabel implements Listener{
 	
 	private static final long serialVersionUID = 1L;
+	
+	private long framesOerSecond = 0;
+	long startTime = 0;
+	long startCount = 0;
+	int speed = 0;
 	
 	/**
 	 * Update the frame count
 	 * @param frameCount
 	 */
 	public void update(long frameCount) {
-		setText("frame " + frameCount);
+		if(startTime == 0) {
+			startCount = frameCount;
+			startTime = System.currentTimeMillis();
+		}
+		
+		if(framesOerSecond != 0 && (frameCount - startCount) % framesOerSecond == 0) {
+			long actualForSecond = System.currentTimeMillis() - startTime;
+			if(actualForSecond != 0) {
+				speed =  (int)(100000f / actualForSecond);
+			}
+			startTime = System.currentTimeMillis();
+		}
+		setBackground(speed != 0 && speed < 98 ? Color.ORANGE : Color.GREEN);
+		setText("frame " + frameCount + " speed " + speed + "%");
+		
 	}
 	/**
 	 * reset the count
 	 */
 	public void reset() {
 		update(0);
+		startTime = 0;
+		speed = 0;
+		setOpaque(false);
+	}
+	@Override
+	public void contextChanged(PropertyName propertyName) {
+		if(Context.PropertyName.VideoFrameRate == propertyName){
+			framesOerSecond = Context.getVideoOutputInfo().getFramesPerSecond();
+		}
+		if(Context.PropertyName.AppState == propertyName ) {
+			//startCount = 0;
+			//startTime = 0;
+			setOpaque(Context.getAppState() == AppState.PLAYING);
+		}
+		if(Context.PropertyName.SongPositionPointer == propertyName) {
+			speed = 0;
+			update(Context.getSongPositionPointer());
+		}
 	}
 }

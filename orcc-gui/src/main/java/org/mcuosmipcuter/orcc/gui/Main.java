@@ -347,9 +347,9 @@ public class Main {
 			}
 		}
 		final JInternalFrame playBackFrame = new JInternalFrame("Audio Timeline");
-		final GraphicsJInternalFrame graphicFrame = new GraphicsJInternalFrame("Video", true, false, true, false);
+		final GraphicsJInternalFrame graphicFrame = new GraphicsJInternalFrame("Video", false, false, false, false);
 		final JDesktopPane deskTop = new JDesktopPane();
-		deskTop.setDesktopManager(new CustomDeskTopManager(playBackFrame, graphicFrame));
+		////deskTop.setDesktopManager(new CustomDeskTopManager(playBackFrame, graphicFrame));
 		deskTop.setVisible(true);
 		
 		frame.getContentPane().add(deskTop);
@@ -441,12 +441,13 @@ public class Main {
 		}	
 
 		{
-			JMenuBar graphicMenuBar = new JMenuBar();
-			graphicFrame.setJMenuBar(graphicMenuBar);
+			//JMenuBar graphicMenuBar = new JMenuBar();
+			//graphicFrame.setJMenuBar(graphicMenuBar);
 			{			
 				
 				final JMenu configMenu = new JMenu("Configuration");
-				graphicMenuBar.add(configMenu);
+				//graphicMenuBar.add(configMenu);
+				mb.add(configMenu);
 
 				VideoOutputInfo v = Context.getVideoOutputInfo();
 				ResolutionMenu resolutions = new ResolutionMenu("video size", v.getWidth(), v.getHeight());
@@ -476,7 +477,8 @@ public class Main {
 				});
 			}
 			final JMenu viewMenu = new JMenu("View");
-			graphicMenuBar.add(viewMenu);
+			//graphicMenuBar.add(viewMenu);
+			mb.add(viewMenu);
 			viewMenu.add(new ZoomMenu("zoom", 0.0f, graphicPanel));
 			graphicPanel.setZoomFactor(0.0f);
 			graphicPanel.setOpaque(true);

@@ -20,6 +20,7 @@ package org.mcuosmipcuter.orcc.soundvis.threads;
 import java.io.IOException;
 
 import org.mcuosmipcuter.orcc.soundvis.Context;
+import org.mcuosmipcuter.orcc.soundvis.Context.AppState;
 import org.mcuosmipcuter.orcc.soundvis.Context.PropertyName;
 import org.mcuosmipcuter.orcc.soundvis.persistence.Session;
 import org.mcuosmipcuter.orcc.util.IOUtil;
@@ -30,14 +31,15 @@ import org.mcuosmipcuter.orcc.util.IOUtil;
  */
 public class SaveThread extends Thread implements Context.Listener{
 
-	/**
-	 * 
-	 */
-	public SaveThread() {
+	private boolean enabled;
+	
+	private long latestTouchCounter;
+	
+	@Override
+	public synchronized void start() {
+		enabled = true;
+		super.start();
 	}
-	
-	long latestTouchCounter;
-	
 
 	@Override
 	public void run() {
@@ -45,7 +47,7 @@ public class SaveThread extends Thread implements Context.Listener{
 			try {
 				sleep(60000); // TODO config
 				long newCounter = Context.getTouchCounter();
-				if(newCounter != latestTouchCounter) {
+				if(enabled && newCounter != latestTouchCounter) {
 					IOUtil.log("save ...");
 					saveLatestSession();
 				}
@@ -56,8 +58,6 @@ public class SaveThread extends Thread implements Context.Listener{
 		}
 		
 	}
-
-
 
 	public void saveLatestSession(){		
 		try {
@@ -74,6 +74,10 @@ public class SaveThread extends Thread implements Context.Listener{
 			// synchronous
 			saveLatestSession();
 		}
-		
+		if(Context.PropertyName.AppState.equals(propertyName)) {
+			this.enabled = Context.getAppState() != AppState.INIT &&  Context.getAppState() != AppState.EXPORTING;
+			System.err.println(enabled + " Context.getAppState() " + Context.getAppState());
+		}
 	}
+
 }

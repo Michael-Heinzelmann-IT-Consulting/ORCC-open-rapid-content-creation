@@ -20,6 +20,7 @@ package org.mcuosmipcuter.orcc.soundvis.gui;
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Composite;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.ComponentAdapter;
@@ -159,6 +160,7 @@ public class GraphPanel extends JPanel implements Renderer, RealtimeSettings {
 //			}
 		}
 		if (Context.getAppState() != AppState.INIT && Context.getAppState() != AppState.PLAYING && Context.getAppState() != AppState.EXPORTING) {
+			
 			AudioInput audioInput = Context.getAudioInput();
 			AudioFormat format = audioInput.getAudioInputInfo().getAudioFormat();
 			final long samplesPerFrame = (int) format.getSampleRate()
@@ -181,6 +183,7 @@ public class GraphPanel extends JPanel implements Renderer, RealtimeSettings {
 								}
 							}
 							if(fn >= Context.getSongPositionPointer()) {
+								//mixin.newFrame(Context.getSongPositionPointer(), false);
 								return false;
 							}
 							frameCount++;
@@ -269,7 +272,9 @@ public class GraphPanel extends JPanel implements Renderer, RealtimeSettings {
 			}
 			if(frameCount < 2 || frameCount % reductionModulus == 0) {
 			if(frameCount > Context.getSongPositionPointer()) {
-				this.repaint();
+				//this.repaint();
+				paintComponent(getGraphics());//
+				//paintImmediately(0, 0, getWidth(), getHeight());
 			}
 			if(mixin != null) {
 				mixin.newFrame(frameCount, sendPost);
@@ -307,6 +312,16 @@ public class GraphPanel extends JPanel implements Renderer, RealtimeSettings {
 		else {
 			this.zoomFactor = zoomFactor;
 			autoZoom = false;
+			//setBackground(Color.GREEN);
+			//setBorder(new EtchedBorder());
+			
+			int w = (int)((float)Context.getVideoOutputInfo().getWidth() * zoomFactor);
+			int h = (int)((float)Context.getVideoOutputInfo().getHeight() * zoomFactor);
+			setSize(w, h);
+			setPreferredSize(new Dimension(w, h));
+			
+			System.err.println(zoomFactor + " " + w +" " + h);
+			//invalidate();
 		}
 		updateSettingListeners();
 	}

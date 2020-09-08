@@ -125,7 +125,7 @@ public class PlayThread extends Thread implements PlayPauseStop {
 					if(sampleCount % samplesPerFrame == 0){
 						cont = checkState();
 						
-						renderer.newFrame(frameCount, cont);
+						//renderer.newFrame(frameCount, cont);
 						if(frameCount >= Context.getSongPositionPointer()) {
 							final int avail = sourceDataLine.available();
 							final long start = System.currentTimeMillis();
@@ -134,6 +134,7 @@ public class PlayThread extends Thread implements PlayPauseStop {
 								IOUtil.log(avail + " was available,  written: " + written + " in " + (System.currentTimeMillis() - start) + "ms requested:" + data.length);
 							}	
 						}
+						renderer.newFrame(frameCount, cont);
 						frameCount++;
 						dataPos = 0;	
 					}
