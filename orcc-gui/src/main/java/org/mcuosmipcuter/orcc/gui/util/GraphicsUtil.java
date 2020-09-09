@@ -19,7 +19,6 @@ package org.mcuosmipcuter.orcc.gui.util;
 
 import java.awt.Component;
 import java.awt.Image;
-import java.awt.Point;
 import java.awt.Rectangle;
 
 /**
@@ -28,30 +27,17 @@ import java.awt.Rectangle;
 public class GraphicsUtil {
 	
 	/**
-	 * @param parent component
-	 * @return
+	 * @param component component
+	 * @return top parent rectangle
 	 */
-	public static Component getPointForChildWindow(Component parent, Component child) {
-		Point point = parent.getLocationOnScreen();
-		Component par= parent.getParent();
+	public static Rectangle getRootComponentOutline(Component component) {
+		Component par= component.getParent();
 		Component frame = null;
 		while((par = par.getParent()) != null){
 			frame = par;
 		}
-		Rectangle screen = frame.getBounds(); //GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
-		Rectangle childBounds = child.getBounds();
-		if(screen.contains(childBounds)){
-			//return point;
-		}
-		else {
-			Rectangle intersect = screen.intersection(childBounds);
-			int dx = childBounds.x - intersect.x;
-			int dy = childBounds.y - intersect.y;
-			point.x -= dx;
-			point.y -= dy;
-			System.err.println("dx: " + dx + " dy:" + dy);
-		}
-		return frame;
+		Rectangle screen = frame.getBounds(); // GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+		return screen;
 	}
 	public static Image getScaledInstanceKeepRatio(Image image, int size, int hints){
 		float ratio = image.getWidth(null) == 0 ? 1f : (float)image.getHeight(null) / (float)image.getWidth(null);

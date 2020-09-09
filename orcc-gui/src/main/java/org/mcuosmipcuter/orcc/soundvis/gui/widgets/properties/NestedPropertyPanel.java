@@ -17,13 +17,11 @@
 */
 package org.mcuosmipcuter.orcc.soundvis.gui.widgets.properties;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Set;
@@ -34,9 +32,7 @@ import javax.swing.JPanel;
 import javax.swing.Popup;
 import javax.swing.PopupFactory;
 import javax.swing.SwingConstants;
-import javax.swing.border.EtchedBorder;
 import javax.swing.border.LineBorder;
-import javax.swing.border.TitledBorder;
 
 import org.mcuosmipcuter.orcc.gui.util.GraphicsUtil;
 
@@ -52,27 +48,21 @@ public class NestedPropertyPanel extends JPanel {
 	private JButton ocButton = new JButton("...");
 	private JLabel nameLabel = new JLabel();
 	boolean expanded;
-	//JPanel valueSelect = new JPanel();
 	JPanel popUpContentPanel = new JPanel();
 	Popup popup = null;
 	/**
 	 * Sets up a grid layout
 	 */
 	public NestedPropertyPanel(Set<PropertyPanel<?>> props, String ownerName, String name) {
-		//setMaximumSize(new Dimension(100, 25));
-		//ocButton.setPreferredSize(new Dimension(50, 15));
+
+		setOpaque(true);
 		setPreferredSize(new Dimension(100, 25));
 		setLayout(new GridLayout(1 , 2, 12, 12));
 		nameLabel.setText(name);
 		nameLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 		add(nameLabel);
 		updateSettingsLabel(props);
-		//valueSelect.add(settingsLabel);
-		//settingsLabel.setFont(new Font("Monospaced", Font.PLAIN, 10));
-		//settingsLabel.setMaximumSize(new Dimension(40, 25));
-		add(ocButton);
-		
-		
+		add(ocButton);	
 		JButton close = new JButton("close");
 		close.addActionListener(new ActionListener() {
 			
@@ -81,21 +71,27 @@ public class NestedPropertyPanel extends JPanel {
 				updateSettingsLabel(props);
 				popup.hide();
 				ocButton.setEnabled(true);
+				NestedPropertyPanel.this.setBackground(Color.LIGHT_GRAY);
 			}
 		});
 		
 		ocButton.addActionListener(new ActionListener() {
-
 		
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				Object[] array = {getName(), popUpContentPanel}; 
-//				int res = JOptionPane.showConfirmDialog(null, array, "set values for " + name, 
-//						JOptionPane.OK_OPTION, JOptionPane.PLAIN_MESSAGE);
-				//JOptionPane.showInternalMessageDialog(NestedPropertyPanel.this, array, "set values for " + name, JOptionPane.QUESTION_MESSAGE);
+
+				Rectangle screen = GraphicsUtil.getRootComponentOutline(NestedPropertyPanel.this);
+				int lowLimit = screen.y + screen.height;
 				Point loc = NestedPropertyPanel.this.ocButton.getLocationOnScreen();
-				//Component par = GraphicsUtil.getPointForChildWindow(NestedPropertyPanel.this, popUpContentPanel);
-				popup = PopupFactory.getSharedInstance().getPopup(NestedPropertyPanel.this.ocButton, popUpContentPanel, loc.x, loc.y);
+				popUpContentPanel.doLayout();
+				int extentY = loc.y + popUpContentPanel.getPreferredSize().height;
+				// debug: System.err.println("extentY " + extentY  + " lowLimit " + lowLimit);
+				int yToUse = extentY < lowLimit ? loc.y : loc.y - (extentY - lowLimit) - 10;
+				
+				popup = PopupFactory.getSharedInstance().getPopup(NestedPropertyPanel.this, popUpContentPanel, loc.x, yToUse);
+
+				NestedPropertyPanel.this.setBackground(Color.YELLOW);
+				
 				ocButton.setEnabled(false);
 				popup.show();
 				// TODO undo option
@@ -109,7 +105,8 @@ public class NestedPropertyPanel extends JPanel {
 		popUpContentPanel.setLayout(gl);
 		popUpContentPanel.setPreferredSize(new Dimension(220, (props.size() + 2) * 30));
 		popUpContentPanel.add(close);
-		popUpContentPanel.add(new JLabel(ownerName + "::" + name));
+		JLabel parents = new JLabel(ownerName + "::" + name, SwingConstants.CENTER);
+		popUpContentPanel.add(parents);
 
 		for(final JPanel p : props) {
 			popUpContentPanel.add(p);
@@ -117,8 +114,6 @@ public class NestedPropertyPanel extends JPanel {
 
 		popUpContentPanel.revalidate();
 		
-		//setLayout(new BorderLayout());
-		//add(valueSelect, BorderLayout.EAST);
 	}
 
 	private void updateSettingsLabel(Set<PropertyPanel<?>> props) {
