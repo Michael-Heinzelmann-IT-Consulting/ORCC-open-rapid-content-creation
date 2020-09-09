@@ -48,6 +48,8 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 	private boolean enabled = true;
 	private long frameFrom = 0;
 	private long frameTo = 0;
+	private long displayFrameFrom = 0;
+	private long displayFrameTo = 0;
 	private boolean frameToAuto = true;
 	private static Graphics2D devNullGraphics;
 	private boolean selected;
@@ -95,7 +97,7 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 		if(
 				(
 						enabled && 
-						frameCount >= frameFrom && (frameCount <= frameTo || frameTo <= 0)
+						frameCount >= Math.min(displayFrameFrom, frameFrom) && (frameCount <= Math.max(displayFrameTo, frameTo) || frameTo <= 0)
 				) 
 				&&
 				(
@@ -142,6 +144,7 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 			VideoOutputInfo videoOutputInfo) {
 		soundCanvas.prepare(audioInputInfo, videoOutputInfo);
 		amplitudeHelper = new AmplitudeHelper(audioInputInfo);
+		getFrameFromTos();
 	}
 
 	@Override
@@ -266,6 +269,8 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 	public DisplayDuration<?>[] getFrameFromTos() {
 		DisplayDuration<?>[] fromTos = soundCanvas.getFrameFromTos();
 		if(fromTos.length > 0) {
+			displayFrameFrom = fromTos[0].getFrom();
+			displayFrameTo = fromTos[fromTos.length - 1].getTo();
 			return fromTos;
 		}
 		return SoundCanvasWrapper.super.getFrameFromTos();
