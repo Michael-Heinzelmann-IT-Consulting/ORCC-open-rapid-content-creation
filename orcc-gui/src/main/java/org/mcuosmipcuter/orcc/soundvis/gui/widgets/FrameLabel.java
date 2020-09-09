@@ -28,7 +28,7 @@ import org.mcuosmipcuter.orcc.soundvis.Context.Listener;
 import org.mcuosmipcuter.orcc.soundvis.Context.PropertyName;
 
 /**
- * Label to display the frame numbers
+ * Label to display the frame numbers and playback speed information
  * @author Michael Heinzelmann
  */
 public class FrameLabel extends JLabel implements Listener{
@@ -76,8 +76,6 @@ public class FrameLabel extends JLabel implements Listener{
 			framesOerSecond = Context.getVideoOutputInfo().getFramesPerSecond();
 		}
 		if(Context.PropertyName.AppState == propertyName ) {
-			//startCount = 0;
-			//startTime = 0;
 			setOpaque(Context.getAppState() == AppState.PLAYING);
 		}
 		if(Context.PropertyName.SongPositionPointer == propertyName) {
