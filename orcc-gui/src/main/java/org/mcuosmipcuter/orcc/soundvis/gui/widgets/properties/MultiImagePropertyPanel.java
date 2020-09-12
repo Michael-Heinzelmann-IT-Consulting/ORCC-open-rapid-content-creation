@@ -27,6 +27,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Image;
+import java.awt.Insets;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -46,6 +47,7 @@ import javax.swing.JScrollPane;
 import javax.swing.Popup;
 import javax.swing.PopupFactory;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.border.EtchedBorder;
 import javax.swing.border.LineBorder;
 
 import org.mcuosmipcuter.orcc.api.util.TextHelper;
@@ -218,24 +220,27 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 		hideSlideEditPopup(); // hide/remove others
 		Point loc = ib.getLocationOnScreen();
 		JPanel editPanel = new JPanel();	
+		editPanel.setBorder(new EtchedBorder(EtchedBorder.RAISED));
 		GridBagLayout gridbag = new GridBagLayout();
+		
 		editPanel.setLayout(gridbag);
 		GridBagConstraints gc = new GridBagConstraints();
-		gc.gridwidth = 2;
-		gc.gridheight = 3;
-	
-		JButton moveLeftButton = new JButton("< move");
-		gridbag.setConstraints(moveLeftButton, gc);
-		editPanel.add(moveLeftButton, gc);
-		moveLeftButton.setEnabled(slide.getPosition() > 1);
+		
+		gc.insets = new Insets(3, 3, 3, 3);
+		gc.fill = GridBagConstraints.HORIZONTAL;
+		gc.weightx = GridBagConstraints.CENTER;
+		//gc.gridheight = 3;
 		
 		gc.gridwidth = GridBagConstraints.REMAINDER;
-		
-		JButton moveRightButton = new JButton("move >");
-		gridbag.setConstraints(moveRightButton, gc);
-		editPanel.add(moveRightButton, gc);
-		moveRightButton.setEnabled(getCurrentValue() != null && slide.getPosition() < getCurrentValue().length);
-		
+		JButton closeButton = new JButton("close");
+		gridbag.setConstraints(closeButton, gc);
+		editPanel.add(closeButton, gc);
+		closeButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				hideSlideEditPopup();			
+			}
+		});
 		
 		JPanel imagePanel = new JPanel() {
 			private static final long serialVersionUID = 1L;
@@ -253,6 +258,18 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 		gridbag.setConstraints(imagePanel, gc);
 		
 		editPanel.add(imagePanel, gc);
+		gc.gridwidth = 2;
+		JButton moveLeftButton = new JButton("< move");
+		gridbag.setConstraints(moveLeftButton, gc);
+		editPanel.add(moveLeftButton, gc);
+		moveLeftButton.setEnabled(slide.getPosition() > 1);
+		
+		gc.gridwidth = GridBagConstraints.REMAINDER;
+		
+		JButton moveRightButton = new JButton("move >");
+		gridbag.setConstraints(moveRightButton, gc);
+		editPanel.add(moveRightButton, gc);
+		moveRightButton.setEnabled(getCurrentValue() != null && slide.getPosition() < getCurrentValue().length);
 
 		JButton rotateButton = new JButton("rotate");
 		gridbag.setConstraints(rotateButton, gc);
