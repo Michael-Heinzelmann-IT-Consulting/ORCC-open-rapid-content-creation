@@ -20,6 +20,7 @@ package org.mcuosmipcuter.orcc.api.util;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 
 /**
@@ -69,7 +70,7 @@ public class TextHelper {
 	 * @param graphics2d the graphics where the text will appear
 	 * @return the dimensions
 	 */
-	public static Dimension getTextDimesion(String[] lines, Graphics2D graphics2d) {
+	public static Dimension getTextDimesion(String[] lines, Graphics graphics2d) {
 		int maxWidth = 0;
 		int height = 0;
 		final int strHeight = graphics2d.getFontMetrics().getHeight();

@@ -35,6 +35,7 @@ import org.mcuosmipcuter.orcc.api.soundvis.AudioOutputInfo;
 import org.mcuosmipcuter.orcc.api.soundvis.ExtendedFrameHistory;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
+import org.mcuosmipcuter.orcc.soundvis.AudioInput.Type;
 import org.mcuosmipcuter.orcc.soundvis.model.AudioClasspathInputImpl;
 import org.mcuosmipcuter.orcc.soundvis.model.AudioFileInputImpl;
 import org.mcuosmipcuter.orcc.soundvis.model.AudioOutputInfoImpl;
@@ -292,6 +293,29 @@ public abstract class Context {
 		AudioInput a = new AudioClasspathInputImpl(audioResourcePath);
 		setAudio(a);
 	}
+	public static synchronized void setAudio(Type inputType, String audioInputName, int outPutFrameRate) throws AppLogicException {
+		AudioInput a;
+		switch(inputType) {
+		case FILE:
+				a = new AudioFileInputImpl(audioInputName);
+				break;
+			case STREAM:
+				a = new AudioClasspathInputImpl(audioInputName);
+				break;
+			default:
+				throw new IllegalArgumentException();
+		}
+		if(a != null) {
+			final float sampleRate = a.getAudioInputInfo().getAudioFormat().getSampleRate();
+			if(sampleRate % outPutFrameRate != 0) {
+				throw new AppLogicException("sample rate " + sampleRate + " % frame rate " + outPutFrameRate + " is not 0");
+			}
+		}
+		audioInput = a;
+		notifyListeners(PropertyName.AudioInputInfo);
+		setOutputFrameRate(outPutFrameRate);
+	}
+	
 	private static void setAudio(AudioInput a) throws AppLogicException {
 		final float sampleRate = a.getAudioInputInfo().getAudioFormat().getSampleRate();
 		final int frameRate = videoOutputInfo.getFramesPerSecond();

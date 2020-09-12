@@ -32,6 +32,9 @@ public class GraphicsUtil {
 	 */
 	public static Rectangle getRootComponentOutline(Component component) {
 		Component par= component.getParent();
+		if(par == null && component != null) {
+			return component.getBounds(); // componet is root
+		}
 		Component frame = null;
 		while((par = par.getParent()) != null){
 			frame = par;

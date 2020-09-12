@@ -173,8 +173,8 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 					setInputOutputData();
 					selectPos = margin;
 					samplePosition = 0;
-					selectFrame = 1;
-					Context.setSongPositionPointer(1);
+					selectFrame = 0;
+					Context.setSongPositionPointer(0);
 				}
 				if( Context.PropertyName.SoundCanvasList == propertyName ||
 					Context.PropertyName.SoundCanvasAdded == propertyName || 

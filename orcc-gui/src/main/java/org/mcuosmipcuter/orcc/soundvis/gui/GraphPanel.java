@@ -33,6 +33,7 @@ import java.util.List;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.swing.JPanel;
+import javax.swing.Popup;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
@@ -59,7 +60,7 @@ import org.mcuosmipcuter.orcc.util.IOUtil;
  * support head less rendering.
  * @author Michael Heinzelmann
  */
-public class GraphPanel extends JPanel implements Renderer, RealtimeSettings {
+public class GraphPanel extends JPanel implements Renderer, RealtimeSettings, Listener {
 
 	private static final long serialVersionUID = 1L;
 	private Mixin mixin;
@@ -78,6 +79,8 @@ public class GraphPanel extends JPanel implements Renderer, RealtimeSettings {
 	ProgressPainterThread progressPainterThread = new ProgressPainterThread();
 	private boolean updating;
 	private String updateString;
+	JPanel popUpContentPanel;
+	Popup popup;
 	
 	/**
 	 * Constructor, adds the mouse drag handling for the back ground image
@@ -87,42 +90,6 @@ public class GraphPanel extends JPanel implements Renderer, RealtimeSettings {
 		setBackground(Color.LIGHT_GRAY);
 		drawDefaultBackGround();
 		
-		Context.addListener(new Listener() {
-			
-			
-			@Override
-			public void progress(String msg) {
-				updateString = msg;
-				paintComponent(getGraphics());
-			}
-
-			@Override
-			public void contextChanged(PropertyName propertyName) {
-				//System.err.println("::::" + propertyName);
-				if(PropertyName.BeforeSoundCanvasProperty.equals(propertyName)) {
-					updateString = "Updating ...";
-					updating = true;
-				}
-				else {
-					updating = false;
-					updateString = null;
-				}
-
-				if(PropertyName.VideoDimension.equals(propertyName)) {
-					if(autoZoom) {
-						setZoomFactor(0.0f); // adapt to new size
-					}
-					displayUpdate(true);
-
-				}
-				EnumSet<PropertyName> match = EnumSet.of(PropertyName.SoundCanvasProperty,
-						PropertyName.SoundCanvasAdded, PropertyName.SoundCanvasList, PropertyName.SongPositionPointer);
-				if (Context.getAppState() != AppState.PLAYING && match.contains(propertyName)) {
-					displayUpdate(true);
-				}
-				
-			}
-		});
 		addComponentListener(new ComponentAdapter(){
 			@Override
 			public void componentResized(ComponentEvent arg0) {
@@ -132,6 +99,38 @@ public class GraphPanel extends JPanel implements Renderer, RealtimeSettings {
 			}
 			
 		});
+	}
+	@Override
+	public void progress(String msg) {
+		updateString = msg;
+		paintComponent(getGraphics());
+	}
+
+	@Override
+	public void contextChanged(PropertyName propertyName) {
+		//System.err.println("::::" + propertyName);
+		if(PropertyName.BeforeSoundCanvasProperty.equals(propertyName)) {
+			updateString = "Updating ...";
+			updating = true;
+		}
+		else {
+			updating = false;
+			updateString = null;
+		}
+
+		if(PropertyName.VideoDimension.equals(propertyName)) {
+			if(autoZoom) {
+				setZoomFactor(0.0f); // adapt to new size
+			}
+			displayUpdate(true);
+
+		}
+		EnumSet<PropertyName> match = EnumSet.of(PropertyName.SoundCanvasProperty,
+				PropertyName.SoundCanvasAdded, PropertyName.SoundCanvasList, PropertyName.SongPositionPointer);
+		if (Context.getAppState() != AppState.PLAYING && match.contains(propertyName)) {
+			displayUpdate(true);
+		}
+		
 	}
 	
 	private void drawDefaultBackGround() {
@@ -150,14 +149,10 @@ public class GraphPanel extends JPanel implements Renderer, RealtimeSettings {
 	public void displayUpdate(boolean prepare) {
 
 		soundCanvasArray = Context.getSoundCanvasList().toArray(new SoundCanvasWrapper[0]);
-
-		for (SoundCanvas soundCanvas : soundCanvasArray) {
-			if (prepare) {
+		if (prepare) {
+			for (SoundCanvas soundCanvas : soundCanvasArray) {
 				soundCanvas.prepare(Context.getAudioInput().getAudioInputInfo(), Context.getVideoOutputInfo());
 			}
-//			if(Context.getAppState() != AppState.PLAYING && Context.getAppState() != AppState.EXPORTING) {
-//				soundCanvas.newFrame(Context.getSongPositionPointer(), graphics);
-//			}
 		}
 		if (Context.getAppState() != AppState.INIT && Context.getAppState() != AppState.PLAYING && Context.getAppState() != AppState.EXPORTING) {
 			
@@ -228,7 +223,12 @@ public class GraphPanel extends JPanel implements Renderer, RealtimeSettings {
 	 * Draws the frame image, both still images preview as well as video animated
 	 */
 	public void paintComponent(Graphics g) {
-		super.paintComponent(g);
+		try {
+			super.paintComponent(g);
+		}
+		catch(Exception ex) {
+			IOUtil.log(ex.getMessage());
+		}
 		if(zoomFactor != 1) {
 			((Graphics2D)g).scale(zoomFactor, zoomFactor);
 		}

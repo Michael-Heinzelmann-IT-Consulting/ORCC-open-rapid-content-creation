@@ -34,7 +34,6 @@ import java.util.List;
 
 import org.mcuosmipcuter.orcc.api.soundvis.MappedValue;
 import org.mcuosmipcuter.orcc.soundvis.AppLogicException;
-import org.mcuosmipcuter.orcc.soundvis.AudioInput.Type;
 import org.mcuosmipcuter.orcc.soundvis.Context;
 import org.mcuosmipcuter.orcc.soundvis.ImageStore.Key;
 import org.mcuosmipcuter.orcc.soundvis.SessionToken;
@@ -125,19 +124,8 @@ public class Session implements Serializable {
 	}
 	private static void setUpApplication(PersistentSession persistentSession) throws AppLogicException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, NoSuchFieldException {
 		Context.setOutputDimension(persistentSession.getVideoOutPutWidth(), persistentSession.getVideoOutPutHeight());
-		Type inputType = persistentSession.getAudioInputType();
-		switch(inputType) {
-		case FILE:
-				Context.setAudioFromFile(persistentSession.getAudioInputName());
-				break;
-			case STREAM:
-				Context.setAudioFromClasspath(persistentSession.getAudioInputName());
-				break;
-			default:
-				throw new IllegalArgumentException();
-		}
-		Context.setOutputFrameRate(persistentSession.getVideoOutPutFrames());
-		
+		Context.setAudio(persistentSession.getAudioInputType(), persistentSession.getAudioInputName(), persistentSession.getVideoOutPutFrames());
+
 		Context.clearCanvasList();
 		for(PersistentSoundCanvasWrapper psw : persistentSession.getSoundCanvasList()) {
 			Context.addCanvasWrapper(psw.restore());

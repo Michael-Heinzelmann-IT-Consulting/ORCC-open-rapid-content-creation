@@ -19,6 +19,7 @@ package org.mcuosmipcuter.orcc.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Frame;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -42,12 +43,15 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.Popup;
+import javax.swing.PopupFactory;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.UnsupportedLookAndFeelException;
 
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.gui.table.CustomTable;
 import org.mcuosmipcuter.orcc.gui.util.ExtensionsFileFilter;
+import org.mcuosmipcuter.orcc.gui.util.GraphicsUtil;
 import org.mcuosmipcuter.orcc.soundvis.AppLogicException;
 import org.mcuosmipcuter.orcc.soundvis.AudioInput;
 import org.mcuosmipcuter.orcc.soundvis.Context;
@@ -74,6 +78,7 @@ import org.mcuosmipcuter.orcc.soundvis.gui.listeners.FileDialogActionListener.Pr
 import org.mcuosmipcuter.orcc.soundvis.gui.listeners.StopActionListener;
 import org.mcuosmipcuter.orcc.soundvis.gui.widgets.GraphicsJInternalFrame;
 import org.mcuosmipcuter.orcc.soundvis.gui.widgets.TimeLabel;
+import org.mcuosmipcuter.orcc.soundvis.gui.widgets.WidgetUtil;
 import org.mcuosmipcuter.orcc.soundvis.persistence.Session;
 import org.mcuosmipcuter.orcc.soundvis.threads.SaveThread;
 import org.mcuosmipcuter.orcc.soundvis.util.ExportUtil;
@@ -121,6 +126,9 @@ public class Main {
 			}
 		});
 		
+		final JDesktopPane deskTop = new JDesktopPane();
+		final JInternalFrame playBackFrame = new JInternalFrame("Audio Timeline");
+		final GraphicsJInternalFrame graphicFrame = new GraphicsJInternalFrame("Video", true, false, false, false);
 		final GraphPanel graphicPanel = new GraphPanel();
 
 		
@@ -152,9 +160,38 @@ public class Main {
 				openAudio.addActionListener(importActionListener);
 				
 				CallBack openSessionCallback = new CallBack() {
+					Popup popup = null;;
+
 					public void fileSelected(File file) {
-							List<String> reportList = new ArrayList<String>();
-							Session.userLoadSession(file, reportList);
+						
+						List<String> reportList = new ArrayList<String>();
+
+						String msg = "loading " + file.getName() + " ...";
+
+						JPanel popUpContentPanel = WidgetUtil.getMessagePanel(msg, 72, frame.getGraphics());
+						Rectangle screen = GraphicsUtil.getRootComponentOutline(frame);
+
+						popup = PopupFactory.getSharedInstance().getPopup(frame, popUpContentPanel,
+								screen.x + screen.width / 2 - popUpContentPanel.getPreferredSize().width / 2,
+								screen.y + screen.height / 2);
+
+						popup.show();
+						Thread t = new Thread() {
+
+							@Override
+							public void run() {
+								try {
+									Session.userLoadSession(file, reportList);
+								} finally {
+									if (popup != null) {
+										popup.hide();
+									}
+								}
+							}
+
+						};
+						t.start();
+
 					}
 				};
 				fileMenu.addSeparator();
@@ -346,10 +383,8 @@ public class Main {
 				});
 			}
 		}
-		final JInternalFrame playBackFrame = new JInternalFrame("Audio Timeline");
-		final GraphicsJInternalFrame graphicFrame = new GraphicsJInternalFrame("Video", false, false, false, false);
-		final JDesktopPane deskTop = new JDesktopPane();
-		////deskTop.setDesktopManager(new CustomDeskTopManager(playBackFrame, graphicFrame));
+
+		//deskTop.setDesktopManager(new CustomDeskTopManager(playBackFrame, graphicFrame));
 		deskTop.setVisible(true);
 		
 		frame.getContentPane().add(deskTop);
@@ -414,6 +449,7 @@ public class Main {
 	        container.add(propTable, BorderLayout.NORTH);     
 	        JScrollPane scrollPane = new JScrollPane(container);
 	        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+	        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 			propertiesFrame.add(scrollPane);
 			
 			{
@@ -435,6 +471,7 @@ public class Main {
 			}
 			
 			propertiesFrame.setLocation(0, playBackH);
+			propertiesFrame.setResizable(true);
 			propertiesFrame.setVisible(true);
 			propertiesFrame.setSize(infoW, deskTop.getHeight() - playBackH);
 			deskTop.add(propertiesFrame);
@@ -491,6 +528,7 @@ public class Main {
 					
 				}
 			});
+			Context.addListener(graphicPanel);
 
 			
 			deskTop.add(graphicFrame);
@@ -523,8 +561,14 @@ public class Main {
 
 
 		}
-
+		
 		List<String> reportList = new ArrayList<String>();
+		
+		JPanel popUpContentPanel = WidgetUtil.getMessagePanel("loading last session ...", 72, frame.getGraphics());
+		Rectangle screen = frame.getBounds();
+		Popup popup = PopupFactory.getSharedInstance().getPopup(frame, popUpContentPanel, screen.x + screen.width / 2 - popUpContentPanel.getPreferredSize().width / 2, screen.y + screen.height / 2);
+		popup.show();
+
 		org.mcuosmipcuter.orcc.gui.Configuration.stage2(args, reportList);
 		if(!reportList.isEmpty()) {
 			StringBuilder messages = new StringBuilder("Errors during session restore:");
@@ -533,9 +577,12 @@ public class Main {
 			}
 			JOptionPane.showMessageDialog(null, messages.toString());
 		}
+		popup.hide();
+
 		SaveThread saveThread = new SaveThread();
 		Context.addListener(saveThread);
 		saveThread.start();
+		Context.setAppState(AppState.READY);
 		
 	}
 	private static boolean allowSessionOpenRoutine() {

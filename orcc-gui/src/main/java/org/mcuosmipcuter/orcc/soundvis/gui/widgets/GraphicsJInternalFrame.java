@@ -23,7 +23,7 @@ public class GraphicsJInternalFrame extends JInternalFrame {
 	public GraphicsJInternalFrame(String string, boolean b, boolean c, boolean d, boolean e) {
 		super(string, b, c, d, e);
 	}
-	
+
 	public String getRealtimeTitle() {
 		return realtimeTitle;
 	}
