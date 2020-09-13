@@ -249,14 +249,12 @@ public class CustomTable extends JPanel implements Context.Listener{
 	 */
 	public void addLayer(final SoundCanvasWrapper soundCanvasWrapper) {
 		final Row row = new Row(soundCanvasWrapper);
-		//row.setPreferredSize(new Dimension(640, 36));
 		row.setPreferredSize(new Dimension(640, 64));
 		row.setLayout(new BorderLayout());
-		TitledBorder tb = new TitledBorder(new LineBorder(Color.ORANGE, 8));
+		TitledBorder tb = new TitledBorder(new LineBorder(Color.WHITE, 8));
 		tb.setTitle(soundCanvasWrapper.getDisplayName());
 		tb.setTitlePosition(TitledBorder.TOP);
 		row.setBorder(tb);
-		//row.setBorder(new LineBorder(Color.ORANGE, 6));
 		row.setBackground(Color.WHITE);
 		final JLabel layer = new JLabel(/*soundCanvasWrapper.getDisplayName()*/);
 		layer.setPreferredSize(new Dimension(140, 16));
@@ -267,18 +265,10 @@ public class CustomTable extends JPanel implements Context.Listener{
 			@Override
 			public void propertyWritten(Field field) {
 				String name = field.getName();
-				long start = System.currentTimeMillis();
-				//System.err.println("updateUI name " + name);
-
 				Context.canvasPropertyWritten(name, soundCanvasWrapper.getSoundCanvas());
 				if(field.isAnnotationPresent(TimedChange.class) || field.isAnnotationPresent(ChangesIcon.class)) {
-					System.err.println("Cust table after canvasPropertyWritten " + name);
-					//Context.beforePropertyUpdate(name);
-				
-				soundCanvasWrapper.updateUI(120, 30, (Graphics2D) soundCanvasWrapper.getIconImage().getGraphics());
-				//System.err.println((System.currentTimeMillis() - start) + "ms updateUI name " + name);
-				layer.setIcon(new ImageIcon(soundCanvasWrapper.getIconImage()));
-
+					soundCanvasWrapper.updateUI(120, 30, (Graphics2D) soundCanvasWrapper.getIconImage().getGraphics());
+					layer.setIcon(new ImageIcon(soundCanvasWrapper.getIconImage()));
 				}
 			}
 		});
@@ -289,7 +279,7 @@ public class CustomTable extends JPanel implements Context.Listener{
 		timeline.setLayout(new GridLayout(1, 0, 6, 6));
 		timeline.setBorder(new LineBorder(Color.WHITE, 4));
 		
-		final JCheckBox showCheckBox = new JCheckBox("on", soundCanvasWrapper.isVisible());
+		final JCheckBox showCheckBox = new JCheckBox(soundCanvasWrapper.isVisible() ? "on" : "off", soundCanvasWrapper.isVisible());
 		showCheckBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -373,7 +363,7 @@ public class CustomTable extends JPanel implements Context.Listener{
 				Context.touch();
 			}
 		});
-		final JCheckBox xorCheckBox = new JCheckBox("std", soundCanvasWrapper.isXor());
+		final JCheckBox xorCheckBox = new JCheckBox(soundCanvasWrapper.isXor() ? "xor": "std", soundCanvasWrapper.isXor());
 		xorCheckBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
