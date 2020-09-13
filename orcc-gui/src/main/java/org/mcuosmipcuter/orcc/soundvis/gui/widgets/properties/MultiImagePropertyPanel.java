@@ -145,7 +145,9 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 	JPanel valueSelect = new JPanel();
 	JScrollPane scrollPane;
 
+	private JPanel commands = new JPanel();
 	private JPanel imagebar = new JPanel();
+	private Color origBackground;
 	Popup popup = null;
 	Popup editPopup = null;
 	boolean isPopupShowing;
@@ -160,13 +162,13 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 	public MultiImagePropertyPanel(final SoundCanvasWrapper soundCanvasWrapper, Object valueOwner) {
 		super(soundCanvasWrapper, valueOwner);
 
-		valueSelect.setBackground(Color.CYAN);
 		valueSelect.setLayout(new BorderLayout(2, 2));
+		valueSelect.setBackground(Color.BLACK);
 		addFileButton.setPreferredSize(new Dimension(80, 80));
 		addFileButton.setFont(getFont().deriveFont(48.0f));
 
 		imagebar.setBackground(Color.BLACK);
-		//imagebar.setPreferredSize(new Dimension(480, 220));
+
 		JButton close = new JButton("close");
 		close.addActionListener(new ActionListener() {
 
@@ -176,7 +178,6 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 				hidePopup();
 			}
 		});
-		//imagebar.setPreferredSize(new Dimension(40, 12));
 		valueSelect.add(close, BorderLayout.NORTH);
 		scrollPane = new JScrollPane(imagebar);
 		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
@@ -191,7 +192,6 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 			}
 		});
 
-		JPanel commands = new JPanel();
 		commands.setLayout(new GridLayout(1, 2, 0, 0));
 		commands.add(fileButton);
 		commands.add(editButton);
@@ -206,6 +206,10 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 		Point loc = editButton.getLocationOnScreen();
 		popup = PopupFactory.getSharedInstance().getPopup(editButton, valueSelect, loc.x, loc.y);
 		editButton.setEnabled(false);
+		commands.setOpaque(true);
+		commands.setBackground(Color.YELLOW);
+		origBackground = getBackground();
+		setBackground(Color.YELLOW);
 		popup.show();
 		isPopupShowing = true;
 	}
@@ -213,6 +217,8 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 	private void hidePopup() {
 		popup.hide();
 		editButton.setEnabled(true);
+		setBackground(origBackground);
+		commands.setOpaque(false);
 		isPopupShowing = false;
 	}
 	
@@ -229,7 +235,6 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 		gc.insets = new Insets(3, 3, 3, 3);
 		gc.fill = GridBagConstraints.HORIZONTAL;
 		gc.weightx = GridBagConstraints.CENTER;
-		//gc.gridheight = 3;
 		
 		gc.gridwidth = GridBagConstraints.REMAINDER;
 		JButton closeButton = new JButton("close");
@@ -439,7 +444,7 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 			int rows = (currentValue.length + 1) / COLS;
 			rows = (currentValue.length + 1) % COLS == 0 ? rows : rows + 1;
 			gc.gridheight = rows;
-			valueSelect.setPreferredSize(new Dimension(500, rows * (80 + 20) + 6));
+			valueSelect.setPreferredSize(new Dimension(500, Math.max(rows * (80 + 20) + 6, 130)));
 			for (final Slide slide : currentValue) {
 				JButton ib = new JButton() {
 					private static final long serialVersionUID = 1L;
