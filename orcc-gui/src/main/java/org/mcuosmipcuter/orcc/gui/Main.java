@@ -143,6 +143,8 @@ public class Main {
 			mb.add(fileMenu);
 			JMenuItem openSession = new JMenuItem("open session");
 			JMenuItem openAudio = new JMenuItem("open audio");
+			JMenuItem saveSessionAs = new JMenuItem("save session as");
+			JMenuItem saveSession = new JMenuItem("save session");
 			{
 				
 				fileMenu.add(openAudio);
@@ -174,7 +176,8 @@ public class Main {
 						popup = PopupFactory.getSharedInstance().getPopup(frame, popUpContentPanel,
 								screen.x + screen.width / 2 - popUpContentPanel.getPreferredSize().width / 2,
 								screen.y + screen.height / 2);
-
+						final AppState before = Context.getAppState();
+						Context.setAppState(AppState.LOADING);
 						popup.show();
 						Thread t = new Thread() {
 
@@ -183,6 +186,7 @@ public class Main {
 								try {
 									Session.userLoadSession(file, reportList);
 								} finally {
+									Context.setAppState(before);
 									if (popup != null) {
 										popup.hide();
 									}
@@ -218,7 +222,6 @@ public class Main {
 					}
 				};
 				fileMenu.addSeparator();
-				JMenuItem saveSessionAs = new JMenuItem("save session as");
 				fileMenu.add(saveSessionAs);
 				FileDialogActionListener saveSessionAsActionListener = new FileDialogActionListener(null, saveSessionAsCallback, "save session");
 				saveSessionAsActionListener.setFileFilter(new ExtensionsFileFilter(Session.FILE_EXTENSION));
@@ -226,9 +229,7 @@ public class Main {
 				saveSessionAs.addActionListener(saveSessionAsActionListener);
 				
 				fileMenu.addSeparator();
-				JMenuItem saveSession = new JMenuItem("save session");
 				fileMenu.add(saveSession);
-
 				saveSession.addActionListener(new ActionListener() {
 					
 					@Override
@@ -346,12 +347,15 @@ public class Main {
 				Context.addListener(new Listener() {
 					public void contextChanged(PropertyName propertyName) {
 						if(PropertyName.AppState.equals(propertyName)) {
-							exportMenu.setEnabled(Context.getAppState() == AppState.READY || Context.getAppState() == AppState.EXPORTING);
-							exportStart.setEnabled(Context.getAppState() != AppState.EXPORTING);
-							exportStop.setEnabled(Context.getAppState() == AppState.EXPORTING);
-							openAudio.setEnabled(Context.getAppState() == AppState.READY);
-							openSession.setEnabled(Context.getAppState() == AppState.READY);
-							newSession.setEnabled(Context.getAppState() == AppState.READY);
+							AppState current = Context.getAppState();
+							exportMenu.setEnabled(current == AppState.READY || current == AppState.EXPORTING);
+							exportStart.setEnabled(current != AppState.INIT && current != AppState.EXPORTING && current != AppState.LOADING);
+							exportStop.setEnabled(current == AppState.EXPORTING);
+							openAudio.setEnabled(current == AppState.READY);
+							openSession.setEnabled(current == AppState.READY);
+							newSession.setEnabled(current == AppState.READY);
+							saveSession.setEnabled(current != AppState.INIT && current != AppState.LOADING);
+							saveSessionAs.setEnabled(current != AppState.INIT && current != AppState.LOADING);
 						}
 					}
 				});
@@ -478,12 +482,9 @@ public class Main {
 		}	
 
 		{
-			//JMenuBar graphicMenuBar = new JMenuBar();
-			//graphicFrame.setJMenuBar(graphicMenuBar);
 			{			
 				
 				final JMenu configMenu = new JMenu("Configuration");
-				//graphicMenuBar.add(configMenu);
 				mb.add(configMenu);
 
 				VideoOutputInfo v = Context.getVideoOutputInfo();
@@ -558,18 +559,24 @@ public class Main {
 					}
 				}
 			});
-
-
 		}
 		
-		List<String> reportList = new ArrayList<String>();
+		
+
+		org.mcuosmipcuter.orcc.gui.Configuration.stage2(args);
 		
 		JPanel popUpContentPanel = WidgetUtil.getMessagePanel("loading last session ...", 72, frame.getGraphics());
 		Rectangle screen = frame.getBounds();
 		Popup popup = PopupFactory.getSharedInstance().getPopup(frame, popUpContentPanel, screen.x + screen.width / 2 - popUpContentPanel.getPreferredSize().width / 2, screen.y + screen.height / 2);
 		popup.show();
 
-		org.mcuosmipcuter.orcc.gui.Configuration.stage2(args, reportList);
+
+		Context.setAppState(AppState.LOADING);
+		List<String> reportList = new ArrayList<String>();
+		boolean restoredSession = Session.restoreSession(reportList);
+		if(!restoredSession) {
+			Session.newSession();
+		}
 		if(!reportList.isEmpty()) {
 			StringBuilder messages = new StringBuilder("Errors during session restore:");
 			for(String m : reportList) {

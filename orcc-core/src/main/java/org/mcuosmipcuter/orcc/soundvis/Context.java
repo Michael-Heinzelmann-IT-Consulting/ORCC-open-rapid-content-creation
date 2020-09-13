@@ -62,7 +62,7 @@ public abstract class Context {
 	 * @author Michael Heinzelmann
 	 */
 	public enum AppState {
-		INIT, READY, PLAYING, PAUSED, EXPORTING
+		INIT, READY, PLAYING, PAUSED, EXPORTING, LOADING
 	}
 	/**
 	 * Listener to this context for asynchronous communication

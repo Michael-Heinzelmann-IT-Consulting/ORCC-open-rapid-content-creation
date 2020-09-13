@@ -17,7 +17,6 @@
 */
 package org.mcuosmipcuter.orcc.gui;
 
-import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -27,7 +26,6 @@ import javax.swing.UIManager;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.soundvis.Context;
 import org.mcuosmipcuter.orcc.soundvis.FontStore;
-import org.mcuosmipcuter.orcc.soundvis.persistence.Session;
 import org.mcuosmipcuter.orcc.util.ClassPathExplodedDirLoader;
 import org.mcuosmipcuter.orcc.util.IOUtil;
 
@@ -121,17 +119,13 @@ public abstract class Configuration {
 	 * Setting up canvas to use, audio (currently only in dev mode) and creating a dummy volume control
 	 * @param args you should pass the ones from main
 	 */
-	public static synchronized void stage2(String[] args, List<String> reportList) {	
+	public static synchronized void stage2(String[] args) {	
 		
 		if(stage < 2) {
 			throw new IllegalStateException("stage 1 required, but is " + stage);
 		}
 		FontStore.init();
 		
-		boolean restoredSession = Session.restoreSession(reportList);
-		if(!restoredSession) {
-			Session.newSession();
-		}
 		// set a dummy control to get volume setup
 		FloatControl dummy = new FloatControl(FloatControl.Type.MASTER_GAIN, -80, 6, 1, 1, 0, "dB"){};
 		Context.setVolumeControl(dummy);
