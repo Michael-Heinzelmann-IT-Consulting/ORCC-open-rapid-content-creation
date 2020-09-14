@@ -38,6 +38,10 @@ import org.mcuosmipcuter.orcc.soundvis.threads.SuperSampleData;
  *
  */
 public class AudioWave implements SoundCanvas {
+	
+	public static enum AMP_VALUES{
+		PEAK, AVERAGE,
+	}
 
 	private String loadedAudioName;
 	private int loadedWidth;
@@ -61,6 +65,9 @@ public class AudioWave implements SoundCanvas {
 	@UserProperty(description="size amplitude")
 	@LimitedIntProperty(minimum = 1, description = "not smaller than 0")
 	private int scaleWidth = 100;
+	
+	@UserProperty(description="value of amplitude")
+	private AMP_VALUES ampValue = AMP_VALUES.PEAK;
 
 	@Override
 	public void newFrame(long frameCount, Graphics2D graphics) {
@@ -83,7 +90,12 @@ public class AudioWave implements SoundCanvas {
 				if(x * noOfSamples > frameCount * samplesPerFrame) {
 					graphics.setColor(colorToPlay);
 				}
-				graphics.drawLine(x, center - susa.getMax() / divY, x, center - susa.getMin() / divY);
+				int up = ampValue == AMP_VALUES.PEAK ? susa.getMax() : susa.getAvgUp();
+				int down = ampValue == AMP_VALUES.PEAK ? susa.getMin() : susa.getAvgDown();
+				graphics.drawLine(x, center - up / divY, x, center - down / divY);
+//				graphics.setColor(Color.YELLOW);
+//				graphics.drawLine(x, center - susa.getAvgUp()/ divY, x, center - susa.getMax() / divY);
+//				graphics.drawLine(x, center - susa.getAvgDown() / divY, x, center - susa.getMin() / divY);
 				x++;
 			}
 			

@@ -6,14 +6,18 @@ package org.mcuosmipcuter.orcc.soundvis.model;
  */
 public class SuperSample {
 	
-	public SuperSample(int min, int max, int noOfSamples) {
+	public SuperSample(int min, int max, int noOfSamples, int avgUp, int avgDown) {
 		this.min = min;
 		this.max = max;
 		this.noOfSamples = noOfSamples;
+		this.avgUp = avgUp;
+		this.avgDown = avgDown;
 	}
 	private final int min;
 	private final int max;
 	private final int noOfSamples;
+	private final int avgUp;
+	private final int avgDown;
 	
 	/**
 	 * Get the minimum aggregated
@@ -37,6 +41,14 @@ public class SuperSample {
 	 */
 	public int getNoOfSamples() {
 		return noOfSamples;
+	}
+
+	public int getAvgUp() {
+		return avgUp;
+	}
+
+	public int getAvgDown() {
+		return avgDown;
 	}
 
 	@Override

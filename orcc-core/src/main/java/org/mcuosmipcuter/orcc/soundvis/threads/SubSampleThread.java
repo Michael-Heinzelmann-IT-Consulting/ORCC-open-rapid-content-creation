@@ -76,8 +76,12 @@ public class SubSampleThread extends Thread {
 				int sampleCenter =  (int)Math.pow(2,ai.getAudioInputInfo().getAudioFormat().getSampleSizeInBits()) / 2;
 				long totalCounter;
 				int counter;
+				int upCounter;
+				int doCounter;
 				int max = 0;
 				int min = Integer.MAX_VALUE;
+				long sumUp = 0;
+				long sumDown = 0;
 
 				@Override
 				public boolean nextSample(int[] amplitudes, byte[] rawData, long sampleCount) {
@@ -90,11 +94,23 @@ public class SubSampleThread extends Thread {
 						if(amplitudes[i] < min) {
 							min = amplitudes[i];
 						}
+						if(amplitudes[i] >= sampleCenter) {
+							sumUp += amplitudes[i];
+							upCounter++;
+						}
+						else {
+							sumDown += amplitudes[i];
+							doCounter++;
+						}
 					}
 					if(counter == noOfSamples || totalCounter == total) {
+						//System.err.println("''#" + counter);
 						int signedMin = min - sampleCenter;
 						int signedMax = max - sampleCenter;
-						SuperSample superSample = new SuperSample(signedMin, signedMax, counter);
+						int aU = upCounter != 0 ? (int)(sumUp / upCounter) - sampleCenter: 0;
+						int aD = doCounter != 0 ? (int)(sumDown / doCounter) - sampleCenter: 0;
+						//System.err.println(counter + " " + max + "/" + min + " ."+ sumUp + " " + sumDown + "''#" + aU + " " + aD);
+						SuperSample superSample = new SuperSample(signedMin, signedMax, counter, aU, aD);
 						list.add(superSample);
 						if(signedMin < overalls[0]) {
 							overalls[0] = signedMin;
@@ -105,6 +121,10 @@ public class SubSampleThread extends Thread {
 						counter = 0;
 						min = Integer.MAX_VALUE;
 						max = 0;
+						sumUp = 0;
+						sumDown = 0;
+						upCounter = 0;
+						doCounter = 0;
 					}
 					return true;
 				}
