@@ -24,9 +24,7 @@ import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.swing.JPanel;
 
@@ -34,6 +32,7 @@ import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
 import org.mcuosmipcuter.orcc.api.soundvis.DisplayDuration;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.gui.table.CustomTableListener;
+import org.mcuosmipcuter.orcc.gui.util.GUIDesignUtil;
 import org.mcuosmipcuter.orcc.soundvis.AudioInput;
 import org.mcuosmipcuter.orcc.soundvis.Context;
 import org.mcuosmipcuter.orcc.soundvis.Context.AppState;
@@ -65,14 +64,6 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 	private final static Color selectedCanvasColor = new Color(255, 255, 255, 200);
 	private final static Color canvasColor1 = new Color(146, 166, 176, 44);
 	private final static Color canvasColor2 = new Color(146, 176, 146, 44);
-	private final static Map<String, Color> effectColors = new HashMap<>();
-	static {
-		effectColors.put("mover", Color.ORANGE);
-		effectColors.put("fader", Color.CYAN);
-		effectColors.put("rotator", Color.RED);
-		effectColors.put("scaler", Color.BLUE);
-		effectColors.put("shearer", Color.GREEN);
-	}
 	
 	// flexible layout screen dependent
 	int widthToUse;
@@ -357,7 +348,7 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 									yPoints = new int[] {y+b/2, y+delta +1, y+delta+1 , y+b/2, y+ b, y+b };
 									nPoints = 6;
 								}
-								g.setColor(effectColors.get(fromTos[i].getDisplayObject().getDisplayKey()));
+								g.setColor(GUIDesignUtil.getEffectBgColor(fromTos[i].getDisplayObject().getClass(), Color.WHITE));
 								g.drawPolygon(xPoints, yPoints, nPoints);
 								//g.drawString(fromTos[i].getDisplayObject().getDisplayText(), x1 + 6, y + delta + 12);
 							}
