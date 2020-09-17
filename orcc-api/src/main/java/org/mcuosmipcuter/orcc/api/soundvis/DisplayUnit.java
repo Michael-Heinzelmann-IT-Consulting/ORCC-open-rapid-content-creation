@@ -22,27 +22,33 @@ package org.mcuosmipcuter.orcc.api.soundvis;
  * @author Michael Heinzelmann
  * Unit of display relative to timeline
  *<br/>
- * <code>
+ * 
+ * <pre>
+ *   | ov bef |                          | ov aft |
  *   |--------------------------------------------|
  *                     duration
  *   |---------------|   
- *    currentPosition    
- * </code>
+ *            currentPosition    
+ * </pre>
  *
  */
 public class DisplayUnit {
 	public final int currentPosition;
 	public final int duration;
+	public final int overLapBefore;
+	public final int overLapAfter;
 	public final int index;
-	public DisplayUnit(int currentPosition, int duration, int index) {
+	public DisplayUnit(int currentPosition, int duration, int overLapBefore, int overLapAfter, int index) {
 		this.currentPosition = currentPosition;
 		this.duration = duration;
+		this.overLapBefore = overLapBefore;
+		this.overLapAfter = overLapAfter;
 		this.index = index;
 	}
 	@Override
 	public String toString() {
-		return "DisplayUnit [currentPosition=" + currentPosition + ", duration=" + duration + ", index=" + index + "]";
+		return "DisplayUnit [currentPosition=" + currentPosition + ", duration=" + duration + ", overLapBefore="
+				+ overLapBefore + ", overLapAfter=" + overLapAfter + ", index=" + index + "]";
 	}
-
 	
 }

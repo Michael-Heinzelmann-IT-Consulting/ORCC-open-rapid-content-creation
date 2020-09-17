@@ -3,6 +3,7 @@ package org.mcuosmipcuter.orcc.soundvis.effects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+import org.mcuosmipcuter.orcc.api.soundvis.DisplayUnit;
 import org.mcuosmipcuter.orcc.api.soundvis.EffectShape;
 import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
@@ -39,8 +40,8 @@ public class EffectShaperSimple extends EffectShaper {
 	public EffectShaperSimple(EffectShape initial, int minValues, int maxValues) {
 		super(initial, minValues, maxValues);
 	}
-	public void currentValues(int posInSlideDuration, int numberOfFramesSlideIsVisible, Consumer<Float> valueConsumer) {
-		super.currentValues(posInSlideDuration, numberOfFramesSlideIsVisible, new BiConsumer<Float, Float>() {
+	public void currentValues(DisplayUnit displayUnit, Consumer<Float> valueConsumer) {
+		super.currentValues(displayUnit, new BiConsumer<Float, Float>() {
 			
 			@Override
 			public void accept(Float x, Float y) {

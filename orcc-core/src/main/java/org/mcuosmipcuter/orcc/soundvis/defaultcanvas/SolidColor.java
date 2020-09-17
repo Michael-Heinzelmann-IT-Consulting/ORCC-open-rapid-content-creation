@@ -20,6 +20,10 @@ package org.mcuosmipcuter.orcc.soundvis.defaultcanvas;
 import java.awt.Color;
 import java.awt.Composite;
 import java.awt.Graphics2D;
+import java.awt.Shape;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Area;
+import java.awt.geom.Rectangle2D;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
 import org.mcuosmipcuter.orcc.api.soundvis.ChangesIcon;
@@ -29,8 +33,11 @@ import org.mcuosmipcuter.orcc.api.soundvis.NestedProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
+import org.mcuosmipcuter.orcc.api.util.DimensionHelper;
 import org.mcuosmipcuter.orcc.soundvis.effects.Fader;
+import org.mcuosmipcuter.orcc.soundvis.effects.Positioner;
 import org.mcuosmipcuter.orcc.soundvis.effects.Repeater;
+import org.mcuosmipcuter.orcc.soundvis.effects.Scaler;
 
 /**
  * Displays a solid color
@@ -44,14 +51,23 @@ public class SolidColor implements SoundCanvas {
 	private int width;
 	private int height;
 
+	Shape screen;
+	private DimensionHelper dimensionHelper;
+	
 	private long frameFrom;
 	private long frameTo;
 	
 	@NestedProperty(description = "fading in and out")
 	private Fader fader = new Fader();
 	
+	@NestedProperty(description = "scale in and out")
+	Scaler scaler = new Scaler();
+	
+	@NestedProperty(description = "x and y position")
+	Positioner positioner = new Positioner();
+	
 	@NestedProperty(description = "repeating inside from and to")
-	private Repeater repeater = new Repeater(fader);
+	private Repeater repeater = new Repeater(scaler, fader);
 
 	@Override
 	public void nextSample(int[] amplitudes) {
@@ -59,10 +75,16 @@ public class SolidColor implements SoundCanvas {
 
 	@Override
 	public void newFrame(long frameCount, Graphics2D graphics2D) {	
+	
 		for(DisplayUnit displayUnit : repeater.repeat(frameFrom, frameTo, frameCount)) {
+			Area fillArea = new Area(screen);
+			AffineTransform atsc = scaler.scale(displayUnit, fillArea.getBounds().width, fillArea.getBounds().height);
+			fillArea.transform(atsc);
+			AffineTransform atp = positioner.position(dimensionHelper, fillArea.getBounds());
+			fillArea.transform(atp);
 			graphics2D.setColor(color);
-			Composite origComposite = fader.fade(graphics2D, displayUnit.currentPosition, displayUnit.duration);
-			graphics2D.fillRect(0, 0, width, height);
+			Composite origComposite = fader.fade(graphics2D, displayUnit);
+			graphics2D.fillRect(fillArea.getBounds().x, fillArea.getBounds().y, fillArea.getBounds().width, fillArea.getBounds().height);
 			graphics2D.setComposite(origComposite);
 		}
 	}
@@ -72,6 +94,8 @@ public class SolidColor implements SoundCanvas {
 			VideoOutputInfo videoOutputInfo) {
 		width = videoOutputInfo.getWidth();
 		height = videoOutputInfo.getHeight();
+		screen = new Rectangle2D.Double(0,0,width, height);
+		dimensionHelper = new DimensionHelper(videoOutputInfo);
 	}
 
 	@Override

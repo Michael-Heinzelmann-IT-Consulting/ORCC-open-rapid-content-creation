@@ -22,6 +22,7 @@ import java.util.function.BiConsumer;
 
 import org.mcuosmipcuter.orcc.api.soundvis.DisplayDuration;
 import org.mcuosmipcuter.orcc.api.soundvis.DisplayObject;
+import org.mcuosmipcuter.orcc.api.soundvis.DisplayUnit;
 import org.mcuosmipcuter.orcc.api.soundvis.EffectShape;
 import org.mcuosmipcuter.orcc.api.soundvis.NestedProperty;
 
@@ -35,10 +36,10 @@ public class Scaler implements DisplayObject{
 	EffectShaper effectShaper = new EffectShaper();
 	
 	
-	public AffineTransform scale(int posInSlideDuration, int numberOfFramesSlideIsVisible, int width, int height) {
+	public AffineTransform scale(DisplayUnit displayUnit, int width, int height) {
 		AffineTransform transform = new AffineTransform();
 		
-		effectShaper.currentValues(posInSlideDuration, numberOfFramesSlideIsVisible, new BiConsumer<Float, Float>() {
+		effectShaper.currentValues(displayUnit, new BiConsumer<Float, Float>() {
 
 			@Override
 			public void accept(Float x, Float y) {

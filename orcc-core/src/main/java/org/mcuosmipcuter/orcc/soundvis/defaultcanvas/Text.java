@@ -275,11 +275,11 @@ public class Text implements SoundCanvas, PropertyListener {
 
 			int lineTop = topPixels + ascent;
 			int lineIdx = 0;
-			final Composite origComposite = fader.fade(graphics2d, displayUnit.currentPosition, displayUnit.duration);
+			final Composite origComposite = fader.fade(graphics2d, displayUnit);
 
 			final AffineTransform saveTransfrom = graphics2d.getTransform();
 
-			AffineTransform transform = shearer.shear(displayUnit.currentPosition, displayUnit.duration);
+			AffineTransform transform = shearer.shear(displayUnit);
 			transform.concatenate(mover.move(displayUnit.currentPosition, displayUnit.duration));
 			transform.concatenate(positioner.position(dimensionHelper));
 			transform.concatenate(rotator.rotate(displayUnit.currentPosition, displayUnit.duration, (videoOutputInfo.getWidth()) / 2, (videoOutputInfo.getHeight() ) / 2));
@@ -323,7 +323,7 @@ public class Text implements SoundCanvas, PropertyListener {
 
 					for (int i = 0; i < lineToUse.length(); i++) {
 						Rectangle2D go = gv.getGlyphOutline(i).getBounds2D();
-						AffineTransform glyphTx = ishearer.shear(displayUnit.currentPosition, displayUnit.duration);
+						AffineTransform glyphTx = ishearer.shear(displayUnit);
 						AffineTransform glyphTxR = iRotator.rotate(displayUnit.currentPosition, 
 								displayUnit.duration, (int)go.getWidth()/2, (int)
 								go.getCenterY());

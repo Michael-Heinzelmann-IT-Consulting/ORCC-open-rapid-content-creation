@@ -107,7 +107,7 @@ public class Shutter implements SoundCanvas {
 
 		Area clipAreaInside = new Area(clip);
 
-		AffineTransform atsc = scaler.scale(displayUnit.currentPosition, displayUnit.duration, clipAreaInside.getBounds().width, clipAreaInside.getBounds().height);
+		AffineTransform atsc = scaler.scale(displayUnit, clipAreaInside.getBounds().width, clipAreaInside.getBounds().height);
 		clipAreaInside.transform(atsc);
 
 		AffineTransform atp = positioner.position(dimensionHelper, clipAreaInside.getBounds());
@@ -139,7 +139,7 @@ public class Shutter implements SoundCanvas {
 		graphics2D.setColor(color);
 
 		graphics2D.setClip(fillArea);
-		final Composite saveComposite = fader.fade(graphics2D, displayUnit.currentPosition, displayUnit.duration);
+		final Composite saveComposite = fader.fade(graphics2D, displayUnit);
 
 		// graphics2D.setPaint(new GrayFilter(false, 50).);
 

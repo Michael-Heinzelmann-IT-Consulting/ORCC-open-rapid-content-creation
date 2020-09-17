@@ -24,6 +24,7 @@ import java.util.function.Consumer;
 
 import org.mcuosmipcuter.orcc.api.soundvis.DisplayDuration;
 import org.mcuosmipcuter.orcc.api.soundvis.DisplayObject;
+import org.mcuosmipcuter.orcc.api.soundvis.DisplayUnit;
 import org.mcuosmipcuter.orcc.api.soundvis.EffectShape;
 import org.mcuosmipcuter.orcc.api.soundvis.NestedProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
@@ -52,10 +53,10 @@ public class Fader implements DisplayObject{
 	private RULE rule = RULE.SRC_OVER;
 	
 	
-	public Composite fade(Graphics2D graphics2D, int posInSlideDuration, int numberOfFramesSlideIsVisible) {
+	public Composite fade(Graphics2D graphics2D, DisplayUnit displayUnit) {
 		
 		final Composite saveComposite = graphics2D.getComposite();
-			effectShaper.currentValues(posInSlideDuration, numberOfFramesSlideIsVisible, new Consumer<Float>() {				
+			effectShaper.currentValues(displayUnit, new Consumer<Float>() {				
 				@Override
 				public void accept(Float transparency) {
 					transparency = transparency < 0 ? 0 : (transparency > 1 ? 1f : transparency);

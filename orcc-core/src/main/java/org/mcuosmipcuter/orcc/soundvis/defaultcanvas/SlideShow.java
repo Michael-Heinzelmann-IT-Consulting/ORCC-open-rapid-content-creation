@@ -118,7 +118,7 @@ public class SlideShow implements SoundCanvas {
 
 				Area imageArea = new Area(new Rectangle(image.getWidth(), image.getHeight()));
 
-				AffineTransform transformS = scaler.scale(displayUnit.currentPosition, displayUnit.duration, imageArea.getBounds().width, imageArea.getBounds().height);
+				AffineTransform transformS = scaler.scale(displayUnit, imageArea.getBounds().width, imageArea.getBounds().height);
 				imageArea.transform(transformS);
 
 				AffineTransform transformP = positioner.position(dimensionHelper, imageArea.getBounds());
@@ -154,7 +154,7 @@ public class SlideShow implements SoundCanvas {
 					imageArea.transform(transformM);
 				}
 
-				final Composite saveComposite = fader.fade(graphics2D, displayUnit.currentPosition, displayUnit.duration);
+				final Composite saveComposite = fader.fade(graphics2D, displayUnit);
 
 
 				try {							

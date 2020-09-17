@@ -22,6 +22,7 @@ import java.util.function.BiConsumer;
 
 import org.mcuosmipcuter.orcc.api.soundvis.DisplayDuration;
 import org.mcuosmipcuter.orcc.api.soundvis.DisplayObject;
+import org.mcuosmipcuter.orcc.api.soundvis.DisplayUnit;
 import org.mcuosmipcuter.orcc.api.soundvis.EffectShape;
 import org.mcuosmipcuter.orcc.api.soundvis.NestedProperty;
 
@@ -34,10 +35,10 @@ public class Shearer implements DisplayObject {
 	@NestedProperty(description = "shaer effects")
 	EffectShaper effectShaper = new EffectShaper(new EffectShape(0, 0, 0, 0, 0, 0, 0), Integer.MIN_VALUE, Integer.MAX_VALUE);
 	
-	public AffineTransform shear(int posInSlideDuration, int numberOfFramesSlideIsVisible) {
+	public AffineTransform shear(DisplayUnit displayUnit) {
 		AffineTransform transform = new AffineTransform();
 		
-		effectShaper.currentValues(posInSlideDuration, numberOfFramesSlideIsVisible, new BiConsumer<Float, Float>() {
+		effectShaper.currentValues(displayUnit, new BiConsumer<Float, Float>() {
 			@Override
 			public void accept(Float x, Float y) {
 				transform.shear(x, y);

@@ -69,7 +69,7 @@ public class Repeater {
 					if(index >= repeat ) {
 						index = 0;
 					}
-					DisplayUnit d = new DisplayUnit(relFrameCount - start, duration, index);
+					DisplayUnit d = new DisplayUnit(relFrameCount - start, duration, oLapBef, oLapAft, index);
 					units.add(d);
 					index++;
 				}

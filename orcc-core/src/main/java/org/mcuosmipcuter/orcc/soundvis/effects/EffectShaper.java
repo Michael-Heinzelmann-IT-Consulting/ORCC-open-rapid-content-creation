@@ -19,6 +19,7 @@ package org.mcuosmipcuter.orcc.soundvis.effects;
 
 import java.util.function.BiConsumer;
 
+import org.mcuosmipcuter.orcc.api.soundvis.DisplayUnit;
 import org.mcuosmipcuter.orcc.api.soundvis.EffectShape;
 import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
@@ -88,11 +89,19 @@ public class EffectShaper {
 	public int getMaxValues() {
 		return maxValues;
 	}
-	public void currentValues(int posInSlideDuration, int numberOfFramesSlideIsVisible, BiConsumer<Float, Float> valueConsumer) {
-		currentValues(posInSlideDuration, numberOfFramesSlideIsVisible, valueConsumer, getEffectShape());
+	public void currentValues(DisplayUnit displayUnit, BiConsumer<Float, Float> valueConsumer) {
+		currentValues(displayUnit, valueConsumer, getEffectShape());
 	}
-	protected void currentValues(int posInSlideDuration, int numberOfFramesSlideIsVisible, BiConsumer<Float, Float> valueConsumer, EffectShape current) {
+	protected void currentValues(DisplayUnit displayUnit, BiConsumer<Float, Float> valueConsumer, EffectShape current) {
 
+		int posInSlideDuration = recalcPosInSlideDuration(displayUnit, current);
+		int numberOfFramesSlideIsVisible =  recalcNumberOfFramesSlideIsVisible(displayUnit, current);
+		if(posInSlideDuration >= numberOfFramesSlideIsVisible) {
+			posInSlideDuration = numberOfFramesSlideIsVisible -1; // INFINITY SLOPE VERTICAL //
+		}
+		
+		//System.err.println(valueConsumer + " " + displayUnit.index+ ": " + displayUnit.currentPosition + " "+ posInSlideDuration + " / " + displayUnit.duration + " " + numberOfFramesSlideIsVisible);
+		
 		float begScaleX = current.begValueXPercent / 100f;
 		float begScaleY = current.begValueYPercent / 100f;
 		float midScaleX = current.midValueXPercent / 100f;
@@ -116,7 +125,7 @@ public class EffectShaper {
 			float distanceOut = ((Math.abs(current.framesOut) + current.endFrames) * 100f);
 			if(distanceOut != 0) {
 				float scaleRateOut = 100f / distanceOut;
-				currentScaleOut = (numberOfFramesSlideIsVisible + current.endFrames - posInSlideDuration + 1) * scaleRateOut;
+				currentScaleOut = (numberOfFramesSlideIsVisible + current.endFrames - posInSlideDuration) * scaleRateOut;
 			}
 		}
 		if(isScalingIn) {
@@ -139,7 +148,7 @@ public class EffectShaper {
 			if(posInSlideDuration < current.beginFrames) {
 				valueConsumer.accept(current.begValueXPercent / 100f, current.begValueYPercent / 100f);
 			}
-			else if(posInSlideDuration >= (numberOfFramesSlideIsVisible + current.endFrames)) {
+			else if(posInSlideDuration >= (numberOfFramesSlideIsVisible + current.endFrames)) {  // INFINITY SLOPE VERTICAL //
 				valueConsumer.accept(current.endValueXPercent / 100f, current.endValueYPercent / 100f);
 			}
 			else {
@@ -148,7 +157,30 @@ public class EffectShaper {
 		}
 
 	}
-	
+	private int recalcPosInSlideDuration(DisplayUnit displayUnit, EffectShape current) {
+		int posInSlideDuration = displayUnit.currentPosition; 
+		if(displayUnit.overLapBefore < 0) {
+			if(current.framesIn >= 0) {
+				posInSlideDuration += displayUnit.overLapBefore;
+			}
+			else {
+				posInSlideDuration += (displayUnit.overLapBefore - current.framesIn);
+			}
+		}
+		return posInSlideDuration >= 0 ? posInSlideDuration : 0;
+	}
+	private int recalcNumberOfFramesSlideIsVisible(DisplayUnit displayUnit, EffectShape current) {
+		int numberOfFramesSlideIsVisible = displayUnit.duration;
+		
+		if(displayUnit.overLapBefore < 0) {
+			numberOfFramesSlideIsVisible += (displayUnit.overLapBefore - Math.min(current.framesIn, 0));
+		}
+		if(displayUnit.overLapAfter > 0) {
+			numberOfFramesSlideIsVisible -= (displayUnit.overLapAfter - Math.max(current.framesOut, 0));
+		}
+		
+		return numberOfFramesSlideIsVisible;
+	}
 	public EffectShape getEffectShape() {
 		EffectShape effectShape = new EffectShape(framesIn, framesOut, beginFrames, endFrames,
 				begValueXPercent, begValueYPercent, midValueXPercent, midValueYPercent, endValueXPercent,
