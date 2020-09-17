@@ -24,6 +24,7 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.lang.reflect.Field;
 import java.util.Set;
 
 import javax.swing.JButton;
@@ -54,12 +55,12 @@ public class NestedPropertyPanel extends JPanel {
 	/**
 	 * Sets up a grid layout
 	 */
-	public NestedPropertyPanel(Set<PropertyPanel<?>> props, String ownerName, Class<?> type) {
+	public NestedPropertyPanel(Set<PropertyPanel<?>> props, String ownerName, Field field) {
 
 		setOpaque(true);
 		setPreferredSize(new Dimension(100, 25));
 		setLayout(new GridLayout(1 , 2, 12, 12));
-		nameLabel.setText(type.getSimpleName());
+		nameLabel.setText(field.getName());
 		nameLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 		add(nameLabel);
 		updateSettingsLabel(props);
@@ -93,8 +94,8 @@ public class NestedPropertyPanel extends JPanel {
 				popup = PopupFactory.getSharedInstance().getPopup(NestedPropertyPanel.this, popUpContentPanel, loc.x, yToUse);
 
 
-				NestedPropertyPanel.this.setBackground(GUIDesignUtil.getEffectBgColor(type,  Color.YELLOW));
-				NestedPropertyPanel.this.nameLabel.setForeground(GUIDesignUtil.getEffectFgColor(type,  Color.BLACK));
+				NestedPropertyPanel.this.setBackground(GUIDesignUtil.getEffectBgColor(field.getType(),  Color.YELLOW));
+				NestedPropertyPanel.this.nameLabel.setForeground(GUIDesignUtil.getEffectFgColor(field.getType(),  Color.BLACK));
 				
 				ocButton.setEnabled(false);
 				popup.show();
@@ -104,13 +105,13 @@ public class NestedPropertyPanel extends JPanel {
 		});
 
 		setBackground(Color.YELLOW);
-		Color borderColor = GUIDesignUtil.getEffectBgColor(type, Color.YELLOW);
+		Color borderColor = GUIDesignUtil.getEffectBgColor(field.getType(), Color.YELLOW);
 		popUpContentPanel.setBorder(new  LineBorder(borderColor, 4, true));
 		GridLayout gl = new GridLayout(props.size() + 2, 1, 0, 0);		
 		popUpContentPanel.setLayout(gl);
 		popUpContentPanel.setPreferredSize(new Dimension(220, (props.size() + 2) * 30));
 		popUpContentPanel.add(close);
-		JLabel parents = new JLabel(ownerName + "::" + type.getSimpleName(), SwingConstants.CENTER);
+		JLabel parents = new JLabel(ownerName + "::" + field.getName(), SwingConstants.CENTER);
 		popUpContentPanel.add(parents);
 
 		for(final JPanel p : props) {

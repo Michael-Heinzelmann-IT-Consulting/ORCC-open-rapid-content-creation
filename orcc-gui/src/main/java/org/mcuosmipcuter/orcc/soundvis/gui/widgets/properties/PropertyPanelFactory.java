@@ -89,7 +89,7 @@ public class PropertyPanelFactory {
 						}
 					}	
 				}
-				result.add(new NestedPropertyPanel(props, soundCanvasWrapper.getDisplayName(), field.getType()));
+				result.add(new NestedPropertyPanel(props, soundCanvasWrapper.getDisplayName(), field));
 				
 			}
 
