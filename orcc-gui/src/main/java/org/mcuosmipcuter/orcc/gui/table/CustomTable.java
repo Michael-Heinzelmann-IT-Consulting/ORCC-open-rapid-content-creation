@@ -51,6 +51,7 @@ import javax.swing.event.ChangeListener;
 
 import org.mcuosmipcuter.orcc.api.soundvis.ChangesIcon;
 import org.mcuosmipcuter.orcc.api.soundvis.PropertyListener;
+import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.TimedChange;
 import org.mcuosmipcuter.orcc.soundvis.Context;
 import org.mcuosmipcuter.orcc.soundvis.Context.PropertyName;
@@ -257,6 +258,7 @@ public class CustomTable extends JPanel implements Context.Listener{
 		row.setBorder(tb);
 		row.setBackground(Color.WHITE);
 		final JLabel layer = new JLabel(/*soundCanvasWrapper.getDisplayName()*/);
+		layer.setName("icon_label");
 		layer.setPreferredSize(new Dimension(140, 16));
 		layer.setToolTipText("edit or move " + soundCanvasWrapper.getDisplayName());
 		soundCanvasWrapper.setIconImage(getImage());
@@ -471,4 +473,21 @@ public class CustomTable extends JPanel implements Context.Listener{
 		}
 
 	}
+	@Override
+	public void updateUI(SoundCanvas soundCanvas) {
+		for (Component c : getComponents()) {
+			if (c instanceof Row) {
+				SoundCanvasWrapper soundCanvasWrapper = ((Row) c).getSoundCanvasWrapper();
+				if (soundCanvasWrapper.getSoundCanvas() == soundCanvas) {
+					soundCanvasWrapper.updateUI(120, 30, (Graphics2D) soundCanvasWrapper.getIconImage().getGraphics());
+					for (Component ci : ((Row) c).getComponents()) {
+						if("icon_label".equals(ci.getName())){
+							((JLabel)ci).setIcon(new ImageIcon(soundCanvasWrapper.getIconImage()));
+						}
+					}
+				}
+			}
+		}
+	}
+	
 }

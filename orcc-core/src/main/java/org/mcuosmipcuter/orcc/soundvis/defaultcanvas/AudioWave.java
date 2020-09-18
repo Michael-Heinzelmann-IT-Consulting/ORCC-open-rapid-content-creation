@@ -20,10 +20,14 @@ package org.mcuosmipcuter.orcc.soundvis.defaultcanvas;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
+import java.lang.reflect.Field;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
+import org.mcuosmipcuter.orcc.api.soundvis.ChangesIcon;
 import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
+import org.mcuosmipcuter.orcc.api.soundvis.PropertyListener;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
+import org.mcuosmipcuter.orcc.api.soundvis.TimedChange;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.soundvis.AudioInput;
@@ -37,7 +41,7 @@ import org.mcuosmipcuter.orcc.soundvis.threads.SuperSampleData;
  * @author Michael Heinzelmann
  *
  */
-public class AudioWave implements SoundCanvas {
+public class AudioWave implements SoundCanvas, PropertyListener {
 	
 	public static enum AMP_VALUES{
 		PEAK, AVERAGE,
@@ -45,21 +49,25 @@ public class AudioWave implements SoundCanvas {
 
 	private String loadedAudioName;
 	private int loadedWidth;
+	@TimedChange
 	private SuperSampleData superSampleData;
+	private SuperSampleData superSampleDataToUse;
 	private int videoWidth;
 	private int videoHeight;
 	int noOfSamples;
 	int samplesPerFrame;
 	
+	@ChangesIcon
 	@UserProperty(description = "color of the already played area")
 	private Color colorPlayed = Color.BLACK;
 	
+	@ChangesIcon
 	@UserProperty(description = "color of the area yet to play")
 	private Color colorToPlay = Color.GRAY;
 	
 
 	@UserProperty(description="size amplitude")
-	@LimitedIntProperty(minimum = 1, description = "not smaller than 0")
+	@LimitedIntProperty(minimum = 1, description = "not smaller than 1")
 	private int amplitudeSize = 100;
 	
 	@UserProperty(description="size amplitude")
@@ -68,11 +76,15 @@ public class AudioWave implements SoundCanvas {
 	
 	@UserProperty(description="value of amplitude")
 	private AMP_VALUES ampValue = AMP_VALUES.PEAK;
+	
+	@UserProperty(description="size amplitude")
+	@LimitedIntProperty(minimum = 1, description = "not smaller than 1")
+	private int reduction = 1;
 
 	@Override
 	public void newFrame(long frameCount, Graphics2D graphics) {
 		
-		if(superSampleData != null && videoHeight != 0) {
+		if(superSampleDataToUse != null && videoHeight != 0) {
 			AffineTransform save = graphics.getTransform();
 			AffineTransform atSc = new AffineTransform();
 			double sw = scaleWidth / 100d;
@@ -81,22 +93,24 @@ public class AudioWave implements SoundCanvas {
 
 			int  marginVertical = (int)((videoHeight  ) -  videoHeight *((float)amplitudeSize / 100f));
 
-			int divY = (Math.max(Math.abs(superSampleData.getOverallMin()), Math.abs(superSampleData.getOverallMax())) * 2 / (videoHeight - marginVertical / 1) + 1);
+			int divY = (Math.max(Math.abs(superSampleDataToUse.getOverallMin()), Math.abs(superSampleDataToUse.getOverallMax())) * 2 / (videoHeight - marginVertical / 1) + 1);
 			graphics.setColor(colorPlayed);
 			int center = videoHeight / 2;
 			int x = 1;
 			graphics.transform(atSc);
-			for (SuperSample susa : superSampleData.getList()) {
+			for (SuperSample susa : superSampleDataToUse.getList()) {
 				if(x * noOfSamples > frameCount * samplesPerFrame) {
 					graphics.setColor(colorToPlay);
 				}
 				int up = ampValue == AMP_VALUES.PEAK ? susa.getMax() : susa.getAvgUp();
 				int down = ampValue == AMP_VALUES.PEAK ? susa.getMin() : susa.getAvgDown();
-				graphics.drawLine(x, center - up / divY, x, center - down / divY);
+				for(int r = 0; r < reduction; r++) {
+					graphics.drawLine(x + r, center - up / divY, x + r, center - down / divY);
+				}
 //				graphics.setColor(Color.YELLOW);
 //				graphics.drawLine(x, center - susa.getAvgUp()/ divY, x, center - susa.getMax() / divY);
 //				graphics.drawLine(x, center - susa.getAvgDown() / divY, x, center - susa.getMin() / divY);
-				x++;
+				x+= reduction;
 			}
 			
 			graphics.setTransform(save);
@@ -113,13 +127,15 @@ public class AudioWave implements SoundCanvas {
 		long totalSampleLength = ai.getAudioInputInfo().getFrameLength();
 		noOfSamples = (int)(totalSampleLength / width ) + 1;
 		samplesPerFrame =  (int)audioInputInfo.getAudioFormat().getSampleRate() / videoOutputInfo.getFramesPerSecond();
-		if(width != loadedWidth || inputName.equals(loadedAudioName)) {
+		if(width != loadedWidth || !inputName.equals(loadedAudioName)) {
 			SubSampleThread subSampleThread = new SubSampleThread(ai, noOfSamples, new CallBack() {
 				@Override
 				public void finishedSampling(SuperSampleData superSampleData) {
 					AudioWave.this.superSampleData = superSampleData;
-					AudioWave.this.loadedAudioName = loadedAudioName;
-					AudioWave.this.loadedWidth = loadedWidth;
+					AudioWave.this.superSampleDataToUse = superSampleData.reduce(reduction);
+					AudioWave.this.loadedAudioName = inputName;
+					AudioWave.this.loadedWidth = width;
+					Context.updateUI(AudioWave.this);
 				}
 			});
 			subSampleThread.start();
@@ -128,8 +144,28 @@ public class AudioWave implements SoundCanvas {
 
 	@Override
 	public void updateUI(int width, int height, Graphics2D graphics) {
-		// TODO Auto-generated method stub
+		if(superSampleData != null) {
+			int factor = videoWidth / width;
+			SuperSampleData local = superSampleData.reduce(factor);
+			int x = 1;
+			int center = height / 2;
+			int divY = (Math.max(Math.abs(local.getOverallMin()), Math.abs(local.getOverallMax())) * 2 / height);
+			graphics.setColor(colorPlayed);
+			for (SuperSample susa : local.getList()) {
+				graphics.drawLine(x , center - susa.getMax() / divY, x, center - susa.getMin() / divY);
+				if(x > width / 2) {
+					graphics.setColor(colorToPlay);
+				}
+				x++;
+			}
+		}
+	}
 
+	@Override
+	public void propertyWritten(Field field) {
+		if("reduction".equals(field.getName())) {
+			superSampleDataToUse = superSampleData.reduce(reduction);
+		}
 	}
 
 }

@@ -75,7 +75,8 @@ public abstract class Context {
 		 */
 		public void contextChanged(PropertyName propertyName);
 		public default void progress(String msg) {
-			
+		}
+		public default void updateUI(SoundCanvas soundCanvas) {
 		}
 	}
 	
@@ -152,6 +153,11 @@ public abstract class Context {
 			listener.progress(msg);
 		}
 		touch();
+	}
+	private static void notifyUIListeners(SoundCanvas soundCanvas) {
+		for(Listener listener : listeners) {
+			listener.updateUI(soundCanvas);
+		}
 	}
 	
 	// static fields
@@ -428,6 +434,9 @@ public abstract class Context {
 	}
 	public static void progressUpdate(String msg) {
 		notifyListeners(msg);
+	}
+	public static void updateUI(SoundCanvas soundCanvas) {
+		notifyUIListeners(soundCanvas);
 	}
 	public static void cancelPropertyUpdate(String name) {
 		notifyListeners(PropertyName.SoundCanvasPropertyCancelled);
