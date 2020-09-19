@@ -157,11 +157,11 @@ public class PlayBackPanel extends JPanel implements Mixin{
 				if(PropertyName.AppState.equals(propertyName)) {
 					AppState appState = Context.getAppState();
 					stateLabel.setText(String.valueOf(appState));
-					stop.setEnabled(appState != AppState.EXPORTING);
+					stop.setEnabled(appState != AppState.EXPORTING && appState != AppState.LOADING);
 					if(appState == AppState.READY) {
 						playPause.reset();
 					}
-					playPause.setEnabled(appState != AppState.EXPORTING);
+					playPause.setEnabled(appState != AppState.EXPORTING && appState != AppState.LOADING);
 					if(appState == AppState.EXPORTING) {
 						progressPaintState = 1;
 						playPause.reset();
@@ -171,7 +171,7 @@ public class PlayBackPanel extends JPanel implements Mixin{
 					}
 				}
 				if(PropertyName.AudioInputInfo.equals(propertyName)) {
-					playPause.setEnabled(Context.getAudioInput() != null);
+					playPause.setEnabled(Context.getAudioInput() != null && Context.getAppState() != AppState.LOADING);
 					autoZoom.setEnabled(Context.getAudioInput() != null);
 				}
 				if(PropertyName.AudioInputInfo.equals(propertyName) || PropertyName.VideoFrameRate.equals(propertyName) ) {
