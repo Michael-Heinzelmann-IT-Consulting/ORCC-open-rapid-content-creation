@@ -49,4 +49,8 @@ public class ExtensionsFileFilter extends FileFilter {
 		return null;
 	}
 
+	public String[] getExtensions() {
+		return extensions;
+	}
+
 }

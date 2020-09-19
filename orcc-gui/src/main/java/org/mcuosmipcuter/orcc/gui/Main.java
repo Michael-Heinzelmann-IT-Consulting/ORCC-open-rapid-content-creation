@@ -300,6 +300,9 @@ public class Main {
 					}
 				};
 				FileDialogActionListener exportActionListener = new FileDialogActionListener(frame, exportVideo, "set as export file");
+				exportActionListener.addChoosableFilter(new ExtensionsFileFilter(".mov"));
+				exportActionListener.addChoosableFilter(new ExtensionsFileFilter(".mp4"));
+				exportActionListener.setForcedExtension(".mov");
 				exportStart.addActionListener(exportActionListener);
 				
 				CallBack exportFrameImageCallback= new CallBack() {
@@ -328,7 +331,7 @@ public class Main {
 				exportFrameActionListener.setPreSelectCallBack(new PreSelectCallBack() {				
 					@Override
 					public File preSelected() {
-						String preselected = "frame" + Context.getSongPositionPointer();
+						String preselected = "frame" + Context.getSongPositionPointer() + ".jpg";
 						return new File(preselected);
 					}
 				});
