@@ -17,6 +17,7 @@
 */
 package org.mcuosmipcuter.orcc.soundvis;
 
+import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -42,32 +43,39 @@ public class ImageStore {
 		private final String absolutePath;
 		private final int quadrantRotation;
 		private final boolean mirrored;
+		private final int width;
+		private final int height;
 		
 		public Key(File imageFile) {
-			this(imageFile.lastModified(), imageFile.getAbsolutePath(), 0, false);
+			this(imageFile.lastModified(), imageFile.getAbsolutePath(), 0, false, 0, 0);
 		}
 
-		public Key(long lastModified, String absolutePath, int quadrantRotation, boolean mirrored) {
+		public Key(long lastModified, String absolutePath, int quadrantRotation, boolean mirrored, int width, int height) {
 			this.lastModified = lastModified;
 			this.absolutePath = absolutePath;
 			this.quadrantRotation = quadrantRotation;
 			this.mirrored = mirrored;
+			this.width = width;
+			this.height = height;
 		}
 
 		@Override
 		public String toString() {
 			return "Key [lastModified=" + lastModified + ", absolutePath=" + absolutePath + ", quadrantRotation="
-					+ quadrantRotation + ", mirrored=" + mirrored + "]";
+					+ quadrantRotation + ", mirrored=" + mirrored + ", width=" + width + ", height=" + height + "]";
 		}
+		
 
 		@Override
 		public int hashCode() {
 			final int prime = 31;
 			int result = 1;
 			result = prime * result + ((absolutePath == null) ? 0 : absolutePath.hashCode());
+			result = prime * result + height;
 			result = prime * result + (int) (lastModified ^ (lastModified >>> 32));
 			result = prime * result + (mirrored ? 1231 : 1237);
 			result = prime * result + quadrantRotation;
+			result = prime * result + width;
 			return result;
 		}
 
@@ -85,11 +93,15 @@ public class ImageStore {
 					return false;
 			} else if (!absolutePath.equals(other.absolutePath))
 				return false;
+			if (height != other.height)
+				return false;
 			if (lastModified != other.lastModified)
 				return false;
 			if (mirrored != other.mirrored)
 				return false;
 			if (quadrantRotation != other.quadrantRotation)
+				return false;
+			if (width != other.width)
 				return false;
 			return true;
 		}
@@ -110,11 +122,18 @@ public class ImageStore {
 			return mirrored;
 		}
 
+		public int getWidth() {
+			return width;
+		}
 
+		public int getHeight() {
+			return height;
+		}
 		
 	}
 	
 	private static Map<Key, SoftReference<BufferedImage>> store = new HashMap<Key, SoftReference<BufferedImage>>();
+	private static Map<Key, SoftReference<Image>> storeScaled = new HashMap<Key, SoftReference<Image>>();
 	public static boolean contains(Key key) {
 		return store.containsKey(key);
 	}
@@ -153,6 +172,20 @@ public class ImageStore {
 			}
 		}
 	}
+	public static Image getOrLoadScaledImage(Key originalKey, int newWidth, int newHeight) {
+		Key newKey = new Key(originalKey.lastModified, originalKey.absolutePath, originalKey.quadrantRotation, originalKey.mirrored, newWidth, newHeight);
+		SoftReference<Image> ref = storeScaled.get(newKey);
+		if(ref != null) {
+			return ref.get();
+		}
+		BufferedImage  original = getOrLoadImage(originalKey);
+		Image  scaled = null;
+		if(original != null) {;
+			scaled = original.getScaledInstance(newWidth, newHeight, Image.SCALE_DEFAULT);
+			storeScaled.putIfAbsent(newKey, new SoftReference<Image>(scaled));
+		}
+		return scaled;
+	}
 	
 	public static void addImage(Key key, BufferedImage image) {
 		store.put(key, new SoftReference<BufferedImage>(image));
@@ -166,7 +199,7 @@ public class ImageStore {
 		else {
 			BufferedImage oldImage = getImage(oldKey);
 			if(oldImage == null) {
-				IOUtil.log("returnin null, old key not stored " + oldKey);
+				IOUtil.log("returning null, old key not stored " + oldKey);
 				return null;
 			}
 			if(newKey.equals(oldKey)) {

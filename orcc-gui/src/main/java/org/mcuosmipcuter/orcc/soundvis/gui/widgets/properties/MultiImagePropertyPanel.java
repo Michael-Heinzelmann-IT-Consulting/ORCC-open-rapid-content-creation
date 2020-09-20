@@ -286,7 +286,7 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 			public void actionPerformed(ActionEvent e) {
 				Key oldKey = slide.getKey();
 				int newRotation = (oldKey.getQuadrantRotation() + 1) % 4;
-				Key newKey = new Key(oldKey.getLastModified(), oldKey.getAbsolutePath(), newRotation, oldKey.isMirrored());
+				Key newKey = new Key(oldKey.getLastModified(), oldKey.getAbsolutePath(), newRotation, oldKey.isMirrored(), oldKey.getWidth(), oldKey.getHeight());
 				BufferedImage newImage = ImageStore.transformImage(oldKey, newKey);	
 				slide.setImage(newKey, newImage);
 				hideSlideEditPopup();
@@ -304,7 +304,7 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 			public void actionPerformed(ActionEvent e) {
 				Key oldKey = slide.getKey();
 				boolean newMirror = ! oldKey.isMirrored();
-				Key newKey = new Key(oldKey.getLastModified(), oldKey.getAbsolutePath(), oldKey.getQuadrantRotation(), newMirror);
+				Key newKey = new Key(oldKey.getLastModified(), oldKey.getAbsolutePath(), oldKey.getQuadrantRotation(), newMirror, oldKey.getWidth(), oldKey.getHeight());
 				BufferedImage newImage = ImageStore.transformImage(oldKey, newKey);	
 				slide.setImage(newKey, newImage);
 				hideSlideEditPopup();
@@ -508,13 +508,15 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 
 				ib.setBackground(Color.YELLOW);
 				ib.setBorder(new LineBorder(Color.BLACK, 2));
-				ImageIcon icon = new ImageIcon(slide.getImage().getScaledInstance(80, 80, Image.SCALE_FAST));
+				//ImageIcon icon = new ImageIcon(slide.getImage().getScaledInstance(80, 80, Image.SCALE_FAST));
+				ImageIcon icon = new ImageIcon(ImageStore.getOrLoadScaledImage(slide.getKey(), 80, 80));
 
 				//ib.setMaximumSize(new Dimension(80, 80));
 				ib.setPreferredSize(new Dimension(80, 80));
 				// ib.setIcon(new ImageIcon(image.getScaledInstance(80, 80, Image.SCALE_FAST)));
 				ib.setIcon(icon);
-				ib.setSelectedIcon(new ImageIcon(icon.getImage().getScaledInstance(60, 60, Image.SCALE_FAST)));
+				//ib.setSelectedIcon(new ImageIcon(icon.getImage().getScaledInstance(60, 60, Image.SCALE_FAST)));
+				ib.setSelectedIcon(new ImageIcon(ImageStore.getOrLoadScaledImage(slide.getKey(), 60, 60)));
 				if (col == COLS) {
 					gc.gridwidth = GridBagConstraints.REMAINDER; // end row
 					col = 0;

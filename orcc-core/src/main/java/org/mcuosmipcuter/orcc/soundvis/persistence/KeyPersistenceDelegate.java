@@ -42,7 +42,7 @@ public class KeyPersistenceDelegate extends PersistenceDelegate {
 		Key key = (Key) oldInstance;
 		try {
 			// Key.class.getConstructor(long.class, String.class, int.class, boolean.class).getName()
-			return new Expression(key, Key.class, "new", new Object[] {key.getLastModified(), key.getAbsolutePath(), key.getQuadrantRotation(), key.isMirrored()});
+			return new Expression(key, Key.class, "new", new Object[] {key.getLastModified(), key.getAbsolutePath(), key.getQuadrantRotation(), key.isMirrored(), key.getWidth(), key.getHeight()});
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
