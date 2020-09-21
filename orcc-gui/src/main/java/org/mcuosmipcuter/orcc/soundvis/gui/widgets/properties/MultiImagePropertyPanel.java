@@ -437,7 +437,7 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 
 		int COLS = 6;
 		GridBagConstraints gc = new GridBagConstraints();
-		gc.gridwidth = COLS;// GridBagConstraints.REMAINDER;
+		gc.gridwidth = COLS;
 		gc.fill = GridBagConstraints.BOTH;
 		int col = 1;
 		if (currentValue != null && currentValue.length > 0) {
@@ -457,7 +457,7 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 				};
 
 				Context.progressUpdate(" creating preview " + (jbuttons.size() + 1));
-				System.err.println(System.currentTimeMillis() + " new preview " + slide);
+	
 				ib.addActionListener(new ActionListener() {
 					@Override
 					public void actionPerformed(ActionEvent e) {
@@ -467,7 +467,6 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 				ib.addMouseListener(new MouseListener() {
 					@Override
 					public void mouseReleased(MouseEvent e) {
-						// TODO Auto-generated method stub
 						ib.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 					}
 					@Override
@@ -476,11 +475,9 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 					}
 					@Override
 					public void mouseExited(MouseEvent e) {
-						// TODO Auto-generated method stub
 					}
 					@Override
 					public void mouseEntered(MouseEvent e) {
-						// TODO Auto-generated method stub
 					}
 					@Override
 					public void mouseClicked(MouseEvent e) {
@@ -498,7 +495,6 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 				ib.addMouseMotionListener(new MouseMotionListener() {
 					@Override
 					public void mouseMoved(MouseEvent e) {
-						// TODO Auto-generated method stub
 					}
 					@Override
 					public void mouseDragged(MouseEvent e) {
@@ -508,14 +504,10 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 
 				ib.setBackground(Color.YELLOW);
 				ib.setBorder(new LineBorder(Color.BLACK, 2));
-				//ImageIcon icon = new ImageIcon(slide.getImage().getScaledInstance(80, 80, Image.SCALE_FAST));
 				ImageIcon icon = new ImageIcon(ImageStore.getOrLoadScaledImage(slide.getKey(), 80, 80));
-
-				//ib.setMaximumSize(new Dimension(80, 80));
 				ib.setPreferredSize(new Dimension(80, 80));
-				// ib.setIcon(new ImageIcon(image.getScaledInstance(80, 80, Image.SCALE_FAST)));
 				ib.setIcon(icon);
-				//ib.setSelectedIcon(new ImageIcon(icon.getImage().getScaledInstance(60, 60, Image.SCALE_FAST)));
+
 				ib.setSelectedIcon(new ImageIcon(ImageStore.getOrLoadScaledImage(slide.getKey(), 60, 60)));
 				if (col == COLS) {
 					gc.gridwidth = GridBagConstraints.REMAINDER; // end row
