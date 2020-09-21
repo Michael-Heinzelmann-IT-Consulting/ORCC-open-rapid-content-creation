@@ -216,6 +216,7 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 
 	private void hidePopup() {
 		popup.hide();
+		popup = null;
 		editButton.setEnabled(true);
 		setBackground(origBackground);
 		commands.setOpaque(false);
@@ -552,4 +553,13 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 		
 		return placeholderImage;
 	}
+
+	@Override
+	public void passivate() {
+		hideSlideEditPopup();
+		if(isPopupShowing) {
+			hidePopup();
+		}
+	}
+	
 }

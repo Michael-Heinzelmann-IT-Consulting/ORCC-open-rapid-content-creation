@@ -65,7 +65,7 @@ public class IntegerPropertyPanel extends PropertyPanel<Integer> {
 		jSpinner.setValue(currentValue);
 	}
 	@Override
-	protected void activate() {
+	public void activate() {
 		ChangeListener cl = new ChangeListener() {
 			
 			@Override

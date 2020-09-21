@@ -43,7 +43,7 @@ import org.mcuosmipcuter.orcc.gui.util.GraphicsUtil;
  * Panel to display nested canvas properties editors
  * @author Michael Heinzelmann
  */
-public class NestedPropertyPanel extends JPanel {
+public class NestedPropertyPanel extends JPanel implements EditorLifeCycle{
 	
 	private static final long serialVersionUID = 1L;
 	
@@ -51,7 +51,9 @@ public class NestedPropertyPanel extends JPanel {
 	private JLabel nameLabel = new JLabel();
 	boolean expanded;
 	JPanel popUpContentPanel = new JPanel();
-	Popup popup = null;
+	Popup popup;
+	private Color originalBackGround;
+	
 	/**
 	 * Sets up a grid layout
 	 */
@@ -66,15 +68,11 @@ public class NestedPropertyPanel extends JPanel {
 		updateSettingsLabel(props);
 		add(ocButton);	
 		JButton close = new JButton("close");
-		close.addActionListener(new ActionListener() {
-			
+		close.addActionListener(new ActionListener() {			
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				updateSettingsLabel(props);
-				popup.hide();
-				ocButton.setEnabled(true);
-				NestedPropertyPanel.this.setBackground(Color.LIGHT_GRAY);
-				nameLabel.setForeground(Color.BLACK);
+				passivate();
 			}
 		});
 		
@@ -93,7 +91,7 @@ public class NestedPropertyPanel extends JPanel {
 				
 				popup = PopupFactory.getSharedInstance().getPopup(NestedPropertyPanel.this, popUpContentPanel, loc.x, yToUse);
 
-
+				originalBackGround = getBackground();
 				NestedPropertyPanel.this.setBackground(GUIDesignUtil.getEffectBgColor(field.getType(),  Color.YELLOW));
 				NestedPropertyPanel.this.nameLabel.setForeground(GUIDesignUtil.getEffectFgColor(field.getType(),  Color.BLACK));
 				
@@ -104,7 +102,6 @@ public class NestedPropertyPanel extends JPanel {
 			}
 		});
 
-		setBackground(Color.YELLOW);
 		Color borderColor = GUIDesignUtil.getEffectBgColor(field.getType(), Color.YELLOW);
 		popUpContentPanel.setBorder(new  LineBorder(borderColor, 4, true));
 		GridLayout gl = new GridLayout(props.size() + 2, 1, 0, 0);		
@@ -129,4 +126,24 @@ public class NestedPropertyPanel extends JPanel {
 		}
 		ocButton.setToolTipText(sb.toString());
 	}
+	
+	private void hidePopup() {
+		if(popup != null) {
+			popup.hide();
+			popup = null;
+		}
+	}
+
+	@Override
+	public void activate() {
+	}
+
+	@Override
+	public void passivate() {
+		hidePopup();
+		ocButton.setEnabled(true);
+		setBackground(originalBackGround);
+		nameLabel.setForeground(Color.BLACK);
+	}
+	
 }

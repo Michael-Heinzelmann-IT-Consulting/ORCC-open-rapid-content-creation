@@ -47,7 +47,7 @@ public class BooleanPropertyPanel extends PropertyPanel<Boolean> {
 		this.repaint();
 	}
 	@Override
-	protected void activate() {
+	public void activate() {
 		check.addChangeListener(new ChangeListener() {
 			boolean checked = check.isSelected();
 			public void stateChanged(ChangeEvent e) {

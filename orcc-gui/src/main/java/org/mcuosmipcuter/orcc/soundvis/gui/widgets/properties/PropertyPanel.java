@@ -37,7 +37,7 @@ import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
  * Abstract base class to be extended for different types of properties
  * @author Michael Heinzelmann
  */
-public abstract  class PropertyPanel <T> extends JPanel {
+public abstract  class PropertyPanel <T> extends JPanel implements EditorLifeCycle {
 	
 	private static final long serialVersionUID = 1L;
 	
@@ -101,8 +101,13 @@ public abstract  class PropertyPanel <T> extends JPanel {
 		gc.gridwidth = GridBagConstraints.REMAINDER; //end row
 		add(c, BorderLayout.EAST);
 	}
-	protected void activate() {
+	@Override
+	public void activate() {
 		// for setup listeners etc.
+	}
+	@Override
+	public void passivate() {
+		// for hiding popups etc.
 	}
 	/* (non-Javadoc)
 	 * @see java.awt.Component#getName()

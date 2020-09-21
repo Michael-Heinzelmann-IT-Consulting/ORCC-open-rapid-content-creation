@@ -258,6 +258,7 @@ public class CustomTable extends JPanel implements Context.Listener{
 		row.setBorder(tb);
 		row.setBackground(Color.WHITE);
 		final JLabel layer = new JLabel(/*soundCanvasWrapper.getDisplayName()*/);
+		layer.setOpaque(true);
 		layer.setName("icon_label");
 		layer.setPreferredSize(new Dimension(140, 16));
 		layer.setToolTipText("edit or move " + soundCanvasWrapper.getDisplayName());
@@ -279,7 +280,7 @@ public class CustomTable extends JPanel implements Context.Listener{
 		
 		final JPanel timeline = new JPanel();
 		timeline.setLayout(new GridLayout(1, 0, 6, 6));
-		timeline.setBorder(new LineBorder(Color.WHITE, 4));
+		timeline.setBorder(new LineBorder(timeline.getBackground(), 4));
 		
 		final JCheckBox showCheckBox = new JCheckBox(soundCanvasWrapper.isVisible() ? "on" : "off", soundCanvasWrapper.isVisible());
 		showCheckBox.addActionListener(new ActionListener() {
@@ -388,6 +389,8 @@ public class CustomTable extends JPanel implements Context.Listener{
 		layer.setIcon(new ImageIcon(image));
 
 		final JLabel remove = new JLabel(" x ");
+		remove.setOpaque(true);
+		remove.setBackground(new Color(240, 225, 225));
 		row.add(timeline);
 		
 		row.add(remove, BorderLayout.EAST);
@@ -411,6 +414,7 @@ public class CustomTable extends JPanel implements Context.Listener{
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if(moveEnabled) {
+					row.passivatePropertyEditors();
 					CustomTable.this.remove(row);
 					CustomTable.this.revalidate();
 					List<SoundCanvasWrapper> currentList = new ArrayList<SoundCanvasWrapper>();
@@ -455,6 +459,7 @@ public class CustomTable extends JPanel implements Context.Listener{
 		if (Context.PropertyName.SoundCanvasListCleared == propertyName) {
 			for (Component c : getComponents()) {
 				if (c instanceof Row) {
+					((Row)c).passivatePropertyEditors();
 					remove(c);
 				}
 			}
