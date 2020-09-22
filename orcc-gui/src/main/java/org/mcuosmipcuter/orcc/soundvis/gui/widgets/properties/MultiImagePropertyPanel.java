@@ -22,7 +22,6 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -50,7 +49,6 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.LineBorder;
 
-import org.mcuosmipcuter.orcc.api.util.TextHelper;
 import org.mcuosmipcuter.orcc.gui.util.GraphicsUtil;
 import org.mcuosmipcuter.orcc.soundvis.Context;
 import org.mcuosmipcuter.orcc.soundvis.ImageStore;
@@ -107,7 +105,7 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 					if (fromStore instanceof BufferedImage) {
 						slides[i].setImage(key, fromStore);
 					} else {
-						image = createPlaceHolderImage(selectedFiles[i]);							
+						image = ImageStore.createPlaceHolderImage(selectedFiles[i]);							
 						slides[i].setImage(key, image);
 						ImageStore.addImage(key, image);
 					}
@@ -541,17 +539,13 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 
 		this.repaint();
 	}
-	private BufferedImage createPlaceHolderImage(File file) {
-		int width = Context.getVideoOutputInfo().getWidth();
-		int height = Context.getVideoOutputInfo().getHeight();
-		BufferedImage placeholderImage = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
-		Graphics2D graphics = placeholderImage.createGraphics();
-		graphics.setColor(Color.WHITE);
-		graphics.fillRect(0, 0, width, height);
 
-		TextHelper.writeText(file.getName(), graphics, height / 10, Color.BLUE, width, height / 2);
-		
-		return placeholderImage;
+	@Override
+	public void activate() {
+		for(Slide slide : getCurrentValue()) {
+			ImageStore.getOrLoadScaledImage(slide.getKey(), 80, 80);
+			ImageStore.getOrLoadScaledImage(slide.getKey(), 60, 60);
+		}
 	}
 
 	@Override

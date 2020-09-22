@@ -41,9 +41,10 @@ public class Row extends JPanel {
 	private static final long serialVersionUID = 1L;
 	
 	private final SoundCanvasWrapper soundCanvasWrapper;
-	JPanel panel;
-	boolean panelVisible;
-	int headerHeight;
+	private JPanel panel;
+	private final Set<JPanel> props ;
+	private boolean panelVisible;
+	private int headerHeight;
 	public boolean isPanelVisible() {
 		return panelVisible;
 	}
@@ -54,6 +55,7 @@ public class Row extends JPanel {
 	 */
 	public Row(SoundCanvasWrapper soundCanvasWrapper) {
 		this.soundCanvasWrapper = soundCanvasWrapper;
+		props = PropertyPanelFactory.getCanvasPanels(soundCanvasWrapper);
 	}
 
 	/**
@@ -77,7 +79,6 @@ public class Row extends JPanel {
 			if(panel == null) {
 				panel = new JPanel();
 
-				Set<JPanel> props = PropertyPanelFactory.getCanvasPanels(soundCanvasWrapper);
 				GridBagConstraints gc = new GridBagConstraints();
 				GridBagLayout gl = new GridBagLayout();
 				panel.setLayout(gl);

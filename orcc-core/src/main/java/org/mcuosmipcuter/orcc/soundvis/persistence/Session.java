@@ -94,6 +94,7 @@ public class Session implements Serializable {
 			PersistentSession persistentSession =  loadSessionImpl(file, reportList);
 			setUpApplication(persistentSession);
 			Context.setSessionToken(new SessionToken(file.getAbsolutePath()));
+			saveDefaultSession();
 			return true;
 		} catch (Exception e) {
 			e.printStackTrace();

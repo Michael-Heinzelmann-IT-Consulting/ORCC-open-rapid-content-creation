@@ -17,16 +17,18 @@
 */
 package org.mcuosmipcuter.orcc.soundvis;
 
+import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
 import java.lang.ref.SoftReference;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.imageio.ImageIO;
 
+import org.mcuosmipcuter.orcc.api.util.TextHelper;
 import org.mcuosmipcuter.orcc.soundvis.util.ImageUtil;
 import org.mcuosmipcuter.orcc.util.IOUtil;
 
@@ -154,27 +156,36 @@ public class ImageStore {
 		if (fromStore != null) {
 			return fromStore;
 		} else {
-			try {
-				File imageFile = new File(key.getAbsolutePath());
-				BufferedImage image = ImageIO.read(imageFile);
-				if(image != null) {
-					if(key.quadrantRotation != 0) {
-						image = ImageUtil.quadrantRotate(image, key.quadrantRotation);
-					}
-					if(key.mirrored) {
-						image = ImageUtil.mirrorY(image);
-					}
-					addImage(key, image);
+			BufferedImage image = null;
+			File imageFile = new File(key.getAbsolutePath());
+			if (imageFile.exists()) {
+				try {
+					image = ImageIO.read(imageFile);
+				} catch (Exception ex) {
+					IOUtil.log("problem loading image for " + key.getAbsolutePath() + ": " + ex.getMessage());
 				}
-				return image;
-			} catch (IOException ex) {
-				throw new RuntimeException(ex);
+			} else {
+				IOUtil.log(key.getAbsolutePath() + " does not exist.");
 			}
+			if (image != null) {
+				if (key.quadrantRotation != 0) {
+					image = ImageUtil.quadrantRotate(image, key.quadrantRotation);
+				}
+				if (key.mirrored) {
+					image = ImageUtil.mirrorY(image);
+				}	
+			} else {
+				image = createPlaceHolderImage(imageFile);
+			}
+			addImage(key, image);
+			return image;
+
 		}
 	}
 	public static Image getOrLoadScaledImage(Key originalKey, int newWidth, int newHeight) {
 		Key newKey = new Key(originalKey.lastModified, originalKey.absolutePath, originalKey.quadrantRotation, originalKey.mirrored, newWidth, newHeight);
 		SoftReference<Image> ref = storeScaled.get(newKey);
+		IOUtil.log((ref != null ? "*hit" : "miss") + " for scaled " + newKey);
 		if(ref != null) {
 			return ref.get();
 		}
@@ -214,6 +225,18 @@ public class ImageStore {
 			addImage(newKey, newImage);
 			return newImage;
 		}	
+	}
+	public static BufferedImage createPlaceHolderImage(File file) {
+		int width = 600;
+		int height = 400;
+		BufferedImage placeholderImage = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
+		Graphics2D graphics = placeholderImage.createGraphics();
+		graphics.setColor(Color.WHITE);
+		graphics.fillRect(0, 0, width, height);
+
+		TextHelper.writeText(file.getName(), graphics, height / 10, Color.BLUE, width, height / 2);
+		
+		return placeholderImage;
 	}
 
 }
