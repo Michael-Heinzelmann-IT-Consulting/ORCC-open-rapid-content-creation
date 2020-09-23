@@ -481,8 +481,6 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 					@Override
 					public void mouseClicked(MouseEvent e) {
 						ib.setToolTipText(slide.getText());
-						System.err.println("ib " + System.identityHashCode(ib));
-						System.err.println(e.getX());
 						if(e.getButton() == MouseEvent.BUTTON3) {
 							showSlideEditPopup(ib, slide);
 						}

@@ -76,7 +76,6 @@ public class SaveThread extends Thread implements Context.Listener{
 		}
 		if(Context.PropertyName.AppState.equals(propertyName)) {
 			this.enabled = Context.getAppState() != AppState.INIT &&  Context.getAppState() != AppState.EXPORTING;
-			System.err.println(enabled + " Context.getAppState() " + Context.getAppState());
 		}
 	}
 

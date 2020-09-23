@@ -106,7 +106,6 @@ public class ThresholdVerticalLines implements SoundCanvas {
 	@Override
 	public void updateUI(int width, int height, Graphics2D graphics) {
 		float t = threshold / 100f;
-		System.err.println(t + " - " + (new Exception().getStackTrace()[1]));
 		graphics.setColor(Color.WHITE);
 		graphics.fillRect(0, 0, width, height);
 		graphics.setColor(foreGroundColor);

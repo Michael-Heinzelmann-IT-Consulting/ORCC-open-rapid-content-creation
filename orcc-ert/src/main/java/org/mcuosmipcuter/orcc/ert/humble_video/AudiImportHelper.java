@@ -268,24 +268,5 @@ public class AudiImportHelper implements SoundReader {
 		  	}
 		  	return audioDecoder;
 	  }
-	  
-	  /**
-	   * Takes a media container (file) as the first argument, opens it,
-	   * opens up the default audio device on your system, and plays back the audio.
-	   *  
-	   * @param args Must contain one string which represents a filename
-	   * @throws IOException 
-	   * @throws InterruptedException 
-	   * @throws LineUnavailableException 
-	   */
-	  public static void main(String[] args) throws InterruptedException, IOException, LineUnavailableException
-	  {
-
-	          byte[] barr = new AudiImportHelper().readSound(("/Users/user/Dropbox/hhur_min_drums_mp3.mp3"));
-	          
-	          System.err.println(barr.length);
-	      
-
-	  }
 
 }

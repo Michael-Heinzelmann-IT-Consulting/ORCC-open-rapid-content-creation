@@ -81,7 +81,6 @@ public class PropertyPanelFactory {
 					}
 					if(nestedField.isAnnotationPresent(NestedProperty.class)) {
 						Object nested2 = getValue(nestedField, nestedValue);
-						System.err.println(nestedValue);
 						for(Field nested2Field : nested2.getClass().getDeclaredFields()) {
 							if(nested2Field.isAnnotationPresent(UserProperty.class)) {
 								props.add(getPropertyPanel(nested2Field, nested2, soundCanvasWrapper));
