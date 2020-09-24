@@ -41,8 +41,10 @@ import java.util.Set;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextPane;
 import javax.swing.Popup;
 import javax.swing.PopupFactory;
 import javax.swing.ScrollPaneConstants;
@@ -202,7 +204,7 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 
 	private void showPopup() {
 		Point loc = editButton.getLocationOnScreen();
-		popup = PopupFactory.getSharedInstance().getPopup(editButton, valueSelect, loc.x, loc.y);
+		popup = PopupFactory.getSharedInstance().getPopup(null, valueSelect, loc.x, loc.y);
 		editButton.setEnabled(false);
 		commands.setOpaque(true);
 		commands.setBackground(Color.YELLOW);
@@ -245,7 +247,33 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 				hideSlideEditPopup();			
 			}
 		});
-		
+
+		JTextPane text = new JTextPane();
+
+		text.setPreferredSize(new Dimension(280, 56));
+		text.setEnabled(true);
+		text.setEditable(true);
+		text.setText(slide.getText());
+
+		JButton textButton = new JButton(slide.getText());
+		textButton.setPreferredSize(new Dimension(280, 28));
+		gridbag.setConstraints(textButton, gc);
+		editPanel.add(textButton, gc);
+		textButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				JScrollPane sp = new JScrollPane(text);
+				Object[] array = {getName(), sp}; 
+				int res = JOptionPane.showConfirmDialog(null, array, "set value for text", 
+						JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+				if(res == JOptionPane.OK_OPTION) {
+					slide.setText(text.getText());
+					textButton.setText(text.getText());
+					Context.touchSession();
+				}		
+			}
+		});
+
 		JPanel imagePanel = new JPanel() {
 			private static final long serialVersionUID = 1L;
 
@@ -259,9 +287,11 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 			}};
 		imagePanel.setPreferredSize(new Dimension(320, 320));
 		imagePanel.setBackground(Color.BLACK);
+
 		gridbag.setConstraints(imagePanel, gc);
 		
 		editPanel.add(imagePanel, gc);
+
 		gc.gridwidth = 2;
 		JButton moveLeftButton = new JButton("< move");
 		gridbag.setConstraints(moveLeftButton, gc);
@@ -316,7 +346,7 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 		gridbag.setConstraints(removeButton, gc);
 		editPanel.add(removeButton, gc);
 		
-		editPopup = PopupFactory.getSharedInstance().getPopup(ib, editPanel, loc.x, loc.y);
+		editPopup = PopupFactory.getSharedInstance().getPopup(null, editPanel, loc.x, loc.y);
 		moveLeftButton.addActionListener(new ActionListener() {	
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -338,6 +368,7 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 				removeSlide(slide);
 			}
 		});		
+		
 		editPopup.show();
 		
 	}
