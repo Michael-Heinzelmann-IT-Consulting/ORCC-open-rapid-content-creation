@@ -32,7 +32,7 @@ public class ImageUtil {
 	 * @param quadrant any integer, number will be normalized to its modulus 4, positive numbers rotate clockwise
 	 * @return a new rotated image or if rotation evaluates to 0 the original
 	 */
-	public static BufferedImage quadrantRotate(BufferedImage origImage, int quadrant) {
+	public static BufferedImage quadrantRotate(BufferedImage origImage, final int quadrant) {
 
 		if (origImage == null) {
 			IOUtil.log("WARN: image null, returning null");
@@ -43,10 +43,8 @@ public class ImageUtil {
 		int origHeight = origImage.getHeight(null);
 		IOUtil.log("image w: " + origWidth + " h: " + origHeight);
 		
-		int q = quadrant % 4;
-		
-		q = q < 0 ? 4 - q : q;
-		
+		final int q = adjustQuadrant(quadrant);
+
 		if(q == 0) {
 			return origImage;
 		}
@@ -108,5 +106,16 @@ public class ImageUtil {
 
 		return newImage;
 
+	}
+	
+	/**
+	 * Adjust for zero based, positive (clockwise) quadrant indexing
+	 * @param quadrant any signed integer
+	 * @return the resulting positive zero based quadrant: 0 or 1 or 2 or 3 
+	 */
+	public static int adjustQuadrant(int quadrant) {
+		int q = Math.abs(quadrant) % 4;
+		q = q!= 0 && quadrant < 0 ? 4 - q : q;
+		return q;
 	}
 }

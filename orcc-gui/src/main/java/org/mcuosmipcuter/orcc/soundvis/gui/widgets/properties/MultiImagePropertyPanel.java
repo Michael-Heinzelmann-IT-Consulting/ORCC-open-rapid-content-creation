@@ -204,7 +204,7 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 
 	private void showPopup() {
 		Point loc = editButton.getLocationOnScreen();
-		popup = PopupFactory.getSharedInstance().getPopup(null, valueSelect, loc.x, loc.y);
+		popup = PopupFactory.getSharedInstance().getPopup(this, valueSelect, loc.x, loc.y);
 		editButton.setEnabled(false);
 		commands.setOpaque(true);
 		commands.setBackground(Color.YELLOW);
@@ -264,7 +264,7 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 			public void actionPerformed(ActionEvent e) {
 				JScrollPane sp = new JScrollPane(text);
 				Object[] array = {getName(), sp}; 
-				int res = JOptionPane.showConfirmDialog(null, array, "set value for text", 
+				int res = JOptionPane.showConfirmDialog(MultiImagePropertyPanel.this, array, "set value for text", 
 						JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 				if(res == JOptionPane.OK_OPTION) {
 					slide.setText(text.getText());
@@ -316,10 +316,8 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 				Key oldKey = slide.getKey();
 				int newRotation = (oldKey.getQuadrantRotation() + 1) % 4;
 				Key newKey = new Key(oldKey.getLastModified(), oldKey.getAbsolutePath(), newRotation, oldKey.isMirrored(), oldKey.getWidth(), oldKey.getHeight());
-				BufferedImage newImage = ImageStore.transformImage(oldKey, newKey);	
-				slide.setImage(newKey, newImage);
-				hideSlideEditPopup();
-				setNewValue(currentValue);
+				updateSlideImage(slide, oldKey, newKey);
+				imagePanel.repaint();
 			}
 		});
 		
@@ -334,10 +332,8 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 				Key oldKey = slide.getKey();
 				boolean newMirror = ! oldKey.isMirrored();
 				Key newKey = new Key(oldKey.getLastModified(), oldKey.getAbsolutePath(), oldKey.getQuadrantRotation(), newMirror, oldKey.getWidth(), oldKey.getHeight());
-				BufferedImage newImage = ImageStore.transformImage(oldKey, newKey);	
-				slide.setImage(newKey, newImage);
-				hideSlideEditPopup();
-				setNewValue(currentValue);
+				updateSlideImage(slide, oldKey, newKey);
+				imagePanel.repaint();
 			}
 		});
 		
@@ -346,7 +342,7 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 		gridbag.setConstraints(removeButton, gc);
 		editPanel.add(removeButton, gc);
 		
-		editPopup = PopupFactory.getSharedInstance().getPopup(null, editPanel, loc.x, loc.y);
+		editPopup = PopupFactory.getSharedInstance().getPopup(this, editPanel, loc.x, loc.y);
 		moveLeftButton.addActionListener(new ActionListener() {	
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -378,6 +374,12 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 			editPopup = null;
 		}
 		
+	}
+	private void updateSlideImage(Slide slide, Key oldKey, Key newKey) {
+		BufferedImage newImage = ImageStore.transformImage(oldKey, newKey);	
+		slide.setImage(newKey, newImage);
+		Context.setSongPositionPointer(Context.getSongPositionPointer());
+		Context.touchSession();
 	}
 	
 	private void removeSlide(Slide slide) {

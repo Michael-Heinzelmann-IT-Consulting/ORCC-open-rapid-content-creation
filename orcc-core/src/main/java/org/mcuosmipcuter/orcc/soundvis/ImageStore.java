@@ -217,7 +217,7 @@ public class ImageStore {
 				return oldImage;
 			}
 			if(oldKey.quadrantRotation != newKey.quadrantRotation) {
-				newImage = ImageUtil.quadrantRotate(oldImage, newKey.quadrantRotation);
+				newImage = ImageUtil.quadrantRotate(oldImage, newKey.quadrantRotation - oldKey.quadrantRotation);
 			}
 			if(oldKey.mirrored != newKey.mirrored) {
 				newImage = ImageUtil.mirrorY(oldImage);
