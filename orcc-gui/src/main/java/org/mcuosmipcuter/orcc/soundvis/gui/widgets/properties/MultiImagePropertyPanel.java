@@ -215,8 +215,10 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 	}
 
 	private void hidePopup() {
-		popup.hide();
-		popup = null;
+		if(popup != null) {
+			popup.hide();
+			popup = null;
+		}
 		editButton.setEnabled(true);
 		setBackground(origBackground);
 		commands.setOpaque(false);
@@ -263,8 +265,8 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				JScrollPane sp = new JScrollPane(text);
-				Object[] array = {getName(), sp}; 
-				int res = JOptionPane.showConfirmDialog(MultiImagePropertyPanel.this, array, "set value for text", 
+				Object[] array = {slide.getDisplayKey(), sp}; 
+				int res = JOptionPane.showConfirmDialog(null, array, "set value for text", 
 						JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 				if(res == JOptionPane.OK_OPTION) {
 					slide.setText(text.getText());
@@ -573,9 +575,11 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 
 	@Override
 	public void activate() {
-		for(Slide slide : getCurrentValue()) {
-			ImageStore.getOrLoadScaledImage(slide.getKey(), 80, 80);
-			ImageStore.getOrLoadScaledImage(slide.getKey(), 60, 60);
+		if(getCurrentValue() != null) {
+			for(Slide slide : getCurrentValue()) {
+				ImageStore.getOrLoadScaledImage(slide.getKey(), 80, 80);
+				ImageStore.getOrLoadScaledImage(slide.getKey(), 60, 60);
+			}
 		}
 	}
 
