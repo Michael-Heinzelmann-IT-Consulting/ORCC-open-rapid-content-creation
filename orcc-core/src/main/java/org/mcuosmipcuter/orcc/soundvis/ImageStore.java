@@ -167,16 +167,16 @@ public class ImageStore {
 			} else {
 				IOUtil.log(key.getAbsolutePath() + " does not exist.");
 			}
-			if (image != null) {
-				if (key.quadrantRotation != 0) {
-					image = ImageUtil.quadrantRotate(image, key.quadrantRotation);
-				}
-				if (key.mirrored) {
-					image = ImageUtil.mirrorY(image);
-				}	
-			} else {
+			if (image == null) {
 				image = createPlaceHolderImage(imageFile);
 			}
+			if (key.quadrantRotation != 0) {
+				image = ImageUtil.quadrantRotate(image, key.quadrantRotation);
+			}
+			if (key.mirrored) {
+				image = ImageUtil.mirrorY(image);
+			}	
+			
 			addImage(key, image);
 			return image;
 
