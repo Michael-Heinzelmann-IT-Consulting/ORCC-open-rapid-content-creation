@@ -380,6 +380,9 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 	private void updateSlideImage(Slide slide, Key oldKey, Key newKey) {
 		BufferedImage newImage = ImageStore.transformImage(oldKey, newKey);	
 		slide.setImage(newKey, newImage);
+		JButton ib = (JButton) jbuttons.toArray()[slide.getPosition() - 1];
+		ib.setIcon(new ImageIcon(ImageStore.getOrLoadScaledImage(slide.getKey(), 80, 80)));
+		ib.setSelectedIcon(new ImageIcon(ImageStore.getOrLoadScaledImage(slide.getKey(), 60, 60)));
 		Context.setSongPositionPointer(Context.getSongPositionPointer());
 		Context.touchSession();
 	}
