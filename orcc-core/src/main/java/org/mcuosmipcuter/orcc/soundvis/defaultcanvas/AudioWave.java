@@ -30,6 +30,7 @@ import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.TimedChange;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
+import org.mcuosmipcuter.orcc.api.util.DimensionHelper;
 import org.mcuosmipcuter.orcc.soundvis.AudioInput;
 import org.mcuosmipcuter.orcc.soundvis.Context;
 import org.mcuosmipcuter.orcc.soundvis.model.SuperSample;
@@ -56,6 +57,7 @@ public class AudioWave implements SoundCanvas, PropertyListener {
 	private int videoHeight;
 	int noOfSamples;
 	int samplesPerFrame;
+	private DimensionHelper dimensionHelper;
 	
 	@ChangesIcon
 	@UserProperty(description = "color of the already played area")
@@ -73,6 +75,9 @@ public class AudioWave implements SoundCanvas, PropertyListener {
 	@UserProperty(description="size amplitude")
 	@LimitedIntProperty(minimum = 1, description = "not smaller than 0")
 	private int scaleWidth = 100;
+	
+	@UserProperty(description="center Y axis in %")
+	private int centerY = 50;
 	
 	@UserProperty(description="value of amplitude")
 	private AMP_VALUES ampValue = AMP_VALUES.PEAK;
@@ -95,7 +100,7 @@ public class AudioWave implements SoundCanvas, PropertyListener {
 
 			int divY = (Math.max(Math.abs(superSampleDataToUse.getOverallMin()), Math.abs(superSampleDataToUse.getOverallMax())) * 2 / (videoHeight - marginVertical / 1) + 1);
 			graphics.setColor(colorPlayed);
-			int center = videoHeight / 2;
+			int center = dimensionHelper.realY(centerY);
 			int x = 1;
 			graphics.transform(atSc);
 			for (SuperSample susa : superSampleDataToUse.getList()) {
@@ -121,6 +126,7 @@ public class AudioWave implements SoundCanvas, PropertyListener {
 	public void prepare(AudioInputInfo audioInputInfo, VideoOutputInfo videoOutputInfo) {
 		this.videoWidth = videoOutputInfo.getWidth();
 		this.videoHeight = videoOutputInfo.getHeight();
+		this.dimensionHelper = new DimensionHelper(videoOutputInfo);
 		AudioInput ai = Context.getAudioInput();
 		final String inputName = ai.getName();
 		final int width = videoOutputInfo.getWidth();
