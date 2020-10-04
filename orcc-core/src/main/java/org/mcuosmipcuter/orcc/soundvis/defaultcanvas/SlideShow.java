@@ -45,6 +45,7 @@ import org.mcuosmipcuter.orcc.soundvis.effects.Positioner;
 import org.mcuosmipcuter.orcc.soundvis.effects.Repeater;
 import org.mcuosmipcuter.orcc.soundvis.effects.Rotator;
 import org.mcuosmipcuter.orcc.soundvis.effects.Scaler;
+import org.mcuosmipcuter.orcc.soundvis.effects.SimpleText;
 
 
 /**
@@ -52,6 +53,11 @@ import org.mcuosmipcuter.orcc.soundvis.effects.Scaler;
  * @author Michael Heinzelmann
  */
 public class SlideShow implements SoundCanvas {
+	@Override
+	public int getEditorColumns() {
+		return 3;
+	}
+
 	@TimedChange
 	@UserProperty(description="slides to show")
 	private Slide[] slides;
@@ -91,6 +97,8 @@ public class SlideShow implements SoundCanvas {
 	private Rotator rotator = new Rotator();
 	@NestedProperty(description = "scale in and out")
 	Scaler scaler = new Scaler();
+	@NestedProperty(description = "slide text")
+	SimpleText slideText = new SimpleText();
 	
 	private Repeater repeater = new Repeater(fader, mover, rotator, scaler);
 
@@ -157,18 +165,27 @@ public class SlideShow implements SoundCanvas {
 				final Composite saveComposite = fader.fade(graphics2D, displayUnit);
 
 
-				try {							
+				try {	
+					//graphics2D.setXORMode(Color.BLACK);
+
 					graphics2D.transform(transformM);
 					graphics2D.transform(transformR);
+
 					graphics2D.setClip(clip);
 					graphics2D.transform(transformP);
 					graphics2D.transform(transformS);
 					graphics2D.drawImage(image, 0, 0, null, null);
+					
+
 				}
 				finally {
 					graphics2D.setComposite(saveComposite);
 					graphics2D.setTransform(saveAT);
 					graphics2D.setClip(null);
+					slideText.writeText(graphics2D, dimensionHelper, slides[displayUnit.index % slides.length].getText());
+//					graphics2D.setXORMode(graphics2D.getColor());
+//					TextHelper.writeText(slides[displayUnit.index % slides.length].getText(), graphics2D, 30, Color.GRAY, videoOutputInfo.getWidth(), videoOutputInfo.getHeight() / 10);
+//					graphics2D.setPaintMode();
 				}
 			}
 		}
