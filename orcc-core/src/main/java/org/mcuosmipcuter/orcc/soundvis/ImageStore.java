@@ -60,7 +60,22 @@ public class ImageStore {
 			this.width = width;
 			this.height = height;
 		}
-
+		public Key toOriginal() {
+			return new Key(this.lastModified, this.absolutePath, 0, false, 0, 0);
+		}
+		public Key toUntransformed() {
+			return new Key(this.lastModified, this.absolutePath, 0, false, this.width, this.height);
+		}
+		public Key mirrorY() {
+			boolean newMirror = ! this.isMirrored();
+			return new Key(this.getLastModified(), this.getAbsolutePath(), this.getQuadrantRotation(), newMirror, this.getWidth(), this.getHeight());
+		}
+		public Key rotateClockWise() {
+			int oldRotation = this.getQuadrantRotation();
+			int newRotation = this.isMirrored() ? ((oldRotation == 0) ? 3 : oldRotation - 1 ) : (this.getQuadrantRotation() + 1) % 4;
+			return new Key(this.getLastModified(), this.getAbsolutePath(), newRotation, this.isMirrored(), this.getWidth(), this.getHeight());
+	
+		}
 		@Override
 		public String toString() {
 			return "Key [lastModified=" + lastModified + ", absolutePath=" + absolutePath + ", quadrantRotation="
@@ -141,7 +156,6 @@ public class ImageStore {
 	}
 	public static BufferedImage getImage(Key key) {
 
-		//Key key = new Key(imageFile.lastModified(), imageFile.getAbsolutePath());
 		SoftReference<BufferedImage> ref = store.get(key);
 		if(ref != null) {
 			IOUtil.log("*hit for " + key + " image " + ref.get());
@@ -169,6 +183,10 @@ public class ImageStore {
 			}
 			if (image == null) {
 				image = createPlaceHolderImage(imageFile);
+			}
+			Key originalKey = key.toOriginal();
+			if(getImage(originalKey) == null) {
+				addImage(originalKey, image);
 			}
 			if (key.quadrantRotation != 0) {
 				image = ImageUtil.quadrantRotate(image, key.quadrantRotation);
@@ -202,26 +220,29 @@ public class ImageStore {
 		store.put(key, new SoftReference<BufferedImage>(image));
 	}
 	
-	public static BufferedImage transformImage(Key oldKey, Key newKey) {
+	public static BufferedImage transformImage(Key newKey) {
 		BufferedImage newImage = getImage(newKey);
 		if(newImage != null) {
 			return newImage;
 		}
 		else {
-			BufferedImage oldImage = getImage(oldKey);
-			if(oldImage == null) {
-				IOUtil.log("returning null, old key not stored " + oldKey);
+			Key untransformedKey = newKey.toUntransformed();
+			
+			BufferedImage untransformedImage = getImage(untransformedKey);
+			if(untransformedImage == null) {
+				IOUtil.log("returning null, untransformed key not stored " + untransformedKey);
 				return null;
 			}
-			if(newKey.equals(oldKey)) {
-				return oldImage;
+			if(newKey.equals(untransformedKey)) {
+				return untransformedImage;
 			}
-			if(oldKey.quadrantRotation != newKey.quadrantRotation) {
-				newImage = ImageUtil.quadrantRotate(oldImage, newKey.quadrantRotation - oldKey.quadrantRotation);
+
+			newImage = ImageUtil.quadrantRotate(untransformedImage, newKey.quadrantRotation);
+			
+			if(newKey.mirrored) {
+				newImage = ImageUtil.mirrorY(newImage);
 			}
-			if(oldKey.mirrored != newKey.mirrored) {
-				newImage = ImageUtil.mirrorY(oldImage);
-			}
+
 			addImage(newKey, newImage);
 			return newImage;
 		}	

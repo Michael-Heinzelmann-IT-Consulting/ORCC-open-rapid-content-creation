@@ -28,6 +28,7 @@ import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -74,18 +75,18 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 		public FileLoadActionListener(boolean append) {
 			this.append = append;
 		}
+		JFileChooser chooser = new JFileChooser() {
+			private static final long serialVersionUID = 1L;
 
+			@Override
+			public void approveSelection() {
+				IOUtil.log(System.currentTimeMillis() + " chooser approve ");
+				super.approveSelection();
+			}
+		};
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			JFileChooser chooser = new JFileChooser() {
-				private static final long serialVersionUID = 1L;
 
-				@Override
-				public void approveSelection() {
-					IOUtil.log(System.currentTimeMillis() + " chooser approve " + e);
-					super.approveSelection();
-				}
-			};
 			chooser.setMultiSelectionEnabled(true);
 			IOUtil.log(System.currentTimeMillis() + " chooser return " + e);
 			Context.beforePropertyUpdate(name);
@@ -316,9 +317,8 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				Key oldKey = slide.getKey();
-				int newRotation = (oldKey.getQuadrantRotation() + 1) % 4;
-				Key newKey = new Key(oldKey.getLastModified(), oldKey.getAbsolutePath(), newRotation, oldKey.isMirrored(), oldKey.getWidth(), oldKey.getHeight());
-				updateSlideImage(slide, oldKey, newKey);
+				Key newKey = oldKey.rotateClockWise();
+				updateSlideImage(slide, newKey);
 				imagePanel.repaint();
 			}
 		});
@@ -332,9 +332,8 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				Key oldKey = slide.getKey();
-				boolean newMirror = ! oldKey.isMirrored();
-				Key newKey = new Key(oldKey.getLastModified(), oldKey.getAbsolutePath(), oldKey.getQuadrantRotation(), newMirror, oldKey.getWidth(), oldKey.getHeight());
-				updateSlideImage(slide, oldKey, newKey);
+				Key newKey = oldKey.mirrorY();
+				updateSlideImage(slide, newKey);
 				imagePanel.repaint();
 			}
 		});
@@ -344,7 +343,14 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 		gridbag.setConstraints(removeButton, gc);
 		editPanel.add(removeButton, gc);
 		
-		editPopup = PopupFactory.getSharedInstance().getPopup(this, editPanel, loc.x, loc.y);
+		Rectangle screen = GraphicsUtil.getRootComponentOutline(MultiImagePropertyPanel.this);
+		int lowLimit = screen.y + screen.height;
+		editPanel.doLayout();
+		int extentY = loc.y + editPanel.getPreferredSize().height;
+		// debug: System.err.println("extentY " + extentY  + " lowLimit " + lowLimit);
+		int yToUse = extentY < lowLimit ? loc.y : loc.y - (extentY - lowLimit) - 10;
+		
+		editPopup = PopupFactory.getSharedInstance().getPopup(this, editPanel, loc.x, yToUse);
 		moveLeftButton.addActionListener(new ActionListener() {	
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -377,8 +383,8 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 		}
 		
 	}
-	private void updateSlideImage(Slide slide, Key oldKey, Key newKey) {
-		BufferedImage newImage = ImageStore.transformImage(oldKey, newKey);	
+	private void updateSlideImage(Slide slide, Key newKey) {
+		BufferedImage newImage = ImageStore.transformImage(newKey);	
 		slide.setImage(newKey, newImage);
 		JButton ib = (JButton) jbuttons.toArray()[slide.getPosition() - 1];
 		ib.setIcon(new ImageIcon(ImageStore.getOrLoadScaledImage(slide.getKey(), 80, 80)));
