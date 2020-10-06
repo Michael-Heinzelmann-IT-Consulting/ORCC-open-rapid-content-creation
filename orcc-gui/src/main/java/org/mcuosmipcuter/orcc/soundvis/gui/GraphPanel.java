@@ -123,7 +123,11 @@ public class GraphPanel extends JPanel implements Renderer, RealtimeSettings, Li
 				setZoomFactor(0.0f); // adapt to new size
 			}
 			displayUpdate(true);
-
+		}
+		if(PropertyName.SessionChanged.equals(propertyName)) {
+			frameImage = new BufferedImage(Context.getVideoOutputInfo().getWidth(), Context.getVideoOutputInfo().getHeight(), BufferedImage.TYPE_3BYTE_BGR);
+			graphics = frameImage.createGraphics();
+			displayUpdate(true);
 		}
 		EnumSet<PropertyName> match = EnumSet.of(PropertyName.SoundCanvasProperty,
 				PropertyName.SoundCanvasAdded, PropertyName.SoundCanvasList, PropertyName.SongPositionPointer);
