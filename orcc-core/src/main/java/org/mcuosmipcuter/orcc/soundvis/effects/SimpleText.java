@@ -18,12 +18,15 @@
 package org.mcuosmipcuter.orcc.soundvis.effects;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics2D;
 
 import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
+import org.mcuosmipcuter.orcc.api.soundvis.MappedValue;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 import org.mcuosmipcuter.orcc.api.util.DimensionHelper;
 import org.mcuosmipcuter.orcc.api.util.TextHelper;
+import org.mcuosmipcuter.orcc.soundvis.FontStore;
 
 /**
  * @author Michael Heinzelmann
@@ -41,6 +44,8 @@ public class SimpleText {
 	private Color backGroundColor = Color.WHITE;
 	@UserProperty(description="color of text")
 	private Color textColor = Color.BLACK;
+	@UserProperty(description = "the font to use")
+	private MappedValue<String> fontName = FontStore.getDefaultFont();
 	@LimitedIntProperty(minimum=0, description="at least 0")
 	@UserProperty(description="size of font")
 	private int fontSize = 30;
@@ -73,7 +78,11 @@ public class SimpleText {
 			graphics2D.fillRect(0, tf, w, h);
 		}
 		graphics2D.setColor(textColor);
+		Font backUp = graphics2D.getFont();		
+		Font font = FontStore.getFontByMappedValue(fontName);
+		graphics2D.setFont(font);
 		TextHelper.writeText(text, graphics2D, fontSize, textColor, w, tt);
+		graphics2D.setFont(backUp);
 		
 		if(xor) {
 			graphics2D.setPaintMode();
