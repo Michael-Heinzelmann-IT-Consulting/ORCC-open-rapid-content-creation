@@ -6,32 +6,33 @@ import java.util.function.Consumer;
 import org.mcuosmipcuter.orcc.api.soundvis.DisplayUnit;
 import org.mcuosmipcuter.orcc.api.soundvis.EffectShape;
 import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
+import org.mcuosmipcuter.orcc.api.soundvis.Unit;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 
 public class EffectShaperSimple extends EffectShaper {
 	
 	@LimitedIntProperty(description = "configurable", minGetterMethod = "getMinValues", maxGetterMethod = "getMaxValues")
-	@UserProperty(description="begin value x")
+	@UserProperty(description="begin value x", unit=Unit.PERCENT_OBJECT)
 	private int begValuePercent = initial.begValueXPercent;
 	
 	@LimitedIntProperty(description = "configurable", minGetterMethod = "getMinValues", maxGetterMethod = "getMaxValues")
-	@UserProperty(description="mid value x")
+	@UserProperty(description="mid value x", unit=Unit.PERCENT_OBJECT)
 	private int midValuePercent = initial.midValueXPercent;
 	
 	@LimitedIntProperty(description = "configurable", minGetterMethod = "getMinValues", maxGetterMethod = "getMaxValues")
-	@UserProperty(description="end value x")
+	@UserProperty(description="end value x", unit=Unit.PERCENT_OBJECT)
 	private int endValuePercent = initial.endValueXPercent;
 	
-	@UserProperty(description="slope in frames")
+	@UserProperty(description="slope in frames", unit=Unit.FRAMES)
 	private int framesIn = initial.framesIn;
 	@LimitedIntProperty(minimum = 0, description = "only positive integers")
-	@UserProperty(description="static in frames")
+	@UserProperty(description="static in frames", unit=Unit.FRAMES)
 	private int beginFrames = initial.beginFrames;
 	
-	@UserProperty(description="slope out frames")
+	@UserProperty(description="slope out frames", unit=Unit.FRAMES)
 	private int framesOut = initial.framesOut;
 	@LimitedIntProperty(maximum = 0, description = "only negative integers")
-	@UserProperty(description="static out frames")
+	@UserProperty(description="static out frames", unit=Unit.FRAMES)
 	private int endFrames = initial.endFrames;
 
 	public EffectShaperSimple() {

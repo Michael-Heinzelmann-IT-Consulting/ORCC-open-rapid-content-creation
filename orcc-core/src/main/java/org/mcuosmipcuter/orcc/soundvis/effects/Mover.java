@@ -21,28 +21,29 @@ import java.awt.geom.AffineTransform;
 
 import org.mcuosmipcuter.orcc.api.soundvis.DisplayDuration;
 import org.mcuosmipcuter.orcc.api.soundvis.DisplayObject;
+import org.mcuosmipcuter.orcc.api.soundvis.Unit;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 
 public class Mover implements DisplayObject {
 	
-	@UserProperty(description="in move 0 means none")
+	@UserProperty(description="in move 0 means none", unit=Unit.FRAMES)
 	private int moveInXFrames;
-	@UserProperty(description="move in x speed")
+	@UserProperty(description="move in x speed", unit = Unit.PIXEL_PER_FRAME)
 	private int moveInXSpeed;
 	
-	@UserProperty(description="in move 0 means none")
+	@UserProperty(description="in move 0 means none", unit=Unit.FRAMES)
 	private int moveInYFrames;
-	@UserProperty(description="move in y speed")
+	@UserProperty(description="move in y speed", unit = Unit.PIXEL_PER_FRAME)
 	private int moveInYSpeed;
 	
-	@UserProperty(description="in move 0 means none")
+	@UserProperty(description="in move 0 means none", unit = Unit.FRAMES)
 	private int moveOutXFrames;
-	@UserProperty(description="move out x speed")
+	@UserProperty(description="move out x speed", unit = Unit.PIXEL_PER_FRAME)
 	private int moveOutXSpeed;
 	
-	@UserProperty(description="in move 0 means none")
+	@UserProperty(description="in move 0 means none", unit = Unit.FRAMES)
 	private int moveOutYFrames;
-	@UserProperty(description="move out y speed")
+	@UserProperty(description="move out y speed", unit = Unit.PIXEL_PER_FRAME)
 	private int moveOutYSpeed;
 	
 	public AffineTransform move(int posInSlideDuration, int numberOfFramesSlideIsVisible) {

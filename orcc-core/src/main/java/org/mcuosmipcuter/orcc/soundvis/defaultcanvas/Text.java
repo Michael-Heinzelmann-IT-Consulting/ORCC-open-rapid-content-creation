@@ -39,8 +39,10 @@ import org.mcuosmipcuter.orcc.api.soundvis.DisplayUnit;
 import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.MappedValue;
 import org.mcuosmipcuter.orcc.api.soundvis.NestedProperty;
+import org.mcuosmipcuter.orcc.api.soundvis.NumberMeaning;
 import org.mcuosmipcuter.orcc.api.soundvis.PropertyListener;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
+import org.mcuosmipcuter.orcc.api.soundvis.Unit;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.api.util.DimensionHelper;
@@ -83,8 +85,9 @@ public class Text implements SoundCanvas, PropertyListener {
 	@LimitedIntProperty(description = "", minimum = 0)
 	private boolean showMargins;
 
-	@UserProperty(description = "font size for text in % of video height")
+	@UserProperty(description = "font size for text in % of video height", unit = Unit.POINTS)
 	@LimitedIntProperty(description = "font size limitation", minimum = 0)
+	@NumberMeaning(numbers = 0, meanings = "auto")
 	private int fontSize = 0;
 
 	@UserProperty(description = "the text alignment of lines")
@@ -94,27 +97,26 @@ public class Text implements SoundCanvas, PropertyListener {
 	@UserProperty(description = "text color")
 	private Color textColor = Color.BLACK;
 
-	@UserProperty(description = "left and right margin of text in % of video width")
+	@LimitedIntProperty(description = "50% is center", maximum = 50)
+	@UserProperty(description = "left and right margin of text in % of video width", unit = Unit.PERCENT_VIDEO)
 	int leftRightMargin = 10;
 
-	@UserProperty(description = "top margin of text in % of video height")
+	@UserProperty(description = "top margin of text in % of video height", unit = Unit.PERCENT_VIDEO)
 	int topMargin = 20;
 
-	@UserProperty(description = "bottom margin of text in % of video height")
+	@UserProperty(description = "bottom margin of text in % of video height", unit = Unit.PERCENT_VIDEO)
 	int bottomAutoMargin = 20;
 
 	@UserProperty(description = "top progress")
 	private TextProgress textProgress = TextProgress.PAGE;
 
-	@UserProperty(description = "type the text")
-	@LimitedIntProperty(description = "", minimum = 0)
 	private boolean typing;
-
+	@UserProperty(description = "frames per character")
+	@NumberMeaning(numbers = {-1, 0, 1}, meanings = {"slower", "off", "faster"})
+	private int modProgress = -1;
+	
 	@NestedProperty(description = "x and y position")
 	Positioner positioner = new Positioner();
-
-	@UserProperty(description = "frames per character")
-	private int modProgress = -1;
 
 	@NestedProperty(description = "fading in and out")
 	private Fader fader = new Fader();
@@ -218,12 +220,14 @@ public class Text implements SoundCanvas, PropertyListener {
 
 			int progessIdx;
 			if (modProgress != 0) {
+				typing = true;
 				if (modProgress > 0) {
 					progessIdx = displayUnit.currentPosition * modProgress; // speedup
 				} else {
 					progessIdx = displayUnit.currentPosition / Math.abs(modProgress); // slowdown
 				}
 			} else {
+				typing = false;
 				progessIdx = text.length();
 			}
 

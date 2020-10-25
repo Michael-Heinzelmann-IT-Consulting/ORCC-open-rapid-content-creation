@@ -17,11 +17,19 @@
 */
 package org.mcuosmipcuter.orcc.soundvis.gui.widgets.properties;
 
+import java.text.DecimalFormat;
+import java.text.FieldPosition;
+import java.text.ParsePosition;
+
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.text.DefaultFormatterFactory;
+import javax.swing.text.NumberFormatter;
 
+import org.mcuosmipcuter.orcc.api.soundvis.NumberMeaning;
+import org.mcuosmipcuter.orcc.api.soundvis.Unit;
 import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
 
 
@@ -44,19 +52,102 @@ public class IntegerPropertyPanel extends PropertyPanel<Integer> {
 	 * @param maximum the maximum for the spinner
 	 * @param stepSize the step size for the spinner
 	 */
-	public IntegerPropertyPanel(SoundCanvasWrapper soundCanvasWrapper, Object valueOwner, boolean timed, int value, int minimum, int maximum, int stepSize) {
+	public IntegerPropertyPanel(SoundCanvasWrapper soundCanvasWrapper, Object valueOwner, boolean timed, int value, int minimum, int maximum, int stepSize, Unit unit, NumberMeaning numberMeaning) {
 		super(soundCanvasWrapper, valueOwner);
 		SpinnerNumberModel model = new SpinnerNumberModel(value, minimum, maximum, stepSize);
 		jSpinner = new JSpinner(model);
+			String format;
+			switch(unit) {
+				case PERCENT_OBJECT:
+				case PERCENT_VIDEO:
+					format = "0'%'";
+					break;
+				case DEGREES:
+					format = "0'°'";
+					break;
+				case FRAMES:
+					format = "0'fr'";
+					break;
+				case PIXEL:
+					format = "0'px'";
+					break;
+				case POINTS:
+					format = "0'pt'";
+					break;
+				case TIMES:
+					format = "0'x'";
+					break;
+				case PIXEL_PER_FRAME:
+					format = "0'px/fr'";
+					break;
+				case DEGREES_PER_FRAME:
+					format = "0'°/fr'";
+					break;
+			default:
+				format = "0";
+				break;
+			}
+			
+			 NumberFormatter displayFormat = new NumberFormatter(new DecimalFormat(format) {
+				private static final long serialVersionUID = 1L;
+				@Override
+				public StringBuffer format(long number, StringBuffer result, FieldPosition fieldPosition) {
+					if(numberMeaning != null) {
+						for(int i = 0; i < numberMeaning.numbers().length; i++) {
+							if(number == numberMeaning.numbers()[i]) {
+								String meaning = i < numberMeaning.meanings().length ? numberMeaning.meanings()[i] : "";
+								result.append(meaning);
+								return result;
+							}
+						}
+					}
+					
+					return super.format(number, result, fieldPosition);
+				}
+				
+
+				@Override
+				public Number parse(String text, ParsePosition pos) {
+					if(numberMeaning != null) {
+						for(int i = 0; i < numberMeaning.meanings().length; i++) {
+							if(text.equals(numberMeaning.meanings()[i])) {
+								int number = i < numberMeaning.numbers().length ? numberMeaning.numbers()[i] : 0;
+								pos.setIndex(text.length());
+								return Long.valueOf(number);
+							}
+						}
+					}
+					try {
+						Number number = Long.parseLong(text);
+						pos.setIndex(text.length());
+						return number;
+					}
+					catch(NumberFormatException ex) {
+						// forward to super
+					}
+					return super.parse(text, pos);
+				}});
+				
+			
+//			else {
+//				displayFormat = new NumberFormatter(new DecimalFormat(format));
+//			}
+			NumberFormatter editFormat = new NumberFormatter(new DecimalFormat("0"));
+			DefaultFormatterFactory factory = new DefaultFormatterFactory(displayFormat, displayFormat, displayFormat);
+			JSpinner.NumberEditor editor = new JSpinner.NumberEditor(jSpinner,format);
+			editor.getTextField().setFormatterFactory(factory);
+			jSpinner.setEditor(editor);
+		
+
 		add(jSpinner);
 		this.timed = timed;
 	}
 	/**
-	 * Constructor with a canvas, all other values will be default
+	 * Constructor with no limits
 	 * @param soundCanvas the canvas to work with
 	 */
-	public IntegerPropertyPanel(SoundCanvasWrapper soundCanvasWrapper, Object valueOwner, boolean timed) {
-		this(soundCanvasWrapper, valueOwner, timed, 0, Integer.MIN_VALUE, Integer.MAX_VALUE, 1);
+	public IntegerPropertyPanel(SoundCanvasWrapper soundCanvasWrapper, Object valueOwner, boolean timed, Unit unit, NumberMeaning  numberMeaning) {
+		this(soundCanvasWrapper, valueOwner, timed, 0, Integer.MIN_VALUE, Integer.MAX_VALUE, 1, unit, numberMeaning);
 	}
 
 	@Override
@@ -70,7 +161,13 @@ public class IntegerPropertyPanel extends PropertyPanel<Integer> {
 			
 			@Override
 			public void stateChanged(ChangeEvent e) {
-				setNewValue((Integer)jSpinner.getValue());
+				if(jSpinner.getValue() instanceof Integer) {
+					setNewValue((Integer)jSpinner.getValue());
+				}
+				if(jSpinner.getValue() instanceof Long) {
+					Long l = (Long)jSpinner.getValue();
+					setNewValue(l.intValue());
+				}
 			}
 		};
 		jSpinner.addChangeListener(timed ? new TimedChangeListener(cl) : cl);

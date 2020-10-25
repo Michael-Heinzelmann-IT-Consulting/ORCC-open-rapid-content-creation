@@ -23,6 +23,7 @@ import java.awt.Graphics2D;
 
 import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.MappedValue;
+import org.mcuosmipcuter.orcc.api.soundvis.Unit;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 import org.mcuosmipcuter.orcc.api.util.DimensionHelper;
 import org.mcuosmipcuter.orcc.api.util.TextHelper;
@@ -47,19 +48,19 @@ public class SimpleText {
 	@UserProperty(description = "the font to use")
 	private MappedValue<String> fontName = FontStore.getDefaultFont();
 	@LimitedIntProperty(minimum=0, description="at least 0")
-	@UserProperty(description="size of font")
+	@UserProperty(description="size of font", unit = Unit.POINTS)
 	private int fontSize = 30;
 	@LimitedIntProperty(minimum=0, maximum = 100, description="between 0 and 100")
-	@UserProperty(description="top of text field")
+	@UserProperty(description="top of text field", unit = Unit.PERCENT_VIDEO)
 	private int topField = 0;
 	@LimitedIntProperty(minimum=0, maximum = 100, description="between 0 and 100")
-	@UserProperty(description="width of text field")
+	@UserProperty(description="width of text field", unit = Unit.PERCENT_VIDEO)
 	private int width = 100;
 	@LimitedIntProperty(minimum=0, maximum = 100, description="between 0 and 100")
-	@UserProperty(description="height of text field")
+	@UserProperty(description="height of text field", unit = Unit.PERCENT_VIDEO)
 	private int height = 100;
 	@LimitedIntProperty(minimum=0, maximum = 100, description="between 0 and 100")
-	@UserProperty(description="top of text field")
+	@UserProperty(description="top of text field", unit = Unit.PERCENT_VIDEO)
 	private int topText = 50;
 	
 	public void writeText(Graphics2D graphics2D, DimensionHelper dimensionHelper, String text) {
@@ -81,7 +82,7 @@ public class SimpleText {
 		Font backUp = graphics2D.getFont();		
 		Font font = FontStore.getFontByMappedValue(fontName);
 		graphics2D.setFont(font);
-		TextHelper.writeText(text, graphics2D, fontSize, textColor, w, tt);
+		TextHelper.writeText(text, graphics2D, fontSize, textColor, dimensionHelper.getVideoWidth(), tt);
 		graphics2D.setFont(backUp);
 		
 		if(xor) {

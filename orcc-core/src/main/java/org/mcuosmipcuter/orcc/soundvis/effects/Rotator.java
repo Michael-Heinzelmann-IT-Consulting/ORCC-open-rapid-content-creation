@@ -21,19 +21,20 @@ import java.awt.geom.AffineTransform;
 
 import org.mcuosmipcuter.orcc.api.soundvis.DisplayDuration;
 import org.mcuosmipcuter.orcc.api.soundvis.DisplayObject;
+import org.mcuosmipcuter.orcc.api.soundvis.Unit;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 
 public class Rotator implements DisplayObject {
 	
-	@UserProperty(description="in rotate 0 means none")
+	@UserProperty(description="in rotate 0 means none", unit = Unit.FRAMES)
 	private int rotateInFrames;
-	@UserProperty(description="rotate in speed")
+	@UserProperty(description="rotate in speed", unit = Unit.DEGREES_PER_FRAME)
 	private int rotateInSpeed;
 	
 	
-	@UserProperty(description="in move 0 means none")
+	@UserProperty(description="in move 0 means none", unit = Unit.FRAMES)
 	private int rotateOutFrames;
-	@UserProperty(description="rotate out speed")
+	@UserProperty(description="rotate out speed", unit = Unit.DEGREES_PER_FRAME)
 	private int rotateOutSpeed;
 	
 	

@@ -28,8 +28,10 @@ import javax.swing.JPanel;
 import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.MappedValue;
 import org.mcuosmipcuter.orcc.api.soundvis.NestedProperty;
+import org.mcuosmipcuter.orcc.api.soundvis.NumberMeaning;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.TimedChange;
+import org.mcuosmipcuter.orcc.api.soundvis.Unit;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
 import org.mcuosmipcuter.orcc.soundvis.defaultcanvas.model.Slide;
@@ -116,7 +118,9 @@ public class PropertyPanelFactory {
 			return new BooleanPropertyPanel(soundCanvasWrapper, valueOwner);
 		}
 		if(int.class.equals(type)) {
+			NumberMeaning numberMeaning = field.isAnnotationPresent(NumberMeaning.class) ? field.getAnnotation(NumberMeaning.class) : null;
 			final IntegerPropertyPanel i;
+			Unit unit = field.isAnnotationPresent(UserProperty.class) ? field.getAnnotation(UserProperty.class).unit() : Unit.OTHER;
 			if(field.isAnnotationPresent(LimitedIntProperty.class)) {
 				LimitedIntProperty l = field.getAnnotation(LimitedIntProperty.class);
 				Integer integer = getValue(field, valueOwner);
@@ -138,10 +142,10 @@ public class PropertyPanelFactory {
 					}
 				}
 
-				i = new IntegerPropertyPanel(soundCanvasWrapper, valueOwner, timed, value, minimum, maximum, l.stepSize());
+				i = new IntegerPropertyPanel(soundCanvasWrapper, valueOwner, timed, value, minimum, maximum, l.stepSize(), unit, numberMeaning);
 			}
 			else {
-				i = new IntegerPropertyPanel(soundCanvasWrapper, valueOwner, timed);
+				i = new IntegerPropertyPanel(soundCanvasWrapper, valueOwner, timed, unit, numberMeaning);
 			}
 			return i;
 		}

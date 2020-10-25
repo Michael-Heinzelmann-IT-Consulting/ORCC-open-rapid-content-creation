@@ -1,6 +1,6 @@
 /**
 *   ORCC rapid content creation for entertainment, education and media production
-*   Copyright (C) 2012 Michael Heinzelmann, Michael Heinzelmann IT-Consulting
+*   Copyright (C) 2020 Michael Heinzelmann, Michael Heinzelmann IT-Consulting
 *
 *   This program is free software: you can redistribute it and/or modify
 *   it under the terms of the GNU General Public License as published by
@@ -23,21 +23,20 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * User property annotation to be used by canvas developers to inform soundvis
- * that the annotated property is read/writable for the user, soundvis will use reflection
- * to access the property, so getter/setter are not required.<br/>
- * Supported base types: boolean, java.awt.Color, int, String<br/>
- * Consult the latest editor documentation whether other types are supported 
  * @author Michael Heinzelmann
+ *
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(value=ElementType.FIELD)
-public @interface UserProperty {
-	
+public @interface NumberMeaning {
 	/**
-	 * Describe to the user the meaning of the property and how it is intended to be used
-	 * @return the description of the property
+	 * number
+	 * @return the number
 	 */
-	String description();
-	Unit unit() default Unit.OTHER;
+	int[] numbers();
+	/**
+	 * meaning
+	 * @return the meaning of the number displayed with or instead of the number
+	 */
+	String[] meanings();
 }

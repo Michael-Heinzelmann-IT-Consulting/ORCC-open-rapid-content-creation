@@ -22,6 +22,7 @@ import java.util.function.BiConsumer;
 import org.mcuosmipcuter.orcc.api.soundvis.DisplayUnit;
 import org.mcuosmipcuter.orcc.api.soundvis.EffectShape;
 import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
+import org.mcuosmipcuter.orcc.api.soundvis.Unit;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 
 public class EffectShaper {
@@ -31,36 +32,36 @@ public class EffectShaper {
 	private int maxValues = Integer.MAX_VALUE;
 	
 	@LimitedIntProperty(description = "configurable", minGetterMethod = "getMinValues", maxGetterMethod = "getMaxValues")
-	@UserProperty(description="begin value x")
+	@UserProperty(description="begin value x", unit=Unit.PERCENT_OBJECT)
 	private int begValueXPercent = initial.begValueXPercent;
 	@LimitedIntProperty(description = "configurable", minGetterMethod = "getMinValues", maxGetterMethod = "getMaxValues")
-	@UserProperty(description="begin value y")
+	@UserProperty(description="begin value y", unit=Unit.PERCENT_OBJECT)
 	private int begValueYPercent = initial.begValueYPercent;
 	
 	@LimitedIntProperty(description = "configurable", minGetterMethod = "getMinValues", maxGetterMethod = "getMaxValues")
-	@UserProperty(description="mid value x")
+	@UserProperty(description="mid value x", unit=Unit.PERCENT_OBJECT)
 	private int midValueXPercent = initial.midValueXPercent;
 	@LimitedIntProperty(description = "configurable", minGetterMethod = "getMinValues", maxGetterMethod = "getMaxValues")
-	@UserProperty(description="mid value y")
+	@UserProperty(description="mid value y", unit=Unit.PERCENT_OBJECT)
 	private int midValueYPercent = initial.midValueYPercent;
 	
 	@LimitedIntProperty(description = "configurable", minGetterMethod = "getMinValues", maxGetterMethod = "getMaxValues")
-	@UserProperty(description="end value x")
+	@UserProperty(description="end value x", unit=Unit.PERCENT_OBJECT)
 	private int endValueXPercent = initial.endValueXPercent;
 	@LimitedIntProperty(description = "configurable", minGetterMethod = "getMinValues", maxGetterMethod = "getMaxValues")
-	@UserProperty(description="end value y")
+	@UserProperty(description="end value y", unit=Unit.PERCENT_OBJECT)
 	private int endValueYPercent = initial.endValueYPercent;
 	
-	@UserProperty(description="slope in frames")
+	@UserProperty(description="slope in frames", unit=Unit.FRAMES)
 	private int framesIn = initial.framesIn;
 	@LimitedIntProperty(minimum = 0, description = "only positive integers")
-	@UserProperty(description="static in frames")
+	@UserProperty(description="static in frames", unit=Unit.FRAMES)
 	private int beginFrames = initial.beginFrames;
 	
-	@UserProperty(description="slope out frames")
+	@UserProperty(description="slope out frames", unit=Unit.FRAMES)
 	private int framesOut = initial.framesOut;
 	@LimitedIntProperty(maximum = 0, description = "only negative integers")
-	@UserProperty(description="static out frames")
+	@UserProperty(description="static out frames", unit=Unit.FRAMES)
 	private int endFrames = initial.endFrames;
 	
 	

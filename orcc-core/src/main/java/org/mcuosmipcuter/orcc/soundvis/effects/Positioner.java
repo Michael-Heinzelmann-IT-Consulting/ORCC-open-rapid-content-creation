@@ -20,6 +20,7 @@ package org.mcuosmipcuter.orcc.soundvis.effects;
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 
+import org.mcuosmipcuter.orcc.api.soundvis.Unit;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 import org.mcuosmipcuter.orcc.api.util.DimensionHelper;
 
@@ -29,10 +30,10 @@ import org.mcuosmipcuter.orcc.api.util.DimensionHelper;
  */
 public class Positioner {
 	
-	@UserProperty(description="center x position")
+	@UserProperty(description="center x position", unit = Unit.PERCENT_VIDEO)
 	private int centerX = 0;
 	
-	@UserProperty(description="center y position")
+	@UserProperty(description="center y position", unit = Unit.PERCENT_VIDEO)
 	private int centerY = 0;
 	
 	public AffineTransform position(DimensionHelper dimensionHelper, Rectangle outline) {

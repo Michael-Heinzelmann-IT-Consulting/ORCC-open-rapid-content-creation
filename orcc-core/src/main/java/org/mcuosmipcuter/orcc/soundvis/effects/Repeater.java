@@ -24,6 +24,7 @@ import org.mcuosmipcuter.orcc.api.soundvis.DisplayDuration;
 import org.mcuosmipcuter.orcc.api.soundvis.DisplayObject;
 import org.mcuosmipcuter.orcc.api.soundvis.DisplayUnit;
 import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
+import org.mcuosmipcuter.orcc.api.soundvis.Unit;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 
 /**
@@ -33,10 +34,10 @@ import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 public class Repeater {
 	
 	@LimitedIntProperty(minimum=1, description="number cannot be lower than 1")
-	@UserProperty(description="number of repeat")
+	@UserProperty(description="number of repeat", unit=Unit.TIMES)
 	int repeat = 1;
 	@LimitedIntProperty(minimum=0, description="number cannot be lower than 0 = auto")
-	@UserProperty(description="number of repeat")
+	@UserProperty(description="number of repeat", unit = Unit.FRAMES)
 	int frames = 0;
 	
 	private DisplayObject[] dispayObjects;
