@@ -33,8 +33,10 @@ import org.mcuosmipcuter.orcc.api.soundvis.DisplayDuration;
 import org.mcuosmipcuter.orcc.api.soundvis.DisplayUnit;
 import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.NestedProperty;
+import org.mcuosmipcuter.orcc.api.soundvis.NumberMeaning;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.TimedChange;
+import org.mcuosmipcuter.orcc.api.soundvis.Unit;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.api.util.DimensionHelper;
@@ -62,11 +64,13 @@ public class SlideShow implements SoundCanvas {
 	@UserProperty(description="slides to show")
 	private Slide[] slides;
 	
-	@UserProperty(description="number of frames per image")
+	@UserProperty(description="number of frames per image", unit = Unit.FRAMES)
 	@LimitedIntProperty(minimum=0, description="cannot be negative")
+	@NumberMeaning(numbers = 0, meanings = "auto")
 	private int numberOfFrames = 0;
-	@UserProperty(description="number of frames per image")
+	@UserProperty(description="number of frames per image", unit = Unit.TIMES)
 	@LimitedIntProperty(minimum=0, description="cannot be negative")
+	@NumberMeaning(numbers = 0, meanings = "auto")
 	private int repeat = 0;
 	
 	private DimensionHelper dimensionHelper;
