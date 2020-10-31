@@ -25,9 +25,11 @@ import java.lang.reflect.Field;
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
 import org.mcuosmipcuter.orcc.api.soundvis.ChangesIcon;
 import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
+import org.mcuosmipcuter.orcc.api.soundvis.NumberMeaning;
 import org.mcuosmipcuter.orcc.api.soundvis.PropertyListener;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.TimedChange;
+import org.mcuosmipcuter.orcc.api.soundvis.Unit;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.api.util.DimensionHelper;
@@ -68,21 +70,22 @@ public class AudioWave implements SoundCanvas, PropertyListener {
 	private Color colorToPlay = Color.GRAY;
 	
 
-	@UserProperty(description="size amplitude")
+	@UserProperty(description="size amplitude", unit = Unit.PERCENT_VIDEO)
 	@LimitedIntProperty(minimum = 1, description = "not smaller than 1")
 	private int amplitudeSize = 100;
 	
-	@UserProperty(description="size amplitude")
+	@UserProperty(description="size wave", unit = Unit.PERCENT_VIDEO)
 	@LimitedIntProperty(minimum = 1, description = "not smaller than 0")
 	private int scaleWidth = 100;
 	
-	@UserProperty(description="center Y axis in %")
+	@UserProperty(description="center Y axis in %", unit = Unit.PERCENT_VIDEO)
 	private int centerY = 50;
 	
 	@UserProperty(description="value of amplitude")
 	private AMP_VALUES ampValue = AMP_VALUES.PEAK;
 	
-	@UserProperty(description="size amplitude")
+	@UserProperty(description="size amplitude", unit = Unit.TIMES)
+	@NumberMeaning(numbers = 1, meanings = "none")
 	@LimitedIntProperty(minimum = 1, description = "not smaller than 1")
 	private int reduction = 1;
 

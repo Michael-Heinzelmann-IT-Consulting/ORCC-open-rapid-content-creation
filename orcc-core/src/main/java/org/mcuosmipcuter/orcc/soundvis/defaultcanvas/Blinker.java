@@ -19,13 +19,14 @@ package org.mcuosmipcuter.orcc.soundvis.defaultcanvas;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.RadialGradientPaint;
 import java.awt.MultipleGradientPaint.CycleMethod;
+import java.awt.RadialGradientPaint;
 import java.awt.geom.Point2D;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
 import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
+import org.mcuosmipcuter.orcc.api.soundvis.Unit;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.api.util.AmplitudeHelper;
@@ -37,17 +38,17 @@ import org.mcuosmipcuter.orcc.api.util.DimensionHelper;
  */
 public class Blinker implements SoundCanvas {
 
-	@UserProperty(description="x size of tile in % of video width")
+	@UserProperty(description="x size of tile in % of video width", unit = Unit.PERCENT_VIDEO)
 	int tileX = 100;
-	@UserProperty(description="y size of tile in % of video height")
+	@UserProperty(description="y size of tile in % of video height", unit = Unit.PERCENT_VIDEO)
 	int tileY = 100;
-	@UserProperty(description="x position of center in % of video width")
+	@UserProperty(description="x position of center in % of video width", unit = Unit.PERCENT_VIDEO)
 	int centerX = 50;
-	@UserProperty(description="y position of center in % of video height")
+	@UserProperty(description="y position of center in % of video height", unit = Unit.PERCENT_VIDEO)
 	int centerY = 50;
-	@UserProperty(description="x position of focus  in % of video width")
+	@UserProperty(description="x position of focus  in % of video width", unit = Unit.PERCENT_VIDEO)
 	int focusX = 50;
-	@UserProperty(description="y position of focus  in % of video height")
+	@UserProperty(description="y position of focus  in % of video height", unit = Unit.PERCENT_VIDEO)
 	int focusY = 50;
 	@UserProperty(description="color of background")
 	private Color backColor = Color.WHITE;
@@ -57,10 +58,10 @@ public class Blinker implements SoundCanvas {
 	private Color centerColor = Color.RED;
 	@UserProperty(description="cycle method")
 	private CycleMethod cycleMethod = CycleMethod.NO_CYCLE;
-	@UserProperty(description="size of radius in % of video height")
+	@UserProperty(description="size of radius in % of video height", unit = Unit.PERCENT_VIDEO)
 	private int radius = 100;
 	@LimitedIntProperty(description="must be inbetween min and max", minimum=1, maximum=99)
-	@UserProperty(description="distance in %")
+	@UserProperty(description="distance in %", unit = Unit.PERCENT_OBJECT)
 	private int distance = 50;
 	
 	private float amplitudeDivisor;
@@ -135,7 +136,16 @@ public class Blinker implements SoundCanvas {
 
 	@Override
 	public void updateUI(int width, int height, Graphics2D graphics) {
-		// TODO Auto-generated method stub
+		  Color[] colors = {centerColor, midColor , backColor};
+		  float radiusPx = height /(radius/100f) * (240/255f);
+		     float dist = distance / 100f;
+		     float[] distances = {0.0f,  dist, 1.0f};
+		     Point2D center = new Point2D.Float(width / 2, height / 2);
+		     Point2D focus = center;
+		     RadialGradientPaint p =
+		         new RadialGradientPaint(center, radiusPx, focus, distances, colors, cycleMethod);
+		     graphics.setPaint(p);
+		     graphics.fillRect(0, 0, width, height);
 		
 	}
 

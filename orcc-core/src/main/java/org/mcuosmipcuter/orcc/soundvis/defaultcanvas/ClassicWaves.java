@@ -21,7 +21,9 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
+import org.mcuosmipcuter.orcc.api.soundvis.NumberMeaning;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
+import org.mcuosmipcuter.orcc.api.soundvis.Unit;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.api.util.AmplitudeHelper;
@@ -45,7 +47,8 @@ public class ClassicWaves implements SoundCanvas {
 	@UserProperty(description="whether to draw without margin")
 	private boolean drawMargin = true;
 	
-	@UserProperty(description="beam width of analyzer")
+	@UserProperty(description="beam width of analyzer", unit = Unit.PIXEL)
+	@NumberMeaning(numbers = 0, meanings = "no beam")
 	private int beamWidth = 0;
 	
 	// parameters automatically set

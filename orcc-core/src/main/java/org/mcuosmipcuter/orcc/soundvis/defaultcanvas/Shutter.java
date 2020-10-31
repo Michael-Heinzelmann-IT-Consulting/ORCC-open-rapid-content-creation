@@ -33,6 +33,7 @@ import org.mcuosmipcuter.orcc.api.soundvis.DisplayUnit;
 import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.NestedProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
+import org.mcuosmipcuter.orcc.api.soundvis.Unit;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.api.util.DimensionHelper;
@@ -58,7 +59,7 @@ public class Shutter implements SoundCanvas {
 	@UserProperty(description = "color of the area")
 	private CLIP_SHAPE clipShape = CLIP_SHAPE.RECTANGLE;
 	@LimitedIntProperty(description = "limits", minimum = 1, maximum = 36)
-	@UserProperty(description = "rotate multiply the area")
+	@UserProperty(description = "rotate multiply the area", unit = Unit.TIMES)
 	private int multiPlyRotated = 1;
 	@UserProperty(description = "add shapes xor")
 	private boolean multiplyXor;

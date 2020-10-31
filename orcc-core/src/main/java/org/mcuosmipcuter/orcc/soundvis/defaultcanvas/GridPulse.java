@@ -21,7 +21,10 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
+import org.mcuosmipcuter.orcc.api.soundvis.ChangesIcon;
+import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
+import org.mcuosmipcuter.orcc.api.soundvis.Unit;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.api.util.AmplitudeHelper;
@@ -31,21 +34,23 @@ import org.mcuosmipcuter.orcc.api.util.AmplitudeHelper;
  */
 public class GridPulse implements SoundCanvas {
 	
-	@UserProperty(description="maximum size of the grid , this size is reached on maximum amplitude, lower amplitudes produce proportionally smaller grid")
+	@UserProperty(description="maximum size of the grid , this size is reached on maximum amplitude, lower amplitudes produce proportionally smaller grid", unit = Unit.PERCENT_OBJECT)
 	int maxGridSize = 100;
-	@UserProperty(description="max thickness")
+	@UserProperty(description="max thickness", unit = Unit.PIXEL)
+	@LimitedIntProperty(minimum = 0, description = "cannot be negative")
 	int thickness = 10;
 	@UserProperty(description="whether to change thickness proportionally")
 	boolean proportionalThickness = true;
 	@UserProperty(description="whether to fill if the sreen is full")
 	boolean fillOnFull = true;
+	@ChangesIcon
 	@UserProperty(description="foreground color")
 	private Color foreGround = Color.BLACK;
 	@UserProperty(description="if reverse the low amplituses are large and high amplitudes small")
 	boolean reverse = false;
-	@UserProperty(description="x distance from center")
+	@UserProperty(description="x distance from center", unit = Unit.PIXEL)
 	int shiftX = 0;
-	@UserProperty(description="y distance from center")
+	@UserProperty(description="y distance from center", unit = Unit.PIXEL)
 	int shiftY = 0;
 	
 	private int centerX;

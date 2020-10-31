@@ -23,6 +23,7 @@ import java.awt.Graphics2D;
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
 import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
+import org.mcuosmipcuter.orcc.api.soundvis.Unit;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.api.util.AmplitudeHelper;
@@ -35,7 +36,7 @@ public class ThresholdVerticalLines implements SoundCanvas {
 	@UserProperty(description="color of the waves")
 	private Color foreGroundColor = Color.BLUE;
 	@LimitedIntProperty(description="threshold must be between 0 and 100", minimum=0, maximum = 100)
-	@UserProperty(description="consider amplitudes above this threshold for drawing, value in percent of maximum amplitude")
+	@UserProperty(description="consider amplitudes above this threshold for drawing, value in percent of maximum amplitude", unit = Unit.PERCENT_OBJECT)
 	private int threshold;
 	protected int leftMargin;
 	protected int height;
