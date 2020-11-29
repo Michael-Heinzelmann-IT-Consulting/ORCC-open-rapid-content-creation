@@ -48,6 +48,7 @@ import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.api.util.DimensionHelper;
 import org.mcuosmipcuter.orcc.api.util.TextHelper;
 import org.mcuosmipcuter.orcc.soundvis.FontStore;
+import org.mcuosmipcuter.orcc.soundvis.effects.BackGround;
 import org.mcuosmipcuter.orcc.soundvis.effects.Fader;
 import org.mcuosmipcuter.orcc.soundvis.effects.Mover;
 import org.mcuosmipcuter.orcc.soundvis.effects.Positioner;
@@ -113,7 +114,13 @@ public class Text implements SoundCanvas, PropertyListener {
 	private boolean typing;
 	@UserProperty(description = "frames per character")
 	@NumberMeaning(numbers = {-1, 0, 1}, meanings = {"slower", "off", "faster"})
-	private int modProgress = -1;
+	private int modProgress = 0;
+	
+//	@UserProperty(description = "automatic background complemented from text color")
+//	private boolean autoBackGround;
+	
+	@NestedProperty(description = "background")
+	private BackGround backGround = new BackGround();
 	
 	@NestedProperty(description = "x and y position")
 	Positioner positioner = new Positioner();
@@ -279,18 +286,30 @@ public class Text implements SoundCanvas, PropertyListener {
 
 			int lineTop = topPixels + ascent;
 			int lineIdx = 0;
+
 			final Composite origComposite = fader.fade(graphics2d, displayUnit);
+//			if(autoBackGround) {
+//				graphics2d.setColor(new Color(255 - textColor.getRed(), 255 - textColor.getGreen(), 255 - textColor.getBlue()));
+//				graphics2d.fillRect(0, 0, videoOutputInfo.getWidth(), videoOutputInfo.getHeight());
+//			}
+//			graphics2d.setColor(textColor);
+			
+			///backGround.draw(graphics2d, videoOutputInfo.getWidth(), videoOutputInfo.getHeight(), textColor);
 
 			final AffineTransform saveTransfrom = graphics2d.getTransform();
+			
+
 
 			AffineTransform transform = shearer.shear(displayUnit);
 			transform.concatenate(mover.move(displayUnit.currentPosition, displayUnit.duration));
 			transform.concatenate(positioner.position(dimensionHelper));
+
 			transform.concatenate(rotator.rotate(displayUnit.currentPosition, displayUnit.duration, (videoOutputInfo.getWidth()) / 2, (videoOutputInfo.getHeight() ) / 2));
 
 			if (!transform.isIdentity()) {
 				graphics2d.setTransform(transform);
 			}
+			backGround.draw(graphics2d, videoOutputInfo.getWidth(), videoOutputInfo.getHeight(), textColor);
 
 			for (String line : lines) {
 				if (lineIdx >= startIdx && lineIdx < startIdx + linesToUse) {
