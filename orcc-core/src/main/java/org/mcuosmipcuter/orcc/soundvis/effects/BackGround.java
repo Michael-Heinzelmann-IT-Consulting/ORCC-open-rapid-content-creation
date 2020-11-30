@@ -20,6 +20,7 @@ package org.mcuosmipcuter.orcc.soundvis.effects;
 import java.awt.Color;
 import java.awt.Graphics2D;
 
+import org.mcuosmipcuter.orcc.api.soundvis.ChangesIcon;
 import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.Unit;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
@@ -33,7 +34,7 @@ public class BackGround {
 	public static enum CLIP_SHAPE {
 		RECTANGLE, ELLIPSE
 	}
-	
+	@ChangesIcon
 	@UserProperty(description = "background enabled")
 	private boolean enabled;
 
@@ -45,9 +46,11 @@ public class BackGround {
 	@LimitedIntProperty(minimum = 0, description = "only positive integers")
 	private int zoomY = 100;
 
+	@ChangesIcon
 	@UserProperty(description = "color background")
 	private Color backGround = Color.GRAY;
 
+	@ChangesIcon
 	@UserProperty(description = "complement foreground")
 	private boolean complement;
 	
@@ -67,9 +70,7 @@ public class BackGround {
 		int heightToUse = (int) (videoHeight * (zoomY / 100f));
 		int x = (videoWidth - widthToUse) / 2;
 		int y = (videoHeight - heightToUse) / 2;
-		Color colorToUse = complement && foreGround != null
-				? new Color(255 - foreGround.getRed(), 255 - foreGround.getGreen(), 255 - foreGround.getBlue())
-				: backGround;
+		Color colorToUse = getColorToUse(foreGround);
 
 		graphics2d.setColor(colorToUse);
 		if(shape == CLIP_SHAPE.RECTANGLE) {
@@ -77,8 +78,6 @@ public class BackGround {
 				graphics2d.fillRect(x, y, widthToUse, heightToUse);
 			}
 			else {
-//				int arcWidth = (int) (widthToUse * (cornerRounding / 100f));
-//				int arcHeight = (int) (heightToUse * (cornerRounding / 100f));
 				int arc = (int) (Math.min(heightToUse, widthToUse) * (cornerRounding / 100f));
 				graphics2d.fillRoundRect(x, y, widthToUse, heightToUse, arc, arc);
 			}
@@ -88,6 +87,17 @@ public class BackGround {
 		}
 
 		graphics2d.setColor(saveColor);
+	}
+	
+	public Color getColorToUse(Color foreGround) {
+		Color colorToUse = complement && foreGround != null
+				? new Color(255 - foreGround.getRed(), 255 - foreGround.getGreen(), 255 - foreGround.getBlue())
+				: backGround;
+		return colorToUse;
+	}
+
+	public boolean isDrawingEnabled() {
+		return enabled;
 	}
 
 }

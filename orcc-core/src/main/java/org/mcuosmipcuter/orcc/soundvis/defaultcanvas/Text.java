@@ -116,9 +116,6 @@ public class Text implements SoundCanvas, PropertyListener {
 	@NumberMeaning(numbers = {-1, 0, 1}, meanings = {"slower", "off", "faster"})
 	private int modProgress = 0;
 	
-//	@UserProperty(description = "automatic background complemented from text color")
-//	private boolean autoBackGround;
-	
 	@NestedProperty(description = "background")
 	private BackGround backGround = new BackGround();
 	
@@ -288,17 +285,8 @@ public class Text implements SoundCanvas, PropertyListener {
 			int lineIdx = 0;
 
 			final Composite origComposite = fader.fade(graphics2d, displayUnit);
-//			if(autoBackGround) {
-//				graphics2d.setColor(new Color(255 - textColor.getRed(), 255 - textColor.getGreen(), 255 - textColor.getBlue()));
-//				graphics2d.fillRect(0, 0, videoOutputInfo.getWidth(), videoOutputInfo.getHeight());
-//			}
-//			graphics2d.setColor(textColor);
-			
-			///backGround.draw(graphics2d, videoOutputInfo.getWidth(), videoOutputInfo.getHeight(), textColor);
 
 			final AffineTransform saveTransfrom = graphics2d.getTransform();
-			
-
 
 			AffineTransform transform = shearer.shear(displayUnit);
 			transform.concatenate(mover.move(displayUnit.currentPosition, displayUnit.duration));
@@ -424,6 +412,11 @@ public class Text implements SoundCanvas, PropertyListener {
 
 	@Override
 	public void updateUI(int width, int height, Graphics2D graphics) {
+		if(backGround.isDrawingEnabled()) {
+			Color bg = backGround.getColorToUse(textColor);
+			graphics.setColor(bg);
+			graphics.fillRect(0, 0, width, height);
+		}
 		graphics.setColor(textColor);
 		TextHelper.writeText(text, graphics, height / 3, textColor, width, height / 3);
 
