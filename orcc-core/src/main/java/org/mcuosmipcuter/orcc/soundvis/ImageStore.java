@@ -157,7 +157,7 @@ public class ImageStore {
 	public static BufferedImage getImage(Key key) {
 
 		SoftReference<BufferedImage> ref = store.get(key);
-		if(ref != null) {
+		if(ref != null && ref.get() != null) {
 			IOUtil.log("*hit for " + key + " image " + ref.get());
 		}
 		else {
@@ -203,8 +203,8 @@ public class ImageStore {
 	public static Image getOrLoadScaledImage(Key originalKey, int newWidth, int newHeight) {
 		Key newKey = new Key(originalKey.lastModified, originalKey.absolutePath, originalKey.quadrantRotation, originalKey.mirrored, newWidth, newHeight);
 		SoftReference<Image> ref = storeScaled.get(newKey);
-		IOUtil.log((ref != null ? "*hit" : "miss") + " for scaled " + newKey);
-		if(ref != null) {
+		IOUtil.log((ref != null && ref.get() != null ? "*hit" : "miss") + " for scaled " + newKey);
+		if(ref != null && ref.get() != null) {
 			return ref.get();
 		}
 		BufferedImage  original = getOrLoadImage(originalKey);

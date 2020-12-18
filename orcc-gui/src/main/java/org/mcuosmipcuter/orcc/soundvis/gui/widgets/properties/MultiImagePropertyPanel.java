@@ -545,11 +545,11 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 
 				ib.setBackground(Color.YELLOW);
 				ib.setBorder(new LineBorder(Color.BLACK, 2));
-				ImageIcon icon = new ImageIcon(ImageStore.getOrLoadScaledImage(slide.getKey(), 80, 80));
+				ImageIcon icon = new ImageIcon(ImageStore.getOrLoadScaledImage(slide.getKey().toOriginal(), 80, 80));
 				ib.setPreferredSize(new Dimension(80, 80));
 				ib.setIcon(icon);
 
-				ib.setSelectedIcon(new ImageIcon(ImageStore.getOrLoadScaledImage(slide.getKey(), 60, 60)));
+				ib.setSelectedIcon(new ImageIcon(ImageStore.getOrLoadScaledImage(slide.getKey().toOriginal(), 60, 60)));
 				if (col == COLS) {
 					gc.gridwidth = GridBagConstraints.REMAINDER; // end row
 					col = 0;
