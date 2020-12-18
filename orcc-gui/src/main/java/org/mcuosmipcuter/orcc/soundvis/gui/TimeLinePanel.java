@@ -20,9 +20,12 @@ package org.mcuosmipcuter.orcc.soundvis.gui;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.geom.GeneralPath;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -271,7 +274,7 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 			g.drawLine(margin + currentPos, 0, margin + currentPos, heightToUse);
 			g.setColor(Color.BLACK);
 			g.drawLine(selectPos, 0, selectPos, h);
-			g.drawString(String.valueOf(selectFrame), selectPos + 1, 16);
+			//g.drawString(String.valueOf(selectFrame), selectPos + 1, 16);
 			//g.setXORMode(Color.GRAY);
 			g.setPaintMode();
 			
@@ -318,9 +321,49 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 							int subFrom = margin +  (int)fromTos[i].getFrom()* samplesPerFrame / noOfSamples;
 							int subTo = margin + (int)(fromTos[i].getTo() +1)* samplesPerFrame / noOfSamples;
 							//g.drawRoundRect(subFrom, y + delta, subTo - subFrom, b  + delta, 16, 16);
-							if(fromTos[i].getOverlapBefore() == 0 && fromTos[i].getOverlapAfter() == 0) {
+							if(fromTos[i].getOverlapBefore() == 0 && fromTos[i].getOverlapAfter() == 0 && fromTos[i].getDegreesBefore() == 0 && fromTos[i].getDegreesAfter() == 0) {
 								g.drawRoundRect(subFrom, y + delta, subTo - subFrom, b  + delta, 16, 16);
 								//g.drawString(fromTos[i].getDisplayObject().getDisplayText(), subFrom + 6, y + delta + 12);
+							}
+							else if(fromTos[i].getDegreesBefore() != 0 || fromTos[i].getDegreesAfter() != 0) {
+								int[] shapeDegrees = new int[] {fromTos[i].getDegreesBefore(), fromTos[i].getDegreesAfter()};
+						        int ampl =  b  + delta;
+								int marginYpx = 2;
+						        Color pre = g.getColor();
+						        g.setColor(GUIDesignUtil.getEffectBgColor(fromTos[i].getDisplayObject().getClass(), Color.WHITE));
+								for(int shape = 0; shape <= 1; shape++) {
+									int totalDegrees = Math.abs(shapeDegrees[shape]);
+									if(totalDegrees == 0) {
+										continue;
+									}
+							        float pxPerDeg;
+	
+							        GeneralPath polygon = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
+							        float begin;
+							        float px;
+							        if(shape == 0) {
+										px = Math.abs(fromTos[i].getOverlapBefore())* samplesPerFrame / noOfSamples;
+								        begin = subFrom + (int)px;
+							        }
+							        else {
+								        px = Math.abs(fromTos[i].getOverlapAfter())* samplesPerFrame / noOfSamples;
+								        begin = subTo - (int)px;
+							        }
+							        pxPerDeg = px / totalDegrees;
+							        
+							        polygon.moveTo(begin, y + ampl/2 + marginYpx);
+							        for ( int id = 1; id <= totalDegrees; id++ ) {
+							        	double  rad =  (double)id/ 180d * Math.PI; 
+							            double d = Math.sin(rad);
+							            int yd =(int) (d * ampl / 2d);
+							            float xPx = (shape == 0) ? begin - id * pxPerDeg : begin + id * pxPerDeg;
+							        	polygon.lineTo(xPx, y + ampl/2 - yd + marginYpx);
+							        };
+	
+							        ((Graphics2D) g).draw(polygon);
+								}
+						        
+						        g.setColor(pre);
 							}
 							else {
 								int x1 = subFrom + (int)Math.abs(fromTos[i].getOverlapBefore())* samplesPerFrame / noOfSamples;
@@ -352,7 +395,6 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 								g.drawPolygon(xPoints, yPoints, nPoints);
 								//g.drawString(fromTos[i].getDisplayObject().getDisplayText(), x1 + 6, y + delta + 12);
 							}
-							
 						}
 					}
 					//else {
@@ -400,8 +442,12 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 					}
 				}
 			}
-			
-
+			String str = String.valueOf(selectFrame);
+			Rectangle2D bounds = g.getFontMetrics().getStringBounds(str, 0, str.length(), g);
+			g.setColor(Color.YELLOW);
+			g.fillRect(selectPos, 4, (int)bounds.getWidth() +1, (int)bounds.getHeight());
+			g.setColor(Color.BLACK);
+			g.drawString(str, selectPos + 1, 16);
 		
 		}
 	}

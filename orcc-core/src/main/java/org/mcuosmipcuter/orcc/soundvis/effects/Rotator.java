@@ -78,6 +78,8 @@ public class Rotator implements DisplayObject {
 		duration.setTo(frameTo);
 		duration.setOverlapBefore(rotateInFrames);
 		duration.setOverlapAfter(rotateOutFrames);
+		duration.setDegreesBefore(rotateInFrames * rotateInSpeed);
+		duration.setDegreesAfter(rotateOutFrames * rotateOutSpeed);
 		return duration;
 	}
 

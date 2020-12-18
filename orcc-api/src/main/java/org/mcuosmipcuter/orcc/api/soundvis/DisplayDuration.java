@@ -39,6 +39,8 @@ public class DisplayDuration <T extends DisplayObject> {
 	private int[] effectX;
 	private int[] effectY;
 	
+	private int degreesBefore;
+	private int degreesAfter;
 	
 	public DisplayDuration() {
 		
@@ -134,6 +136,20 @@ public class DisplayDuration <T extends DisplayObject> {
 	}
 	public int[] getEffectY() {
 		return effectY;
+	}
+	
+	public int getDegreesBefore() {
+		return degreesBefore;
+	}
+	public void setDegreesBefore(int degrees) {
+		this.degreesBefore = degrees;
+	}
+
+	public int getDegreesAfter() {
+		return degreesAfter;
+	}
+	public void setDegreesAfter(int degreesAfter) {
+		this.degreesAfter = degreesAfter;
 	}
 	@Override
 	public String toString() {
