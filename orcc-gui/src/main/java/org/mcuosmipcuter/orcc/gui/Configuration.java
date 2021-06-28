@@ -100,17 +100,21 @@ public abstract class Configuration {
 		}
 		else {
 			// TODO use user preferences from persistent storage
+			Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.AudioWave");
+			Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.Blinds");
+			Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.Blinker");
+			Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.Chameleon");
 			Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.ClassicWaves");
 			Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.ColorsLR");
 			Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.GridPulse");
-			Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.Image");
-			Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.SlideShow");
+			//Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.Image");
 			Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.Pulsating");
 			Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.RotatingAmplitudes");
+			Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.SlideShow");
 			Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.SolidColor");
 			Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.Text");
 			Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.ThresholdVerticalLines");
-			Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.XOR");
+			Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.Tiles");
 		}
 		stage = 2;
 	}
