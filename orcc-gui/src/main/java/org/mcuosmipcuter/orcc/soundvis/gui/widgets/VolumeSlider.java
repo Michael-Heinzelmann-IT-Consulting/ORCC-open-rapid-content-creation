@@ -61,22 +61,28 @@ public class VolumeSlider extends JPanel {
 		addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseReleased(MouseEvent e) {
-				volumeListener.adjustVolume(value);
+				if(isEnabled()){
+					volumeListener.adjustVolume(value);
+				}
 			};
 		});
 		addMouseMotionListener(new MouseAdapter() {
 
 			@Override
 			public void mousePressed(MouseEvent e) {
-				view2model(e.getX());
-				volumeListener.adjustVolume(value);
+				if(isEnabled()){
+					view2model(e.getX());
+					volumeListener.adjustVolume(value);
+				}
 				repaint();
 			}
 
 			@Override
 			public void mouseDragged(MouseEvent e) {
-				view2model(e.getX());
-				volumeListener.adjustVolume(value);
+				if(isEnabled()){
+					view2model(e.getX());
+					volumeListener.adjustVolume(value);
+				}
 				repaint();
 			}
 			
@@ -136,7 +142,7 @@ public class VolumeSlider extends JPanel {
 	@Override
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		g.setColor(Color.GRAY);
+		g.setColor(isEnabled() ? Color.GRAY : Color.LIGHT_GRAY);
 		int w = getWidth();
 		int h = getHeight();
 		g.fillPolygon(new int[] {margin, w - margin, w - margin, 0}, new int[] {h / 2, h / 2, 0, h / 2}, 4);

@@ -61,6 +61,7 @@ import org.mcuosmipcuter.orcc.soundvis.gui.widgets.TimeLabel;
 import org.mcuosmipcuter.orcc.soundvis.gui.widgets.VolumeSlider;
 import org.mcuosmipcuter.orcc.soundvis.gui.widgets.VolumeSlider.VolumeListener;
 import org.mcuosmipcuter.orcc.soundvis.threads.PlayThread;
+import org.mcuosmipcuter.orcc.soundvis.util.AudioUtil;
 import org.mcuosmipcuter.orcc.util.IOUtil;
 
 
@@ -188,7 +189,10 @@ public class PlayBackPanel extends JPanel implements Mixin{
 						else {
 							vol.setValue(volumeSlider.getValue());
 						}
-						volumeSlider.setEnabled(true);
+						volumeSlider.setEnabled(!(vol instanceof AudioUtil.DummyVolumeControl));
+					}
+					else {
+						volumeSlider.setEnabled(false);
 					}
 				}
 			}

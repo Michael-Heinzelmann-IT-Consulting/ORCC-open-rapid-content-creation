@@ -22,7 +22,6 @@ import java.io.IOException;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.FloatControl;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 
@@ -32,6 +31,7 @@ import org.mcuosmipcuter.orcc.soundvis.Context.AppState;
 import org.mcuosmipcuter.orcc.soundvis.DecodingCallback;
 import org.mcuosmipcuter.orcc.soundvis.PlayPauseStop;
 import org.mcuosmipcuter.orcc.soundvis.Renderer;
+import org.mcuosmipcuter.orcc.soundvis.util.AudioUtil;
 import org.mcuosmipcuter.orcc.soundvis.util.ByteArrayLinearDecoder;
 import org.mcuosmipcuter.orcc.util.IOUtil;
 
@@ -79,8 +79,9 @@ public class PlayThread extends Thread implements PlayPauseStop {
 			data = new byte[samplesPerFrame * chunkSize];
 			sourceDataLine.open(format, samplesPerFrame * chunkSize);
 			IOUtil.log("samplesPerFrame * chunkSize: " + (samplesPerFrame * chunkSize) + " size: " + sourceDataLine.getBufferSize());
-			FloatControl volumeControl = (FloatControl) sourceDataLine.getControl(FloatControl.Type.MASTER_GAIN);
-			Context.setVolumeControl(volumeControl);
+
+			Context.setVolumeControl(AudioUtil.getVolumeControl(sourceDataLine));
+			
 			sourceDataLine.start();
 			ais = audioInput.getAudioStream();
 			

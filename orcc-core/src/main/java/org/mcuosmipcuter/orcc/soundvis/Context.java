@@ -27,7 +27,9 @@ import java.util.TreeSet;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.FloatControl;
+import javax.sound.sampled.SourceDataLine;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
 import org.mcuosmipcuter.orcc.api.soundvis.AudioLayout;
@@ -41,6 +43,7 @@ import org.mcuosmipcuter.orcc.soundvis.model.AudioFileInputImpl;
 import org.mcuosmipcuter.orcc.soundvis.model.AudioOutputInfoImpl;
 import org.mcuosmipcuter.orcc.soundvis.model.SoundCanvasWrapperImpl;
 import org.mcuosmipcuter.orcc.soundvis.model.VideoOutputInfoImpl;
+import org.mcuosmipcuter.orcc.soundvis.util.AudioUtil;
 import org.mcuosmipcuter.orcc.util.IOUtil;
 
 /**
@@ -303,32 +306,33 @@ public abstract class Context {
 		AudioInput a;
 		switch(inputType) {
 		case FILE:
-				a = new AudioFileInputImpl(audioInputName);
+				setAudioFromFile(audioInputName);
 				break;
 			case STREAM:
-				a = new AudioClasspathInputImpl(audioInputName);
+				setAudioFromClasspath(audioInputName);
 				break;
 			default:
 				throw new IllegalArgumentException();
 		}
-		if(a != null) {
-			final float sampleRate = a.getAudioInputInfo().getAudioFormat().getSampleRate();
-			if(sampleRate % outPutFrameRate != 0) {
-				throw new AppLogicException("sample rate " + sampleRate + " % frame rate " + outPutFrameRate + " is not 0");
-			}
-		}
-		audioInput = a;
-		notifyListeners(PropertyName.AudioInputInfo);
 		setOutputFrameRate(outPutFrameRate);
 	}
 	
 	private static void setAudio(AudioInput a) throws AppLogicException {
-		final float sampleRate = a.getAudioInputInfo().getAudioFormat().getSampleRate();
+		AudioFormat format = a.getAudioInputInfo().getAudioFormat();
+		final float sampleRate = format.getSampleRate();
 		final int frameRate = videoOutputInfo.getFramesPerSecond();
 		if(sampleRate % frameRate != 0) {
 			throw new AppLogicException("sample rate " + sampleRate + " % frame rate " + frameRate + " is not 0");
 		}
 		audioInput = a;
+		try(SourceDataLine sourceDataLine = AudioSystem.getSourceDataLine(format)){
+		int chunkSize =  a.getAudioInputInfo().getAudioFormat().getFrameSize();
+			sourceDataLine.open(format, chunkSize);
+			setVolumeControl(AudioUtil.getVolumeControl(sourceDataLine));
+		}
+		catch(Exception ex) {
+			IOUtil.log(ex.getMessage());
+		}
 		notifyListeners(PropertyName.AudioInputInfo);
 	}
 	/**
