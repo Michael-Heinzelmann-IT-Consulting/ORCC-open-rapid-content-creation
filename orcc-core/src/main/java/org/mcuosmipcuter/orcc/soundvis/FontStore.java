@@ -61,6 +61,9 @@ public class FontStore {
 				return mv;
 			}
 		}
+		if(!logicalFontNamesAlphabetically.isEmpty()) {
+			return logicalFontNamesAlphabetically.keySet().iterator().next();
+		}
 		return null;
 	}
 	
