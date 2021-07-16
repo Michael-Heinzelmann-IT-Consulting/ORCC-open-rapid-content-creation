@@ -74,7 +74,7 @@ public class AudioFileInputImpl implements AudioInput {
 			frameLength = data.length / 4;
 			AudioFormat audioFormat = new AudioFormat(22050, 16, 2, true, false); // from humble
 			audioInputInfoTemp = new AudioInputInfoImpl(audioFormat, frameLength, AudioLayout.COMPRESSED);
-		} catch (Exception e) {
+		} catch (Exception | NoClassDefFoundError e) {
 			IOUtil.log("could not open as audio input: " + e.getMessage());
 
 			FileInputStream fis = null;
