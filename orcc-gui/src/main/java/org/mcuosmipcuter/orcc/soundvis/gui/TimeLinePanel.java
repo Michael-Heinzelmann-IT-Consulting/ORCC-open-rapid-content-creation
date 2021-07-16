@@ -82,6 +82,7 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 	
 	// state
 	private boolean loading;
+	private boolean sampling;
 	private int noOfSamplesLoaded;
 	
 	// calculated data
@@ -184,8 +185,12 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 					if(Context.getAppState() == AppState.EXPORTING) {
 						Context.setSongPositionPointer(0);
 					}
-				}
+					loading = Context.getAppState() == AppState.LOADING;
+				}		
 				repaint();
+				if(loading) {
+					paintImmediately(0, 0, getWidth(), getHeight());
+				}
 			}
 
 		});
@@ -197,7 +202,7 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 		g.setColor(Color.GRAY);
 		g.fillRect(0, 0, getWidth(), getHeight());
 		g.setColor(Color.WHITE);
-		g.drawString("loading ...", Math.max(getWidth() / 2, selectPos), getHeight() / 2);
+		g.drawString("loading ...", getWidth() / 2, getHeight() / 2);
 	}
 
 	/**
@@ -240,7 +245,7 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 	@Override
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		if(loading) {
+		if(loading || sampling) {
 			paintLoading(g);
 			return;
 		}
@@ -496,12 +501,12 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 						superSampleDataFrameZoomed = superSampleData;
 					}
 
-					loading = false;
+					sampling = false;
 					TimeLinePanel.this.revalidate();
 					TimeLinePanel.this.repaint();
 				}
 			});
-			loading = true;
+			sampling = true;
 			noOfSamplesLoaded = noOfSamples;
 			
 			superSample.start();

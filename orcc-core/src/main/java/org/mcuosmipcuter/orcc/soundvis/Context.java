@@ -291,8 +291,19 @@ public abstract class Context {
 	 * @param audioFileName full path to the file
 	 */
 	public static synchronized void setAudioFromFile(String audioFileName) throws AppLogicException {
-		AudioInput a = new AudioFileInputImpl(audioFileName);
-		setAudio(a);
+		final AppState before  = appState;
+		try {
+			if(before != AppState.LOADING) {
+				setAppState(AppState.LOADING);
+			}
+			AudioInput a = new AudioFileInputImpl(audioFileName);
+			setAudio(a);
+		}
+		finally {
+			if(before != AppState.LOADING) {
+				setAppState(before);
+			}
+		}
 	}
 	/**
 	 * Sets the audio from a classpath resource and notifies listeners
@@ -303,7 +314,6 @@ public abstract class Context {
 		setAudio(a);
 	}
 	public static synchronized void setAudio(Type inputType, String audioInputName, int outPutFrameRate) throws AppLogicException {
-		AudioInput a;
 		switch(inputType) {
 		case FILE:
 				setAudioFromFile(audioInputName);

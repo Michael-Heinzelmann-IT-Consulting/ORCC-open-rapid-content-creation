@@ -74,6 +74,13 @@ public class AudioFileInputImpl implements AudioInput {
 				AudioFormat audioFormat = ais.getFormat();
 				frameLength = ais.getFrameLength();
 				audioInputInfoTemp = new AudioInputInfoImpl(audioFormat, frameLength, AudioLayout.LINEAR);
+				try {
+					data = ais.readAllBytes();
+				}
+				catch(OutOfMemoryError oom) {
+					data = null;
+					IOUtil.log("not enogh buffer for " + audioFileName + " " + oom.getMessage());
+				}
 			} catch (Exception ex) {
 				throw new RuntimeException(ex);
 			} finally {
@@ -103,7 +110,7 @@ public class AudioFileInputImpl implements AudioInput {
 	 */
 	@Override
 	public AudioInputStream getAudioStream() {
-		if(audioInputInfo.getLayout() == AudioLayout.COMPRESSED) {
+		if(data != null) {
 			ByteArrayInputStream bis = new ByteArrayInputStream(data);
 			AudioInputStream ais = new AudioInputStream(bis, audioInputInfo.getAudioFormat(), audioInputInfo.getFrameLength());
 			return ais;
