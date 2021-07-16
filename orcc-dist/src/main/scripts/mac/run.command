@@ -13,4 +13,4 @@ echo "GNU General Public License for more details."
 echo ""
 echo "You should have received a copy of the GNU General Public License"
 echo "along with this program.  If not, see <http://www.gnu.org/licenses/>."
-echo "";cd `dirname $0`;java -Dforce.metal.lf=true -Dorg.mcuosmipcuter.orcc.util.IOUtil.log=true -cp orcc-gui-${pom.version}.jar:orcc-core-${pom.version}.jar:orcc-api-${pom.version}.jar:orcc-ert-${pom.version}.jar:slf4j-api-1.6.6.jar:xuggle-xuggler-5.4.jar org.mcuosmipcuter.orcc.gui.Main;
+echo "";cd `dirname $0`;java -Dforce.metal.lf=true -Dorg.mcuosmipcuter.orcc.util.IOUtil.log=true -cp orcc-gui-${pom.version}.jar:orcc-core-${pom.version}.jar:orcc-api-${pom.version}.jar:orcc-ert-${pom.version}.jar:slf4j-api-1.6.6.jar:humble-video-all-0.3.0.jar:humble-video-arch-x86_64-apple-darwin12-0.2.1.jar:humble-video-noarch-0.3.0.jar org.mcuosmipcuter.orcc.gui.Main;
