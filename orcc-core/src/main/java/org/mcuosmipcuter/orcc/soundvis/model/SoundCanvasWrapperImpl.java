@@ -268,7 +268,7 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 	@Override
 	public DisplayDuration<?>[] getFrameFromTos() {
 		DisplayDuration<?>[] fromTos = soundCanvas.getFrameFromTos();
-		if(fromTos.length > 0) {
+		if(fromTos != null && fromTos.length > 0) {
 			displayFrameFrom = fromTos[0].getFrom();
 			displayFrameTo = fromTos[fromTos.length - 1].getTo();
 			return fromTos;
