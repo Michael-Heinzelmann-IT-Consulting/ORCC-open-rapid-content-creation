@@ -19,7 +19,10 @@ package org.mcuosmipcuter.orcc.soundvis.model;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.FileInputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -50,6 +53,15 @@ public class AudioFileInputImpl implements AudioInput {
 	 */
 	public AudioFileInputImpl(String audioFileName) {
 		this.audioFileName = audioFileName;
+		String mimeType = null;
+		try {
+			Path path = new File(audioFileName).toPath();
+			mimeType = Files.probeContentType(path);
+			IOUtil.log("mime type: " + mimeType);	
+		}
+		catch(Exception ex) {
+			IOUtil.log("could not determine mime type " + ex.getMessage());
+		}
 		long frameLength;
 		AudioInputInfo audioInputInfoTemp = null;
 		try {
@@ -74,15 +86,13 @@ public class AudioFileInputImpl implements AudioInput {
 				AudioFormat audioFormat = ais.getFormat();
 				frameLength = ais.getFrameLength();
 				audioInputInfoTemp = new AudioInputInfoImpl(audioFormat, frameLength, AudioLayout.LINEAR);
-				try {
+				if("audio/midi".equals(mimeType)) {
+					IOUtil.log("buffering midi as wave ...");
 					data = ais.readAllBytes();
-				}
-				catch(OutOfMemoryError oom) {
-					data = null;
-					IOUtil.log("not enogh buffer for " + audioFileName + " " + oom.getMessage());
+					IOUtil.log("buffered midi with " + data.length + " bytes.");
 				}
 			} catch (Exception ex) {
-				throw new RuntimeException(ex);
+				throw new RuntimeException("could not get audio from mime type " + mimeType, ex);
 			} finally {
 				IOUtil.safeClose(fis);
 				IOUtil.safeClose(ais);
