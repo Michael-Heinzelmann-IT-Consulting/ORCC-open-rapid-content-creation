@@ -18,6 +18,7 @@
 package org.mcuosmipcuter.orcc.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -120,6 +121,7 @@ public class Main {
 		final JFrame frame = new JFrame("soundvis");
 		
 		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		frame.setMinimumSize(new Dimension(infoW, infoH + playBackH));
 		frame.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
 				exitRoutine();
