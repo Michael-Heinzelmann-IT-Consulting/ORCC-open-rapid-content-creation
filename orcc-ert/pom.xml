@@ -1,74 +1,74 @@
 <?xml version="1.0"?>
-<!-- 
-    ORCC rapid content creation for entertainment, education and media production
-    Copyright (C) 2012 Michael Heinzelmann, Michael Heinzelmann IT-Consulting
+<!-- ORCC rapid content creation for entertainment, education and media production 
+	Copyright (C) 2012 Michael Heinzelmann, Michael Heinzelmann IT-Consulting 
+	This program is free software: you can redistribute it and/or modify it under 
+	the terms of the GNU General Public License as published by the Free Software 
+	Foundation, either version 3 of the License, or (at your option) any later 
+	version. This program is distributed in the hope that it will be useful, 
+	but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+	or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for 
+	more details. You should have received a copy of the GNU General Public License 
+	along with this program. If not, see <http://www.gnu.org/licenses/>. -->
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.mcuosmipcuter.orcc</groupId>
+		<artifactId>orcc</artifactId>
+		<version>1.1.0-SNAPSHOT</version>
+	</parent>
+	<groupId>org.mcuosmipcuter.orcc.ert</groupId>
+	<artifactId>orcc-ert</artifactId>
+	<name>orcc-ert</name>
+	<packaging>jar</packaging>
 
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+	<repositories>
+		<repository>
+			<id>xuggle repo</id>
+			<url>https://www.dcm4che.org/maven2/</url>
+		</repository>
+	</repositories>
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	<dependencies>
+		<dependency>
+			<groupId>org.mcuosmipcuter.orcc.core</groupId>
+			<artifactId>orcc-core</artifactId>
+			<version>1.1.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>xuggle</groupId>
+			<artifactId>xuggle-xuggler</artifactId>
+			<version>5.4</version>
+		</dependency>
+		<dependency>
+			<!-- transitive for xuggler -->
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.6.6</version>
+		</dependency>
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
- -->
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.mcuosmipcuter.orcc</groupId>
-    <artifactId>orcc</artifactId>
-    <version>1.1.0-SNAPSHOT</version>
-  </parent>
-  <groupId>org.mcuosmipcuter.orcc.ert</groupId>
-  <artifactId>orcc-ert</artifactId>
-  <name>orcc-ert</name>
-  <packaging>jar</packaging>
-
-  <repositories>
-   <repository>
-    <id>xuggle repo</id>
-    <url>https://www.dcm4che.org/maven2/</url>
-   </repository>
-  </repositories>
-
-  <dependencies>
-    <dependency>
-      <groupId>org.mcuosmipcuter.orcc.core</groupId>
-      <artifactId>orcc-core</artifactId>
-      <version>1.1.0-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-      <groupId>xuggle</groupId>
-      <artifactId>xuggle-xuggler</artifactId>
-      <version>5.4</version>
-    </dependency>
-    <dependency>
-    <!-- transitive for xuggler -->
-    <groupId>org.slf4j</groupId>
-     <artifactId>slf4j-api</artifactId>
-     <version>1.6.6</version>
-	</dependency>
-	
-	<!-- replcacement for deprecated xuggler -->
-	<dependency>
-      <groupId>io.humble</groupId>
-      <artifactId>humble-video-all</artifactId>
-      <version>0.3.0</version>
-    </dependency>
-    	<dependency>
-      <groupId>io.humble</groupId>
-      <artifactId>humble-video-noarch</artifactId>
-      <version>0.3.0</version>
-    </dependency>
-    <dependency>
-    <groupId>io.humble</groupId>
-    <artifactId>humble-video-arch-x86_64-apple-darwin12</artifactId>
-    <version>0.2.1</version>
-</dependency>
-  </dependencies>
+		<!-- replcacement for deprecated xuggler -->
+		<dependency>
+			<groupId>io.humble</groupId>
+			<artifactId>humble-video-all</artifactId>
+			<version>0.3.0</version>
+		</dependency>
+		<dependency>
+			<groupId>io.humble</groupId>
+			<artifactId>humble-video-noarch</artifactId>
+			<version>0.3.0</version>
+		</dependency>
+		<dependency>
+			<groupId>io.humble</groupId>
+			<artifactId>humble-video-arch-x86_64-apple-darwin12</artifactId>
+			<version>0.2.1</version>
+		</dependency>
+		<dependency>
+			<groupId>io.humble</groupId>
+			<artifactId>humble-video-arch-i686-pc-linux-gnu6</artifactId>
+			<version>0.3.0</version>
+		</dependency>
+	</dependencies>
 </project>

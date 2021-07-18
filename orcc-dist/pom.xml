@@ -52,6 +52,7 @@
           </goals>
           <configuration>
             <descriptors>
+              <descriptor>src/assembly/distribution-linux.xml</descriptor>
               <descriptor>src/assembly/distribution-mac.xml</descriptor>
               <descriptor>src/assembly/distribution-win.xml</descriptor>
             </descriptors>
