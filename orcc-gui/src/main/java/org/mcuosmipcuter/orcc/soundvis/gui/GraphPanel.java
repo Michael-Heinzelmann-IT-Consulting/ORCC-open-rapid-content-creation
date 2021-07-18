@@ -276,8 +276,8 @@ public class GraphPanel extends JPanel implements Renderer, RealtimeSettings, Li
 			}
 			if(frameCount < 2 || frameCount % reductionModulus == 0) {
 			if(frameCount > Context.getSongPositionPointer()) {
-				//this.repaint();
-				paintComponent(getGraphics());//
+				this.repaint();
+				//paintComponent(getGraphics());//
 				//paintImmediately(0, 0, getWidth(), getHeight());
 			}
 			if(mixin != null) {
