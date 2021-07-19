@@ -67,7 +67,8 @@
     	<include>org.slf4j:slf4j-api</include>
     	<include>io.humble:humble-video-all</include>
     	<include>io.humble:humble-video-noarch</include>
-    	<include>io.humble:humble-video-arch-i686-pc-linux-gnu6</include>    	
+    	<include>io.humble:humble-video-arch-i686-pc-linux-gnu6</include>
+    	<include>io.humble:humble-video-arch-x86_64-pc-linux-gnu6</include>    	
     </includes>
    </dependencySet>
    </dependencySets>
