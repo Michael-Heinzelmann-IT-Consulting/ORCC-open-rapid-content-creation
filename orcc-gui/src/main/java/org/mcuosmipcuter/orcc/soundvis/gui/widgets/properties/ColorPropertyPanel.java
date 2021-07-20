@@ -25,6 +25,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
+import javax.swing.JDialog;
 import javax.swing.JPanel;
 
 import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
@@ -53,14 +54,47 @@ public class ColorPropertyPanel extends PropertyPanel<Color> {
 		valueSelect.setLayout(new BorderLayout());
 		valueSelect.add(colorButton, BorderLayout.WEST);
 		colorButton.addActionListener(new ActionListener() {
-			
+			JDialog jd;
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				Color newColor = JColorChooser.showDialog(ColorPropertyPanel.this, "Color", Color.BLACK);
-				if(newColor != null) {
-					setNewValue(newColor);
-					valueSelect.setBackground(newColor);
-				}
+				final Color before = getCurrentValue();
+				JColorChooser jc = new JColorChooser(before);
+				JPanel pv = new JPanel() {
+					private static final long serialVersionUID = 1L;
+					@Override
+					public void setForeground(Color currentColor) {
+						// called by chooser
+						super.setForeground(currentColor);
+						super.setBackground(currentColor);
+						setNewValue(currentColor);
+						valueSelect.setBackground(currentColor);
+					}};
+					pv.setPreferredSize(new Dimension(jc.getPreferredSize().width - 40, 40));
+				jc.setPreviewPanel(pv);
+				
+				jd = JColorChooser.createDialog(ColorPropertyPanel.this, valueOwner.getClass().getSimpleName() + "::" + getName(), false, jc, new ActionListener() {
+					
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						Color newColor  = jc.getColor();
+						if(newColor != null) {
+						setNewValue(newColor);
+						valueSelect.setBackground(newColor);
+						jd.setVisible(false);
+						jd.dispose();
+					}
+					}
+				}, new ActionListener() {
+					
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						setNewValue(before);
+						valueSelect.setBackground(before);
+						jd.setVisible(false);
+						jd.dispose();
+					}
+				});
+				jd.setVisible(true);
 			}
 		});
 		
