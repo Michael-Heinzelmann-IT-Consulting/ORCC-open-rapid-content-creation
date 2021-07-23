@@ -113,26 +113,21 @@ public class IntegerPropertyPanel extends PropertyPanel<Integer> {
 							if(text.equals(numberMeaning.meanings()[i])) {
 								int number = i < numberMeaning.numbers().length ? numberMeaning.numbers()[i] : 0;
 								pos.setIndex(text.length());
-								return Long.valueOf(number);
+								return Integer.valueOf(number);
 							}
 						}
 					}
 					try {
-						Number number = Long.parseLong(text);
+						Number number = Integer.parseInt(text);
 						pos.setIndex(text.length());
 						return number;
 					}
 					catch(NumberFormatException ex) {
 						// forward to super
 					}
-					return super.parse(text, pos);
+					return Integer.valueOf(super.parse(text, pos).intValue()); // convert oversized Long
 				}});
-				
-			
-//			else {
-//				displayFormat = new NumberFormatter(new DecimalFormat(format));
-//			}
-			NumberFormatter editFormat = new NumberFormatter(new DecimalFormat("0"));
+
 			DefaultFormatterFactory factory = new DefaultFormatterFactory(displayFormat, displayFormat, displayFormat);
 			JSpinner.NumberEditor editor = new JSpinner.NumberEditor(jSpinner,format);
 			editor.getTextField().setFormatterFactory(factory);
@@ -161,13 +156,7 @@ public class IntegerPropertyPanel extends PropertyPanel<Integer> {
 			
 			@Override
 			public void stateChanged(ChangeEvent e) {
-				if(jSpinner.getValue() instanceof Integer) {
-					setNewValue((Integer)jSpinner.getValue());
-				}
-				if(jSpinner.getValue() instanceof Long) {
-					Long l = (Long)jSpinner.getValue();
-					setNewValue(l.intValue());
-				}
+				setNewValue((Integer)jSpinner.getValue());
 			}
 		};
 		jSpinner.addChangeListener(timed ? new TimedChangeListener(cl) : cl);
