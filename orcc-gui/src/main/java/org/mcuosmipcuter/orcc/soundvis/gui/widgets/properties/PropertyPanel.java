@@ -43,6 +43,7 @@ public abstract  class PropertyPanel <T> extends JPanel implements EditorLifeCyc
 	
 	protected Field field;
 	protected String name;
+	protected String parentName;
 	protected T defaultValue;
 	protected T currentValue;
 	protected String description;
@@ -79,15 +80,17 @@ public abstract  class PropertyPanel <T> extends JPanel implements EditorLifeCyc
 	protected void setNewValue(T value) {
 		 try {
 			Field field = valueOwner.getClass().getDeclaredField(getName());
+
 			if(field.isAnnotationPresent(TimedChange.class)) {
 				Context.beforePropertyUpdate(field.getName());
 			}
 			field.setAccessible(true);
         	//System.err.println(System.currentTimeMillis()  + " before field.set ");
+			Object oldVale = field.get(valueOwner);
 			field.set(valueOwner, value);
 			//System.err.println(System.currentTimeMillis()  + " after field.set ");
 			setCurrentValue(value);
-			soundCanvasWrapper.propertyWritten(field);
+			soundCanvasWrapper.propertyWritten(field, parentName, oldVale, value);
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}
@@ -177,6 +180,19 @@ public abstract  class PropertyPanel <T> extends JPanel implements EditorLifeCyc
 	 */
 	public Field getField() {
 		return field;
+	}
+	/**
+	 * @return parent name for a nested property or null
+	 */
+	public String getParentName() {
+		return parentName;
+	}
+	/**
+	 * Set parent name if this is a nested property: sound canvas name / parentName / field name
+	 * @param parentName
+	 */
+	public void setParentName(String parentName) {
+		this.parentName = parentName;
 	}
 	
 }

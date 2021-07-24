@@ -79,13 +79,13 @@ public class PropertyPanelFactory {
 				Object nestedValue = getValue(field, soundCanvas);
 				for(Field nestedField : nestedValue.getClass().getDeclaredFields()) {
 					if(nestedField.isAnnotationPresent(UserProperty.class)) {
-						props.add(getPropertyPanel(nestedField, nestedValue, soundCanvasWrapper));
+						props.add(getPropertyPanel(nestedField, nestedValue, soundCanvasWrapper, field.getName()));
 					}
 					if(nestedField.isAnnotationPresent(NestedProperty.class)) {
 						Object nested2 = getValue(nestedField, nestedValue);
 						for(Field nested2Field : nested2.getClass().getDeclaredFields()) {
 							if(nested2Field.isAnnotationPresent(UserProperty.class)) {
-								props.add(getPropertyPanel(nested2Field, nested2, soundCanvasWrapper));
+								props.add(getPropertyPanel(nested2Field, nested2, soundCanvasWrapper, field.getName()));
 							}
 						}
 					}	
@@ -97,7 +97,7 @@ public class PropertyPanelFactory {
 		}
 		return result;
 	}
-	private static PropertyPanel<?> getPropertyPanel(Field field, Object object, SoundCanvasWrapper soundCanvasWrapper) {
+	private static PropertyPanel<?> getPropertyPanel(Field field, Object object, SoundCanvasWrapper soundCanvasWrapper, String parentName) {
 		field.setAccessible(true);
 		Object value = getValue(field, object);
 		@SuppressWarnings("unchecked")
@@ -106,6 +106,7 @@ public class PropertyPanelFactory {
 		c.setDefaultValue(value);
 		c.setCurrentValue(value);
 		c.setDescription(field.getAnnotation(UserProperty.class).description());
+		c.setParentName(parentName);
 		c.activate();
 		return c;
 		

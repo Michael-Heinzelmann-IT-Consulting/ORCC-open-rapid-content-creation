@@ -189,7 +189,7 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 				}		
 				repaint();
 				if(loading) {
-					paintImmediately(0, 0, getWidth(), getHeight());
+					//paintImmediately(0, 0, getWidth(), getHeight());
 				}
 			}
 

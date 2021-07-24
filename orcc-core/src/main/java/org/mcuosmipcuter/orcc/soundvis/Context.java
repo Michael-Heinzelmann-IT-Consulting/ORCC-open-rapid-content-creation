@@ -112,12 +112,13 @@ public abstract class Context {
 		notifyListeners(PropertyName.SessionChanged);
 	}
 	
-	public static boolean touchSession() {
+	public static boolean touchSession(String propertyKey, Object oldValue, Object newValue) {
 		boolean prev = sessionToken.isChanged();
-		sessionToken.setChanged(true);
-		if(!prev) {
+		//sessionToken.setChanged(true);
+		sessionToken.changeOccurred(propertyKey, oldValue, newValue);
+		//if(!prev) {
 			notifyListeners(PropertyName.SessionChanged);
-		}
+		//}
 		return prev == false;
 	}
 
@@ -210,6 +211,7 @@ public abstract class Context {
 	 */
 	public static synchronized void setOutputDimension(int width, int height) {
 		VideoOutputInfoImpl newVideoOutputInfo = new VideoOutputInfoImpl(videoOutputInfo.getFramesPerSecond(), width, height);
+		touchSession("VideoOutputInfo", videoOutputInfo, newVideoOutputInfo);
 		videoOutputInfo = newVideoOutputInfo;
 		notifyListeners(PropertyName.VideoDimension);
 	}
@@ -225,6 +227,7 @@ public abstract class Context {
 			}
 		}
 		VideoOutputInfoImpl newVideoOutputInfo = new VideoOutputInfoImpl(frameRate, videoOutputInfo.getWidth(), videoOutputInfo.getHeight());
+		touchSession("VideoOutputInfo", videoOutputInfo, newVideoOutputInfo);
 		videoOutputInfo = newVideoOutputInfo;
 		notifyListeners(PropertyName.VideoFrameRate);
 	}

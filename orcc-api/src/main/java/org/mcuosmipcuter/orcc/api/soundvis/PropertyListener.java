@@ -20,5 +20,6 @@ package org.mcuosmipcuter.orcc.api.soundvis;
 import java.lang.reflect.Field;
 
 public interface PropertyListener {
-	public void propertyWritten(Field field);
+	default void propertyWritten(Field field) {};
+	default void propertyWritten(Field field, String parentName, Object oldValue, Object newValue) {};
 }

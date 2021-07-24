@@ -133,9 +133,9 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 		maxBefore = max;
 		max = 0;
 	}
-	private void touchSession(Object obj) {
+	private void touchSession(String propertyName, Object oldValue, Object newValue) {
 		// TODO maybe undo manager
-		Context.touchSession();
+		Context.touchSession(soundCanvas.getClass().getSimpleName() + "#" + System.identityHashCode(this) + "::" + propertyName, oldValue, newValue);
 		//IOUtil.log("touch session " + obj);
 	}
 
@@ -158,8 +158,9 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 	}
 	@Override
 	public void setVisible(boolean enabled) {
+		touchSession("enabled", this.enabled, enabled);
 		this.enabled = enabled;
-		touchSession("setVisible " + enabled);
+		
 	}
 	@Override
 	public SoundCanvas getSoundCanvas() {
@@ -190,16 +191,17 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 	}
 	@Override
 	public void setFrameFrom(long frameFrom) {
+		touchSession("frameFrom", this.frameFrom, frameFrom);
 		this.frameFrom = frameFrom;
 		soundCanvas.setFrameRange(frameFrom, calculateFrameToConcrete(frameTo));
-		touchSession("setFrameFrom " + frameFrom);
 	}
 	@Override
 	public void setFrameTo(long frameTo) {
 		this.frameToAuto = frameTo == 0;
-		this.frameTo = calculateFrameToConcrete(frameTo);
+		long newFrameTo = calculateFrameToConcrete(frameTo);
+		touchSession("frameTo ", this.frameTo, newFrameTo);
+		this.frameTo = newFrameTo;
 		soundCanvas.setFrameRange(frameFrom, this.frameTo);
-		touchSession("setFrameTo " + frameTo);
 	}
 	private long calculateFrameToConcrete(long to) {
 		long frameToConcrete = to;
@@ -222,8 +224,8 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 	}
 	@Override
 	public void setRepaintThreshold(int repaintThreshold) {
+		touchSession("repaintThreshold", this.repaintThreshold, repaintThreshold);
 		this.repaintThreshold = repaintThreshold;
-		touchSession("setRepaintThreshold " + repaintThreshold);
 	}
 	@Override
 	public boolean isXor() {
@@ -231,27 +233,30 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 	}
 	@Override
 	public void setXor(boolean xor) {
+		touchSession("xor ", this.xor, xor);
 		this.xor = xor;
-		touchSession("setXor " + xor);
 	}
 	@Override
 	public void setTransparency(int transparency) {
+		touchSession("transparency ", this.transparency, transparency);
 		this.transparency = transparency;
-		touchSession("setTransparency " + transparency);
 	}
 	@Override
 	public int getTransparency() {
 		return transparency;
 	}
 	@Override
-	public void propertyWritten(Field field) {
+	public void propertyWritten(Field field, String parentName, Object oldValue, Object newValue) {
 		if(soundCanvas instanceof PropertyListener) {
 			((PropertyListener)soundCanvas).propertyWritten(field);
 		}
 		for(PropertyListener pl : propertyListeners) {
 			pl.propertyWritten(field);
 		}
-		touchSession("propertyWritten " + field);
+		System.err.println(field.getName());
+		
+		String prePath = parentName != null ? parentName + "::" : "";
+		touchSession(prePath + field.getName(), oldValue, newValue);
 	}
 	@Override
 	public void addPropertyChangeListener(PropertyListener propertyListener) {

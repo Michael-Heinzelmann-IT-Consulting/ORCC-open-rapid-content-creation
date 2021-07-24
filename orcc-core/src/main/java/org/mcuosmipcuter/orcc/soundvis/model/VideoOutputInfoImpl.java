@@ -105,4 +105,10 @@ public class VideoOutputInfoImpl implements VideoOutputInfo {
 		return true;
 	}
 
+	@Override
+	public String toString() {
+		return "VideoOutputInfoImpl [fps=" + framesPerSecond + ", w=" + width + ", h=" + height
+				+ ", title=" + title + "]";
+	}
+
 }

@@ -272,7 +272,7 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 				if(res == JOptionPane.OK_OPTION) {
 					slide.setText(text.getText());
 					textButton.setText(text.getText());
-					Context.touchSession();
+					// TODO Context.touchSession();
 				}		
 			}
 		});
@@ -390,7 +390,7 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 		ib.setIcon(new ImageIcon(ImageStore.getOrLoadScaledImage(slide.getKey(), 80, 80)));
 		ib.setSelectedIcon(new ImageIcon(ImageStore.getOrLoadScaledImage(slide.getKey(), 60, 60)));
 		Context.setSongPositionPointer(Context.getSongPositionPointer());
-		Context.touchSession();
+		// TODO Context.touchSession();
 	}
 	
 	private void removeSlide(Slide slide) {

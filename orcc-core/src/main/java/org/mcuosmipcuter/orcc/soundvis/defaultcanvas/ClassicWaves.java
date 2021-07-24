@@ -102,7 +102,7 @@ public class ClassicWaves implements SoundCanvas {
 				amp = i < marginBuffer.length ? marginBuffer[i] : amplitudeBuffer[i - marginBuffer.length];
 			}
 			else {
-				amp = amplitudeBuffer[i];
+				amp = amplitudeBuffer[i < amplitudeBuffer.length ? i : amplitudeBuffer.length - 1];
 			}
 			if(beamWidth > 0) {
 				if(amp > aMaxamp) {
