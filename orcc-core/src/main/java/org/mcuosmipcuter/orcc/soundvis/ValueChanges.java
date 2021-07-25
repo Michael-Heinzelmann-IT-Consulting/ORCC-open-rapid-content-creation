@@ -21,37 +21,28 @@ package org.mcuosmipcuter.orcc.soundvis;
  * @author Michael Heinzelmann
  */
 public class  ValueChanges  {
-	//private List<Object> newValues = new ArrayList<Object>();
-	private final Object first;
-	private Object last;
+	private final Object original;
+	private Object current;
 	/**
 	 * 
 	 */
 	public ValueChanges(Object originalValue, Object firstChanged) {
-//		newValues.add(originalValue);
-//		newValues.add(firstChanged);
-		first = originalValue;
-		last = firstChanged;
+		original = originalValue;
+		current = firstChanged;
 	}
 	public void addChangeValue(Object value) {
-		//newValues.add(value);
-		last = value;
+		current = value;
 	}
 	public boolean isLogicallyChanged() {
-//		Object first = newValues.get(0);
-//		Object last = newValues.get(newValues.size() - 1);
-		//System.err.println("first:" + first);
-		//System.err.println("lasst:" + last);
-		if(first == null) {
-			return last != null;
+		if(original == null) {
+			return current != null;
 		}
-		boolean result= !first.equals(last);
-		//System.err.println(result);
+		boolean result= !original.equals(current);
 		return result;
 	}
 	@Override
 	public String toString() {
-		return "ValueChanges [o=" + first +  " c=" + last + "]";
+		return "ValueChanges [o=" + original +  " c=" + current + " changed=" + isLogicallyChanged() + "]";
 	}
 	
 }

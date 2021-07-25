@@ -112,14 +112,9 @@ public abstract class Context {
 		notifyListeners(PropertyName.SessionChanged);
 	}
 	
-	public static boolean touchSession(String propertyKey, Object oldValue, Object newValue) {
-		boolean prev = sessionToken.isChanged();
-		//sessionToken.setChanged(true);
+	public static void changeSession(String propertyKey, Object oldValue, Object newValue) {
 		sessionToken.changeOccurred(propertyKey, oldValue, newValue);
-		//if(!prev) {
-			notifyListeners(PropertyName.SessionChanged);
-		//}
-		return prev == false;
+		notifyListeners(PropertyName.SessionChanged);
 	}
 
 	// listener list
@@ -211,7 +206,7 @@ public abstract class Context {
 	 */
 	public static synchronized void setOutputDimension(int width, int height) {
 		VideoOutputInfoImpl newVideoOutputInfo = new VideoOutputInfoImpl(videoOutputInfo.getFramesPerSecond(), width, height);
-		touchSession("VideoOutputInfo", videoOutputInfo, newVideoOutputInfo);
+		changeSession("VideoOutputInfo", videoOutputInfo, newVideoOutputInfo);
 		videoOutputInfo = newVideoOutputInfo;
 		notifyListeners(PropertyName.VideoDimension);
 	}
@@ -227,7 +222,7 @@ public abstract class Context {
 			}
 		}
 		VideoOutputInfoImpl newVideoOutputInfo = new VideoOutputInfoImpl(frameRate, videoOutputInfo.getWidth(), videoOutputInfo.getHeight());
-		touchSession("VideoOutputInfo", videoOutputInfo, newVideoOutputInfo);
+		changeSession("VideoOutputInfo", videoOutputInfo, newVideoOutputInfo);
 		videoOutputInfo = newVideoOutputInfo;
 		notifyListeners(PropertyName.VideoFrameRate);
 	}
@@ -253,7 +248,7 @@ public abstract class Context {
 		soundCanvasWrapper.setFrameTo(0); // TODO frames without audio
 		soundCanvasList.add(soundCanvasWrapper);
 		notifyListeners(PropertyName.SoundCanvasAdded);
-		touchSession(SessionToken.getSoundCanvasWrapperKey(soundCanvasWrapper), null, soundCanvas);
+		changeSession(SessionToken.getSoundCanvasWrapperKey(soundCanvasWrapper), null, soundCanvas);
 	}
 	public static synchronized  void addCanvasWrapper(SoundCanvasWrapper soundCanvasWrapper) {
 		soundCanvasList.add(soundCanvasWrapper);
@@ -289,14 +284,14 @@ public abstract class Context {
 		if (newList.size() > soundCanvasList.size()) {
 			for (SoundCanvasWrapper scw : newList) {
 				if (!soundCanvasList.contains(scw)) {
-					touchSession(SessionToken.getSoundCanvasWrapperKey(scw), null, scw.getSoundCanvas());
+					changeSession(SessionToken.getSoundCanvasWrapperKey(scw), null, scw.getSoundCanvas());
 				}
 			}
 		}
 		if (soundCanvasList.size() > newList.size()) {
 			for (SoundCanvasWrapper scw : soundCanvasList) {
 				if (!newList.contains(scw)) {
-					touchSession(SessionToken.getSoundCanvasWrapperKey(scw), scw.getSoundCanvas(), null);
+					changeSession(SessionToken.getSoundCanvasWrapperKey(scw), scw.getSoundCanvas(), null);
 				}
 			}
 		}
@@ -352,7 +347,7 @@ public abstract class Context {
 		if(sampleRate % frameRate != 0) {
 			throw new AppLogicException("sample rate " + sampleRate + " % frame rate " + frameRate + " is not 0");
 		}
-		touchSession(AudioInput.class.getName(), audioInput != null ? audioInput.getName() : null, a != null ? a.getName() : null);
+		changeSession(AudioInput.class.getName(), audioInput != null ? audioInput.getName() : null, a != null ? a.getName() : null);
 		audioInput = a;
 		try(SourceDataLine sourceDataLine = AudioSystem.getSourceDataLine(format)){
 		int chunkSize =  a.getAudioInputInfo().getAudioFormat().getFrameSize();

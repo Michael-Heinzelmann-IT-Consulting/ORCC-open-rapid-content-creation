@@ -53,9 +53,9 @@ public class TimedChangeListener implements ChangeListener {
 			@Override
 			public void run() {
 				long diff = System.currentTimeMillis() - start;
-				System.err.print("." + diff);
+				//System.err.print("." + diff);
 				if(diff > timeOut) {
-					System.err.println("System.currentTimeMillis()");
+					//System.err.println("System.currentTimeMillis()");
 					wrappedChangeListener.stateChanged(e);
 					cancel();
 					start = 0;

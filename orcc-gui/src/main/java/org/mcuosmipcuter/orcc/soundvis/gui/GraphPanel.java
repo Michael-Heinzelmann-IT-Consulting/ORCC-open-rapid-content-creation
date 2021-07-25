@@ -276,8 +276,8 @@ public class GraphPanel extends JPanel implements Renderer, RealtimeSettings, Li
 			}
 			if(frameCount < 2 || frameCount % reductionModulus == 0) {
 			if(frameCount > Context.getSongPositionPointer()) {
-				this.repaint();
-				//paintComponent(getGraphics());//
+				this.repaint(); // standard asynchronous painting
+				//paintComponent(getGraphics());// synchronous on some systems better graphics but can slow down audio
 				//paintImmediately(0, 0, getWidth(), getHeight());
 			}
 			if(mixin != null) {
@@ -324,7 +324,7 @@ public class GraphPanel extends JPanel implements Renderer, RealtimeSettings, Li
 			setSize(w, h);
 			setPreferredSize(new Dimension(w, h));
 			
-			System.err.println(zoomFactor + " " + w +" " + h);
+			IOUtil.log(zoomFactor + " " + w + " " + h);
 			//invalidate();
 		}
 		updateSettingListeners();

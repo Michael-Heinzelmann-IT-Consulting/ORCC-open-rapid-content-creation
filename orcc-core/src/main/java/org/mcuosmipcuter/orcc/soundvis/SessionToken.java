@@ -6,12 +6,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
+import org.mcuosmipcuter.orcc.util.IOUtil;
 
 public class SessionToken {
 
 	private final String fullPath;
 	private final boolean named;
-	private boolean changed;
 	Map<String, ValueChanges> changes = new HashMap<>();
 	
 	public boolean isDefault() {
@@ -24,7 +24,7 @@ public class SessionToken {
 	public SessionToken(String fullPath) {
 		this.fullPath = fullPath;
 		named = fullPath != null;
-		System.err.println("##################### new session token ###################");
+		IOUtil.log("##################### new session token ###################");
 	}
 
 	public String getFullPath() {
@@ -42,9 +42,6 @@ public class SessionToken {
 		}
 		return false;
 	}
-//	public void setChanged(boolean changed) {
-//		this.changed = changed;
-//	}
 	public void changeOccurred(String propertyKey, Object oldValue, Object newValue) {
 		if(oldValue instanceof SoundCanvas && newValue == null) {
 			// remove all property changes for canvas
