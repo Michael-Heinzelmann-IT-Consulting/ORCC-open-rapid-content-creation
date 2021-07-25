@@ -34,6 +34,7 @@ import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.api.util.AmplitudeHelper;
 import org.mcuosmipcuter.orcc.soundvis.Context;
+import org.mcuosmipcuter.orcc.soundvis.SessionToken;
 import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
 
 /**
@@ -135,7 +136,7 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 	}
 	private void touchSession(String propertyName, Object oldValue, Object newValue) {
 		// TODO maybe undo manager
-		Context.touchSession(soundCanvas.getClass().getSimpleName() + "#" + System.identityHashCode(this) + "::" + propertyName, oldValue, newValue);
+		Context.touchSession(SessionToken.getSoundCanvasKey(soundCanvas) + "::" + propertyName, oldValue, newValue);
 		//IOUtil.log("touch session " + obj);
 	}
 

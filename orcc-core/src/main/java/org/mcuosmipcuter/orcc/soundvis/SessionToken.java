@@ -1,8 +1,11 @@
 package org.mcuosmipcuter.orcc.soundvis;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 
 public class SessionToken {
 
@@ -43,6 +46,17 @@ public class SessionToken {
 //		this.changed = changed;
 //	}
 	public void changeOccurred(String propertyKey, Object oldValue, Object newValue) {
+		if(oldValue instanceof SoundCanvas && newValue == null) {
+			// remove all property changes for canvas
+			String canvaskey = getSoundCanvasKey((SoundCanvas) oldValue);
+			Iterator<String> iter = changes.keySet().iterator();
+			while(iter.hasNext()) {
+				String key = iter.next();
+				if(key.startsWith(canvaskey)) {
+					iter.remove();
+				}
+			}
+		}
 		ValueChanges vc = changes.get(propertyKey);
 		if(vc == null) {
 			vc = new ValueChanges(oldValue, newValue);
@@ -55,5 +69,13 @@ public class SessionToken {
 			System.err.println(e.getKey() + "=" + e.getValue());
 		}
 		
+	}
+	
+	public static String getSoundCanvasKey(SoundCanvas soundCanvas) {
+		return soundCanvas.getClass().getSimpleName() + "#" + System.identityHashCode(soundCanvas);
+	}
+	
+	public static String getSoundCanvasWrapperKey(SoundCanvasWrapper soundCanvasWrapper) {
+		return soundCanvasWrapper.getDisplayName() + "#" + System.identityHashCode(soundCanvasWrapper);
 	}
 }

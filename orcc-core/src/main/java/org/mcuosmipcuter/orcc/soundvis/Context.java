@@ -253,6 +253,7 @@ public abstract class Context {
 		soundCanvasWrapper.setFrameTo(0); // TODO frames without audio
 		soundCanvasList.add(soundCanvasWrapper);
 		notifyListeners(PropertyName.SoundCanvasAdded);
+		touchSession(SessionToken.getSoundCanvasWrapperKey(soundCanvasWrapper), null, soundCanvas);
 	}
 	public static synchronized  void addCanvasWrapper(SoundCanvasWrapper soundCanvasWrapper) {
 		soundCanvasList.add(soundCanvasWrapper);
@@ -285,6 +286,20 @@ public abstract class Context {
 	 * @param newList the new list
 	 */
 	public static synchronized void replaceCanvasList(List<SoundCanvasWrapper> newList) {
+		if (newList.size() > soundCanvasList.size()) {
+			for (SoundCanvasWrapper scw : newList) {
+				if (!soundCanvasList.contains(scw)) {
+					touchSession(SessionToken.getSoundCanvasWrapperKey(scw), null, scw.getSoundCanvas());
+				}
+			}
+		}
+		if (soundCanvasList.size() > newList.size()) {
+			for (SoundCanvasWrapper scw : soundCanvasList) {
+				if (!newList.contains(scw)) {
+					touchSession(SessionToken.getSoundCanvasWrapperKey(scw), scw.getSoundCanvas(), null);
+				}
+			}
+		}
 		soundCanvasList.clear();
 		soundCanvasList.addAll(newList);
 		notifyListeners(PropertyName.SoundCanvasList);
@@ -337,6 +352,7 @@ public abstract class Context {
 		if(sampleRate % frameRate != 0) {
 			throw new AppLogicException("sample rate " + sampleRate + " % frame rate " + frameRate + " is not 0");
 		}
+		touchSession(AudioInput.class.getName(), audioInput != null ? audioInput.getName() : null, a != null ? a.getName() : null);
 		audioInput = a;
 		try(SourceDataLine sourceDataLine = AudioSystem.getSourceDataLine(format)){
 		int chunkSize =  a.getAudioInputInfo().getAudioFormat().getFrameSize();
