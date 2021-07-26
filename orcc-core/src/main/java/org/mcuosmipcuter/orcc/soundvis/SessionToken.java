@@ -1,7 +1,9 @@
 package org.mcuosmipcuter.orcc.soundvis;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -12,7 +14,7 @@ public class SessionToken {
 
 	private final String fullPath;
 	private final boolean named;
-	Map<String, ValueChanges> changes = new HashMap<>();
+	Map<String, ValueChanges> changes = new LinkedHashMap<>();
 	
 	public boolean isDefault() {
 		return !named;
@@ -63,7 +65,7 @@ public class SessionToken {
 			vc.addChangeValue(newValue);
 		}
 		for(Entry<String, ValueChanges> e : changes.entrySet()) {
-			System.err.println(e.getKey() + "=" + e.getValue());
+			//System.err.println(e.getKey() + "=" + e.getValue());
 		}
 		
 	}
@@ -74,5 +76,16 @@ public class SessionToken {
 	
 	public static String getSoundCanvasWrapperKey(SoundCanvasWrapper soundCanvasWrapper) {
 		return soundCanvasWrapper.getDisplayName() + "#" + System.identityHashCode(soundCanvasWrapper);
+	}
+	
+	public List<String> getChangeLog(boolean includeReverted){
+		List<String> result = new ArrayList<>();
+		for(Entry<String, ValueChanges> e : changes.entrySet()) {
+			ValueChanges vc = e.getValue();
+			if(includeReverted || vc.isLogicallyChanged()) {
+				result.add(e.getKey() + "=" + e.getValue());
+			}
+		}
+		return result;
 	}
 }

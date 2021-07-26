@@ -67,6 +67,7 @@ import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
 import org.mcuosmipcuter.orcc.soundvis.gui.AboutBox;
 import org.mcuosmipcuter.orcc.soundvis.gui.AudioOutputLayoutMenu;
 import org.mcuosmipcuter.orcc.soundvis.gui.CanvasClassMenu;
+import org.mcuosmipcuter.orcc.soundvis.gui.ChangsBox;
 import org.mcuosmipcuter.orcc.soundvis.gui.FrameModulusMenu;
 import org.mcuosmipcuter.orcc.soundvis.gui.FrameRateMenu;
 import org.mcuosmipcuter.orcc.soundvis.gui.GraphPanel;
@@ -96,6 +97,8 @@ public class Main {
 	static final int infoH = 200;
 	static final int playBackH = 240;
 	static final int minCells = 3;
+	
+	private static ChangsBox changesBox = new ChangsBox();
 	
 	/**
 	 * @param args
@@ -259,10 +262,10 @@ public class Main {
 					}
 				});
 			}
-			JMenu newMenu = new JMenu("New");
+			JMenu sessionMenu = new JMenu("Session");
 			
-			mb.add(newMenu);
-			JMenuItem newSession = new JMenuItem("session");
+			mb.add(sessionMenu);
+			JMenuItem newSession = new JMenuItem("new");
 			newSession.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
@@ -271,7 +274,16 @@ public class Main {
 					}
 				}
 			});
-			newMenu.add(newSession);
+			sessionMenu.add(newSession);
+			JMenuItem showChanges = new JMenuItem("show changes");
+			showChanges.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					changesBox.showUnsavedChanges(false);
+				}
+			});
+			Context.addListener(changesBox);
+			sessionMenu.add(showChanges);
 			
 			final JMenu exportMenu = new JMenu("Export");
 			final JMenuItem exportStart = new JMenuItem("start");
