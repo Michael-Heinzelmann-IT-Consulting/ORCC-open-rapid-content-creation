@@ -49,7 +49,7 @@
 			<version>1.6.6</version>
 		</dependency>
 
-		<!-- replcacement for deprecated xuggler -->
+		<!-- replacement for deprecated xuggler -->
 		<dependency>
 			<groupId>io.humble</groupId>
 			<artifactId>humble-video-all</artifactId>

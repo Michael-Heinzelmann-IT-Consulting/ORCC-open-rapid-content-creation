@@ -32,10 +32,12 @@ import java.io.IOException;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 import javax.imageio.ImageIO;
 import javax.sound.sampled.AudioFormat;
 import javax.swing.JDesktopPane;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.JMenu;
@@ -48,6 +50,7 @@ import javax.swing.Popup;
 import javax.swing.PopupFactory;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.filechooser.FileFilter;
 
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.gui.table.CustomTable;
@@ -81,6 +84,7 @@ import org.mcuosmipcuter.orcc.soundvis.gui.listeners.StopActionListener;
 import org.mcuosmipcuter.orcc.soundvis.gui.widgets.GraphicsJInternalFrame;
 import org.mcuosmipcuter.orcc.soundvis.gui.widgets.TimeLabel;
 import org.mcuosmipcuter.orcc.soundvis.gui.widgets.WidgetUtil;
+import org.mcuosmipcuter.orcc.soundvis.persistence.FileConfiguration;
 import org.mcuosmipcuter.orcc.soundvis.persistence.Session;
 import org.mcuosmipcuter.orcc.soundvis.threads.SaveThread;
 import org.mcuosmipcuter.orcc.soundvis.util.ExportUtil;
@@ -119,6 +123,9 @@ public class Main {
 	                    JOptionPane.ERROR_MESSAGE);
 			}
 		});
+		
+		FileConfiguration.init();
+		
 		org.mcuosmipcuter.orcc.gui.Configuration.init(args);
 		
 		final JFrame frame = new JFrame("soundvis");
@@ -587,6 +594,32 @@ public class Main {
 		Popup popup = PopupFactory.getSharedInstance().getPopup(frame, popUpContentPanel, screen.x + screen.width / 2 - popUpContentPanel.getPreferredSize().width / 2, screen.y + screen.height / 2);
 		popup.show();
 
+		FileConfiguration.ensureAppDir(new Supplier<File>() {
+
+			@Override
+			public File get() {
+				JFileChooser chooser = new JFileChooser();
+				chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+				chooser.setDialogType(JFileChooser.CUSTOM_DIALOG);
+				chooser.setFileFilter(new FileFilter() {
+					
+					@Override
+					public String getDescription() {
+						return "directories";
+					}
+					
+					@Override
+					public boolean accept(File f) {
+						return f != null && f.isDirectory();
+					}
+				});
+				int res = chooser.showDialog(frame, "Appdir for soundvis");
+				if(res == JFileChooser.APPROVE_OPTION) {
+					return chooser.getSelectedFile();
+				}
+				return null;
+			}
+		});
 
 		Context.setAppState(AppState.LOADING);
 		List<String> reportList = new ArrayList<String>();

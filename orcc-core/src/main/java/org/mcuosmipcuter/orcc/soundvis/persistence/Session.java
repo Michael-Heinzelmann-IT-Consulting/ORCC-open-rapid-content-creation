@@ -68,8 +68,8 @@ public class Session implements Serializable {
 		}
 	}
 	
-	public static boolean restoreSession(List<String> reportList) {
-		File defaultFile = new File(DEFAULT_FILE_NAME + FILE_EXTENSION);
+	public static boolean restoreSession( List<String> reportList) {
+		File defaultFile = new File(FileConfiguration.getAppDir() + FileConfiguration.getSep() + DEFAULT_FILE_NAME + FILE_EXTENSION);
 		PersistentSession persistentSession;
 		try {
 			persistentSession = loadSessionImpl(defaultFile, reportList);
@@ -134,10 +134,10 @@ public class Session implements Serializable {
 	}
 	
 	public static File saveDefaultSession() throws IllegalArgumentException, IllegalAccessException, IOException {
-		File file = new File(DEFAULT_FILE_NAME + FILE_EXTENSION);
+		File file = new File(FileConfiguration.getAppDir() + FileConfiguration.getSep() + DEFAULT_FILE_NAME + FILE_EXTENSION);
 		String path = Context.getSessionToken().isNamed() ? Context.getSessionToken().getFullPath() : null;
 		if(file.exists()) {
-			Files.move(file.toPath(), file.toPath().resolveSibling(DEFAULT_BACkUP_FILE_NAME + FILE_EXTENSION), StandardCopyOption.REPLACE_EXISTING);
+			Files.move(file.toPath(), file.toPath().resolveSibling(FileConfiguration.getAppDir() + FileConfiguration.getSep() + DEFAULT_BACkUP_FILE_NAME + FILE_EXTENSION), StandardCopyOption.REPLACE_EXISTING);
 		}
 		saveSessionImpl(file, path);
 		return file;

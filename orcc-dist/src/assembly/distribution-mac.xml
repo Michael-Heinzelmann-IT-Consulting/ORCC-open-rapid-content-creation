@@ -63,7 +63,6 @@
   <dependencySets>
     <dependencySet>
     <includes>
-    	<include>xuggle:xuggle-xuggler</include>
     	<include>org.slf4j:slf4j-api</include>
     	<include>io.humble:humble-video-all</include>
     	<include>io.humble:humble-video-noarch</include>
