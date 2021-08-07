@@ -196,7 +196,10 @@ public class Main {
 							@Override
 							public void run() {
 								try {
-									Session.userLoadSession(file, reportList);
+									boolean loaded = Session.userLoadSession(file, reportList);
+									if(!loaded) {
+										throw new RuntimeException("could not load session: " + reportList);
+									}
 								} finally {
 									Context.setAppState(before);
 									if (popup != null) {

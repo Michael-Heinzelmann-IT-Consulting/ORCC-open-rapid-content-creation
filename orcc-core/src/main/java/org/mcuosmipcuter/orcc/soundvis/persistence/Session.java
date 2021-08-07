@@ -98,6 +98,10 @@ public class Session implements Serializable {
 			return true;
 		} catch (Exception e) {
 			e.printStackTrace();
+			reportList.add(e.getMessage());
+			if(e.getCause() != null) {
+				reportList.add(e.getCause().getMessage());
+			}
 			return false;
 		}
 	}
