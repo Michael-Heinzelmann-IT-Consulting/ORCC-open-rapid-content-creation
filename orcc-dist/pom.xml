@@ -74,13 +74,13 @@
               <!-- put your configurations here -->
               <toolhome>${JPACKAGE_HOME}</toolhome>
               <dest>${project.build.directory}/jpackage</dest>
-             <input>${project.build.directory}/orcc-dist-1.2.0-SNAPSHOT-distribution-${JPACKAGE_OS}/orcc-dist-1.2.0-SNAPSHOT</input>
-             <mainjar>orcc-gui-1.2.0-SNAPSHOT.jar</mainjar>
+             <input>${project.build.directory}/orcc-dist-${project.version}-distribution-${JPACKAGE_OS}/orcc-dist-${project.version}</input>
+             <mainjar>orcc-gui-${project.version}.jar</mainjar>
              <mainclass>org.mcuosmipcuter.orcc.gui.Main</mainclass>
              <name>soundvis</name>
              <appversion>${project.version}</appversion>
              <copyright>GNU General Public License v3.0</copyright>
-             <licensefile>${project.build.directory}/orcc-dist-1.2.0-SNAPSHOT-distribution-${JPACKAGE_OS}/orcc-dist-1.2.0-SNAPSHOT/LICENSE.txt</licensefile>
+             <licensefile>${project.build.directory}/orcc-dist-${project.version}-distribution-${JPACKAGE_OS}/orcc-dist-${project.version}/LICENSE.txt</licensefile>
             </configuration>
           </execution>
         </executions>

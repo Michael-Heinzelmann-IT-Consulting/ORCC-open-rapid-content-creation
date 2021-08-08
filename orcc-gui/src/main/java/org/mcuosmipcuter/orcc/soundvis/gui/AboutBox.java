@@ -29,6 +29,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
+import org.mcuosmipcuter.orcc.soundvis.persistence.FileConfiguration;
 import org.mcuosmipcuter.orcc.util.IOUtil;
 
 /**
@@ -70,7 +71,21 @@ public class AboutBox {
 	}
 	public static void showSystemProperties(boolean modal) {
 		try {
+			InputStream is = AboutBox.class.getResourceAsStream("/version.properties");
+			Properties vp = new Properties();
+			vp.load(is);
 			StringBuilder stringBuilder = new StringBuilder();
+			
+			for(Entry<Object, Object> ee : vp.entrySet()){
+				stringBuilder.append(ee.getKey() + "=" + ee.getValue());
+				stringBuilder.append("\n");
+			}
+			stringBuilder.append("bootDir=" + FileConfiguration.getBootDir());
+			stringBuilder.append("\n");
+			stringBuilder.append("appDir=" + FileConfiguration.getAppDir());
+			stringBuilder.append("\n");
+			
+			stringBuilder.append("\n");
 			Map <String, String> envMap = System.getenv();
 			for(Entry<String, String> ee : envMap.entrySet()){
 				stringBuilder.append(ee.getKey() + "=" + ee.getValue());
@@ -82,6 +97,7 @@ public class AboutBox {
 				stringBuilder.append(pe.getKey() + "=" + pe.getValue());
 				stringBuilder.append("\n");
 			}
+			
 			JTextArea ta = new JTextArea(20, 50);
 			JScrollPane sp = new JScrollPane(ta);
 			ta.setText(stringBuilder.toString());

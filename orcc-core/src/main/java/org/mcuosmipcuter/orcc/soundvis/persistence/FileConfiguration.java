@@ -38,11 +38,11 @@ public class FileConfiguration {
 	public static final String SOUNDVIS_CONFIG_DIR_NAME = "soundvis";
 	
 	// system settings
-	private static String userHomeDir = System.getProperty("user.home");
-	private static String sep = System.getProperty("file.separator");
-	private static String  tempDir = System.getProperty("java.io.tmpdir");
-	private static String TARGET_CONF_DIR = userHomeDir + sep + ".config";
-	private static String SOUNDVIS_CONF_DIR = TARGET_CONF_DIR + sep + SOUNDVIS_CONFIG_DIR_NAME;
+	private static final String userHomeDir = System.getProperty("user.home");
+	private static final String sep = System.getProperty("file.separator");
+	private static final String  tempDir = System.getProperty("java.io.tmpdir");
+	private static final String TARGET_CONF_DIR = userHomeDir + sep + ".config";
+	private static final String SOUNDVIS_CONF_DIR = TARGET_CONF_DIR + sep + SOUNDVIS_CONFIG_DIR_NAME;
 	
 	private static String bootDir;
 	private static String appDir;
@@ -58,8 +58,12 @@ public class FileConfiguration {
 
 		// current directory
 		bootDir = new File("").getAbsolutePath();
-		
-		// TODO mkdir .config
+
+		File targetConfDir = new File(TARGET_CONF_DIR);
+		if(!targetConfDir.exists()) {
+			targetConfDir.mkdir();
+		}
+
 		boolean ask = false;
 		File confFile = new File(SOUNDVIS_CONF_DIR + sep + SOUNDVIS_PROPERTIES_FILE_NAME);
 		final boolean usrConfigExists = userHomeDir != null && confFile.canWrite();
@@ -77,11 +81,6 @@ public class FileConfiguration {
 					e.printStackTrace();
 				}
 			
-		}
-		final boolean bootDirWriteable = bootDir != null && new File(bootDir).canWrite();
-		if(appDir == null && !ask && bootDirWriteable) {
-			// 'classic' conf
-			appDir = bootDir;
 		}
 
 	}
@@ -130,6 +129,10 @@ public class FileConfiguration {
 		}
 	}
 	
+	public static String getBootDir() {
+		return bootDir;
+	}
+
 	public static String getAppDir() {
 		return appDir;
 	}
