@@ -56,6 +56,7 @@ public class ClassicWaves implements SoundCanvas {
 	private float amplitudeMultiplicator;
 	private int leftMargin;
 	private int height;
+	private int wideMargin;
 	
 	private AmplitudeHelper amplitude;
 	private int factor;
@@ -91,7 +92,7 @@ public class ClassicWaves implements SoundCanvas {
 		counterInsideFrame = 0;
 		graphics.setColor(foreGroundColor);
 		int x = 0;
-		final int lm = drawMargin ? 0 : leftMargin;
+		final int lm = drawMargin ? wideMargin : leftMargin;
 		int aMaxamp = 0;
 		int aMinAmp = 0;
 
@@ -135,13 +136,19 @@ public class ClassicWaves implements SoundCanvas {
 
 	@Override
 	public void prepare(AudioInputInfo audioInputInfo, VideoOutputInfo videoOutputInfo)  {
+		int width = videoOutputInfo.getWidth();
 		int frameRate = videoOutputInfo.getFramesPerSecond();
 		float sampleRate = audioInputInfo.getAudioFormat().getSampleRate(); 
 		int pixelLengthOfaFrame = (int)Math.ceil(sampleRate / (float)frameRate); // e.g. 44100 / 25 = 1764
-		factor = (int)(pixelLengthOfaFrame / videoOutputInfo.getWidth()) + 1;
+		wideMargin = 0;
+		if((float)width / (float) pixelLengthOfaFrame >= 2) { // wide video no 'zoom'
+			width = pixelLengthOfaFrame * 2  - 1;
+			wideMargin = (videoOutputInfo.getWidth() - width) / 2;
+		}
+		factor = (int)(pixelLengthOfaFrame / width) + 1;
 		int pixelsUsed = (int)Math.ceil((float)pixelLengthOfaFrame / (float)factor);
 		amplitudeBuffer = new int[pixelsUsed];
-		marginBuffer = new int[videoOutputInfo.getWidth() - pixelsUsed];
+		marginBuffer = new int[width - pixelsUsed];
 		leftMargin =  (videoOutputInfo.getWidth() - pixelsUsed) / 2;
 		this.height = videoOutputInfo.getHeight();
 		counterInsideFrame = 0;
