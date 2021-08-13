@@ -67,6 +67,10 @@ public class ChangsBox implements Listener{
 		if(st != null) {
 			String name = st.isNamed() ? st.getFullPath() : "unnamed";
 			stringBuilder.append("Session: " + name);
+			for(String e : st.getReportList()) {
+				stringBuilder.append("\n");
+				stringBuilder.append("load error: " + e);
+			}			
 			stringBuilder.append("\n");
 			for(String change : st.getChangeLog(true)) {
 				stringBuilder.append(change);

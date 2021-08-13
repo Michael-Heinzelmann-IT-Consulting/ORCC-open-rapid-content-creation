@@ -34,6 +34,8 @@ public class FileConfiguration {
 
 	public static final String SOUNDVIS_PROPERTY_APP_DIR = "appDir";
 	public static final String SOUNDVIS_PROPERTY_ASK_APP_DIR_ON_STARTUP = "askAppDirOnStartup";
+	public static final String SOUNDVIS_PROPERTY_LOOK_AND_FEEL = "lookAndFeel";
+	
 	public static final String SOUNDVIS_PROPERTIES_FILE_NAME = "soundvis.properties";
 	public static final String SOUNDVIS_CONFIG_DIR_NAME = "soundvis";
 	
@@ -43,13 +45,10 @@ public class FileConfiguration {
 	private static final String  tempDir = System.getProperty("java.io.tmpdir");
 	private static final String TARGET_CONF_DIR = userHomeDir + sep + ".config";
 	private static final String SOUNDVIS_CONF_DIR = TARGET_CONF_DIR + sep + SOUNDVIS_CONFIG_DIR_NAME;
+	private static final String SOUNDVIS_CONF_FILE = SOUNDVIS_CONF_DIR + sep + SOUNDVIS_PROPERTIES_FILE_NAME;
 	
 	private static String bootDir;
 	private static String appDir;
-	
-	private static String exportDir;
-	private static String imageDir;
-	private static String logDir;
 
 	/**
 	 * 
@@ -64,23 +63,13 @@ public class FileConfiguration {
 			targetConfDir.mkdir();
 		}
 
-		boolean ask = false;
-		File confFile = new File(SOUNDVIS_CONF_DIR + sep + SOUNDVIS_PROPERTIES_FILE_NAME);
-		final boolean usrConfigExists = userHomeDir != null && confFile.canWrite();
-		if(usrConfigExists) {
-			// load config
-			Properties cp = new Properties();
+		Properties cp = getProperties();
 
-				try(FileReader fr = new FileReader(confFile)){
-					cp.load(fr);
-					ask = "true".equals(cp.getProperty(SOUNDVIS_PROPERTY_ASK_APP_DIR_ON_STARTUP));
-					if(!ask) {
-						appDir = cp.getProperty(SOUNDVIS_PROPERTY_APP_DIR);
-					}
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			
+		if (!cp.isEmpty()) {
+			boolean ask = "true".equals(cp.getProperty(SOUNDVIS_PROPERTY_ASK_APP_DIR_ON_STARTUP));
+			if (!ask) {
+				appDir = cp.getProperty(SOUNDVIS_PROPERTY_APP_DIR);
+			}
 		}
 
 	}
@@ -96,25 +85,14 @@ public class FileConfiguration {
 				File soundvisConfDir = new File(SOUNDVIS_CONF_DIR);
 				boolean dirCreated = soundvisConfDir.mkdir();
 				IOUtil.log("config dir created: " + dirCreated);
-				File config = new File(soundvisConfDir.getAbsolutePath()  + sep + SOUNDVIS_PROPERTIES_FILE_NAME);
-				Properties cp = new Properties();
-				if(config.exists()) {
-					try(FileReader fr = new FileReader(config)){
-						cp.load(fr);
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
-				else {
+				
+				Properties cp = getProperties();
+				if(cp.isEmpty()){
+					IOUtil.log("creating new config file");
 					cp.put(SOUNDVIS_PROPERTY_ASK_APP_DIR_ON_STARTUP, "false");
 				}
-				
-				try(FileWriter fw = new FileWriter(config)){
-					cp.put(SOUNDVIS_PROPERTY_APP_DIR, appDir);
-					cp.store(fw, "GNU General Public License"); // TODO license, version
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+				cp.put(SOUNDVIS_PROPERTY_APP_DIR, appDir);
+				storeProperties(cp);
 			}
 		}
 		if (appDir == null) { // conf dir not writable or no user selection
@@ -126,6 +104,34 @@ public class FileConfiguration {
 			else {
 				appDir = tempDir;
 			}
+		}
+	}
+
+	public static Properties getProperties() {
+		Properties cp = new Properties();
+		File confFile = new File(SOUNDVIS_CONF_FILE);
+		final boolean usrConfigExists = userHomeDir != null && confFile.canWrite();
+		if (usrConfigExists) {
+			// load config
+			try (FileReader fr = new FileReader(confFile)) {
+				cp.load(fr);
+			} catch (IOException e) {
+				IOUtil.log("IOException: " + e.getMessage());
+			}
+			IOUtil.log(cp.size() + " properties loaded from file config: " + SOUNDVIS_CONF_FILE);
+		}
+		else {
+			IOUtil.log(SOUNDVIS_CONF_FILE + " does not exist or not writeable, returning empty properties");
+		}
+		return cp;
+	}
+	public static void storeProperties(Properties cp) {
+		File config = new File(SOUNDVIS_CONF_FILE);
+		try(FileWriter fw = new FileWriter(config)){
+			cp.store(fw, "GNU General Public License");
+			IOUtil.log("stored " + SOUNDVIS_CONF_FILE);
+		} catch (IOException e) {
+			IOUtil.log("IOException: " + e.getMessage());
 		}
 	}
 	

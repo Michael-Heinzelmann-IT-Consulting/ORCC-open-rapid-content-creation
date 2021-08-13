@@ -75,6 +75,7 @@ import org.mcuosmipcuter.orcc.soundvis.gui.FrameModulusMenu;
 import org.mcuosmipcuter.orcc.soundvis.gui.FrameRateMenu;
 import org.mcuosmipcuter.orcc.soundvis.gui.GraphPanel;
 import org.mcuosmipcuter.orcc.soundvis.gui.PlayBackPanel;
+import org.mcuosmipcuter.orcc.soundvis.gui.PreferencesBox;
 import org.mcuosmipcuter.orcc.soundvis.gui.ResolutionMenu;
 import org.mcuosmipcuter.orcc.soundvis.gui.ZoomMenu;
 import org.mcuosmipcuter.orcc.soundvis.gui.listeners.FileDialogActionListener;
@@ -197,6 +198,7 @@ public class Main {
 							public void run() {
 								try {
 									boolean loaded = Session.userLoadSession(file, reportList);
+									errorsOnSessionLoadRoutine(reportList);
 									if(!loaded) {
 										throw new RuntimeException("could not load session: " + reportList);
 									}
@@ -528,6 +530,15 @@ public class Main {
 				configMenu.addSeparator();
 				configMenu.add(frameRates);
 				Context.addListener(frameRates);
+				
+				JMenuItem preferences = new JMenuItem("preferences (startup)");
+				preferences.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						PreferencesBox.showPreferncesDialog();
+					}
+				});
+				configMenu.addSeparator();
+				configMenu.add(preferences);
 
 				// context listener for menu enabling
 				Context.addListener(new Listener() {
@@ -571,7 +582,8 @@ public class Main {
 				public void contextChanged(PropertyName propertyName) {
 					if(PropertyName.SessionChanged.equals(propertyName)) {
 						String inputTitle = Context.getSessionToken().isNamed() ? Context.getSessionToken().getFullPath() : "unnamed session";
-						String changed = Context.getSessionToken().isChanged() ? " * " :"";
+						String complete = Context.getSessionToken().hasLoadErrors() ? " !!incomplete!! " : "";
+						String changed = Context.getSessionToken().isChanged() ? complete + " * " : complete;
 						graphicFrame.setInputTitle(inputTitle + changed);
 					}
 					if(PropertyName.SoundCanvasAdded.equals(propertyName)||
@@ -592,11 +604,6 @@ public class Main {
 
 		org.mcuosmipcuter.orcc.gui.Configuration.stage2(args);
 		
-		JPanel popUpContentPanel = WidgetUtil.getMessagePanel("loading last session ...", 72, frame.getGraphics());
-		Rectangle screen = frame.getBounds();
-		Popup popup = PopupFactory.getSharedInstance().getPopup(frame, popUpContentPanel, screen.x + screen.width / 2 - popUpContentPanel.getPreferredSize().width / 2, screen.y + screen.height / 2);
-		popup.show();
-
 		FileConfiguration.ensureAppDir(new Supplier<File>() {
 
 			@Override
@@ -624,19 +631,17 @@ public class Main {
 			}
 		});
 
+		JPanel popUpContentPanel = WidgetUtil.getMessagePanel("loading last session ...", 72, frame.getGraphics());
+		Rectangle screen = frame.getBounds();
+		Popup popup = PopupFactory.getSharedInstance().getPopup(frame, popUpContentPanel, screen.x + screen.width / 2 - popUpContentPanel.getPreferredSize().width / 2, screen.y + screen.height / 2);
+		popup.show();
 		Context.setAppState(AppState.LOADING);
 		List<String> reportList = new ArrayList<String>();
 		boolean restoredSession = Session.restoreSession(reportList);
 		if(!restoredSession) {
 			Session.newSession();
 		}
-		if(!reportList.isEmpty()) {
-			StringBuilder messages = new StringBuilder("Errors during session restore:");
-			for(String m : reportList) {
-				messages.append("\n" + m);
-			}
-			JOptionPane.showMessageDialog(null, messages.toString());
-		}
+		errorsOnSessionLoadRoutine(reportList);
 		popup.hide();
 
 		SaveThread saveThread = new SaveThread();
@@ -644,6 +649,15 @@ public class Main {
 		saveThread.start();
 		Context.setAppState(AppState.READY);
 		
+	}
+	private static void errorsOnSessionLoadRoutine(List<String> reportList) {
+		if(!reportList.isEmpty()) {
+			StringBuilder messages = new StringBuilder("Errors during session restore:");
+			for(String m : reportList) {
+				messages.append("\n" + m);
+			}
+			JOptionPane.showMessageDialog(null, messages.toString());
+		}
 	}
 	private static boolean allowSessionOpenRoutine() {
 		if (Context.getSessionToken().needsSave()) {

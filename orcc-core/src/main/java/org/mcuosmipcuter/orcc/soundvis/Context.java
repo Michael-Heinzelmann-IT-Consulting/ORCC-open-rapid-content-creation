@@ -97,7 +97,7 @@ public abstract class Context {
 		return touchCounter;
 	}
 	
-	private static SessionToken sessionToken = new SessionToken(null);
+	private static SessionToken sessionToken = new SessionToken();
 
 	public static SessionToken getSessionToken() {
 		return sessionToken;

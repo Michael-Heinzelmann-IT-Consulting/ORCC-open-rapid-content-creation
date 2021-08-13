@@ -14,6 +14,7 @@ public class SessionToken {
 
 	private final String fullPath;
 	private final boolean named;
+	private final List<String> reportList;
 	Map<String, ValueChanges> changes = new LinkedHashMap<>();
 	
 	public boolean isDefault() {
@@ -22,10 +23,16 @@ public class SessionToken {
 	public boolean isNamed() {
 		return named;
 	}
-	
-	public SessionToken(String fullPath) {
+	public List<String> getReportList() {
+		return reportList;
+	}
+	public SessionToken() {
+		this(null, new ArrayList<>());
+	}
+	public SessionToken(String fullPath, List<String> reportList) {
 		this.fullPath = fullPath;
 		named = fullPath != null;
+		this.reportList = reportList;
 		IOUtil.log("##################### new session token ###################");
 	}
 
@@ -43,6 +50,9 @@ public class SessionToken {
 			}
 		}
 		return false;
+	}
+	public boolean hasLoadErrors() {
+		return !reportList.isEmpty();
 	}
 	public void changeOccurred(String propertyKey, Object oldValue, Object newValue) {
 		if(oldValue instanceof SoundCanvas && newValue == null) {
@@ -63,9 +73,6 @@ public class SessionToken {
 		}
 		else {
 			vc.addChangeValue(newValue);
-		}
-		for(Entry<String, ValueChanges> e : changes.entrySet()) {
-			//System.err.println(e.getKey() + "=" + e.getValue());
 		}
 		
 	}

@@ -17,29 +17,26 @@
 */
 package org.mcuosmipcuter.orcc.gui;
 
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.Properties;
 
 import javax.sound.sampled.FloatControl;
+import javax.swing.LookAndFeel;
 import javax.swing.UIManager;
+import javax.swing.UIManager.LookAndFeelInfo;
+import javax.swing.UnsupportedLookAndFeelException;
 
-import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.soundvis.Context;
 import org.mcuosmipcuter.orcc.soundvis.FontStore;
+import org.mcuosmipcuter.orcc.soundvis.persistence.FileConfiguration;
 import org.mcuosmipcuter.orcc.soundvis.util.AudioUtil;
-import org.mcuosmipcuter.orcc.util.ClassPathExplodedDirLoader;
 import org.mcuosmipcuter.orcc.util.IOUtil;
 
 /**
  * Configuration supporting several boot strap like stages to easy widget initialization<br/>
- * 	// args:<br/>
-	// appmode [cli, gui] usermode [user, devuser, dev], default input file, default output file, default canvas
  * @author Michael Heinzelmann
  */
 public abstract class Configuration {
 
-	private static String appMode;
-	private static String usrMode;
 	private static int stage;
 	
 	/**
@@ -47,35 +44,25 @@ public abstract class Configuration {
 	 * @param args you should pass the ones from main
 	 */
 	public static synchronized void init(String[] args) {
-
-		appMode = args.length > 0 ? args[0] : "gui";
-		usrMode = args.length > 1 ? args[1] : "user";
-	
-		if("gui".equals(appMode)) {
-			try {
-				UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
-				IOUtil.log("using nimbus look and feel");
-			}
-			catch(Exception ex) {
-				if("true".equals(System.getProperty("force.metal.lf"))) {
-					try {
-						UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
-						IOUtil.log("forced to using metal look and feel");
-					} catch (Exception e) {
-						throw new RuntimeException(e);
-					}
-				}
-				else {
-					IOUtil.log("using platform default look and feel");
-				}
-			} 
+		
+		for(LookAndFeelInfo lfi :UIManager .getInstalledLookAndFeels()) {
+			IOUtil.log(lfi.toString());
 		}
-		if(usrMode.startsWith("dev")) {
-			// video size
-			Context.setOutputDimension(1920, 1080);
+	
+		Properties config = FileConfiguration.getProperties();
+		Object lfClassName = config.get(FileConfiguration.SOUNDVIS_PROPERTY_LOOK_AND_FEEL);
+		if(lfClassName != null) {
+			try {
+				UIManager.setLookAndFeel(lfClassName.toString());
+				IOUtil.log("look and feel set to : " + UIManager.getLookAndFeel());
+			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
+					| UnsupportedLookAndFeelException e) {
+				IOUtil.log("could not set look and feel: " + e.getMessage());
+			}
 		}
 		else {
-			// TODO use user preferences from persistent storage
+			LookAndFeel def = UIManager.getLookAndFeel();
+			IOUtil.log("look and feel set to default: " + def);		
 		}
 		
 		stage = 1;
@@ -92,31 +79,23 @@ public abstract class Configuration {
 			throw new IllegalStateException("stage 1 required, but is " + stage);
 		}
 		
-		if(usrMode.startsWith("dev")) {
-			Set<String> canvasClssNames = new TreeSet<String>();
-			ClassPathExplodedDirLoader.loadClassNamesInto(canvasClssNames, SoundCanvas.class); // dev canvas from exploded
-			for(String canvasClassName : canvasClssNames) {
-				Context.addCanvasClassName(canvasClassName);
-			}
-		}
-		else {
-			// TODO use user preferences from persistent storage
-			Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.AudioWave");
-			Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.Blinds");
-			Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.Blinker");
-			Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.Chameleon");
-			Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.ClassicWaves");
-			Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.ColorsLR");
-			Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.GridPulse");
-			//Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.Image");
-			Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.Pulsating");
-			Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.RotatingAmplitudes");
-			Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.SlideShow");
-			Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.SolidColor");
-			Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.Text");
-			Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.ThresholdVerticalLines");
-			Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.Tiles");
-		}
+		// TODO use user preferences from persistent storage
+		Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.AudioWave");
+		Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.Blinds");
+		Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.Blinker");
+		Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.Chameleon");
+		Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.ClassicWaves");
+		Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.ColorsLR");
+		Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.GridPulse");
+		// Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.Image");
+		Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.Pulsating");
+		Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.RotatingAmplitudes");
+		Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.SlideShow");
+		Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.SolidColor");
+		Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.Text");
+		Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.ThresholdVerticalLines");
+		Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.Tiles");
+		
 		stage = 2;
 	}
 	

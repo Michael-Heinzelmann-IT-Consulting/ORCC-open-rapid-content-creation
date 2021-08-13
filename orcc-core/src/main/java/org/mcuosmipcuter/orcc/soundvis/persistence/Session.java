@@ -59,7 +59,7 @@ public class Session implements Serializable {
 	
 	public static void newSession() {
 		Context.clearCanvasList();
-		Context.setSessionToken(new SessionToken(null));
+		Context.setSessionToken(new SessionToken());
 		try {
 			Context.setAudioFromClasspath("/silence_pcm_16bit_wav_30s.wav");
 			Context.addCanvas("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.SolidColor");
@@ -78,8 +78,8 @@ public class Session implements Serializable {
 				return userLoadSession(file, reportList);
 			}
 			else {
-				setUpApplication(persistentSession);
-				Context.setSessionToken(new SessionToken(null));
+				setUpApplication(persistentSession, reportList);
+				Context.setSessionToken(new SessionToken());
 			}
 			
 			return persistentSession != null;
@@ -92,8 +92,8 @@ public class Session implements Serializable {
 	public static boolean userLoadSession(File file, List<String> reportList) {
 		try {
 			PersistentSession persistentSession =  loadSessionImpl(file, reportList);
-			setUpApplication(persistentSession);
-			Context.setSessionToken(new SessionToken(file.getAbsolutePath()));
+			setUpApplication(persistentSession, reportList);
+			Context.setSessionToken(new SessionToken(file.getAbsolutePath(), reportList));
 			saveDefaultSession();
 			return true;
 		} catch (Exception e) {
@@ -127,9 +127,15 @@ public class Session implements Serializable {
 		}
 		
 	}
-	private static void setUpApplication(PersistentSession persistentSession) throws AppLogicException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, NoSuchFieldException {
+	private static void setUpApplication(PersistentSession persistentSession, List<String> reportList) throws AppLogicException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, NoSuchFieldException {
 		Context.setOutputDimension(persistentSession.getVideoOutPutWidth(), persistentSession.getVideoOutPutHeight());
-		Context.setAudio(persistentSession.getAudioInputType(), persistentSession.getAudioInputName(), persistentSession.getVideoOutPutFrames());
+		try {
+			Context.setAudio(persistentSession.getAudioInputType(), persistentSession.getAudioInputName(), persistentSession.getVideoOutPutFrames());
+		} catch (Exception e) {
+			IOUtil.log(e.getMessage() + " " + e.getCause());
+			reportList.add(e.getMessage() + " " + e.getCause());
+			Context.setAudioFromClasspath("/silence_pcm_16bit_wav_30s.wav");
+		}
 
 		Context.clearCanvasList();
 		for(PersistentSoundCanvasWrapper psw : persistentSession.getSoundCanvasList()) {
@@ -148,7 +154,7 @@ public class Session implements Serializable {
 	}
 	public static void userSaveSession(File file) throws IllegalArgumentException, IllegalAccessException, IOException {
 		saveSessionImpl(file, null);
-		Context.setSessionToken(new SessionToken(file.getAbsolutePath()));
+		Context.setSessionToken(new SessionToken(file.getAbsolutePath(), new ArrayList<>()));
 	}
 	private static PersistentSession saveSessionImpl(File file, String persitentSessionPath) throws IllegalArgumentException, IllegalAccessException, IOException {
 
