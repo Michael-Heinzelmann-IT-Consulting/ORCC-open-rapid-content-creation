@@ -295,7 +295,7 @@ public class CustomTable extends JPanel implements Context.Listener{
 		SpinnerNumberModel modelFrom = new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1);
 		final JSpinner fromFrame = new JSpinner(modelFrom);
 		fromFrame.setToolTipText("from");
-		fromFrame.setValue(soundCanvasWrapper.getFrameFrom());
+		fromFrame.setValue((int)soundCanvasWrapper.getFrameFrom());
 		fromFrame.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent arg0) {
 				soundCanvasWrapper.setFrameFrom(((Number)fromFrame.getValue()).longValue());
@@ -306,7 +306,7 @@ public class CustomTable extends JPanel implements Context.Listener{
 		((DefaultEditor)fromFrame.getEditor()).getTextField().addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
 				if(e.getClickCount() >= 2) {
-					fromFrame.setValue(tableListener.getFrameSelected());
+					fromFrame.setValue((int)tableListener.getFrameSelected());
 					Context.touch();
 				}
 			}
@@ -314,7 +314,7 @@ public class CustomTable extends JPanel implements Context.Listener{
 		SpinnerNumberModel modelTo = new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1);
 		final JSpinner toFrame = new JSpinner(modelTo);
 		toFrame.setToolTipText("to");
-		toFrame.setValue(soundCanvasWrapper.isFrameToAuto() ? 0 : soundCanvasWrapper.getFrameTo());
+		toFrame.setValue(soundCanvasWrapper.isFrameToAuto() ? (int)0 : (int)soundCanvasWrapper.getFrameTo());
 		toFrame.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent arg0) {
 				soundCanvasWrapper.setFrameTo(((Number)toFrame.getValue()).longValue());
@@ -325,7 +325,7 @@ public class CustomTable extends JPanel implements Context.Listener{
 		((DefaultEditor)toFrame.getEditor()).getTextField().addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
 				if(e.getClickCount() >= 2) {
-					toFrame.setValue(tableListener.getFrameSelected());
+					toFrame.setValue((int)tableListener.getFrameSelected());
 					Context.touch();
 				}
 			}
