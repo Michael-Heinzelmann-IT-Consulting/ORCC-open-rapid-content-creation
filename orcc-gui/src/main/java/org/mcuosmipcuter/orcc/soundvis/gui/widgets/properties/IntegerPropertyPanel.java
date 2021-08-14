@@ -125,7 +125,8 @@ public class IntegerPropertyPanel extends PropertyPanel<Integer> {
 					catch(NumberFormatException ex) {
 						// forward to super
 					}
-					return Integer.valueOf(super.parse(text, pos).intValue()); // convert oversized Long
+					Number num = super.parse(text, pos);
+					return Integer.valueOf(num != null ? num.intValue() : (int)0); // convert oversized Long
 				}});
 
 			DefaultFormatterFactory factory = new DefaultFormatterFactory(displayFormat, displayFormat, displayFormat);
