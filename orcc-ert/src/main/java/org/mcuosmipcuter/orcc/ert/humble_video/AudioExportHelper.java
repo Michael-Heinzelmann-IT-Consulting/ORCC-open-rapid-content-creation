@@ -14,7 +14,8 @@ public class AudioExportHelper {
 	MediaAudio samples;
 	private final int PLANE_SIZE;
 	
-	public AudioExportHelper(Encoder audioEncoderPointer, Muxer muxerPointer) {
+	
+	/*package*/ AudioExportHelper(Encoder audioEncoderPointer, Muxer muxerPointer) {
 		this.audioEncoderPointer = audioEncoderPointer;
 		this.muxerPointer = muxerPointer;
 		samples = makeNewSample();

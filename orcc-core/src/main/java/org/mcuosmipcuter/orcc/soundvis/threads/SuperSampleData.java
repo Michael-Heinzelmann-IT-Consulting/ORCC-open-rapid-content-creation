@@ -49,7 +49,6 @@ public class SuperSampleData {
 		int min = Integer.MAX_VALUE;
 		long sumUp = 0;
 		long sumDown = 0;
-		int r = 0;
 		int f = 0;
 		for(int i = 0; i < list.length; i++) {
 			int noOfSamples = list[i].getNoOfSamples() * factor;
@@ -64,7 +63,6 @@ public class SuperSampleData {
 			f++;
 			if(i > 0 && (i % factor == 0 || i == list.length - 1)) {
 				reducedList.add(new SuperSample(min, max, noOfSamples, (int)(sumUp / f), (int)(sumDown / f)));
-				r++;
 				max = Integer.MIN_VALUE;
 				min = Integer.MAX_VALUE;
 				sumUp = 0;

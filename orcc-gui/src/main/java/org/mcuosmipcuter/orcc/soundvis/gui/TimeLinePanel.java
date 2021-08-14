@@ -60,7 +60,6 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 	private final int margin = 20;
 	private final int marginY = 24;
 	private final int displaySecondsStep = 5;
-	private final static Color selectPointerColor = new Color(Color.YELLOW.getRed(), Color.YELLOW.getGreen(), Color.YELLOW.getBlue(), 0);
 	private final static Color selectFrameWidthColor =  new Color(Color.YELLOW.getRed(), Color.YELLOW.getGreen(), Color.YELLOW.getBlue(), 44);
 	private final static Color timeMarkerColor = new Color(136, 166, 166);
 	private final static Color timeNumbersColor = new Color(136, 200, 200);
@@ -78,7 +77,6 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 	// user configuration
 	boolean autoZoom = true;
 	int samplesToZoom = 100;
-	private int preRunFrames;
 	
 	// state
 	private boolean loading;
@@ -96,7 +94,6 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 	private int selectPos = margin;
 	private long selectFrame;
 	private long samplePosition;
-	private int paintProgressPos;
 	
 	// data from input / output
 	private int samplesPerFrame = 1;
@@ -129,12 +126,8 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 			public void mouseReleased(MouseEvent e) {
 				int pixel = selectPos - margin;
 				final long frame = pixel * noOfSamples / samplesPerFrame;
-				long f = frame - preRunFrames;
-				if(f < 0) {
-					f = 0;
-				}
 				if(Context.getAppState() == AppState.READY) {
-					Context.setSongPositionPointer(f);
+					Context.setSongPositionPointer(frame);
 				}
 				selectFrame = frame;
 			}
@@ -180,7 +173,7 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 				}
 				if(PropertyName.AppState.equals(propertyName)) {
 					if(Context.getAppState() == AppState.READY) {
-						Context.setSongPositionPointer(selectFrame - preRunFrames);
+						Context.setSongPositionPointer(selectFrame);
 					}
 					if(Context.getAppState() == AppState.EXPORTING) {
 						Context.setSongPositionPointer(0);
@@ -188,9 +181,6 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 					loading = Context.getAppState() == AppState.LOADING;
 				}		
 				repaint();
-				if(loading) {
-					//paintImmediately(0, 0, getWidth(), getHeight());
-				}
 			}
 
 		});
@@ -205,43 +195,6 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 		g.drawString("loading ...", getWidth() / 2, getHeight() / 2);
 	}
 
-	/**
-	 * Method to paint the progress difference since last call only, this method is required for performance reasons
-	 */
-	public void paintProgress() {
-
-		if(loading) {
-			return;
-		}
-
-//		int currentPos = (int)(samplePosition / noOfSamples);
-//		if(paintProgressPos == currentPos) {
-//			return;
-//		}
-//
-//		Graphics g = getGraphics();
-//
-//		if(g == null) {
-//			return;
-//		}
-//		g.setColor(Color.ORANGE);
-//		int x1 = margin + 1 + currentPos;
-//		g.drawLine(x1, 0, x1, heightToUse);
-//
-//		g.setColor(Color.BLACK);
-//
-//		if(paintProgressPos > currentPos) {
-//			paintProgressPos = currentPos > 1 ? currentPos - 1 : 0;
-//		}
-//		final int listLength = superSampleData.getList().length;
-//		for(int pos = paintProgressPos + 1; pos <= currentPos && pos < listLength; pos++) {
-//			SuperSample s = superSampleData.getList()[pos];
-//			int x = margin + 1 + pos;
-//			g.drawLine(x, heightToUse /2 - s.getMax() / divY, x, heightToUse / 2 - s.getMin() / divY);
-//		}
-
-//		paintProgressPos = currentPos;
-	}
 	@Override
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
@@ -558,19 +511,6 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 	 */
 	public void setSamplesToZoom(int samplesToZoom) {
 		this.samplesToZoom = samplesToZoom;
-	}
-
-	/**
-	 * Sets the number of frames to run before selection point (sets also the song position pointer)
-	 * @param preRunFrames
-	 */
-	public void setPreRunFrames(int preRunFrames) {
-		this.preRunFrames = preRunFrames;
-		long f = selectFrame - preRunFrames;
-		if(f < 0) {
-			f = 0;
-		}
-		Context.setSongPositionPointer(f);
 	}
 
 	@Override

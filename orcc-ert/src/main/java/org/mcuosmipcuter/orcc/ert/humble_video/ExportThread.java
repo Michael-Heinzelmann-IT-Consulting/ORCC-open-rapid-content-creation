@@ -96,9 +96,9 @@ public class ExportThread extends Thread implements PlayPauseStop {
 			renderer.start(audioInput.getAudioInputInfo(), Context.getVideoOutputInfo());
 
 			final Rational framerate = Rational.make(1, framesPerSecond);
-			for(MuxerFormat mf : MuxerFormat.getFormats()) {
+			//for(MuxerFormat mf : MuxerFormat.getFormats()) {
 				//System.err.println(mf.getExtensions() + " | " + mf);
-			}
+			//}
 			String formatName = Context.getExportFileName().endsWith(".mp4") ? "mov" : null;
 			muxer = Muxer.make(Context.getExportFileName(), null, formatName);
 			final Muxer muxerPointer = muxer;

@@ -17,9 +17,7 @@
 */
 package org.mcuosmipcuter.orcc.soundvis.threads;
 
-import java.awt.AlphaComposite;
 import java.awt.Color;
-import java.awt.Composite;
 import java.awt.Graphics2D;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;

@@ -56,7 +56,7 @@ public interface SoundCanvasWrapper extends SoundCanvas, PropertyListener {
 	 */
 	public long getFrameTo();
 	
-	public default DisplayDuration[] getFrameFromTos(){
+	public default DisplayDuration<?>[] getFrameFromTos(){
 		return new DisplayDuration[] {};
 	}
 	

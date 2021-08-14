@@ -19,6 +19,6 @@ module orcc.api {
 	exports org.mcuosmipcuter.orcc.api.util;
 	exports org.mcuosmipcuter.orcc.api.soundvis;
 
-	requires java.desktop;
+	requires transitive java.desktop;
 	
 }

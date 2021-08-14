@@ -26,9 +26,9 @@ module orcc.core {
 	exports org.mcuosmipcuter.orcc.soundvis.model;
 	exports org.mcuosmipcuter.orcc.soundvis;
 
-	requires java.desktop;
+	requires transitive java.desktop;
 	requires java.xml;
-	requires orcc.api;
+	requires transitive orcc.api;
 	opens org.mcuosmipcuter.orcc.soundvis.defaultcanvas;
 	opens org.mcuosmipcuter.orcc.soundvis.effects;
 }

@@ -65,7 +65,7 @@ public class  MappedValue <V extends Comparable<V>> implements Comparable<Mapped
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		MappedValue other = (MappedValue) obj;
+		MappedValue<?> other = (MappedValue<?>) obj;
 		if (factoryClass == null) {
 			if (other.factoryClass != null)
 				return false;
