@@ -149,30 +149,43 @@ public class Main {
 		
 		JMenuBar mb = new JMenuBar();
 		frame.setJMenuBar(mb);
+		
+		JMenuItem openAudio = new JMenuItem("open audio");
 		{
 			mb.add(new JMenu("  "));
 			
 			JMenu fileMenu = new JMenu("File");
 			mb.add(fileMenu);
+			
+			fileMenu.add(openAudio);
+			CallBack openAudioCallback = new CallBack() {
+				public void fileSelected(File file) {
+					try {
+						Context.setAudioFromFile(file.getAbsolutePath());
+					} catch (AppLogicException ex) {
+						throw new RuntimeException(ex);
+					}
+				}
+			};
+			FileDialogActionListener importActionListener 
+				= new FileDialogActionListener(null, openAudioCallback, "open as audio input");
+			openAudio.addActionListener(importActionListener);
+			fileMenu.addSeparator();
+			JMenuItem exit = new JMenuItem("exit");
+			fileMenu.add(exit);
+			exit.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent arg0) {
+					exitRoutine();
+				}
+			});
+		}
+		JMenu sessionMenu = new JMenu("Session");
+		mb.add(sessionMenu);
 			JMenuItem openSession = new JMenuItem("open session");
-			JMenuItem openAudio = new JMenuItem("open audio");
 			JMenuItem saveSessionAs = new JMenuItem("save session as");
 			JMenuItem saveSession = new JMenuItem("save session");
 			{
 				
-				fileMenu.add(openAudio);
-				CallBack openAudioCallback = new CallBack() {
-					public void fileSelected(File file) {
-						try {
-							Context.setAudioFromFile(file.getAbsolutePath());
-						} catch (AppLogicException ex) {
-							throw new RuntimeException(ex);
-						}
-					}
-				};
-				FileDialogActionListener importActionListener 
-					= new FileDialogActionListener(null, openAudioCallback, "open as audio input");
-				openAudio.addActionListener(importActionListener);
 				
 				CallBack openSessionCallback = new CallBack() {
 					Popup popup = null;;
@@ -215,9 +228,9 @@ public class Main {
 
 					}
 				};
-				fileMenu.addSeparator();
+				///fileMenu.addSeparator();
 				
-				fileMenu.add(openSession);
+				sessionMenu.add(openSession);
 				FileDialogActionListener openSessionActionListener = new FileDialogActionListener(null, openSessionCallback, "open session");
 				openSessionActionListener.setFileFilter(new ExtensionsFileFilter(Session.FILE_EXTENSION));
 				openSession.addActionListener(new ActionListener() {				
@@ -238,15 +251,15 @@ public class Main {
 						}
 					}
 				};
-				fileMenu.addSeparator();
-				fileMenu.add(saveSessionAs);
+				sessionMenu.addSeparator();
+				sessionMenu.add(saveSessionAs);
 				FileDialogActionListener saveSessionAsActionListener = new FileDialogActionListener(null, saveSessionAsCallback, "save session");
 				saveSessionAsActionListener.setFileFilter(new ExtensionsFileFilter(Session.FILE_EXTENSION));
 				saveSessionAsActionListener.setForcedExtension(Session.FILE_EXTENSION);
 				saveSessionAs.addActionListener(saveSessionAsActionListener);
 				
-				fileMenu.addSeparator();
-				fileMenu.add(saveSession);
+				sessionMenu.addSeparator();
+				sessionMenu.add(saveSession);
 				saveSession.addActionListener(new ActionListener() {
 					
 					@Override
@@ -264,19 +277,7 @@ public class Main {
 						}
 					}
 				});
-				
-				fileMenu.addSeparator();
-				JMenuItem exit = new JMenuItem("exit");
-				fileMenu.add(exit);
-				exit.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent arg0) {
-						exitRoutine();
-					}
-				});
-			}
-			JMenu sessionMenu = new JMenu("Session");
 			
-			mb.add(sessionMenu);
 			JMenuItem newSession = new JMenuItem("new");
 			newSession.addActionListener(new ActionListener() {
 				@Override
@@ -286,6 +287,7 @@ public class Main {
 					}
 				}
 			});
+			sessionMenu.addSeparator();
 			sessionMenu.add(newSession);
 			JMenuItem showChanges = new JMenuItem("show changes");
 			showChanges.addActionListener(new ActionListener() {
@@ -295,6 +297,7 @@ public class Main {
 				}
 			});
 			Context.addListener(changesBox);
+			sessionMenu.addSeparator();
 			sessionMenu.add(showChanges);
 			
 			final JMenu exportMenu = new JMenu("Export");
@@ -401,6 +404,7 @@ public class Main {
 					}
 				});
 				JMenuItem system = new JMenuItem("system environment");
+				helpMenu.addSeparator();
 				helpMenu.add(system);
 				system.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
@@ -408,6 +412,7 @@ public class Main {
 					}
 				});
 				JMenuItem about = new JMenuItem("about");
+				helpMenu.addSeparator();
 				helpMenu.add(about);
 				about.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {

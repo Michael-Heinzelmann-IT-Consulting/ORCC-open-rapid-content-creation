@@ -169,7 +169,6 @@ public abstract class Context {
 	private static AudioOutputInfo audioOutputInfo = new AudioOutputInfoImpl(AudioLayout.COMPRESSED);
 	private static long songPositionPointer;
 	private static FloatControl volumeControl;
-	private static boolean fullPreRun;
 	
 	/**
 	 * Gets the audio input info object
@@ -441,17 +440,7 @@ public abstract class Context {
 	public static FloatControl getVolumeControl() {
 		return volumeControl;
 	}
-	/**
-	 * Whether a full pre run should precede the playing from song position pointer
-	 * @return the boolean value
-	 */
-	public static boolean isFullPreRun() {
-		return fullPreRun;
-	}
-	public static synchronized void setFullPreRun(boolean fullPreRun) {
-		Context.fullPreRun = fullPreRun;
-		notifyListeners(PropertyName.FullPreRun);
-	}
+
 	public static void canvasPropertyWritten(String name,
 			SoundCanvas soundCanvas) {
 		notifyListeners(PropertyName.SoundCanvasProperty);
