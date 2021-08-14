@@ -51,12 +51,6 @@ public class ExportUtil {
 		} catch (ClassNotFoundException e) {
 			IOUtil.log("Humble Video not installed.");
 		}
-		try {
-			Class.forName("com.xuggle.mediatool.IMediaWriter");
-			return true;
-		} catch (ClassNotFoundException e) {
-			IOUtil.log("Xuggler not installed.");
-		}
 		return false;
 	}
 	
@@ -67,7 +61,6 @@ public class ExportUtil {
 	 */
 	public static PlayPauseStop getExportPlayPause(Renderer renderer) {
 		try {
-			//PlayPauseStop e = (PlayPauseStop) Class.forName("org.mcuosmipcuter.orcc.ert.xuggler.ExportThread").newInstance();
 			PlayPauseStop e = (PlayPauseStop) Class.forName("org.mcuosmipcuter.orcc.ert.humble_video.ExportThread").getDeclaredConstructor().newInstance();
 			for(Field field : e.getClass().getDeclaredFields()) {
 				if(field.isAnnotationPresent(VideoRenderer.class)) {

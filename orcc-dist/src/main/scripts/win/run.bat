@@ -14,4 +14,4 @@ rem = GNU General Public License for more details.
 rem = You should have received a copy of the GNU General Public License
 rem = along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-java -cp orcc-gui-${pom.version}.jar;orcc-core-${pom.version}.jar;orcc-api-${pom.version}.jar;orcc-ert-${pom.version}.jar;slf4j-api-1.6.6.jar;xuggle-xuggler-5.4.jar org.mcuosmipcuter.orcc.gui.Main
+java -cp orcc-gui-${pom.version}.jar;orcc-core-${pom.version}.jar;orcc-api-${pom.version}.jar;orcc-ert-${pom.version}.jar;slf4j-api-1.6.6.jar; org.mcuosmipcuter.orcc.gui.Main

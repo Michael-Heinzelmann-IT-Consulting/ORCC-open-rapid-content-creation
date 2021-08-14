@@ -16,12 +16,11 @@
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 module orcc.ert {
-	exports org.mcuosmipcuter.orcc.ert.xuggler;
+
 	exports org.mcuosmipcuter.orcc.ert.humble_video;
 
 	requires humble.video.noarch;
 	requires java.desktop;
 	requires orcc.api;
-	requires orcc.core;
-	requires xuggle.xuggler;
+	requires transitive orcc.core;
 }
