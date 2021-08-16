@@ -22,6 +22,7 @@
   <id>distribution-linux</id>
   <formats>
     <format>dir</format>
+    <format>jar</format>
   </formats>
   <files>
     <file>
