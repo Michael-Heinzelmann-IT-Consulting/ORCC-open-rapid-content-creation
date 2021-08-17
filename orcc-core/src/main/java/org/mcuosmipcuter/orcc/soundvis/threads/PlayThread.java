@@ -74,6 +74,7 @@ public class PlayThread extends Thread implements PlayPauseStop {
 			renderer.start(audioInput.getAudioInputInfo(), Context.getVideoOutputInfo());
 			AudioFormat format = audioInput.getAudioInputInfo().getAudioFormat();
 			sourceDataLine = AudioSystem.getSourceDataLine(format);
+			IOUtil.log("sourceDataLine: " + sourceDataLine);
 			chunkSize =  format.getFrameSize();
 			samplesPerFrame = (int)format.getSampleRate() / Context.getVideoOutputInfo().getFramesPerSecond();
 			data = new byte[samplesPerFrame * chunkSize];
@@ -85,30 +86,6 @@ public class PlayThread extends Thread implements PlayPauseStop {
 			sourceDataLine.start();
 			ais = audioInput.getAudioStream();
 			
-//			long preRun = 1;
-//			for(SoundCanvasWrapper s : Context.getSoundCanvasList()) {
-//				int f = s.getSoundCanvas() instanceof ExtendedFrameHistory ? ((ExtendedFrameHistory)s.getSoundCanvas()).getCurrentHistoryFrameSize() : 1;
-//				IOUtil.log(s + " getPreRunFrames() = " + f);
-//				if(f > preRun) {
-//					preRun = f;
-//				}
-//			}
-//			
-//			final long frameStart = Context.getSongPositionPointer() - preRun > 0 ? Context.getSongPositionPointer() - preRun : Context.getSongPositionPointer();
-//			
-//			if( frameStart > 0) {	
-//				long byteStart = frameStart * samplesPerFrame * chunkSize;
-//				long count = 0;
-//				while(count < byteStart  && ais.available() > 0) {
-//					int step = count < byteStart - samplesPerFrame * chunkSize ? samplesPerFrame * chunkSize : chunkSize;
-//					long skipped = ais.skip( step);
-//					count += skipped;
-//				}
-//				if(count != byteStart) {
-//					IOUtil.log("WARNING did not reach correct start pos in stream: count " + count + "  vs. " + byteStart + " ");
-//				}
-//				frameCount = count / (samplesPerFrame * chunkSize);
-//			}
 			frameCount = Context.getPreRun(ais, format);
 			final long frameStart = frameCount;
 			ByteArrayLinearDecoder.decodeLinear(ais, new DecodingCallback() {
@@ -126,7 +103,6 @@ public class PlayThread extends Thread implements PlayPauseStop {
 					if(sampleCount % samplesPerFrame == 0){
 						cont = checkState();
 						
-						//renderer.newFrame(frameCount, cont);
 						if(frameCount >= Context.getSongPositionPointer()) {
 							final int avail = sourceDataLine.available();
 							final long start = System.currentTimeMillis();
