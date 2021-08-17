@@ -110,6 +110,7 @@ public abstract class Configuration {
 		}
 		FontStore.init();
 		
+		AudioUtil.checkAudioSystem(); // report installed
 		// set a dummy control to get volume setup
 		FloatControl dummy = AudioUtil.getVolumeControl(null);
 		Context.setVolumeControl(dummy);

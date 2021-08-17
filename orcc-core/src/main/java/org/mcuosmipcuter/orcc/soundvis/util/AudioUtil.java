@@ -3,8 +3,10 @@
  */
 package org.mcuosmipcuter.orcc.soundvis.util;
 
+import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Control;
 import javax.sound.sampled.FloatControl;
+import javax.sound.sampled.Mixer.Info;
 import javax.sound.sampled.SourceDataLine;
 
 import org.mcuosmipcuter.orcc.util.IOUtil;
@@ -51,6 +53,13 @@ public class AudioUtil {
 			}
 		}
 		return vol;
+	}
+	
+	public static void checkAudioSystem() {
+		IOUtil.log("Mixer infos:");
+		for(Info info : AudioSystem.getMixerInfo()) {
+			IOUtil.log(info.getName() + " " + info.getVendor() + " " + info.getVersion() + " " + info.getDescription());
+		}
 	}
 
 }
