@@ -20,6 +20,8 @@ package org.mcuosmipcuter.orcc.soundvis.gui;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
@@ -86,18 +88,28 @@ public class AboutBox {
 			stringBuilder.append("\n");
 			
 			stringBuilder.append("\n");
+			List<String> envList = new ArrayList<>();
 			Map <String, String> envMap = System.getenv();
 			for(Entry<String, String> ee : envMap.entrySet()){
-				stringBuilder.append(ee.getKey() + "=" + ee.getValue());
-				stringBuilder.append("\n");
+				envList.add(ee.getKey() + "=" + ee.getValue());
 			}
-			stringBuilder.append("\n");
-			Properties properties = System.getProperties();
-			for(Entry<Object, Object> pe : properties.entrySet()){
-				stringBuilder.append(pe.getKey() + "=" + pe.getValue());
+			envList.sort(null);
+			for(String s : envList) {
+				stringBuilder.append(s);
 				stringBuilder.append("\n");
 			}
 			
+			stringBuilder.append("\n");
+			List<String> propList = new ArrayList<>();
+			Properties properties = System.getProperties();
+			for(Entry<Object, Object> pe : properties.entrySet()){
+				propList.add(pe.getKey() + "=" + pe.getValue());
+			}
+			propList.sort(null);
+			for(String s : propList) {
+				stringBuilder.append(s);
+				stringBuilder.append("\n");
+			}
 			JTextArea ta = new JTextArea(20, 50);
 			JScrollPane sp = new JScrollPane(ta);
 			ta.setText(stringBuilder.toString());
