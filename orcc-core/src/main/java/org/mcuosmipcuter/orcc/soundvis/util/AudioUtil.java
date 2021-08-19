@@ -3,6 +3,10 @@
  */
 package org.mcuosmipcuter.orcc.soundvis.util;
 
+import javax.sound.midi.MidiDevice;
+import javax.sound.midi.MidiFileFormat;
+import javax.sound.midi.MidiSystem;
+import javax.sound.sampled.AudioFileFormat.Type;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Control;
 import javax.sound.sampled.FloatControl;
@@ -56,8 +60,19 @@ public class AudioUtil {
 	}
 	
 	public static void checkAudioSystem() {
+
+		IOUtil.log("AudioFileTypes:");
+		for(Type type : AudioSystem.getAudioFileTypes()) {
+			IOUtil.log(type.toString() + " " + type.getExtension());
+		}
+		
 		IOUtil.log("Mixer infos:");
 		for(Info info : AudioSystem.getMixerInfo()) {
+			IOUtil.log(info.getName() + " " + info.getVendor() + " " + info.getVersion() + " " + info.getDescription());
+		}
+		
+		IOUtil.log("MIDI device infos:");
+		for(MidiDevice.Info info : MidiSystem.getMidiDeviceInfo()) {
 			IOUtil.log(info.getName() + " " + info.getVendor() + " " + info.getVersion() + " " + info.getDescription());
 		}
 	}
