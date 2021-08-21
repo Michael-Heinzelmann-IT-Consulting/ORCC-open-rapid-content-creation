@@ -22,4 +22,4 @@ then
 echo "setting java preferences to snap $JPREFS"
 fi
 
-java "$JPREFS" -Dorg.mcuosmipcuter.orcc.util.IOUtil.log=true -cp orcc-gui-${pom.version}.jar:orcc-core-${pom.version}.jar:orcc-api-${pom.version}.jar:orcc-ert-${pom.version}.jar:slf4j-api-1.6.6.jar:humble-video-all-0.3.0.jar:humble-video-arch-i686-pc-linux-gnu6-0.3.0.jar:humble-video-arch-x86_64-pc-linux-gnu6-0.3.0.jar:humble-video-noarch-0.3.0.jar org.mcuosmipcuter.orcc.gui.Main;
+java $JPREFS -Dorg.mcuosmipcuter.orcc.util.IOUtil.log=true -cp orcc-gui-${pom.version}.jar:orcc-core-${pom.version}.jar:orcc-api-${pom.version}.jar:orcc-ert-${pom.version}.jar:slf4j-api-1.6.6.jar:humble-video-all-0.3.0.jar:humble-video-arch-i686-pc-linux-gnu6-0.3.0.jar:humble-video-arch-x86_64-pc-linux-gnu6-0.3.0.jar:humble-video-noarch-0.3.0.jar org.mcuosmipcuter.orcc.gui.Main;
