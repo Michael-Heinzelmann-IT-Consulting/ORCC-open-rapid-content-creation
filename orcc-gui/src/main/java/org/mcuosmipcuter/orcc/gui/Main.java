@@ -102,6 +102,7 @@ public class Main {
 	static final int infoH = 200;
 	static final int playBackH = 240;
 	static final int minCells = 3;
+	private static boolean exitCalled;
 	
 	private static ChangsBox changesBox = new ChangsBox();
 	
@@ -118,10 +119,12 @@ public class Main {
 			public void uncaughtException(Thread thread, Throwable t) {
 				System.err.println("UNCAUGHT Exception in " + thread);
 				t.printStackTrace();
-				String msg = t.getClass().getSimpleName() + ": " + t.getMessage();
-				JOptionPane.showConfirmDialog(null, msg, "Error",
-	                    JOptionPane.DEFAULT_OPTION,
-	                    JOptionPane.ERROR_MESSAGE);
+				if(!exitCalled) {
+					String msg = t.getClass().getSimpleName() + ": " + t.getMessage();
+					JOptionPane.showConfirmDialog(null, msg, "Error",
+		                    JOptionPane.DEFAULT_OPTION,
+		                    JOptionPane.ERROR_MESSAGE);
+				}
 			}
 		});
 		
@@ -715,6 +718,7 @@ public class Main {
 		} catch (Throwable t) {
 			t.printStackTrace();
 		}
+		exitCalled = true;
 		System.exit(0);
 	}
 }
