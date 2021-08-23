@@ -1,0 +1,89 @@
+name: soundvis
+base: core18 
+version: 1.2.1-SNAPSHOT
+summary: sound visualizer
+description: |
+ open rapid content creation sound visualization
+grade: devel # must be 'stable' to release into candidate/stable channels
+confinement: strict
+apps:
+  soundvis:
+    extensions:
+      - gnome-3-28
+    command-chain: ["snap/command-chain/alsa-launch"]
+    command: run.sh SNAP
+    environment:
+      JAVA_HOME: $SNAP/usr/lib/jvm/java-11-openjdk-amd64
+      PATH: $JAVA_HOME/jre/bin:$PATH
+      GTK_USE_PORTAL: 1
+    plugs:
+     - home
+#     - desktop
+#     - desktop-legacy
+     - audio-playback
+     - audio-record
+     - alsa
+#     - pulseaudio
+#     - gsettings
+#     - browser-support
+#     - network
+#     - network-bind
+#     - jack1
+parts:
+  soundvis:
+    # See 'snapcraft plugins'
+    plugin: maven
+    source: https://github.com/Michael-Heinzelmann-IT-Consulting/ORCC-open-rapid-content-creation.git
+    source-tag: master
+    maven-targets: 
+       - orcc-dist
+    override-build: |
+      snapcraftctl build
+       unzip -o orcc-dist/target/orcc-*.jar -d $SNAPCRAFT_PART_INSTALL/orcc-dist
+    build-packages:
+      - unzip
+    stage-packages:
+      - openjdk-11-jre
+#      - ca-certificates
+#      - ca-certificates-java
+#      - libpulse0
+#      - libpulsedsp
+#      - libasound2
+    after: [alsa-mixin]
+  alsa-mixin:
+    plugin: dump
+    source: https://github.com/diddlesnaps/snapcraft-alsa.git
+    source-subdir: snapcraft-assets
+    build-packages:
+      - libasound2-dev
+    stage-packages:
+      - libasound2
+      - libasound2-plugins
+      - yad
+    stage:
+      # restrict to only audio-related files - you need to ensure
+      # that gtk3 is staged for yad to work correctly, to prompt
+      # users to connect the alsa plug or proceed with pulseaudio.
+      #
+      # This helps prevent symbol conflicts in situations where
+      # you're using a non-default library, such as those that the
+      # gnome-3-34 extension for core18 provides.
+      - etc/asound.conf
+      - snap/command-chain/alsa-launch
+      - usr/bin/yad*
+      - usr/lib/$SNAPCRAFT_ARCH_TRIPLET/alsa-lib
+      - usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libasound*
+      - usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libdnsfile*
+      - usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libFLAC*
+      - usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libjack*
+      - usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libpulse*
+      - usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libsamplerate*
+      - usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libspeex*
+      - usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libvorbis*
+      - usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio
+
+layout:
+  /usr/lib/$SNAPCRAFT_ARCH_TRIPLET/alsa-lib:
+    bind: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/alsa-lib
+  /usr/share/alsa:
+    bind: $SNAP/usr/share/alsa
