@@ -152,13 +152,16 @@ public class GraphPanel extends JPanel implements Renderer, RealtimeSettings, Li
 	 */
 	public void displayUpdate(boolean prepare) {
 
+		if(Context.getAppState() == AppState.PLAYING) {
+			return; // while playing updates are via newFrame()
+		}
 		soundCanvasArray = Context.getSoundCanvasList().toArray(new SoundCanvasWrapper[0]);
 		if (prepare) {
 			for (SoundCanvas soundCanvas : soundCanvasArray) {
 				soundCanvas.prepare(Context.getAudioInput().getAudioInputInfo(), Context.getVideoOutputInfo());
 			}
 		}
-		if (Context.getAppState() != AppState.INIT && Context.getAppState() != AppState.LOADING && Context.getAppState() != AppState.PLAYING && Context.getAppState() != AppState.EXPORTING) {
+		if (Context.getAppState() != AppState.INIT && Context.getAppState() != AppState.LOADING && Context.getAppState() != AppState.EXPORTING) {
 			
 			AudioInput audioInput = Context.getAudioInput();
 			AudioFormat format = audioInput.getAudioInputInfo().getAudioFormat();
