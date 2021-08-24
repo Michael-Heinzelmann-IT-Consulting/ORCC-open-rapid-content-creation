@@ -107,7 +107,7 @@ public class PlayThread extends Thread implements PlayPauseStop {
 							final int avail = sourceDataLine.available();
 							final long start = System.currentTimeMillis();
 							int written = sourceDataLine.write(data, 0, data.length); // blocks for the time of playing
-							if(avail == 0 || avail > data.length) {
+							if(written != data.length || avail > data.length) {
 								IOUtil.log(avail + " was available,  written: " + written + " in " + (System.currentTimeMillis() - start) + "ms requested:" + data.length);
 							}	
 						}
