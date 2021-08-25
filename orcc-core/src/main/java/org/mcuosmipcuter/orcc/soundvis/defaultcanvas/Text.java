@@ -139,8 +139,10 @@ public class Text implements SoundCanvas, PropertyListener {
 	private Rotator iRotator = new Rotator();
 
 	@NestedProperty(description = "repeating inside from and to")
-
 	private Repeater repeater = new Repeater(fader, mover, shearer, ishearer, rotator, iRotator);
+	
+	@UserProperty(description = "use full text per repeat or repeat per line")
+	private boolean repeatPerLine;
 
 
 	VideoOutputInfo videoOutputInfo;
@@ -239,7 +241,8 @@ public class Text implements SoundCanvas, PropertyListener {
 			int caretColIdx = 0;
 			int completedRowIdx = 0;
 			int len = 0;
-			for (String line : lines) {
+			String[] toDisplay = repeatPerLine ? new String[] {lines[displayUnit.index % lines.length]} : lines;
+			for (String line : toDisplay) {
 
 				int lineLegth = line.length() + 1; // newline char!
 				if (modProgress != 0) {
@@ -299,7 +302,7 @@ public class Text implements SoundCanvas, PropertyListener {
 			}
 			backGround.draw(graphics2d, videoOutputInfo.getWidth(), videoOutputInfo.getHeight(), textColor);
 
-			for (String line : lines) {
+			for (String line : toDisplay) {
 				if (lineIdx >= startIdx && lineIdx < startIdx + linesToUse) {
 					int leftMargin;
 					if (textAlign == TextAlign.LEFT) {
