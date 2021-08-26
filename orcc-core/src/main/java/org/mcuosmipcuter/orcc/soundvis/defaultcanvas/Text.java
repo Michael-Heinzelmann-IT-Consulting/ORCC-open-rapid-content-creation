@@ -141,8 +141,10 @@ public class Text implements SoundCanvas, PropertyListener {
 	@NestedProperty(description = "repeating inside from and to")
 	private Repeater repeater = new Repeater(fader, mover, shearer, ishearer, rotator, iRotator);
 	
-	@UserProperty(description = "use full text per repeat or repeat per line")
-	private boolean repeatPerLine;
+	@UserProperty(description = "use full text per repeat or repeat number of lines")
+	@LimitedIntProperty(description = "not negative", minimum = 0)
+	@NumberMeaning(numbers = 0, meanings = "all")
+	private int linesPerRepeat;
 
 
 	VideoOutputInfo videoOutputInfo;
@@ -156,6 +158,17 @@ public class Text implements SoundCanvas, PropertyListener {
 	private int autoAdjustedFontSize;
 	private Stroke strokeX;
 	private Stroke strokeY;
+	
+	private String[] getLinesToDisplay(final int repeatIndex) {
+		if(linesPerRepeat > 0 && linesPerRepeat < lines.length) {
+			String[] result = new String[linesPerRepeat]; 
+			for(int i = 0; i < linesPerRepeat; i++){
+				result [i] = lines[(repeatIndex * linesPerRepeat + i) % lines.length];
+			}
+			return result;
+		}
+		return lines;
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -241,8 +254,8 @@ public class Text implements SoundCanvas, PropertyListener {
 			int caretColIdx = 0;
 			int completedRowIdx = 0;
 			int len = 0;
-			String[] toDisplay = repeatPerLine ? new String[] {lines[displayUnit.index % lines.length]} : lines;
-			for (String line : toDisplay) {
+			String[] linesToDisplay = getLinesToDisplay(displayUnit.index);
+			for (String line : linesToDisplay) {
 
 				int lineLegth = line.length() + 1; // newline char!
 				if (modProgress != 0) {
@@ -302,7 +315,7 @@ public class Text implements SoundCanvas, PropertyListener {
 			}
 			backGround.draw(graphics2d, videoOutputInfo.getWidth(), videoOutputInfo.getHeight(), textColor);
 
-			for (String line : toDisplay) {
+			for (String line : linesToDisplay) {
 				if (lineIdx >= startIdx && lineIdx < startIdx + linesToUse) {
 					int leftMargin;
 					if (textAlign == TextAlign.LEFT) {
