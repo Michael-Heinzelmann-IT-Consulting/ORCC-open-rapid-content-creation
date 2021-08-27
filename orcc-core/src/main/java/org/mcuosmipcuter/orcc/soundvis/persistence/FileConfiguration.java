@@ -43,7 +43,7 @@ public class FileConfiguration {
 	private static final String userHomeDir = System.getProperty("user.home");
 	private static final String sep = System.getProperty("file.separator");
 	private static final String  tempDir = System.getProperty("java.io.tmpdir");
-	private static final String TARGET_CONF_DIR = userHomeDir + sep + "orcc";
+	private static final String TARGET_CONF_DIR = userHomeDir + sep + ".config";
 	private static final String SOUNDVIS_CONF_DIR = TARGET_CONF_DIR + sep + SOUNDVIS_CONFIG_DIR_NAME;
 	private static final String SOUNDVIS_CONF_FILE = SOUNDVIS_CONF_DIR + sep + SOUNDVIS_PROPERTIES_FILE_NAME;
 	
