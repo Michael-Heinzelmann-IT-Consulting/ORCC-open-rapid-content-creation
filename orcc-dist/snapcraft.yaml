@@ -11,24 +11,15 @@ apps:
     extensions:
       - gnome-3-28
     command-chain: ["snap/command-chain/alsa-launch"]
-    command: run.sh SNAP
+    command: run.sh SNAP $SNAP_USER_COMMON
     environment:
       JAVA_HOME: $SNAP/usr/lib/jvm/java-11-openjdk-amd64
       PATH: $JAVA_HOME/jre/bin:$PATH
       GTK_USE_PORTAL: 1
     plugs:
      - home
-#     - desktop
-#     - desktop-legacy
      - audio-playback
-     - audio-record
      - alsa
-#     - pulseaudio
-#     - gsettings
-#     - browser-support
-#     - network
-#     - network-bind
-#     - jack1
 parts:
   soundvis:
     # See 'snapcraft plugins'
@@ -44,11 +35,6 @@ parts:
       - unzip
     stage-packages:
       - openjdk-11-jre
-#      - ca-certificates
-#      - ca-certificates-java
-#      - libpulse0
-#      - libpulsedsp
-#      - libasound2
     after: [alsa-mixin]
   alsa-mixin:
     plugin: dump
