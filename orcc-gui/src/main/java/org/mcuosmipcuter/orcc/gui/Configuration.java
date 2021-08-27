@@ -41,11 +41,13 @@ public abstract class Configuration {
 	
 	/**
 	 * Initial stage that creates all the basics: look & feel
-	 * @param args you should pass the ones from main
+	 * @param args you should pass the ones from main: install type|sandbox dir
 	 */
 	public static synchronized void init(String[] args) {
 		
-		for(LookAndFeelInfo lfi :UIManager .getInstalledLookAndFeels()) {
+		FileConfiguration.init(args != null && args.length > 1 ? args[1] : null);
+		
+		for(LookAndFeelInfo lfi : UIManager .getInstalledLookAndFeels()) {
 			IOUtil.log(lfi.toString());
 		}
 	

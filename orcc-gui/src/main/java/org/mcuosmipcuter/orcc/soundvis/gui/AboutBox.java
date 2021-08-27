@@ -84,6 +84,8 @@ public class AboutBox {
 			}
 			stringBuilder.append("bootDir=" + FileConfiguration.getBootDir());
 			stringBuilder.append("\n");
+			stringBuilder.append("targetConfDir=" + FileConfiguration.getTargetConfDir());
+			stringBuilder.append("\n");
 			stringBuilder.append("appDir=" + FileConfiguration.getAppDir());
 			stringBuilder.append("\n");
 			

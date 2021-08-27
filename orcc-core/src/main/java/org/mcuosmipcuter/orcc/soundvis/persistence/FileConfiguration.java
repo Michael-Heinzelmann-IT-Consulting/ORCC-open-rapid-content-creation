@@ -37,30 +37,39 @@ public class FileConfiguration {
 	public static final String SOUNDVIS_PROPERTY_LOOK_AND_FEEL = "lookAndFeel";
 	
 	public static final String SOUNDVIS_PROPERTIES_FILE_NAME = "soundvis.properties";
+	private static final String TARGET_CONF_DIR_NAME = ".config";
 	public static final String SOUNDVIS_CONFIG_DIR_NAME = "soundvis";
 	
 	// system settings
 	private static final String userHomeDir = System.getProperty("user.home");
 	private static final String sep = System.getProperty("file.separator");
 	private static final String  tempDir = System.getProperty("java.io.tmpdir");
-	private static final String TARGET_CONF_DIR = userHomeDir + sep + ".config";
-	private static final String SOUNDVIS_CONF_DIR = TARGET_CONF_DIR + sep + SOUNDVIS_CONFIG_DIR_NAME;
-	private static final String SOUNDVIS_CONF_FILE = SOUNDVIS_CONF_DIR + sep + SOUNDVIS_PROPERTIES_FILE_NAME;
-	
+
+	// variable names
+	private static String targetConfDir;
+	private static String soundvisConfFile;
 	private static String bootDir;
 	private static String appDir;
 
 	/**
 	 * 
 	 */
-	public static void init() {
+	public static void init(String sandBoxDir) {
 
 		// current directory
 		bootDir = new File("").getAbsolutePath();
-
-		File targetConfDir = new File(TARGET_CONF_DIR);
-		if(!targetConfDir.exists()) {
-			targetConfDir.mkdir();
+		
+		if(sandBoxDir != null && !sandBoxDir.isEmpty()) {
+			targetConfDir = sandBoxDir + sep + TARGET_CONF_DIR_NAME + sep + SOUNDVIS_CONFIG_DIR_NAME; // sandboxed installation e.g snap
+		}
+		else {
+			targetConfDir = userHomeDir  + sep + TARGET_CONF_DIR_NAME  + sep + SOUNDVIS_CONFIG_DIR_NAME; // old style installation
+		}
+		soundvisConfFile = targetConfDir + sep + SOUNDVIS_PROPERTIES_FILE_NAME;
+		
+		File targetConfDirFile = new File(targetConfDir);
+		if(!targetConfDirFile.exists()) {
+			targetConfDirFile.mkdirs();
 		}
 
 		Properties cp = getProperties();
@@ -76,13 +85,13 @@ public class FileConfiguration {
 
 	public static void ensureAppDir(Supplier<File> appDirUserSupplier) {
 
-		final boolean usrConfigWritable = new File(TARGET_CONF_DIR).canWrite();
+		final boolean usrConfigWritable = new File(targetConfDir).canWrite();
 		if (appDir == null && usrConfigWritable) {
 			// write initial
 			File ad = appDirUserSupplier.get();
 			if(ad != null) {
 				appDir = ad.getAbsolutePath();
-				File soundvisConfDir = new File(SOUNDVIS_CONF_DIR);
+				File soundvisConfDir = new File(targetConfDir);
 				boolean dirCreated = soundvisConfDir.mkdir();
 				IOUtil.log("config dir created: " + dirCreated);
 				
@@ -109,7 +118,7 @@ public class FileConfiguration {
 
 	public static Properties getProperties() {
 		Properties cp = new Properties();
-		File confFile = new File(SOUNDVIS_CONF_FILE);
+		File confFile = new File(soundvisConfFile);
 		final boolean usrConfigExists = userHomeDir != null && confFile.canWrite();
 		if (usrConfigExists) {
 			// load config
@@ -118,18 +127,18 @@ public class FileConfiguration {
 			} catch (IOException e) {
 				IOUtil.log("IOException: " + e.getMessage());
 			}
-			IOUtil.log(cp.size() + " properties loaded from file config: " + SOUNDVIS_CONF_FILE);
+			IOUtil.log(cp.size() + " properties loaded from file config: " + soundvisConfFile);
 		}
 		else {
-			IOUtil.log(SOUNDVIS_CONF_FILE + " does not exist or not writeable, returning empty properties");
+			IOUtil.log(soundvisConfFile + " does not exist or not writeable, returning empty properties");
 		}
 		return cp;
 	}
 	public static void storeProperties(Properties cp) {
-		File config = new File(SOUNDVIS_CONF_FILE);
+		File config = new File(soundvisConfFile);
 		try(FileWriter fw = new FileWriter(config)){
 			cp.store(fw, "GNU General Public License");
-			IOUtil.log("stored " + SOUNDVIS_CONF_FILE);
+			IOUtil.log("stored " + soundvisConfFile);
 		} catch (IOException e) {
 			IOUtil.log("IOException: " + e.getMessage());
 		}
@@ -144,6 +153,10 @@ public class FileConfiguration {
 	}
 	public static String getSep() {
 		return sep;
+	}
+
+	public static String getTargetConfDir() {
+		return targetConfDir;
 	}
 
 }

@@ -128,8 +128,6 @@ public class Main {
 			}
 		});
 		
-		FileConfiguration.init();
-		
 		org.mcuosmipcuter.orcc.gui.Configuration.init(args);
 		
 		final JFrame frame = new JFrame("soundvis");
