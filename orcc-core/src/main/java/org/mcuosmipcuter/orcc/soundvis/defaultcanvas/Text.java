@@ -40,6 +40,7 @@ import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.MappedValue;
 import org.mcuosmipcuter.orcc.api.soundvis.NestedProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.NumberMeaning;
+import org.mcuosmipcuter.orcc.api.soundvis.PropertyGroup;
 import org.mcuosmipcuter.orcc.api.soundvis.PropertyListener;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.Unit;
@@ -74,18 +75,18 @@ public class Text implements SoundCanvas, PropertyListener {
 	private int year = Calendar.getInstance().get(Calendar.YEAR);
 	private String user = System.getProperty("user.name");
 
-	@UserProperty(description = "the font to use")
-	private MappedValue<String> fontName = FontStore.getDefaultFont();
-
 	@ChangesIcon
 	@UserProperty(description = "the text to display")
 	private String text = "ORCC rapid content creation\nfor entertainment, education\nand media production\n" + year
 			+ " " + user + " graphics by soundvis";
 
-	@UserProperty(description = "")
-	@LimitedIntProperty(description = "", minimum = 0)
-	private boolean showMargins;
-
+	//// font
+	@SuppressWarnings("unused") // used by reflection
+	private PropertyGroup fontProps = new PropertyGroup("fontName", "fontSize", "textAlign", "textColor");
+	
+	@UserProperty(description = "the font to use")
+	private MappedValue<String> fontName = FontStore.getDefaultFont();
+	
 	@UserProperty(description = "font size for text in % of video height", unit = Unit.POINTS)
 	@LimitedIntProperty(description = "font size limitation", minimum = 0)
 	@NumberMeaning(numbers = 0, meanings = "auto")
@@ -98,6 +99,10 @@ public class Text implements SoundCanvas, PropertyListener {
 	@UserProperty(description = "text color")
 	private Color textColor = Color.BLACK;
 
+	//// margins
+	@SuppressWarnings("unused") // used by reflection
+	private PropertyGroup margins = new PropertyGroup("leftRightMargin", "topMargin", "bottomAutoMargin", "showMargins");
+	
 	@LimitedIntProperty(description = "50% is center", maximum = 50)
 	@UserProperty(description = "left and right margin of text in % of video width", unit = Unit.PERCENT_VIDEO)
 	int leftRightMargin = 10;
@@ -107,11 +112,22 @@ public class Text implements SoundCanvas, PropertyListener {
 
 	@UserProperty(description = "bottom margin of text in % of video height", unit = Unit.PERCENT_VIDEO)
 	int bottomAutoMargin = 20;
-
+	
+	@UserProperty(description = "display outline")
+	private boolean showMargins;
+	
+	///// text progress
+	@SuppressWarnings("unused") // used by reflection
+	private PropertyGroup progress = new PropertyGroup("typing", "textProgress", "modProgress");
+	
+	@UserProperty(description = "type the text")
+	private boolean typing;
+	
 	@UserProperty(description = "top progress")
 	private TextProgress textProgress = TextProgress.PAGE;
 
-	private boolean typing;
+	////
+
 	@UserProperty(description = "frames per character")
 	@NumberMeaning(numbers = {-1, 0, 1}, meanings = {"slower", "off", "faster"})
 	private int modProgress = 0;
@@ -239,14 +255,12 @@ public class Text implements SoundCanvas, PropertyListener {
 
 			int progessIdx;
 			if (modProgress != 0) {
-				typing = true;
 				if (modProgress > 0) {
 					progessIdx = displayUnit.currentPosition * modProgress; // speedup
 				} else {
 					progessIdx = displayUnit.currentPosition / Math.abs(modProgress); // slowdown
 				}
 			} else {
-				typing = false;
 				progessIdx = text.length();
 			}
 

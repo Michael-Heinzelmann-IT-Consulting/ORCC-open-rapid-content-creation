@@ -20,6 +20,8 @@ package org.mcuosmipcuter.orcc.soundvis.gui.widgets.properties;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.lang.reflect.Field;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -29,6 +31,7 @@ import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.MappedValue;
 import org.mcuosmipcuter.orcc.api.soundvis.NestedProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.NumberMeaning;
+import org.mcuosmipcuter.orcc.api.soundvis.PropertyGroup;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.TimedChange;
 import org.mcuosmipcuter.orcc.api.soundvis.Unit;
@@ -54,15 +57,15 @@ public class PropertyPanelFactory {
 	public static Set<JPanel> getCanvasPanels(SoundCanvasWrapper soundCanvasWrapper)  {
 
 		Set<JPanel> result = new LinkedHashSet<>();
-		
+		Set<String> groupedNames = new HashSet<String>();
 		SoundCanvas soundCanvas = soundCanvasWrapper.getSoundCanvas();
 
 		for(Field field : soundCanvas.getClass().getDeclaredFields()) {
 			
 			field.setAccessible(true);
 			
-			if(field.isAnnotationPresent(UserProperty.class)) {
-				
+			if(field.isAnnotationPresent(UserProperty.class) && !groupedNames.contains(field.getName())) {
+				// if not created for group create top level
 				Object value = getValue(field, soundCanvas);
 				@SuppressWarnings("unchecked")
 				PropertyPanel<Object> c = panelFromFieldType(field, soundCanvasWrapper, soundCanvasWrapper.getSoundCanvas());
@@ -92,6 +95,28 @@ public class PropertyPanelFactory {
 				}
 				result.add(new NestedPropertyPanel(props, soundCanvasWrapper.getDisplayName(), field));
 				
+			}
+			if(PropertyGroup.class.isAssignableFrom(field.getType())){
+				PropertyGroup pg = (PropertyGroup)getValue(field, soundCanvas);
+				Set<PropertyPanel<?>> props  = new LinkedHashSet<>();
+				for(String fieldName : pg.getFieldNames()) {
+					try {
+						Field groupField = soundCanvas.getClass().getDeclaredField(fieldName); // top level field that is grouped
+						if(!groupField.isAnnotationPresent(UserProperty.class)) {
+							throw new RuntimeException("@UserProperty must be set for " + fieldName + " to be in group " + field.getName());
+						}
+						PropertyPanel<?> pp = getAndRemovePanelByName(result, fieldName); // take from top level if already created
+						if(pp == null) {
+							pp = getPropertyPanel(groupField, soundCanvas, soundCanvasWrapper, field.getName());
+						}
+						groupedNames.add(fieldName);
+						props.add(pp);
+					
+					} catch (NoSuchFieldException | SecurityException e) {
+						e.printStackTrace();
+					} 
+				}
+				result.add(new NestedPropertyPanel(props, soundCanvasWrapper.getDisplayName(), field));
 			}
 
 		}
@@ -186,5 +211,16 @@ public class PropertyPanelFactory {
 		}
 	}
 
+	private static PropertyPanel<?> getAndRemovePanelByName(Set<JPanel> result, String name){
+		Iterator<JPanel> iter = result.iterator();
+		while(iter.hasNext()) {
+			JPanel jp = iter.next();
+			if(jp instanceof PropertyPanel && jp.getName().equals(name)) {
+				iter.remove();
+				return (PropertyPanel<?>) jp;
+			}
+		}
+		return null;
+	}
 }
 
