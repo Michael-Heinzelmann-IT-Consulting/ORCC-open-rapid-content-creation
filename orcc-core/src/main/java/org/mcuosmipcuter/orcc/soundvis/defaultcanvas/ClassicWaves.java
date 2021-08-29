@@ -21,7 +21,10 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
+import org.mcuosmipcuter.orcc.api.soundvis.ChangesIcon;
+import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.NumberMeaning;
+import org.mcuosmipcuter.orcc.api.soundvis.PropertyGroup;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.Unit;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
@@ -38,18 +41,32 @@ public class ClassicWaves implements SoundCanvas {
 	public static enum FILL {
 		NONE, TOP, BOTTOM
 	}
+	public static enum BEAM_TYPE{
+		FLAT, ETCHED, RAISED
+	}
 	
+	@ChangesIcon
 	@UserProperty(description="color of the waves")
 	private Color foreGroundColor = Color.BLUE;
+	
+	@ChangesIcon
 	@UserProperty(description="whether to draw filled bottom")
 	private FILL fill = FILL.NONE;
 	
 	@UserProperty(description="whether to draw without margin")
 	private boolean drawMargin = true;
 	
+	///// beams
+	@SuppressWarnings("unused") // used by reflection
+	private PropertyGroup beams = new PropertyGroup("beamWidth", "beamType");
+	
 	@UserProperty(description="beam width of analyzer", unit = Unit.PIXEL)
 	@NumberMeaning(numbers = 0, meanings = "no beam")
+	@LimitedIntProperty(minimum = 0, description = "not negative")
 	private int beamWidth = 0;
+	
+	@UserProperty(description="beam type analyzer")
+	private BEAM_TYPE beamType = BEAM_TYPE.FLAT;
 	
 	// parameters automatically set
 	private float amplitudeDivisor;
@@ -113,8 +130,15 @@ public class ClassicWaves implements SoundCanvas {
 					aMinAmp = amp;
 				}
 				if((x + 1) % beamWidth == 0) {
-					final int rectWidth = getY(aMaxamp - aMinAmp, height / 2 - aMaxamp, height / 2 + aMaxamp);
-					graphics.fillRect(x  + lm - beamWidth + 1, fill == FILL.TOP ? 0 : height / 2 - aMaxamp, beamWidth, rectWidth);
+					int ct = aMaxamp > Math.abs(aMinAmp) ? aMaxamp : aMinAmp;
+					int cb = Math.abs(aMinAmp) > aMaxamp ? aMinAmp : aMaxamp;
+					final int rectHeight = getY(aMaxamp - aMinAmp, height / 2 - ct, height / 2 + cb);
+					if(beamType == BEAM_TYPE.FLAT) {
+						graphics.fillRect(x  + lm - beamWidth + 1, fill == FILL.TOP ? 0 : height / 2 - aMaxamp, beamWidth, rectHeight);
+					}
+					else {
+						graphics.fill3DRect(x  + lm - beamWidth + 1, getY(height / 2 - aMaxamp, 0 , height / 2 - cb), beamWidth, rectHeight, beamType == BEAM_TYPE.RAISED);
+					}
 					aMaxamp = 0;
 					aMinAmp = 0;
 				}
