@@ -157,9 +157,9 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 	}
 	@Override
 	public void setVisible(boolean enabled) {
-		changeSession("enabled", this.enabled, enabled);
+		final boolean oldEnabled = this.enabled;
 		this.enabled = enabled;
-		
+		changeSession("enabled", oldEnabled, enabled);	
 	}
 	@Override
 	public SoundCanvas getSoundCanvas() {
@@ -190,17 +190,19 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 	}
 	@Override
 	public void setFrameFrom(long frameFrom) {
-		changeSession("frameFrom", this.frameFrom, frameFrom);
+		final long oldFrameFrom = this.displayFrameFrom;
 		this.frameFrom = frameFrom;
 		soundCanvas.setFrameRange(frameFrom, calculateFrameToConcrete(frameTo));
+		changeSession("frameFrom", oldFrameFrom, frameFrom);
 	}
 	@Override
 	public void setFrameTo(long frameTo) {
 		this.frameToAuto = frameTo == 0;
 		long newFrameTo = calculateFrameToConcrete(frameTo);
-		changeSession("frameTo", this.frameTo, newFrameTo);
+		final long oldFrameTo = this.frameTo;
 		this.frameTo = newFrameTo;
 		soundCanvas.setFrameRange(frameFrom, this.frameTo);
+		changeSession("frameTo", oldFrameTo, newFrameTo);
 	}
 	private long calculateFrameToConcrete(long to) {
 		long frameToConcrete = to;
@@ -223,8 +225,9 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 	}
 	@Override
 	public void setRepaintThreshold(int repaintThreshold) {
-		changeSession("repaintThreshold", this.repaintThreshold, repaintThreshold);
+		final int oldRepaintThreshold = this.repaintThreshold;
 		this.repaintThreshold = repaintThreshold;
+		changeSession("repaintThreshold", oldRepaintThreshold, repaintThreshold);
 	}
 	@Override
 	public boolean isXor() {
@@ -232,13 +235,15 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 	}
 	@Override
 	public void setXor(boolean xor) {
-		changeSession("xor ", this.xor, xor);
+		final boolean oldXor = this.xor;
 		this.xor = xor;
+		changeSession("xor ", oldXor, xor);
 	}
 	@Override
 	public void setTransparency(int transparency) {
-		changeSession("transparency", this.transparency, transparency);
+		final int oldTransparency = this.transparency;
 		this.transparency = transparency;
+		changeSession("transparency", oldTransparency, transparency);
 	}
 	@Override
 	public int getTransparency() {
