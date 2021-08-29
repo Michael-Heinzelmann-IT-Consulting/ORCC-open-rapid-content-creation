@@ -19,6 +19,7 @@ package org.mcuosmipcuter.orcc.soundvis.persistence;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 import java.util.Map;
 
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
@@ -63,9 +64,10 @@ public class PersistentSoundCanvasWrapper {
 		soundCanvas =  PersistentObject.createTo(sc);
 	}
 	
-	public SoundCanvasWrapper restore() throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, NoSuchFieldException {
+	public SoundCanvasWrapper restore(List<String> reportList) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
 		SoundCanvas sc = (SoundCanvas) soundCanvas.getDelegate().getDeclaredConstructor((Class<?>[])null).newInstance((Object[])null);
 		for(Map.Entry<String, Object> entry : soundCanvas.getPersistentProperties().entrySet()) {
+			try {
 			Field field = sc.getClass().getDeclaredField(entry.getKey());
 			field.setAccessible(true);
 			if(entry.getValue() instanceof PersistentObject) {
@@ -74,6 +76,9 @@ public class PersistentSoundCanvasWrapper {
 			}
 			else {
 				field.set(sc, entry.getValue());
+			}
+			}catch(Exception ex) {
+				reportList.add(ex.getMessage());
 			}
 			
 		}
