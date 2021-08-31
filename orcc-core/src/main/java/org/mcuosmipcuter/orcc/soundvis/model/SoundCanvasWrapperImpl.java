@@ -22,6 +22,10 @@ import java.awt.Color;
 import java.awt.Composite;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Shape;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Area;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.lang.reflect.Field;
 import java.util.HashSet;
@@ -33,9 +37,11 @@ import org.mcuosmipcuter.orcc.api.soundvis.PropertyListener;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.api.util.AmplitudeHelper;
+import org.mcuosmipcuter.orcc.api.util.DimensionHelper;
 import org.mcuosmipcuter.orcc.soundvis.Context;
 import org.mcuosmipcuter.orcc.soundvis.SessionToken;
 import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
+import org.mcuosmipcuter.orcc.soundvis.effects.Positioner;
 
 /**
  * Implementation of a sound canvas wrapper
@@ -55,6 +61,8 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 	private static Graphics2D devNullGraphics;
 	private boolean selected;
 	private boolean editorOpen;
+	private int posX;
+	private int posY;
 	private int repaintThreshold;
 	private boolean thresholdExceeded;
 	protected AmplitudeHelper amplitudeHelper;
@@ -63,6 +71,9 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 	private Image iconImage;
 	int max;
 	int maxBefore;
+	private Shape screen;
+	private DimensionHelper dimensionHelper;
+	Positioner positioner = new Positioner();
 	
 	static {
 		//since this image is for nothing it can be small
@@ -111,14 +122,25 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 				graphics2d.setXORMode(graphics2d.getColor());
 			}
 			Composite origComposite = null;
+
 			if(transparency != 100) {
 				origComposite = graphics2d.getComposite();
 				graphics2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, transparency / 100f));  
+			}
+			if(posX != 0 || posY != 0) {
+				positioner.setCenterX(posX);
+				positioner.setCenterY(posY);
+				Area fillArea = new Area(screen);
+				AffineTransform atp = positioner.position(dimensionHelper, fillArea.getBounds());
+				graphics2d.transform(atp);
 			}
 
 			// draws to the real graphics
 			soundCanvas.newFrame(frameCount, graphics2d);
 			
+			if(posX != 0 || posY != 0) {
+				graphics2d.setTransform(new AffineTransform());
+			}
 			if(transparency != 100) {
 				graphics2d.setComposite(origComposite);
 			}
@@ -144,6 +166,10 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 		soundCanvas.prepare(audioInputInfo, videoOutputInfo);
 		amplitudeHelper = new AmplitudeHelper(audioInputInfo);
 		getFrameFromTos();
+		int width = videoOutputInfo.getWidth();
+		int height = videoOutputInfo.getHeight();
+		screen = new Rectangle2D.Double(0,0,width, height);
+		dimensionHelper = new DimensionHelper(videoOutputInfo);
 	}
 
 	@Override
@@ -218,6 +244,30 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 	@Override
 	public void setSelected(boolean selected) {
 		this.selected = selected;
+	}
+
+	@Override
+	public int getPosX() {
+		return posX;
+	}
+	
+	@Override
+	public void setPosX(int posX) {
+		int oldPosX = this.posX;
+		this.posX = posX;
+		changeSession("posX", oldPosX, posX);
+	}
+	
+	@Override
+	public int getPosY() {
+		return posY;
+	}
+
+	@Override
+	public void setPosY(int posY) {
+		int oldPosY = this.posY;
+		this.posY = posY;
+		changeSession("posY", oldPosY, posY);
 	}
 	@Override
 	public int getRepaintThreshold() {

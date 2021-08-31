@@ -49,4 +49,21 @@ public class Positioner {
 	public AffineTransform position(DimensionHelper dimensionHelper) {
 		return position(dimensionHelper, null);
 	}
+
+	public int getCenterX() {
+		return centerX;
+	}
+
+	public void setCenterX(int centerX) {
+		this.centerX = centerX;
+	}
+
+	public int getCenterY() {
+		return centerY;
+	}
+
+	public void setCenterY(int centerY) {
+		this.centerY = centerY;
+	}
+	
 }

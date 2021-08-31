@@ -102,4 +102,8 @@ public interface SoundCanvasWrapper extends SoundCanvas, PropertyListener {
 	boolean isEditorOpen();
 	void setEditorOpen(boolean editorOpen);
 	boolean isFrameToAuto();
+	int getPosX();
+	void setPosX(int posX);
+	int getPosY();
+	void setPosY(int posY);
 }
