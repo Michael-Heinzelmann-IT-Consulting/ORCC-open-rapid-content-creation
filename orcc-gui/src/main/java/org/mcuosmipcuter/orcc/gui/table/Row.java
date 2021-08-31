@@ -22,7 +22,6 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.util.LinkedHashSet;
 import java.util.Set;
 
 import javax.swing.JPanel;
@@ -85,7 +84,7 @@ public class Row extends JPanel {
 				gc.fill = GridBagConstraints.BOTH;
 				gc.anchor = GridBagConstraints.LINE_START;
 		         gc.weightx = 1;
-				Set<JPanel> nestedProps = new LinkedHashSet<JPanel>();
+
 				int maxCols = soundCanvasWrapper.getSoundCanvas().getEditorColumns();
 				int c = 0;
 				for(final JPanel p : props) {
@@ -99,10 +98,6 @@ public class Row extends JPanel {
 					}
 					gl.setConstraints(p, gc);
 					panel.add(p);
-				}
-				for(final JPanel p : nestedProps) {
-					gc.gridwidth = GridBagConstraints.REMAINDER; //end row
-					panel.add(p, gc);
 				}
 			}
 			int h = headerHeight + panel.getPreferredSize().height;
