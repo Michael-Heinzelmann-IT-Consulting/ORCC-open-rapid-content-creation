@@ -160,7 +160,7 @@ public class PropertyPanelFactory {
 					}
 				}
 				int maximum = l.maximum();
-				if(l.minGetterMethod().length() > 0 ) {
+				if(l.maxGetterMethod().length() > 0 ) {
 					try {
 						maximum = (Integer)valueOwner.getClass().getDeclaredMethod(l.maxGetterMethod()).invoke(valueOwner);
 					} catch (Exception ex) {
