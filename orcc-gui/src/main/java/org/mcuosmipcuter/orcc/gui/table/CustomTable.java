@@ -250,7 +250,7 @@ public class CustomTable extends JPanel implements Context.Listener{
 	 */
 	public void addLayer(final SoundCanvasWrapper soundCanvasWrapper) {
 		final Row row = new Row(soundCanvasWrapper);
-		row.setPreferredSize(new Dimension(640, 64));
+		row.setPreferredSize(new Dimension(640, 92));
 		row.setLayout(new BorderLayout());
 		TitledBorder tb = new TitledBorder(new LineBorder(Color.WHITE, 8));
 		tb.setTitle(soundCanvasWrapper.getDisplayName());
@@ -278,9 +278,6 @@ public class CustomTable extends JPanel implements Context.Listener{
 
 		row.add(layer, BorderLayout.WEST);
 		
-		final JPanel timeline = new JPanel();
-		timeline.setLayout(new GridLayout(1, 0, 6, 6));
-		timeline.setBorder(new LineBorder(timeline.getBackground(), 4));
 		
 		final JCheckBox showCheckBox = new JCheckBox(soundCanvasWrapper.isVisible() ? "on" : "off", soundCanvasWrapper.isVisible());
 		showCheckBox.addActionListener(new ActionListener() {
@@ -356,6 +353,26 @@ public class CustomTable extends JPanel implements Context.Listener{
 			}
 		});
 		
+		SpinnerNumberModel modelPos = new SpinnerNumberModel(100, 0, 100, 1);
+		final JSpinner posX = new JSpinner();
+		posX.setToolTipText("position X");
+		posX.setValue(soundCanvasWrapper.getPosX());		
+		posX.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent arg0) {
+				soundCanvasWrapper.setPosX(((((Number)posX.getValue()).intValue())));
+				Context.touch();
+			}
+		});
+		final JSpinner posY = new JSpinner();
+		posY.setToolTipText("position Y");
+		posY.setValue(soundCanvasWrapper.getPosY());		
+		posY.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent arg0) {
+				soundCanvasWrapper.setPosY(((((Number)posY.getValue()).intValue())));
+				Context.touch();
+			}
+		});
+		
 		SpinnerNumberModel modelThreshold = new SpinnerNumberModel(0, 0, 100, 1);
 		final JSpinner threshold = new JSpinner(modelThreshold);
 		threshold.setToolTipText("repaint threshold");
@@ -375,15 +392,26 @@ public class CustomTable extends JPanel implements Context.Listener{
 				Context.touch();
 			}
 		});
+
 		
-		timeline.add(expandButton);
+		final JPanel timeline = new JPanel();
+		timeline.setLayout(new GridLayout(2, 4, 2, 2));
+		timeline.setBorder(new LineBorder(timeline.getBackground(), 2));
+		
+		
 		timeline.add(showCheckBox);
 		timeline.add(fromFrame);
 		timeline.add(toFrame);
-		timeline.add(transparency);
-		timeline.add(threshold);
 		timeline.add(xorCheckBox);
+		timeline.add(expandButton);
+		timeline.add(posX);
+		timeline.add(posY);
+		timeline.add(transparency);
+		//timeline.add(threshold);
+		
 
+		
+		
 		BufferedImage image = getImage();
 		soundCanvasWrapper.updateUI(120, 30, image.createGraphics());
 		layer.setIcon(new ImageIcon(image));
