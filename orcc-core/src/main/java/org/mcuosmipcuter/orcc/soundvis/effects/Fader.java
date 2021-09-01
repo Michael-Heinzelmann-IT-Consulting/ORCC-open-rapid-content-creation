@@ -56,6 +56,9 @@ public class Fader implements DisplayObject{
 	public Composite fade(Graphics2D graphics2D, DisplayUnit displayUnit) {
 		
 		final Composite saveComposite = graphics2D.getComposite();
+		EffectShape current = effectShaper.getEffectShape();
+		boolean active = current.midValueXPercent != 100 || current.framesIn != 0 || current.framesOut != 0 || current.beginFrames != 0 || current.endFrames != 0;
+		if(active) {
 			effectShaper.currentValues(displayUnit, new Consumer<Float>() {				
 				@Override
 				public void accept(Float transparency) {
@@ -64,7 +67,7 @@ public class Fader implements DisplayObject{
 					
 				}
 			});
-	
+		}
 		return saveComposite;
 	}
 
