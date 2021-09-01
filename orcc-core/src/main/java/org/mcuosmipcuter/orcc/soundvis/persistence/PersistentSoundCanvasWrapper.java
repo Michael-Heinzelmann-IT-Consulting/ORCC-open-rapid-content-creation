@@ -91,6 +91,8 @@ public class PersistentSoundCanvasWrapper {
 		soundCanvasWrapper.setFrameFrom(frameFrom);
 		soundCanvasWrapper.setFrameTo(frameToAuto ? 0 : frameTo);
 		soundCanvasWrapper.setRepaintThreshold(repaintThreshold);
+		soundCanvasWrapper.setPosX(posX);
+		soundCanvasWrapper.setPosY(posY);
 		soundCanvasWrapper.setTransparency(transparency);
 		soundCanvasWrapper.setVisible(visible);
 		soundCanvasWrapper.setXor(xor);
