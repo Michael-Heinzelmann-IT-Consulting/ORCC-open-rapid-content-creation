@@ -92,6 +92,7 @@ public abstract class Configuration {
 		// Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.Image");
 		Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.Pulsating");
 		Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.RotatingAmplitudes");
+		Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.Shutter");
 		Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.SlideShow");
 		Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.SolidColor");
 		Context.addCanvasClassName("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.Text");
