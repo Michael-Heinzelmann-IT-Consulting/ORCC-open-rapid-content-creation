@@ -25,12 +25,14 @@ import java.awt.geom.Point2D;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
 import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
+import org.mcuosmipcuter.orcc.api.soundvis.NestedProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.Unit;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.api.util.AmplitudeHelper;
 import org.mcuosmipcuter.orcc.api.util.DimensionHelper;
+import org.mcuosmipcuter.orcc.soundvis.effects.MovingAverage;
 
 /**
  * @author Michael Heinzelmann
@@ -64,6 +66,9 @@ public class Blinker implements SoundCanvas {
 	@UserProperty(description="distance in %", unit = Unit.PERCENT_OBJECT)
 	private int distance = 50;
 	
+	@NestedProperty(description = "smoothening using moving average")
+	MovingAverage movingAverage = new MovingAverage(1000);
+	
 	private float amplitudeDivisor;
 
 	private AmplitudeHelper amplitude;
@@ -79,6 +84,7 @@ public class Blinker implements SoundCanvas {
 	public void nextSample(int[] amplitudes) {
 
 		int mono = amplitude.getUnSignedMono(amplitudes);
+		mono = movingAverage.average(mono);
 		if(mono > max) {
 			max = mono;
 		}

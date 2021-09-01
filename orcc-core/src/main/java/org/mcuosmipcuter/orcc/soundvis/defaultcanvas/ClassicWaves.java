@@ -23,6 +23,7 @@ import java.awt.Graphics2D;
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
 import org.mcuosmipcuter.orcc.api.soundvis.ChangesIcon;
 import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
+import org.mcuosmipcuter.orcc.api.soundvis.NestedProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.NumberMeaning;
 import org.mcuosmipcuter.orcc.api.soundvis.PropertyGroup;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
@@ -30,6 +31,7 @@ import org.mcuosmipcuter.orcc.api.soundvis.Unit;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.api.util.AmplitudeHelper;
+import org.mcuosmipcuter.orcc.soundvis.effects.MovingAverage;
 
 
 /**
@@ -68,6 +70,14 @@ public class ClassicWaves implements SoundCanvas {
 	@UserProperty(description="beam type analyzer")
 	private BEAM_TYPE beamType = BEAM_TYPE.FLAT;
 	
+	@NestedProperty(description = "smoothening using moving average")
+	MovingAverage movingAverage = new MovingAverage(1000);
+	
+//	@UserProperty(description="smooth", unit = Unit.OTHER)
+//	@NumberMeaning(numbers = 0, meanings = "none")
+//	@LimitedIntProperty(minimum = 0, maximum = 1000, description = "not negative and < 1000")
+//	int smooth = 0;
+	
 	// parameters automatically set
 	private float amplitudeDivisor;
 	private float amplitudeMultiplicator;
@@ -79,6 +89,9 @@ public class ClassicWaves implements SoundCanvas {
 	private int factor;
 	private long samplecount;
 	int max;
+
+//	int[] amps = new int[1000];
+//	int ampsCount;
 	
 	// state
 	private int counterInsideFrame;
@@ -91,6 +104,30 @@ public class ClassicWaves implements SoundCanvas {
 
 		int mono = amplitude.getSignedMono(amplitudes);
 		int amp = amplitudeDivisor > 1 ? (int)(mono / amplitudeDivisor) : (int)(mono * amplitudeMultiplicator);
+		
+		amp = movingAverage.average(amp);
+		
+//		long sum = 0;
+//		if(smooth > 0) {
+//			if(ampsCount < smooth - 1) {
+//				amps[ampsCount] = amp;
+//				ampsCount++;
+//			}
+//			else {
+//				for(int i = 0; i < smooth-1; i++) {
+//					amps[i] = amps[i+1];
+//				}
+//				amps[smooth - 1] = amp;
+//				
+//				for(int i = 0; i < smooth; i++) {
+//					sum += amps[i];
+//					//System.err.println(sum);
+//				}
+//				amp = (int)(sum / smooth);
+//				//System.err.println(sum + ".." + amp);
+//			}
+//		}
+		
 		if(factor == 1 || Math.abs(amp) > Math.abs(max)) {
 			max = amp;
 		}

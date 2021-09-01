@@ -23,11 +23,13 @@ import java.awt.Graphics2D;
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
 import org.mcuosmipcuter.orcc.api.soundvis.ChangesIcon;
 import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
+import org.mcuosmipcuter.orcc.api.soundvis.NestedProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.Unit;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.api.util.AmplitudeHelper;
+import org.mcuosmipcuter.orcc.soundvis.effects.MovingAverage;
 
 /**
  * @author Michael Heinzelmann
@@ -53,6 +55,9 @@ public class GridPulse implements SoundCanvas {
 	@UserProperty(description="y distance from center", unit = Unit.PIXEL)
 	int shiftY = 0;
 	
+	@NestedProperty(description = "smoothening using moving average")
+	MovingAverage movingAverage = new MovingAverage(1000);
+	
 	private int centerX;
 	private int centerY;
 
@@ -64,6 +69,8 @@ public class GridPulse implements SoundCanvas {
 	public void nextSample(int[] amplitudes) {
 
 		int mono = 2 * Math.abs(amplitude.getSignedMono(amplitudes));
+		
+		mono = movingAverage.average(mono);
 		if(mono > max) {
 			max = mono;
 		}

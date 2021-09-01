@@ -26,10 +26,12 @@ import java.util.Deque;
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
 import org.mcuosmipcuter.orcc.api.soundvis.ExtendedFrameHistory;
 import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
+import org.mcuosmipcuter.orcc.api.soundvis.NestedProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.api.util.AmplitudeHelper;
+import org.mcuosmipcuter.orcc.soundvis.effects.MovingAverage;
 
 /**
  * @author Michael Heinzelmann
@@ -74,6 +76,9 @@ public class RotatingAmplitudes implements SoundCanvas, ExtendedFrameHistory {
 	@UserProperty(description="dot size for dot mode for drawing")
 	private int dotSize = 2;
 	
+	@NestedProperty(description = "smoothening using moving average")
+	MovingAverage movingAverage = new MovingAverage(1000);
+	
 	private int centerX;
 	private int centerY;
 
@@ -94,6 +99,7 @@ public class RotatingAmplitudes implements SoundCanvas, ExtendedFrameHistory {
 
 		int mono = amplitude.getSignedMono(amplitudes);
 		int amp = amplitudeDivisor > 1 ? (int)(mono / amplitudeDivisor) : (int)(mono * amplitudeMultiplicator);
+		amp = movingAverage.average(amp);
 		if(Math.abs(amp) > Math.abs(max)) {
 			max = ampMode == AMP_MODE.UNSIGNED ?  Math.abs(amp) : amp;
 		}
