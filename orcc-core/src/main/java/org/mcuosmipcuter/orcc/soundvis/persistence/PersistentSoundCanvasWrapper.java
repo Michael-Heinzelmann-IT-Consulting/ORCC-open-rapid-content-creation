@@ -82,7 +82,7 @@ public class PersistentSoundCanvasWrapper {
 				field.set(sc, entry.getValue());
 			}
 			}catch(Exception ex) {
-				reportList.add(ex.getMessage());
+				reportList.add(sc + ": "+ ex.getMessage());
 			}
 			
 		}
