@@ -128,7 +128,7 @@ public class Session implements Serializable {
 		
 	}
 	private static void setUpApplication(PersistentSession persistentSession, List<String> reportList) throws AppLogicException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, NoSuchFieldException {
-		Context.setOutputDimension(persistentSession.getVideoOutPutWidth(), persistentSession.getVideoOutPutHeight());
+		Context.loadFrameRateAndOutputDimension(persistentSession.getVideoOutPutFrames(), persistentSession.getVideoOutPutWidth(), persistentSession.getVideoOutPutHeight());
 		try {
 			Context.setAudio(persistentSession.getAudioInputType(), persistentSession.getAudioInputName(), persistentSession.getVideoOutPutFrames());
 		} catch (Exception e) {

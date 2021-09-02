@@ -209,6 +209,12 @@ public abstract class Context {
 		videoOutputInfo = newVideoOutputInfo;
 		notifyListeners(PropertyName.VideoDimension);
 	}
+	public static synchronized void loadFrameRateAndOutputDimension(int framesPerSecond, int width, int height) {
+		VideoOutputInfoImpl newVideoOutputInfo = new VideoOutputInfoImpl(framesPerSecond, width, height);
+		changeSession("VideoOutputInfo", videoOutputInfo, newVideoOutputInfo);
+		videoOutputInfo = newVideoOutputInfo;
+		notifyListeners(PropertyName.VideoDimension);
+	}
 	/**
 	 * Sets the target video frame rate and notifies listeners
 	 * @param frameRate the frame rate to use
