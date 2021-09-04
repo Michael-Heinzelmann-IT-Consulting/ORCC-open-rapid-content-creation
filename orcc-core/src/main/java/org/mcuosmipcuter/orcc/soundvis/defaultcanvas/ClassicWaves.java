@@ -73,11 +73,6 @@ public class ClassicWaves implements SoundCanvas {
 	@NestedProperty(description = "smoothening using moving average")
 	MovingAverage movingAverage = new MovingAverage(1000);
 	
-//	@UserProperty(description="smooth", unit = Unit.OTHER)
-//	@NumberMeaning(numbers = 0, meanings = "none")
-//	@LimitedIntProperty(minimum = 0, maximum = 1000, description = "not negative and < 1000")
-//	int smooth = 0;
-	
 	// parameters automatically set
 	private float amplitudeDivisor;
 	private float amplitudeMultiplicator;
@@ -90,9 +85,6 @@ public class ClassicWaves implements SoundCanvas {
 	private long samplecount;
 	int max;
 
-//	int[] amps = new int[1000];
-//	int ampsCount;
-	
 	// state
 	private int counterInsideFrame;
 	private int[] amplitudeBuffer;
@@ -106,27 +98,6 @@ public class ClassicWaves implements SoundCanvas {
 		int amp = amplitudeDivisor > 1 ? (int)(mono / amplitudeDivisor) : (int)(mono * amplitudeMultiplicator);
 		
 		amp = movingAverage.average(amp);
-		
-//		long sum = 0;
-//		if(smooth > 0) {
-//			if(ampsCount < smooth - 1) {
-//				amps[ampsCount] = amp;
-//				ampsCount++;
-//			}
-//			else {
-//				for(int i = 0; i < smooth-1; i++) {
-//					amps[i] = amps[i+1];
-//				}
-//				amps[smooth - 1] = amp;
-//				
-//				for(int i = 0; i < smooth; i++) {
-//					sum += amps[i];
-//					//System.err.println(sum);
-//				}
-//				amp = (int)(sum / smooth);
-//				//System.err.println(sum + ".." + amp);
-//			}
-//		}
 		
 		if(factor == 1 || Math.abs(amp) > Math.abs(max)) {
 			max = amp;
@@ -171,7 +142,7 @@ public class ClassicWaves implements SoundCanvas {
 					int cb = Math.abs(aMinAmp) > aMaxamp ? aMinAmp : aMaxamp;
 					final int rectHeight = getY(aMaxamp - aMinAmp, height / 2 - ct, height / 2 + cb);
 					if(beamType == BEAM_TYPE.FLAT) {
-						graphics.fillRect(x  + lm - beamWidth + 1, fill == FILL.TOP ? 0 : height / 2 - aMaxamp, beamWidth, rectHeight);
+						graphics.fillRect(x  + lm - beamWidth + 1, getY(height / 2 - aMaxamp, 0 , height / 2 - cb), beamWidth, rectHeight);
 					}
 					else {
 						graphics.fill3DRect(x  + lm - beamWidth + 1, getY(height / 2 - aMaxamp, 0 , height / 2 - cb), beamWidth, rectHeight, beamType == BEAM_TYPE.RAISED);
