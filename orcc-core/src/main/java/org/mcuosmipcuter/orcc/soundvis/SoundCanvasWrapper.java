@@ -89,8 +89,6 @@ public interface SoundCanvasWrapper extends SoundCanvas, PropertyListener {
 	 * @param selected true if selected
 	 */
 	public void setSelected(boolean selected);
-	public abstract void setRepaintThreshold(int repaintThreshold);
-	public abstract int getRepaintThreshold();
 	public abstract void setXor(boolean xor);
 	public abstract boolean isXor();
 	public void setTransparency(int transparency);

@@ -63,14 +63,11 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 	private boolean editorOpen;
 	private int posX;
 	private int posY;
-	private int repaintThreshold;
-	private boolean thresholdExceeded;
 	protected AmplitudeHelper amplitudeHelper;
 	private int transparency = 100;
 	private boolean xor;
 	private Image iconImage;
-	int max;
-	int maxBefore;
+
 	private Shape screen;
 	private DimensionHelper dimensionHelper;
 	Positioner positioner = new Positioner();
@@ -87,36 +84,13 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 	@Override
 	public void nextSample(int[] amplitudes) {
 		soundCanvas.nextSample(amplitudes);
-		int mono = amplitudeHelper.getSignedMono(amplitudes);
-		int percent = amplitudeHelper.getSignedPercent(Math.abs(mono));
-		if(percent > max) {
-			max = percent;
-		}
-//		if(repaintThreshold > 0) {
-//			int mono = amplitudeHelper.getSignedMono(amplitudes);
-//			int percent = amplitudeHelper.getSignedPercent(Math.abs(mono));	
-//			if(percent > repaintThreshold) {
-//				thresholdExceeded = true;
-//			}
-//		}
 	}
 
 	@Override
 	public void newFrame(long frameCount, Graphics2D graphics2d) {
-		if((max - maxBefore) > repaintThreshold) {
-			thresholdExceeded = true;
-		}
-		if(
-				(
-						enabled && 
-						frameCount >= Math.min(displayFrameFrom, frameFrom) && (frameCount <= Math.max(displayFrameTo, frameTo) || frameTo <= 0)
-				) 
-				&&
-				(
-						repaintThreshold == 0 || 
-						repaintThreshold > 0 && thresholdExceeded
-				) 
-			)
+
+		if(enabled && frameCount >= Math.min(displayFrameFrom, frameFrom) 
+				&& (frameCount <= Math.max(displayFrameTo, frameTo) || frameTo <= 0))
 		{
 			if(xor) {
 				graphics2d.setXORMode(graphics2d.getColor());
@@ -153,8 +127,6 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 			//limited number of methods, use a dummy graphics object 
 			soundCanvas.newFrame(frameCount, devNullGraphics);
 		}
-		maxBefore = max;
-		max = 0;
 	}
 	private void changeSession(String propertyName, Object oldValue, Object newValue) {
 		Context.changeSession(SessionToken.getSoundCanvasKey(soundCanvas) + "::" + propertyName, oldValue, newValue);
@@ -198,7 +170,6 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 	@Override
 	public void postFrame() {
 		soundCanvas.postFrame();
-		thresholdExceeded = false;
 	}
 	@Override
 	public void updateUI(int width, int height, Graphics2D graphics) {
@@ -269,16 +240,7 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 		this.posY = posY;
 		changeSession("posY", oldPosY, posY);
 	}
-	@Override
-	public int getRepaintThreshold() {
-		return repaintThreshold;
-	}
-	@Override
-	public void setRepaintThreshold(int repaintThreshold) {
-		final int oldRepaintThreshold = this.repaintThreshold;
-		this.repaintThreshold = repaintThreshold;
-		changeSession("repaintThreshold", oldRepaintThreshold, repaintThreshold);
-	}
+	
 	@Override
 	public boolean isXor() {
 		return xor;

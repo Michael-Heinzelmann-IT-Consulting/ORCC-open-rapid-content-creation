@@ -25,6 +25,7 @@ import java.util.Map;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
 import org.mcuosmipcuter.orcc.soundvis.model.SoundCanvasWrapperImpl;
+import org.mcuosmipcuter.orcc.util.IOUtil;
 
 /**
  * Bean conforming class to delegate to/from others that are not
@@ -38,7 +39,7 @@ public class PersistentSoundCanvasWrapper {
 	private boolean frameToAuto;
 	private int posX;
 	private int posY;
-	private int repaintThreshold;
+	private int repaintThreshold; // no longer supported
 	private int transparency;
 	private boolean visible;
 	private boolean xor;
@@ -59,7 +60,6 @@ public class PersistentSoundCanvasWrapper {
 		this.frameToAuto = s.isFrameToAuto();
 		this.posX = s.getPosX();
 		this.posY = s.getPosY();
-		this.repaintThreshold = s.getRepaintThreshold();
 		this.transparency = s.getTransparency();
 		this.visible = s.isVisible();
 		this.xor = s.isXor();
@@ -90,7 +90,6 @@ public class PersistentSoundCanvasWrapper {
 		SoundCanvasWrapper soundCanvasWrapper = new SoundCanvasWrapperImpl(sc);
 		soundCanvasWrapper.setFrameFrom(frameFrom);
 		soundCanvasWrapper.setFrameTo(frameToAuto ? 0 : frameTo);
-		soundCanvasWrapper.setRepaintThreshold(repaintThreshold);
 		soundCanvasWrapper.setPosX(posX);
 		soundCanvasWrapper.setPosY(posY);
 		soundCanvasWrapper.setTransparency(transparency);
@@ -128,6 +127,7 @@ public class PersistentSoundCanvasWrapper {
 	}
 
 	public void setRepaintThreshold(int repaintThreshold) {
+		IOUtil.log("WARNING legacy repaintThreshold: " + repaintThreshold);
 		this.repaintThreshold = repaintThreshold;
 	}
 

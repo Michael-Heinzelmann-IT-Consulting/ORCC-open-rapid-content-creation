@@ -353,7 +353,6 @@ public class CustomTable extends JPanel implements Context.Listener{
 			}
 		});
 		
-		SpinnerNumberModel modelPos = new SpinnerNumberModel(100, 0, 100, 1);
 		final JSpinner posX = new JSpinner();
 		posX.setToolTipText("position X");
 		posX.setValue(soundCanvasWrapper.getPosX());		
@@ -373,16 +372,6 @@ public class CustomTable extends JPanel implements Context.Listener{
 			}
 		});
 		
-		SpinnerNumberModel modelThreshold = new SpinnerNumberModel(0, 0, 100, 1);
-		final JSpinner threshold = new JSpinner(modelThreshold);
-		threshold.setToolTipText("repaint threshold");
-		threshold.setValue(soundCanvasWrapper.getRepaintThreshold());		
-		threshold.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent arg0) {
-				soundCanvasWrapper.setRepaintThreshold(((((Number)threshold.getValue()).intValue())));
-				Context.touch();
-			}
-		});
 		final JCheckBox xorCheckBox = new JCheckBox(soundCanvasWrapper.isXor() ? "xor": "std", soundCanvasWrapper.isXor());
 		xorCheckBox.addActionListener(new ActionListener() {
 			@Override

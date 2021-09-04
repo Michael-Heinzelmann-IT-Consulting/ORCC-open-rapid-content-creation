@@ -127,52 +127,5 @@ public class TestSoundCanvasWrapperImpl extends TestCase {
 		assertNull("expected local null graphics", iterator.next().getArgs()[1]);
 		assertNotNull("expected dummy graphics", iterator.next().getArgs()[1]);
 	}
-	public void testFirstFrameLogic() {
-		
-		soundCanvasWrapperImpl.setRepaintThreshold(10); //  user setting
-		
-		int[] amplitudes = new int[] {((int) Math.pow(2, SAMPLESIZE_BITS)) / 2}; //  amplitude= 0
-		soundCanvasWrapperImpl.nextSample(amplitudes);
-		soundCanvasWrapperImpl.newFrame(1, null);
-		
-		amplitudes = new int[] {(int) Math.pow(2, SAMPLESIZE_BITS)}; // maximum amplitude
-		soundCanvasWrapperImpl.nextSample(amplitudes);
-		soundCanvasWrapperImpl.newFrame(4, null);
-		
-		Iterator<Invocation> iterator = myInvocationHandler.getInvocations(("newFrame")).iterator();
-		assertNotNull("expected dummy graphics", iterator.next().getArgs()[1]);
-		assertNull("expected local null graphics", iterator.next().getArgs()[1]);
-
-	}
-	
-	public void testThresholdExceeded() {
-		
-		int[] amplitudes = new int[] {(int) Math.pow(2, SAMPLESIZE_BITS)}; // maximum amplitude
-		
-		soundCanvasWrapperImpl.setRepaintThreshold(100); // maximum threshold user setting
-		soundCanvasWrapperImpl.nextSample(amplitudes);
-		soundCanvasWrapperImpl.newFrame(5, null);
-		
-		soundCanvasWrapperImpl.setRepaintThreshold(9); // lowering user setting
-		soundCanvasWrapperImpl.nextSample(amplitudes);
-		soundCanvasWrapperImpl.newFrame(6, null);
-		
-		amplitudes = new int[] {((int) Math.pow(2, SAMPLESIZE_BITS)) / 2}; //  amplitude= 0
-		
-		soundCanvasWrapperImpl.nextSample(amplitudes);
-		soundCanvasWrapperImpl.newFrame(7, null);
-		
-		amplitudes = new int[] {((int) Math.pow(2, SAMPLESIZE_BITS)) / 5}; //  amplitude= 20 %
-		
-		soundCanvasWrapperImpl.nextSample(amplitudes);
-		soundCanvasWrapperImpl.newFrame(8, null);
-		
-		
-		Iterator<Invocation> iterator = myInvocationHandler.getInvocations(("newFrame")).iterator();
-		assertNotNull("expected dummy graphics", iterator.next().getArgs()[1]);
-		assertNotNull("expected dummy graphics", iterator.next().getArgs()[1]);
-		assertNotNull("expected dummy graphics", iterator.next().getArgs()[1]);
-		assertNull("expected local null graphics", iterator.next().getArgs()[1]);
-	}
 	
 }
