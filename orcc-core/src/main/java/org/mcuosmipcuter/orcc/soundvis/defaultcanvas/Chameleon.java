@@ -22,12 +22,15 @@ import java.awt.Graphics2D;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
 import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
+import org.mcuosmipcuter.orcc.api.soundvis.NestedProperty;
+import org.mcuosmipcuter.orcc.api.soundvis.PropertyGroup;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.api.util.AmplitudeHelper;
 import org.mcuosmipcuter.orcc.api.util.ColorHelper;
 import org.mcuosmipcuter.orcc.api.util.DimensionHelper;
+import org.mcuosmipcuter.orcc.soundvis.effects.MovingAverage;
 
 /**
  * @author Michael Heinzelmann
@@ -44,6 +47,9 @@ public class Chameleon implements SoundCanvas {
 	@UserProperty(description="base color to add brightness")
 	private Color baseColorForAdding = Color.BLACK;
 	
+	///// colors
+	@SuppressWarnings("unused") // used by reflection
+	private PropertyGroup colors = new PropertyGroup("addRed", "addGreen", "addBlue", "subtractRed", "subtractGreen", "subtractBlue");
 	@UserProperty(description="add brightness to red")
 	private boolean addRed = true;
 	@UserProperty(description="add brightness to green")
@@ -57,22 +63,18 @@ public class Chameleon implements SoundCanvas {
 	private boolean subtractGreen = true;
 	@UserProperty(description="subtract brightness from blue")
 	private boolean subtractBlue = true;
-	
-	@LimitedIntProperty(description="must be inbetween min and max", minimum=0, maximum=100)
-	@UserProperty(description="x start of shape in % of video width")
-	int startX = 0;
-	
+	/////
+
 	@LimitedIntProperty(description="must be inbetween min and max", minimum=0, maximum=100)
 	@UserProperty(description="width of shape in % of video width")
 	int sizeWidh = 100;
 	
 	@LimitedIntProperty(description="must be inbetween min and max", minimum=0, maximum=100)
-	@UserProperty(description="y start of shape in % of video height")
-	int startY = 0;
-	
-	@LimitedIntProperty(description="must be inbetween min and max", minimum=0, maximum=100)
 	@UserProperty(description="height of shape in % of video height")
 	int sizeHeight = 100;
+	
+	@NestedProperty(description = "smoothening using moving average")
+	MovingAverage movingAverage = new MovingAverage(1000);
 	
 	private AmplitudeHelper amplitude;
 	private DimensionHelper dimensionHelper;
@@ -89,6 +91,7 @@ public class Chameleon implements SoundCanvas {
 	public void nextSample(int[] amplitudes) {
 
 		int mono = amplitude.getSignedMono(amplitudes);
+		mono = movingAverage.average(mono);
 		if(mono > max) {
 			max = mono;
 		}
@@ -116,18 +119,37 @@ public class Chameleon implements SoundCanvas {
 		
 		graphics2D.setColor(baseColorForAdding);
 		ColorHelper.setColorFromPercentNoClipping(r, g, b, graphics2D);
-		int x = dimensionHelper.realX(startX);
-		int y = dimensionHelper.realX(startY);
+		
 		int w = dimensionHelper.realX(sizeWidh);
 		int h = dimensionHelper.realY(sizeHeight);
 		
-		//graphics2D.fillRect(dimensionHelper.realX(startX), dimensionHelper.realX(startY), dimensionHelper.realX(sizeWidh), dimensionHelper.realY(sizeHeight));
+		int x = 0;
+		int y = 0;
+		int radius = 0;
+		
 		switch(drawMode) {
 		case CIRCLE:
-			graphics2D.fillOval(x, y, Math.min(w, h), Math.min(w, h));
+		case SQARE:
+			radius = Math.min(w, h);
+			x = (dimensionHelper.getVideoWidth() - radius) / 2;
+			y = (dimensionHelper.getVideoHeight() - radius) / 2;
+			break;
+		case ELLIPSE:
+		case RECTANGLE:
+			x = (dimensionHelper.getVideoWidth() - w) / 2;
+			y = (dimensionHelper.getVideoHeight() - h) / 2;
+			break;
+		default:
+			
+		}
+		
+		switch(drawMode) {
+		case CIRCLE:
+			graphics2D.fillOval(x, y, radius, radius);
 			break;
 		case SQARE:
-			graphics2D.fillRect(x, y, Math.min(w, h), Math.min(w, h));
+			radius = Math.min(w, h);
+			graphics2D.fillRect(x, y, radius, radius);
 			break;
 		case ELLIPSE:
 			graphics2D.fillOval(x, y, w, h);
