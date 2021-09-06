@@ -21,6 +21,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
+import org.mcuosmipcuter.orcc.api.soundvis.ChangesIcon;
 import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.NestedProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.PropertyGroup;
@@ -41,26 +42,34 @@ public class Chameleon implements SoundCanvas {
 		CIRCLE, SQARE, RECTANGLE, ELLIPSE
 	}
 	
+	@ChangesIcon
 	@UserProperty(description="mode of fill")
 	DRAW_MODE drawMode = DRAW_MODE.CIRCLE;
 
+	@ChangesIcon
 	@UserProperty(description="base color to add brightness")
 	private Color baseColorForAdding = Color.BLACK;
 	
 	///// colors
 	@SuppressWarnings("unused") // used by reflection
 	private PropertyGroup colors = new PropertyGroup("addRed", "addGreen", "addBlue", "subtractRed", "subtractGreen", "subtractBlue");
+	@ChangesIcon
 	@UserProperty(description="add brightness to red")
 	private boolean addRed = true;
+	@ChangesIcon
 	@UserProperty(description="add brightness to green")
 	private boolean addGreen = true;
+	@ChangesIcon
 	@UserProperty(description="add brightness to blue")
 	private boolean addBlue = true;
 	
+	@ChangesIcon
 	@UserProperty(description="subtract brightness from red")
 	private boolean subtractRed = true;
+	@ChangesIcon
 	@UserProperty(description="subtract brightness from green")
 	private boolean subtractGreen = true;
+	@ChangesIcon
 	@UserProperty(description="subtract brightness from blue")
 	private boolean subtractBlue = true;
 	/////
@@ -74,7 +83,7 @@ public class Chameleon implements SoundCanvas {
 	int sizeHeight = 100;
 	
 	@NestedProperty(description = "smoothening using moving average")
-	MovingAverage movingAverage = new MovingAverage(1000);
+	MovingAverage movingAverage = new MovingAverage(1200);
 	
 	private AmplitudeHelper amplitude;
 	private DimensionHelper dimensionHelper;
@@ -109,16 +118,7 @@ public class Chameleon implements SoundCanvas {
 		
 		int ma = amplitude.getSignedPercent(max);
 		int mi = amplitude.getSignedPercent(min);
-		int r = addRed ? ma : 0;
-		int g = addGreen ?  ma : 0;
-		int b = addBlue ?  ma : 0;
-		
-		r = subtractRed ? r + mi : r;
-		g = subtractGreen ? g + mi : g;
-		b = subtractBlue ? b + mi : b;
-		
-		graphics2D.setColor(baseColorForAdding);
-		ColorHelper.setColorFromPercentNoClipping(r, g, b, graphics2D);
+		setColors(graphics2D, ma,  mi);
 		
 		int w = dimensionHelper.realX(sizeWidh);
 		int h = dimensionHelper.realY(sizeHeight);
@@ -165,6 +165,18 @@ public class Chameleon implements SoundCanvas {
 //		TextHelper.writeText(r + " " + g + " " + b, graphics2D, 120, Color.BLUE, 600, 500);
 	}
 
+	private void setColors(Graphics2D graphics2D, int ma, int mi) {
+		int r = addRed ? ma : 0;
+		int g = addGreen ?  ma : 0;
+		int b = addBlue ?  ma : 0;
+		
+		r = subtractRed ? r + mi : r;
+		g = subtractGreen ? g + mi : g;
+		b = subtractBlue ? b + mi : b;
+		
+		graphics2D.setColor(baseColorForAdding);
+		ColorHelper.setColorFromPercentNoClipping(r, g, b, graphics2D);
+	}
 	/* (non-Javadoc)
 	 * @see org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas#prepare(org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo, org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo, java.awt.Graphics2D, org.mcuosmipcuter.orcc.api.soundvis.CanvasBackGround)
 	 */
@@ -183,8 +195,27 @@ public class Chameleon implements SoundCanvas {
 	}
 
 	@Override
-	public void updateUI(int width, int height, Graphics2D graphics) {
-		// TODO Auto-generated method stub
+	public void updateUI(int w, int h, Graphics2D graphics2D) {
+		setColors(graphics2D, 50, 50);
+		int radius = Math.min(w, h);
+		int x = (w - radius) / 2;
+		int y = (h - radius) / 2;
+		switch(drawMode) {
+		case CIRCLE:
+			graphics2D.fillOval(x, y, radius, radius);
+			break;
+		case SQARE:
+			radius = Math.min(w, h);
+			graphics2D.fillRect(x, y, radius, radius);
+			break;
+		case ELLIPSE:
+			graphics2D.fillOval(0, 0, w, h);
+			break;
+		case RECTANGLE:
+			graphics2D.fillRect(0, 0, w, h);
+			break;
+		default:
+		}
 		
 	}
 
