@@ -23,6 +23,7 @@ import java.awt.Composite;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.image.BufferedImage;
@@ -119,12 +120,9 @@ public class GraphPanel extends JPanel implements Renderer, RealtimeSettings, Li
 		}
 
 		if(PropertyName.VideoDimension.equals(propertyName)) {
-			if(autoZoom) {
-				setZoomFactor(0.0f); // adapt to new size
-			}
-			displayUpdate(true);
+			setZoomFactor(autoZoom ? 0.0f : zoomFactor);
 		}
-		if(PropertyName.SessionChanged.equals(propertyName)) {
+		if(PropertyName.SessionChanged.equals(propertyName) || PropertyName.VideoDimension.equals(propertyName)) {
 			frameImage = new BufferedImage(Context.getVideoOutputInfo().getWidth(), Context.getVideoOutputInfo().getHeight(), BufferedImage.TYPE_3BYTE_BGR);
 			graphics = frameImage.createGraphics();
 			displayUpdate(true);
@@ -185,7 +183,6 @@ public class GraphPanel extends JPanel implements Renderer, RealtimeSettings, Li
 								}
 							}
 							if(fn >= Context.getSongPositionPointer()) {
-								//mixin.newFrame(Context.getSongPositionPointer(), false);
 								return false;
 							}
 							frameCount++;
@@ -209,14 +206,16 @@ public class GraphPanel extends JPanel implements Renderer, RealtimeSettings, Li
 		graphics = frameImage.createGraphics();
 		if(Context.getAppState() == AppState.EXPORTING) {
 			reductionModulus = 1; // always use original frame rate
+			graphics.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+			graphics.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
+			graphics.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
 		}
 		else {
 			reductionModulus = backupReductionModulus; // reset
+			graphics.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_SPEED);
+			graphics.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_SPEED);
+			graphics.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_SPEED);
 		}
-		//graphics.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-		//graphics.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_SPEED);
-		//graphics.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_SPEED);
-		//graphics.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_SPEED);
 		
 		soundCanvasArray = Context.getSoundCanvasList().toArray(new SoundCanvasWrapper[0]);
 		for(SoundCanvas soundCanvas : soundCanvasArray) {
@@ -319,8 +318,6 @@ public class GraphPanel extends JPanel implements Renderer, RealtimeSettings, Li
 		else {
 			this.zoomFactor = zoomFactor;
 			autoZoom = false;
-			//setBackground(Color.GREEN);
-			//setBorder(new EtchedBorder());
 			
 			int w = (int)((float)Context.getVideoOutputInfo().getWidth() * zoomFactor);
 			int h = (int)((float)Context.getVideoOutputInfo().getHeight() * zoomFactor);
