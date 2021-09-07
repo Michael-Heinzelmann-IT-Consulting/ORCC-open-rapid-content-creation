@@ -143,7 +143,13 @@ public class Main {
 		final JDesktopPane deskTop = new JDesktopPane();
 		final JInternalFrame playBackFrame = new JInternalFrame("Audio Timeline");
 		final GraphicsJInternalFrame graphicFrame = new GraphicsJInternalFrame("Video", true, false, false, false);
-		final GraphPanel graphicPanel = new GraphPanel();
+		final GraphPanel graphicPanel = new GraphPanel(new Supplier<Dimension>() {
+			@Override
+			public Dimension get() {
+				IOUtil.log("graphicFrame.getContentPane().getSize() -- " + graphicFrame.getContentPane().getSize());
+				return graphicFrame.getContentPane().getSize();
+			}
+		});
 
 		
 		org.mcuosmipcuter.orcc.gui.Configuration.stage1(args);

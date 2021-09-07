@@ -30,6 +30,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.function.Supplier;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -82,12 +83,13 @@ public class GraphPanel extends JPanel implements Renderer, RealtimeSettings, Li
 	private String updateString;
 	JPanel popUpContentPanel;
 	Popup popup;
+	private final Supplier<Dimension> sizeSupplier;
 	
 	/**
 	 * Constructor, adds the mouse drag handling for the back ground image
 	 */
-	public GraphPanel() {
-		
+	public GraphPanel(Supplier<Dimension> sizeSupplier) {
+		this.sizeSupplier =  sizeSupplier;
 		setBackground(Color.LIGHT_GRAY);
 		drawDefaultBackGround();
 		
@@ -304,6 +306,8 @@ public class GraphPanel extends JPanel implements Renderer, RealtimeSettings, Li
 	@Override
 	public synchronized void setZoomFactor(final float zoomFactor) {
 		if(zoomFactor == 0.0f) {
+			Dimension outerDimension = sizeSupplier.get();
+			setSize(outerDimension);
 			int panelW = getWidth();
 			int panelH = getHeight();
 			int width = Context.getVideoOutputInfo().getWidth();
