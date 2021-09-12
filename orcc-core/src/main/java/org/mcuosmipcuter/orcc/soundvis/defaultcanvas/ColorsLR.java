@@ -22,6 +22,7 @@ import java.awt.Graphics2D;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
 import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
+import org.mcuosmipcuter.orcc.api.soundvis.NumberMeaning;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
@@ -35,12 +36,15 @@ public class ColorsLR implements SoundCanvas {
 	
 	@LimitedIntProperty(minimum=-1, maximum=255, description="-1 means red is automatic")
 	@UserProperty(description="RGB value 0-255 for red if -1 the amplitude min-max color is used")
+	@NumberMeaning(numbers = -1, meanings = "off")
 	int fixedRed = -1;
 	@LimitedIntProperty(minimum=-1, maximum=255, description="-1 means green is automatic")
 	@UserProperty(description="RGB value 0-255 for green if -1 the amplitude min-max color is used")
+	@NumberMeaning(numbers = -1, meanings = "off")
 	int fixedGreen = -1;
 	@LimitedIntProperty(minimum=-1, maximum=255, description="-1 means blue is automatic")
 	@UserProperty(description="RGB value 0-255 for blue if -1 the amplitude min-max color is used")
+	@NumberMeaning(numbers = -1, meanings = "off")
 	int fixedBlue = -1;
 	
 	private int centerX;

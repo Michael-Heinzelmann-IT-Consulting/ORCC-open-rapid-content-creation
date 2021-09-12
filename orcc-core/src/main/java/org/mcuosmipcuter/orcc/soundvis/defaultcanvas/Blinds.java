@@ -33,6 +33,7 @@ import org.mcuosmipcuter.orcc.api.soundvis.DisplayDuration;
 import org.mcuosmipcuter.orcc.api.soundvis.DisplayUnit;
 import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.NestedProperty;
+import org.mcuosmipcuter.orcc.api.soundvis.PropertyGroup;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
@@ -55,7 +56,14 @@ public class Blinds implements SoundCanvas {
 	public static enum OPEN_CLOSE {
 		OPEN_IN_CLOSE_OUT, CLOSE_IN_OPEN_OUT,
 	}
+	///// vertical
+	@SuppressWarnings("unused") // used by reflection
+	private PropertyGroup vertical = new PropertyGroup("numberVertical", "colorVertical", "bladeShapeVertical", "openCloseVertical");
+	///// horizontal
+	@SuppressWarnings("unused") // used by reflection
+	private PropertyGroup horizontal = new PropertyGroup("numberHorizontal", "colorHorizontal", "bladeShapeHorizontal", "openCloseHorizontal");
 	
+
 	@NestedProperty(description = "x and y position")
 	Positioner positioner = new Positioner();
 
@@ -96,7 +104,6 @@ public class Blinds implements SoundCanvas {
 	private OPEN_CLOSE openCloseHorizontal = OPEN_CLOSE.OPEN_IN_CLOSE_OUT;
 	@UserProperty(description = "opening of the horizontal blades")
 	private OPEN_CLOSE openCloseVertical = OPEN_CLOSE.OPEN_IN_CLOSE_OUT;
-	
 
 	Shape screen;
 
@@ -108,8 +115,6 @@ public class Blinds implements SoundCanvas {
 	@Override
 	public void newFrame(long frameCount, Graphics2D graphics2D) {
 		
-//		int posInSlideDuration = repeater.repeat(frameFrom, frameTo, frameCount);
-//		int repeatDurationFrames = repeater.getRepeatDurationFrames(frameFrom, frameTo);
 		for(DisplayUnit displayUnit : repeater.repeat(frameFrom, frameTo, frameCount)) {
 		
 		Area fillArea = new Area(screen);
@@ -186,10 +191,6 @@ public class Blinds implements SoundCanvas {
 			transform.translate(maxBladeWidth, 0);
 			bladeAreaVertical.transform(transform);
 		}
-		
-		
-		//graphics2D.setColor(Color.RED);
-		//graphics2D.draw(outlineScPos);
 
 		graphics2D.setClip(null);
 		graphics2D.setComposite(saveComposite);

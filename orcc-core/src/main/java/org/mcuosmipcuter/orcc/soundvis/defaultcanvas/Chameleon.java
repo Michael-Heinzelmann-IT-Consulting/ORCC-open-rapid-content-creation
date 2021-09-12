@@ -26,6 +26,7 @@ import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.NestedProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.PropertyGroup;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
+import org.mcuosmipcuter.orcc.api.soundvis.Unit;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.api.util.AmplitudeHelper;
@@ -75,11 +76,11 @@ public class Chameleon implements SoundCanvas {
 	/////
 
 	@LimitedIntProperty(description="must be inbetween min and max", minimum=0, maximum=100)
-	@UserProperty(description="width of shape in % of video width")
+	@UserProperty(description="width of shape in % of video width", unit = Unit.PERCENT_VIDEO)
 	int sizeWidh = 100;
 	
 	@LimitedIntProperty(description="must be inbetween min and max", minimum=0, maximum=100)
-	@UserProperty(description="height of shape in % of video height")
+	@UserProperty(description="height of shape in % of video height", unit = Unit.PERCENT_VIDEO)
 	int sizeHeight = 100;
 	
 	@NestedProperty(description = "smoothening using moving average")

@@ -28,6 +28,7 @@ import org.mcuosmipcuter.orcc.api.soundvis.ExtendedFrameHistory;
 import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.NestedProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
+import org.mcuosmipcuter.orcc.api.soundvis.Unit;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.api.util.AmplitudeHelper;
@@ -47,20 +48,20 @@ public class RotatingAmplitudes implements SoundCanvas, ExtendedFrameHistory {
 		SIGNED, UNSIGNED
 	}
 	
-	@UserProperty(description="degrees per frame speed")
+	@UserProperty(description="degrees per frame speed", unit = Unit.DEGREES_PER_FRAME)
 	private int degreesPerFrame = 30;
 	@UserProperty(description="foreground color")
 	private Color foreGround = Color.BLACK;
 	@LimitedIntProperty(description="size must be greater zero", minimum=1)
 	@UserProperty(description="frames to keep")
 	int size = 360;
-	@UserProperty(description="x distance from center")
+	@UserProperty(description="x distance from center", unit = Unit.PIXEL)
 	int shiftX = 0;
-	@UserProperty(description="y distance from center")
+	@UserProperty(description="y distance from center", unit = Unit.PIXEL)
 	int shiftY = 0;
 	
 	@LimitedIntProperty(description="limits for zoom", minimum=1)
-	@UserProperty(description="amp zoom in %")
+	@UserProperty(description="amp zoom in %", unit = Unit.PERCENT_OBJECT)
 	int ampZoom = 100;
 	
 	@UserProperty(description="first polygon from center")
@@ -73,7 +74,7 @@ public class RotatingAmplitudes implements SoundCanvas, ExtendedFrameHistory {
 	private AMP_MODE ampMode = AMP_MODE.UNSIGNED;
 	
 	@LimitedIntProperty(description="limits for dot size", minimum=2, stepSize= 2)
-	@UserProperty(description="dot size for dot mode for drawing")
+	@UserProperty(description="dot size for dot mode for drawing", unit = Unit.PIXEL)
 	private int dotSize = 2;
 	
 	@NestedProperty(description = "smoothening using moving average")
