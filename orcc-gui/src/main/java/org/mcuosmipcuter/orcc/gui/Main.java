@@ -696,9 +696,9 @@ public class Main {
 
 		try {
 			SessionToken st = Context.getSessionToken();
-			if (st.isDefault()) {
-				Session.saveDefaultSession();
-			} else if (st.needsSave()) {
+
+			Session.saveDefaultSession();
+			 if (st.needsSave()) {
 				int res = JOptionPane.showOptionDialog(null,
 						"save named session " + Context.getSessionToken().getFullPath(), "Do you want to save ?",
 						JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null,
@@ -712,7 +712,7 @@ public class Main {
 					}
 				}
 				if (res == JOptionPane.NO_OPTION) {
-					Session.saveDefaultSession();
+					// nothing
 				}
 				if (res == JOptionPane.CANCEL_OPTION) {
 					return;
