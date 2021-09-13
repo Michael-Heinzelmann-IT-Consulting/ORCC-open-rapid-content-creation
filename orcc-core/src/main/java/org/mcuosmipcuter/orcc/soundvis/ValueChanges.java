@@ -17,6 +17,8 @@
 */
 package org.mcuosmipcuter.orcc.soundvis;
 
+import java.util.Arrays;
+
 /**
  * @author Michael Heinzelmann
  */
@@ -37,6 +39,9 @@ public class  ValueChanges  {
 		if(original == null) {
 			return current != null;
 		}
+		if(original.getClass().isArray()) {
+			return !handleArrays();
+		}
 		boolean result= !original.equals(current);
 		return result;
 	}
@@ -45,4 +50,9 @@ public class  ValueChanges  {
 		return "ValueChanges [o=" + original +  " c=" + current + " changed=" + isLogicallyChanged() + "]";
 	}
 	
+	private boolean handleArrays() {
+		Object[] currArr = (Object[])current;
+		Object[] origArr = (Object[])original;
+		return Arrays.equals(currArr, origArr);
+	}
 }

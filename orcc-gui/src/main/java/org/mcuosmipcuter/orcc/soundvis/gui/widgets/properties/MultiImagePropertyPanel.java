@@ -318,7 +318,7 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 			public void actionPerformed(ActionEvent e) {
 				Key oldKey = slide.getKey();
 				Key newKey = oldKey.rotateClockWise();
-				updateSlideImage(slide, newKey);
+				updateSlideImage(slide, oldKey, newKey);
 				imagePanel.repaint();
 			}
 		});
@@ -333,7 +333,7 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 			public void actionPerformed(ActionEvent e) {
 				Key oldKey = slide.getKey();
 				Key newKey = oldKey.mirrorY();
-				updateSlideImage(slide, newKey);
+				updateSlideImage(slide, oldKey, newKey);
 				imagePanel.repaint();
 			}
 		});
@@ -383,14 +383,14 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 		}
 		
 	}
-	private void updateSlideImage(Slide slide, Key newKey) {
+	private void updateSlideImage(Slide slide, Key oldKey, Key newKey) {
 		BufferedImage newImage = ImageStore.transformImage(newKey);	
 		slide.setImage(newKey, newImage);
 		JButton ib = (JButton) jbuttons.toArray()[slide.getPosition() - 1];
 		ib.setIcon(new ImageIcon(ImageStore.getOrLoadScaledImage(slide.getKey(), 80, 80)));
 		ib.setSelectedIcon(new ImageIcon(ImageStore.getOrLoadScaledImage(slide.getKey(), 60, 60)));
 		Context.setSongPositionPointer(Context.getSongPositionPointer());
-		// TODO Context.touchSession();
+		changeSession(slide.getDisplayKey(), oldKey, newKey);
 	}
 	
 	private void removeSlide(Slide slide) {
@@ -545,11 +545,11 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 
 				ib.setBackground(Color.YELLOW);
 				ib.setBorder(new LineBorder(Color.BLACK, 2));
-				ImageIcon icon = new ImageIcon(ImageStore.getOrLoadScaledImage(slide.getKey().toOriginal(), 80, 80));
+				ImageIcon icon = new ImageIcon(ImageStore.getOrLoadScaledImage(slide.getKey(), 80, 80));
 				ib.setPreferredSize(new Dimension(80, 80));
 				ib.setIcon(icon);
 
-				ib.setSelectedIcon(new ImageIcon(ImageStore.getOrLoadScaledImage(slide.getKey().toOriginal(), 60, 60)));
+				ib.setSelectedIcon(new ImageIcon(ImageStore.getOrLoadScaledImage(slide.getKey(), 60, 60)));
 				if (col == COLS) {
 					gc.gridwidth = GridBagConstraints.REMAINDER; // end row
 					col = 0;

@@ -128,7 +128,8 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 			soundCanvas.newFrame(frameCount, devNullGraphics);
 		}
 	}
-	private void changeSession(String propertyName, Object oldValue, Object newValue) {
+	@Override
+	public void changeSession(String propertyName, Object oldValue, Object newValue) {
 		Context.changeSession(SessionToken.getSoundCanvasKey(soundCanvas) + "::" + propertyName, oldValue, newValue);
 	}
 

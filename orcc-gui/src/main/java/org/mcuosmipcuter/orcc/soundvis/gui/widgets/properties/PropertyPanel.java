@@ -104,6 +104,9 @@ public abstract  class PropertyPanel <T> extends JPanel implements EditorLifeCyc
 		gc.gridwidth = GridBagConstraints.REMAINDER; //end row
 		add(c, BorderLayout.EAST);
 	}
+	protected void changeSession(String propertyName, Object oldValue, Object newValue) {
+		soundCanvasWrapper.changeSession(name + "::" + propertyName, oldValue, newValue);
+	}
 	@Override
 	public void activate() {
 		// for setup listeners etc.
