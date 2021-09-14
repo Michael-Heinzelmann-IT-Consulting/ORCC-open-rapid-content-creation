@@ -210,31 +210,36 @@ public class Text implements SoundCanvas, PropertyListener {
 			if (autoAdjustedFontSize == 0) {
 				int currFontSize = font.getSize();
 				Font scaledFont = font;
+				String prevMsg = "";
 				while ((currFontSize += 1) > 0) {
 
 					scaledFont = font.deriveFont((float) currFontSize);
 					graphics2d.setFont(scaledFont);
 					FontMetrics fontMetricsPrev = graphics2d.getFontMetrics();
-					int maxLinePx = 0;
+					int linesMaxWidth = 0;
 					int longestLineIdx = -1;
+					int linesHeight = 0;
 					for (int i = 0; i < lines.length; i++) {
 						int px = fontMetricsPrev.stringWidth(lines[i]);
-						if (px >= maxLinePx) {
-							maxLinePx = px;
+						if (px >= linesMaxWidth) {
+							linesMaxWidth = px;
 							longestLineIdx = i;
 						}
+						linesHeight += fontMetricsPrev.getHeight();
 					}
 					fontMetricsPrev = graphics2d.getFontMetrics();
-
-					if (fontMetricsPrev.stringWidth(lines[longestLineIdx]) > xPixelsToUse
-							|| fontMetricsPrev.getHeight() > yPixelsToUse) {
+					
+					if (linesMaxWidth > xPixelsToUse
+							|| linesHeight > yPixelsToUse) {
 						font = font.deriveFont((float) (currFontSize - 1));
-						IOUtil.log("longestLineIdx: " + longestLineIdx + " maxLinePx:" + maxLinePx + " font size "
-								+ font.getSize());
+						IOUtil.log("exceeded   longestLineIdx: " + longestLineIdx + " linesMaxWidth/xPixelsToUse:" + linesMaxWidth + "/" + xPixelsToUse + " linesHeight/yPixelsToUse:" + linesHeight + "/" + yPixelsToUse + " font size "
+								+ currFontSize);
+						IOUtil.log("using now: " + prevMsg);
 						autoAdjustedFontSize = font.getSize();
 						break;
 					}
-
+					prevMsg = "longestLineIdx: " + longestLineIdx + " linesMaxWidth/xPixelsToUse:" + linesMaxWidth + "/" + xPixelsToUse + " linesHeight/yPixelsToUse:" + linesHeight + "/" + yPixelsToUse + " font size "
+							+ currFontSize;
 				}
 			}
 		} else {
