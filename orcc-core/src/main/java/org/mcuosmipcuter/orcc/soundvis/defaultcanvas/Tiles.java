@@ -25,7 +25,9 @@ import java.util.Deque;
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
 import org.mcuosmipcuter.orcc.api.soundvis.ExtendedFrameHistory;
 import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
+import org.mcuosmipcuter.orcc.api.soundvis.NumberMeaning;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
+import org.mcuosmipcuter.orcc.api.soundvis.Unit;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.api.util.AmplitudeHelper;
@@ -39,20 +41,23 @@ public class Tiles implements SoundCanvas, ExtendedFrameHistory {
 
 	@LimitedIntProperty(minimum=-1, maximum=255, description="-1 means red is automatic")
 	@UserProperty(description="RGB value 0-255 for red if -1 the amplitude min-max color is used")
+	@NumberMeaning(numbers = -1, meanings = "off")
 	int fixedRed = -1;
 	@LimitedIntProperty(minimum=-1, maximum=255, description="-1 means green is automatic")
 	@UserProperty(description="RGB value 0-255 for green if -1 the amplitude min-max color is used")
+	@NumberMeaning(numbers = -1, meanings = "off")
 	int fixedGreen = -1;
 	@LimitedIntProperty(minimum=-1, maximum=255, description="-1 means blue is automatic")
 	@UserProperty(description="RGB value 0-255 for blue if -1 the amplitude min-max color is used")
+	@NumberMeaning(numbers = -1, meanings = "off")
 	int fixedBlue = -1;
 
 	@UserProperty(description="start with full queue")
-	boolean fillBeforStart = false;
+	boolean fillBeforeStart = false;
 
-	@UserProperty(description="x size of tile")
+	@UserProperty(description="x size of tile", unit = Unit.PIXEL)
 	int tileX = 240;
-	@UserProperty(description="y size of tile")
+	@UserProperty(description="y size of tile", unit = Unit.PIXEL)
 	int tileY = 180;
 	
 	int size;
@@ -132,7 +137,7 @@ public class Tiles implements SoundCanvas, ExtendedFrameHistory {
 		max = 0;
 		deque.clear();
 		size = (width / tileX) * (height / tileY);
-		if(fillBeforStart) {
+		if(fillBeforeStart) {
 			for(int i = 0; i < size; i++) {
 				int r = fixedRed == -1 ? 127 : fixedRed;
 				int g = fixedGreen == -1 ? 127 : fixedGreen;
