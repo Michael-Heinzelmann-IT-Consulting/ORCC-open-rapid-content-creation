@@ -478,19 +478,23 @@ public abstract class Context {
 		return frameToConcrete;
 	}
 	
-	public static long getPreRun(AudioInputStream ais, AudioFormat format) throws IOException {
+	public static long getPreRun(AudioInputStream ais, AudioFormat format, boolean forAllCanvas) throws IOException {
 		
 		int chunkSize =  format.getFrameSize();
 		int samplesPerFrame = (int)format.getSampleRate() / Context.getVideoOutputInfo().getFramesPerSecond();
+		final long songPos = Context.getSongPositionPointer();
 		long preRun = 1;
 		for(SoundCanvasWrapper s : soundCanvasList) {
-			int f = s.getSoundCanvas() instanceof ExtendedFrameHistory ? ((ExtendedFrameHistory)s.getSoundCanvas()).getCurrentHistoryFrameSize() : 1;
-			IOUtil.log(s + " getPreRunFrames() = " + f);
-			if(f > preRun) {
-				preRun = f;
+			if((forAllCanvas || s.getFrameFrom() <= songPos && s.getFrameTo() > songPos) && s.getSoundCanvas() instanceof ExtendedFrameHistory) {
+				int f = ((ExtendedFrameHistory)s.getSoundCanvas()).getCurrentHistoryFrameSize();
+				IOUtil.log(s + " getPreRunFrames() = " + f);
+				if(f > preRun) {
+					preRun = f;
+				}
 			}
 		}
-		final long frameStart = Context.getSongPositionPointer() - preRun >= 0 ? Context.getSongPositionPointer() - preRun : 0;
+		IOUtil.log("forAllCanvas: " +  forAllCanvas + " preRun: " + preRun);
+		final long frameStart = songPos - preRun >= 0 ? Context.getSongPositionPointer() - preRun : 0;
 		
 		if( frameStart >= 0) {	
 			long byteStart = frameStart * samplesPerFrame * chunkSize;

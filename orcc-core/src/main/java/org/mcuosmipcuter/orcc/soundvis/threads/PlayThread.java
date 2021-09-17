@@ -86,7 +86,7 @@ public class PlayThread extends Thread implements PlayPauseStop {
 			sourceDataLine.start();
 			ais = audioInput.getAudioStream();
 			
-			frameCount = Context.getPreRun(ais, format);
+			frameCount = Context.getPreRun(ais, format, true);
 			final long frameStart = frameCount;
 			ByteArrayLinearDecoder.decodeLinear(ais, new DecodingCallback() {
 				

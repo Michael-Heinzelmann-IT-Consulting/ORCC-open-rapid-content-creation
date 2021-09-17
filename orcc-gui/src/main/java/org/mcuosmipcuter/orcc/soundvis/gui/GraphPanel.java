@@ -169,7 +169,7 @@ public class GraphPanel extends JPanel implements Renderer, RealtimeSettings, Li
 					/ Context.getVideoOutputInfo().getFramesPerSecond();
 
 			try (AudioInputStream ais = audioInput.getAudioStream();) {
-				final long startCount = Context.getPreRun(ais, format);
+				final long startCount = Context.getPreRun(ais, format, false);
 				ByteArrayLinearDecoder.decodeLinear(ais, new DecodingCallback() {
 					long frameCount = 0;
 
