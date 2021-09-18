@@ -42,10 +42,10 @@ public class Repeater {
 	@NumberMeaning(numbers = 0, meanings = "auto")
 	int frames = 0;
 	
-	private DisplayObject[] dispayObjects;
+	private DisplayObject[] displayObjects;
 	
-	public Repeater(DisplayObject ...dispayObjects) {
-		this.dispayObjects = dispayObjects;
+	public Repeater(DisplayObject ...displayObjects) {
+		this.displayObjects = displayObjects;
 	}
 
 	public DisplayUnit[] repeat(long frameFrom, long frameTo, long frameCount) {
@@ -55,7 +55,7 @@ public class Repeater {
 		
 		int oLapBef = 0;
 		int oLapAft = 0;
-		for(DisplayObject d : dispayObjects) {
+		for(DisplayObject d : displayObjects) {
 			oLapBef = (int) Math.min(oLapBef, d.getDisplayDuration(frameFrom, frameTo).getOverlapBefore());
 			oLapAft = (int) Math.max(oLapAft, d.getDisplayDuration(frameFrom, frameTo).getOverlapAfter());
 		}
@@ -103,18 +103,18 @@ public class Repeater {
 	public DisplayDuration<?>[] getFrameFromTos(long frameFrom, long frameTo) {
 		int oLapBef = 0;
 		int oLapAft = 0;
-		for(DisplayObject d : dispayObjects) {
+		for(DisplayObject d : displayObjects) {
 			oLapBef = (int) Math.min(oLapBef, d.getDisplayDuration(frameFrom, frameTo).getOverlapBefore());
 			oLapAft = (int) Math.max(oLapAft, d.getDisplayDuration(frameFrom, frameTo).getOverlapAfter());
 		}
-		int effects = dispayObjects.length;
+		int effects = displayObjects.length;
 		int repeatDurationFrames = getRepeatDurationFrames(frameFrom, frameTo);
 		DisplayDuration<?>[]result = new DisplayDuration<?>[repeat * effects];
 		int c = 0;
 		for(int r = 0; r < repeat * effects; r += effects) {
 			long end = repeat == 1 ? frameTo : frameFrom + repeatDurationFrames * (c + 1) - 1;
 			for(int j = 0; j < effects; j++) {
-				DisplayDuration<?> dd = dispayObjects[j].getDisplayDuration(frameFrom + repeatDurationFrames * c, end);
+				DisplayDuration<?> dd = displayObjects[j].getDisplayDuration(frameFrom + repeatDurationFrames * c, end);
 				dd.setFrom(dd.getFrom() + oLapBef);
 				dd.setTo(dd.getTo() + oLapAft);
 				result[r + j] = dd;
