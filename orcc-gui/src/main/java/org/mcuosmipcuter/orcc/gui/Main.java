@@ -592,7 +592,7 @@ public class Main {
 			
 			Context.addListener(new Listener() {
 				public void contextChanged(PropertyName propertyName) {
-					if(PropertyName.SessionChanged.equals(propertyName)) {
+					if(PropertyName.NewSession.equals(propertyName)) {
 						String inputTitle = Context.getSessionToken().isNamed() ? Context.getSessionToken().getFullPath() : "unnamed session";
 						String complete = Context.getSessionToken().hasLoadErrors() ? " !!incomplete!! " : "";
 						String changed = Context.getSessionToken().isChanged() ? complete + " * " : complete;

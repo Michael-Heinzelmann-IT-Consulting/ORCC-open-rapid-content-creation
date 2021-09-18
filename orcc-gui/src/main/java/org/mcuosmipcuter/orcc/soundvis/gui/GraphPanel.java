@@ -124,13 +124,12 @@ public class GraphPanel extends JPanel implements Renderer, RealtimeSettings, Li
 		if(PropertyName.VideoDimension.equals(propertyName)) {
 			setZoomFactor(autoZoom ? 0.0f : zoomFactor);
 		}
-		if(PropertyName.SessionChanged.equals(propertyName) || PropertyName.VideoDimension.equals(propertyName)) {
+		if(PropertyName.NewSession.equals(propertyName) || PropertyName.VideoDimension.equals(propertyName)) {
 			frameImage = new BufferedImage(Context.getVideoOutputInfo().getWidth(), Context.getVideoOutputInfo().getHeight(), BufferedImage.TYPE_3BYTE_BGR);
 			graphics = frameImage.createGraphics();
 			displayUpdate(true);
 		}
-		EnumSet<PropertyName> match = EnumSet.of(PropertyName.SoundCanvasProperty,
-				PropertyName.SoundCanvasAdded, PropertyName.SoundCanvasList, PropertyName.SongPositionPointer);
+		EnumSet<PropertyName> match = EnumSet.of(PropertyName.SessionChanged, PropertyName.SoundCanvasAdded, PropertyName.SoundCanvasList, PropertyName.SongPositionPointer);
 		if (Context.getAppState() != AppState.PLAYING && match.contains(propertyName)) {
 			displayUpdate(true);
 		}
@@ -152,9 +151,6 @@ public class GraphPanel extends JPanel implements Renderer, RealtimeSettings, Li
 	 */
 	public void displayUpdate(boolean prepare) {
 
-		if(Context.getAppState() == AppState.PLAYING) {
-			return; // while playing updates are via newFrame()
-		}
 		soundCanvasArray = Context.getSoundCanvasList().toArray(new SoundCanvasWrapper[0]);
 		if (prepare) {
 			for (SoundCanvas soundCanvas : soundCanvasArray) {

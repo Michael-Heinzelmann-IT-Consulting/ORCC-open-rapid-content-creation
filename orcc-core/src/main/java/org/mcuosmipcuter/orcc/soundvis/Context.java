@@ -58,7 +58,7 @@ public abstract class Context {
 	public enum PropertyName {
 		AudioInputInfo, VideoDimension, SoundCanvasAdded, SoundCanvasRemoved, SoundCanvasList, SoundCanvasListCleared,
 		ExportFileName, CanvasClassNames, AppState, SongPositionPointer, VideoFrameRate, VolumeControl, FullPreRun,
-		SoundCanvasProperty, BeforeSoundCanvasProperty, SoundCanvasPropertyCancelled, SessionChanged, AudioOutputInfo;
+		SoundCanvasProperty, BeforeSoundCanvasProperty, SoundCanvasPropertyCancelled, SessionChanged, NewSession, AudioOutputInfo;
 	}
 	/**
 	 * Enumeration of application states
@@ -109,7 +109,7 @@ public abstract class Context {
 		}
 		Context.sessionToken = sessionToken;
 		IOUtil.log("setSessionToken " + sessionToken);
-		notifyListeners(PropertyName.SessionChanged);
+		notifyListeners(PropertyName.NewSession);
 	}
 	
 	public static void changeSession(String propertyKey, Object oldValue, Object newValue) {

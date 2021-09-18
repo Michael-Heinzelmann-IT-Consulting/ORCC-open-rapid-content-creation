@@ -81,7 +81,7 @@ public class ChangsBox implements Listener{
 	}
 	@Override
 	public void contextChanged(PropertyName propertyName) {
-		if(jd.isVisible() && PropertyName.SessionChanged == propertyName) {
+		if(jd.isVisible() && (PropertyName.SessionChanged == propertyName|| PropertyName.NewSession == propertyName)) {
 			update();
 			sp.revalidate();
 		}
