@@ -245,7 +245,7 @@ public abstract class Context {
 	 */
 	public static synchronized  void addCanvas(String canvasClassName) throws InstantiationException, IllegalAccessException, ClassNotFoundException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
 		SoundCanvas soundCanvas = (SoundCanvas) Class.forName(canvasClassName).getDeclaredConstructor((Class<?>[])null).newInstance((Object[])null);
-		SoundCanvasWrapper soundCanvasWrapper = new SoundCanvasWrapperImpl(soundCanvas);
+		SoundCanvasWrapper soundCanvasWrapper = new SoundCanvasWrapperImpl(soundCanvas, null);
 		if(audioInput != null) {
 			soundCanvasWrapper.prepare(audioInput.getAudioInputInfo(), videoOutputInfo);
 		}
@@ -253,7 +253,7 @@ public abstract class Context {
 		soundCanvasWrapper.setFrameTo(0); // TODO frames without audio
 		soundCanvasList.add(soundCanvasWrapper);
 		notifyListeners(PropertyName.SoundCanvasAdded);
-		changeSession(SessionToken.getSoundCanvasWrapperKey(soundCanvasWrapper), null, soundCanvas);
+		changeSession(soundCanvasWrapper.getSessionId(), null, soundCanvas);
 	}
 	public static synchronized  void addCanvasWrapper(SoundCanvasWrapper soundCanvasWrapper) {
 		soundCanvasList.add(soundCanvasWrapper);
@@ -289,14 +289,14 @@ public abstract class Context {
 		if (newList.size() > soundCanvasList.size()) {
 			for (SoundCanvasWrapper scw : newList) {
 				if (!soundCanvasList.contains(scw)) {
-					changeSession(SessionToken.getSoundCanvasWrapperKey(scw), null, scw.getSoundCanvas());
+					changeSession(scw.getSessionId(), null, scw.getSoundCanvas());
 				}
 			}
 		}
 		if (soundCanvasList.size() > newList.size()) {
 			for (SoundCanvasWrapper scw : soundCanvasList) {
 				if (!newList.contains(scw)) {
-					changeSession(SessionToken.getSoundCanvasWrapperKey(scw), scw.getSoundCanvas(), null);
+					changeSession(scw.getSessionId(), scw.getSoundCanvas(), null);
 				}
 			}
 		}

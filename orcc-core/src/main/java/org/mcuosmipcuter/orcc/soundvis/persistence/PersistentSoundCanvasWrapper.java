@@ -43,6 +43,7 @@ public class PersistentSoundCanvasWrapper {
 	private int transparency;
 	private boolean visible;
 	private boolean xor;
+	private String sessionId;
 	
 	private PersistentObject soundCanvas;
 
@@ -63,6 +64,7 @@ public class PersistentSoundCanvasWrapper {
 		this.transparency = s.getTransparency();
 		this.visible = s.isVisible();
 		this.xor = s.isXor();
+		this.sessionId = s.getSessionId();
 		
 		SoundCanvas sc = s.getSoundCanvas();
 		soundCanvas =  PersistentObject.createTo(sc);
@@ -87,7 +89,7 @@ public class PersistentSoundCanvasWrapper {
 			
 		}
 		
-		SoundCanvasWrapper soundCanvasWrapper = new SoundCanvasWrapperImpl(sc);
+		SoundCanvasWrapper soundCanvasWrapper = new SoundCanvasWrapperImpl(sc, sessionId);
 		soundCanvasWrapper.setFrameFrom(frameFrom);
 		soundCanvasWrapper.setFrameTo(frameToAuto ? 0 : frameTo);
 		soundCanvasWrapper.setPosX(posX);
@@ -177,6 +179,14 @@ public class PersistentSoundCanvasWrapper {
 
 	public void setPosY(int posY) {
 		this.posY = posY;
+	}
+
+	public String getSessionId() {
+		return sessionId;
+	}
+
+	public void setSessionId(String sessionId) {
+		this.sessionId = sessionId;
 	}
 
 }

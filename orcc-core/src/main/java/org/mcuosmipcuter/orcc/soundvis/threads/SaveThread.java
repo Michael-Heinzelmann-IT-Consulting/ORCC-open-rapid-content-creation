@@ -61,7 +61,7 @@ public class SaveThread extends Thread implements Context.Listener{
 
 	public void saveLatestSession(){		
 		try {
-			Session.saveDefaultSession();
+			Session.saveDefaultSession(true);
 		} catch (IllegalArgumentException | IllegalAccessException | IOException e) {
 			e.printStackTrace();
 		}

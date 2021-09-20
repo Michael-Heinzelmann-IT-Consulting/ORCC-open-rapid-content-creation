@@ -31,6 +31,7 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.mcuosmipcuter.orcc.api.soundvis.MappedValue;
 import org.mcuosmipcuter.orcc.soundvis.AppLogicException;
@@ -38,6 +39,7 @@ import org.mcuosmipcuter.orcc.soundvis.Context;
 import org.mcuosmipcuter.orcc.soundvis.ImageStore.Key;
 import org.mcuosmipcuter.orcc.soundvis.SessionToken;
 import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
+import org.mcuosmipcuter.orcc.soundvis.ValueChanges;
 import org.mcuosmipcuter.orcc.util.IOUtil;
 
 /**
@@ -73,14 +75,26 @@ public class Session implements Serializable {
 		PersistentSession persistentSession;
 		try {
 			persistentSession = loadSessionImpl(defaultFile, reportList);
+			SessionToken st;
 			if(persistentSession.getSessionPath() != null) {
-				File file = new File(persistentSession.getSessionPath());
-				return userLoadSession(file, reportList);
+//				File file = new File(persistentSession.getSessionPath());
+//				return userLoadSession(file, reportList);
+				st = new SessionToken(persistentSession.getSessionPath(), reportList);
+				for(Map.Entry<String, ValueChanges> e : persistentSession.getChanges().entrySet()) {
+					if(e.getValue().isLogicallyChanged()) {
+						st.changeOccurred(e.getKey(), e.getValue().getOriginal(), e.getValue().getCurrent());
+					}
+				}
 			}
 			else {
-				setUpApplication(persistentSession, reportList);
-				Context.setSessionToken(new SessionToken());
+				st = new SessionToken();
 			}
+//			else {
+				setUpApplication(persistentSession, reportList);
+
+
+				Context.setSessionToken(st);
+//			}
 			
 			return persistentSession != null;
 		} catch (Exception e) {
@@ -94,7 +108,7 @@ public class Session implements Serializable {
 			PersistentSession persistentSession =  loadSessionImpl(file, reportList);
 			setUpApplication(persistentSession, reportList);
 			Context.setSessionToken(new SessionToken(file.getAbsolutePath(), reportList));
-			saveDefaultSession();
+			saveDefaultSession(false);
 			return true;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -143,20 +157,21 @@ public class Session implements Serializable {
 		}
 	}
 	
-	public static File saveDefaultSession() throws IllegalArgumentException, IllegalAccessException, IOException {
+	public static File saveDefaultSession(boolean persistChanges) throws IllegalArgumentException, IllegalAccessException, IOException {
 		File file = new File(FileConfiguration.getTargetConfDir() + FileConfiguration.getSep() + DEFAULT_FILE_NAME + FILE_EXTENSION);
-		String path = Context.getSessionToken().isNamed() ? Context.getSessionToken().getFullPath() : null;
+		SessionToken st = Context.getSessionToken();
+		String path = st.isNamed() ? st.getFullPath() : null;
 		if(file.exists()) {
 			Files.move(file.toPath(), file.toPath().resolveSibling(FileConfiguration.getTargetConfDir() + FileConfiguration.getSep() + DEFAULT_BACkUP_FILE_NAME + FILE_EXTENSION), StandardCopyOption.REPLACE_EXISTING);
 		}
-		saveSessionImpl(file, path);
+		saveSessionImpl(file, path, persistChanges ? st.getChanges() : null);
 		return file;
 	}
 	public static void userSaveSession(File file) throws IllegalArgumentException, IllegalAccessException, IOException {
-		saveSessionImpl(file, null);
+		saveSessionImpl(file, null, null);
 		Context.setSessionToken(new SessionToken(file.getAbsolutePath(), new ArrayList<>()));
 	}
-	private static PersistentSession saveSessionImpl(File file, String persitentSessionPath) throws IllegalArgumentException, IllegalAccessException, IOException {
+	private static PersistentSession saveSessionImpl(File file, String persitentSessionPath, Map<String, ValueChanges> changes) throws IllegalArgumentException, IllegalAccessException, IOException {
 
 		List<SoundCanvasWrapper> appObjects = Context.getSoundCanvasList();
 		
@@ -168,6 +183,7 @@ public class Session implements Serializable {
 		}
 
 		PersistentSession persistentSession = new PersistentSession();
+		persistentSession.setChanges(changes);
 		persistentSession.setSessionPath(persitentSessionPath);
 		persistentSession.setSoundCanvasList(persistentWrappers);
 		persistentSession.setAudioInputType(Context.getAudioInput().getType());
@@ -180,6 +196,7 @@ public class Session implements Serializable {
 				XMLEncoder encoder = new XMLEncoder(out)) {
 			encoder.setPersistenceDelegate(MappedValue.class, new MappedValuePersistenceDelegate());
 			encoder.setPersistenceDelegate(Key.class, new KeyPersistenceDelegate());
+			//encoder.setPersistenceDelegate(ValueChanges.class, new ValueChangesPersistenceDelegate());
 			encoder.writeObject(persistentSession);
 			encoder.flush();
 			IOUtil.log("saved: " + file.getAbsolutePath() + " persitentSessionPath: " + persitentSessionPath);

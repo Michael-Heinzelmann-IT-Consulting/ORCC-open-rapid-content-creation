@@ -30,6 +30,7 @@ import java.awt.image.BufferedImage;
 import java.lang.reflect.Field;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
 import org.mcuosmipcuter.orcc.api.soundvis.DisplayDuration;
@@ -39,7 +40,6 @@ import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.api.util.AmplitudeHelper;
 import org.mcuosmipcuter.orcc.api.util.DimensionHelper;
 import org.mcuosmipcuter.orcc.soundvis.Context;
-import org.mcuosmipcuter.orcc.soundvis.SessionToken;
 import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
 import org.mcuosmipcuter.orcc.soundvis.effects.Positioner;
 
@@ -52,6 +52,7 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 	private Set<PropertyListener> propertyListeners = new HashSet<PropertyListener>();
 	
 	private final SoundCanvas soundCanvas;
+	private final String sessionId;
 	private boolean enabled = true;
 	private long frameFrom = 0;
 	private long frameTo = 0;
@@ -71,6 +72,7 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 	private Shape screen;
 	private DimensionHelper dimensionHelper;
 	Positioner positioner = new Positioner();
+
 	
 	static {
 		//since this image is for nothing it can be small
@@ -78,8 +80,9 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 		devNullGraphics = bi.createGraphics();
 	}
 	
-	public SoundCanvasWrapperImpl(SoundCanvas soundCanvas) {
+	public SoundCanvasWrapperImpl(SoundCanvas soundCanvas, String sessionId) {
 		this.soundCanvas = soundCanvas;
+		this.sessionId = sessionId != null ? sessionId : soundCanvas.getClass().getSimpleName() + UUID.randomUUID().toString();
 	}
 	@Override
 	public void nextSample(int[] amplitudes) {
@@ -130,7 +133,7 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 	}
 	@Override
 	public void changeSession(String propertyName, Object oldValue, Object newValue) {
-		Context.changeSession(SessionToken.getSoundCanvasKey(soundCanvas) + "::" + propertyName, oldValue, newValue);
+		Context.changeSession(sessionId + "::" + propertyName, oldValue, newValue);
 	}
 
 	@Override
@@ -311,6 +314,10 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 	@Override
 	public boolean isFrameToAuto() {
 		return frameToAuto;
+	}
+	@Override
+	public String getSessionId() {
+		return sessionId;
 	}
 	
 }

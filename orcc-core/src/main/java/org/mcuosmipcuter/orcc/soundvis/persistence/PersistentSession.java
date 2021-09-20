@@ -20,8 +20,10 @@ package org.mcuosmipcuter.orcc.soundvis.persistence;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.mcuosmipcuter.orcc.soundvis.AudioInput;
+import org.mcuosmipcuter.orcc.soundvis.ValueChanges;
 
 /**
  * Bean conforming class
@@ -42,6 +44,7 @@ public class PersistentSession implements Serializable {
 	private int videoOutPutHeight;
 	private int videoOutPutWidth;
 	private int videoOutPutFrames;
+	private Map<String, ValueChanges> changes;
 
 	/**
 	 * 
@@ -106,5 +109,12 @@ public class PersistentSession implements Serializable {
 		this.videoOutPutFrames = videoOutPutFrames;
 	}
 
+	public Map<String, ValueChanges> getChanges() {
+		return changes;
+	}
+
+	public void setChanges(Map<String, ValueChanges> changes) {
+		this.changes = changes;
+	}
 
 }

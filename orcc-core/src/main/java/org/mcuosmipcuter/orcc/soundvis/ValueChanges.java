@@ -23,8 +23,14 @@ import java.util.Arrays;
  * @author Michael Heinzelmann
  */
 public class  ValueChanges  {
-	private final Object original;
+	private Object original;
+	public void setOriginal(Object original) {
+		this.original = original;
+	}
 	private Object current;
+	public ValueChanges() {
+		
+	}
 	/**
 	 * 
 	 */
@@ -55,4 +61,14 @@ public class  ValueChanges  {
 		Object[] origArr = (Object[])original;
 		return Arrays.equals(currArr, origArr);
 	}
+	public Object getOriginal() {
+		return original;
+	}
+	public Object getCurrent() {
+		return current;
+	}
+	public void setCurrent(Object current) {
+		this.current = current;
+	}
+
 }

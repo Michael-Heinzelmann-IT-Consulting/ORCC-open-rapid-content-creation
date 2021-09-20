@@ -672,7 +672,8 @@ public class Main {
 		}
 	}
 	private static boolean allowSessionOpenRoutine() {
-		if (Context.getSessionToken().needsSave()) {
+		SessionToken st = Context.getSessionToken();
+		if (st.isDefault() || st.isChanged()) {
 			String message = "Do you want to continue ?";
 			int res = JOptionPane.showOptionDialog(null,
 					message, "session not saved!",
@@ -697,10 +698,9 @@ public class Main {
 		try {
 			SessionToken st = Context.getSessionToken();
 
-			Session.saveDefaultSession();
-			 if (st.needsSave()) {
+			 if (st.isChanged() && st.isNamed()) {
 				int res = JOptionPane.showOptionDialog(null,
-						"save named session " + Context.getSessionToken().getFullPath(), "Do you want to save ?",
+						"save session " + Context.getSessionToken().getFullPath(), "Do you want to save ?",
 						JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null,
 						new String[] { "yes", "no", "cancel" }, "cancel");
 				if (res == JOptionPane.OK_OPTION) {
@@ -717,8 +717,8 @@ public class Main {
 				if (res == JOptionPane.CANCEL_OPTION) {
 					return;
 				}
-
 			}
+			Session.saveDefaultSession(true);
 		} catch (Throwable t) {
 			t.printStackTrace();
 		}

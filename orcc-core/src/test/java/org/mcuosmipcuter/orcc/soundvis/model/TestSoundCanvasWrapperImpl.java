@@ -52,7 +52,7 @@ public class TestSoundCanvasWrapperImpl extends TestCase {
 		VideoOutputInfo videoOutputInfo = new VideoOutputInfoImpl(30, 480, 600);
 		myInvocationHandler = new MyInvocationHandler();
 		SoundCanvas mockSoundCanvas = createMock(myInvocationHandler);
-		soundCanvasWrapperImpl = new SoundCanvasWrapperImpl(mockSoundCanvas);
+		soundCanvasWrapperImpl = new SoundCanvasWrapperImpl(mockSoundCanvas, "mockID123");
 		soundCanvasWrapperImpl.prepare(audioInputInfo, videoOutputInfo);
 	}
 	private static class Invocation {
