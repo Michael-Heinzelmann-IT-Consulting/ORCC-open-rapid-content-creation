@@ -1,11 +1,13 @@
 package org.mcuosmipcuter.orcc.soundvis;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.util.IOUtil;
 
 public class SessionToken {
@@ -50,17 +52,7 @@ public class SessionToken {
 		return !reportList.isEmpty();
 	}
 	public void changeOccurred(String propertyKey, Object oldValue, Object newValue) {
-//		if(oldValue instanceof SoundCanvas && newValue == null) {
-//			// remove all property changes for canvas
-//			String canvaskey = getSoundCanvasKey((SoundCanvas) oldValue);
-//			Iterator<String> iter = changes.keySet().iterator();
-//			while(iter.hasNext()) {
-//				String key = iter.next();
-//				if(key.startsWith(canvaskey)) {
-//					iter.remove();
-//				}
-//			}
-//		}
+
 		ValueChanges vc = changes.get(propertyKey);
 		if(vc == null) {
 			vc = new ValueChanges(oldValue, newValue);
@@ -69,16 +61,17 @@ public class SessionToken {
 		else {
 			vc.addChangeValue(newValue);
 		}
-		
+		if(oldValue instanceof SoundCanvas && newValue == null) {
+			// remove all sub property changes for canvas
+			Iterator<String> iter = changes.keySet().iterator();
+			while(iter.hasNext()) {
+				String key = iter.next();
+				if(key.startsWith(propertyKey) && !key.equals(propertyKey)) {
+					iter.remove();
+				}
+			}
+		}
 	}
-	
-//	public static String getSoundCanvasKey(SoundCanvas soundCanvas) {
-//		return soundCanvas.getClass().getSimpleName() + "#" + System.identityHashCode(soundCanvas);
-//	}
-//	
-//	public static String getSoundCanvasWrapperKey(SoundCanvasWrapper soundCanvasWrapper) {
-//		return soundCanvasWrapper.getDisplayName() + "#" + System.identityHashCode(soundCanvasWrapper);
-//	}
 	
 	public List<String> getChangeLog(boolean includeReverted){
 		List<String> result = new ArrayList<>();

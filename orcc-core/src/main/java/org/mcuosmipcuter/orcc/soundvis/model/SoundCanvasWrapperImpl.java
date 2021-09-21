@@ -298,8 +298,8 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 			return fromTos;
 		}
 		else {
-			displayFrameFrom = Long.MAX_VALUE;
-			displayFrameTo = Long.MIN_VALUE;
+			displayFrameFrom = frameFrom;//Long.MAX_VALUE;
+			displayFrameTo = frameTo;//Long.MIN_VALUE;
 		}
 		return SoundCanvasWrapper.super.getFrameFromTos();
 	}

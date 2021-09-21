@@ -196,7 +196,6 @@ public class Session implements Serializable {
 				XMLEncoder encoder = new XMLEncoder(out)) {
 			encoder.setPersistenceDelegate(MappedValue.class, new MappedValuePersistenceDelegate());
 			encoder.setPersistenceDelegate(Key.class, new KeyPersistenceDelegate());
-			//encoder.setPersistenceDelegate(ValueChanges.class, new ValueChangesPersistenceDelegate());
 			encoder.writeObject(persistentSession);
 			encoder.flush();
 			IOUtil.log("saved: " + file.getAbsolutePath() + " persitentSessionPath: " + persitentSessionPath);

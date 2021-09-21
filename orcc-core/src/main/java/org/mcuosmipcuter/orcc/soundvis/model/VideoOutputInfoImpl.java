@@ -29,6 +29,9 @@ public class VideoOutputInfoImpl implements VideoOutputInfo {
 	private int height;
 	private String title;
 	
+	public VideoOutputInfoImpl() {
+	}
+
 	public VideoOutputInfoImpl(int framesPerSecond, int width, int height) {
 		this.framesPerSecond = framesPerSecond;
 		this.width = width;
