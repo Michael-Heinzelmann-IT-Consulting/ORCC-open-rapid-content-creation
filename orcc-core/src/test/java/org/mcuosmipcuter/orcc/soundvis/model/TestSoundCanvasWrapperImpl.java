@@ -44,16 +44,14 @@ public class TestSoundCanvasWrapperImpl extends TestCase {
 	private SoundCanvasWrapper soundCanvasWrapperImpl;
 	private MyInvocationHandler myInvocationHandler;
 	private final int SAMPLESIZE_BITS = 16;
-
+	AudioFormat audioFormat = new AudioFormat(44100, SAMPLESIZE_BITS, 2, false, false);
+	AudioInputInfo audioInputInfo = new AudioInputInfoImpl(audioFormat, 1000L, AudioLayout.LINEAR);
+	VideoOutputInfo videoOutputInfo = new VideoOutputInfoImpl(30, 480, 600);
 	@Override
 	protected void setUp() throws Exception {
-		AudioFormat audioFormat = new AudioFormat(44100, SAMPLESIZE_BITS, 2, false, false);
-		AudioInputInfo audioInputInfo = new AudioInputInfoImpl(audioFormat, 1000L, AudioLayout.LINEAR);
-		VideoOutputInfo videoOutputInfo = new VideoOutputInfoImpl(30, 480, 600);
 		myInvocationHandler = new MyInvocationHandler();
 		SoundCanvas mockSoundCanvas = createMock(myInvocationHandler);
 		soundCanvasWrapperImpl = new SoundCanvasWrapperImpl(mockSoundCanvas, "mockID123");
-		soundCanvasWrapperImpl.prepare(audioInputInfo, videoOutputInfo);
 	}
 	private static class Invocation {
 		private final String methodName;
@@ -100,9 +98,11 @@ public class TestSoundCanvasWrapperImpl extends TestCase {
 	}
 	
 	public void testPrepare() {
+		soundCanvasWrapperImpl.prepare(audioInputInfo, videoOutputInfo);
 		assertEquals(1, myInvocationHandler.getInvocations(("prepare")).size());
 	}
 	public void testEnabled() {
+		soundCanvasWrapperImpl.prepare(audioInputInfo, videoOutputInfo);
 		soundCanvasWrapperImpl.newFrame(4, null);
 		soundCanvasWrapperImpl.setVisible(false);
 		soundCanvasWrapperImpl.newFrame(5, null);
@@ -115,6 +115,8 @@ public class TestSoundCanvasWrapperImpl extends TestCase {
 		
 		soundCanvasWrapperImpl.setFrameFrom(5);
 		soundCanvasWrapperImpl.setFrameTo(6);
+		
+		soundCanvasWrapperImpl.prepare(audioInputInfo, videoOutputInfo);
 		
 		soundCanvasWrapperImpl.newFrame(4, null);
 		soundCanvasWrapperImpl.newFrame(5, null);
