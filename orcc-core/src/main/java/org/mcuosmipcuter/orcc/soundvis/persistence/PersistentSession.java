@@ -30,6 +30,10 @@ import org.mcuosmipcuter.orcc.soundvis.ValueChanges;
  * @author user
  *
  */
+/**
+ * @author Michael Heinzelmann
+ *
+ */
 public class PersistentSession implements Serializable {
 	
 	/**
@@ -37,6 +41,8 @@ public class PersistentSession implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 	
+	private String version;
+	private String buildNumber;
 	private String sessionPath;
 	private List<PersistentSoundCanvasWrapper> soundCanvasList = new ArrayList<PersistentSoundCanvasWrapper>();
 	private AudioInput.Type audioInputType;
@@ -115,6 +121,22 @@ public class PersistentSession implements Serializable {
 
 	public void setChanges(Map<String, ValueChanges> changes) {
 		this.changes = changes;
+	}
+
+	public String getVersion() {
+		return version;
+	}
+
+	public void setVersion(String version) {
+		this.version = version;
+	}
+
+	public String getBuildNumber() {
+		return buildNumber;
+	}
+
+	public void setBuildNumber(String buildNumber) {
+		this.buildNumber = buildNumber;
 	}
 
 }

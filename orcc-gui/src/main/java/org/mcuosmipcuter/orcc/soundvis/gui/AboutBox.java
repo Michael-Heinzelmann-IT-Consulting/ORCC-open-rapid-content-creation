@@ -31,6 +31,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
+import org.mcuosmipcuter.orcc.soundvis.Context;
 import org.mcuosmipcuter.orcc.soundvis.persistence.FileConfiguration;
 import org.mcuosmipcuter.orcc.util.IOUtil;
 
@@ -73,9 +74,9 @@ public class AboutBox {
 	}
 	public static void showSystemProperties(boolean modal) {
 		try {
-			InputStream is = AboutBox.class.getResourceAsStream("/version.properties");
-			Properties vp = new Properties();
-			vp.load(is);
+
+			Properties vp = Context.getVersionProperties();
+
 			StringBuilder stringBuilder = new StringBuilder();
 			
 			for(Entry<Object, Object> ee : vp.entrySet()){

@@ -32,6 +32,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import org.mcuosmipcuter.orcc.api.soundvis.MappedValue;
 import org.mcuosmipcuter.orcc.soundvis.AppLogicException;
@@ -132,6 +133,10 @@ public class Session implements Serializable {
 				}
 			});
 			PersistentSession persistentSession = (PersistentSession) in.readObject();
+			Properties vp = Context.getVersionProperties();
+			IOUtil.log("version loaded/running: " +  persistentSession.getVersion()  + "/" + vp.getProperty("version"));
+			IOUtil.log("buildNr loaded/running: " + persistentSession.getBuildNumber() + "/" +vp.getProperty("buildNumber"));
+			
 			return persistentSession;
 		} catch (Exception e) {
 			IOUtil.log("load session failed: " + e.getMessage());
@@ -183,6 +188,9 @@ public class Session implements Serializable {
 		}
 
 		PersistentSession persistentSession = new PersistentSession();
+		Properties vp = Context.getVersionProperties();
+		persistentSession.setVersion(vp.getProperty("version"));
+		persistentSession.setBuildNumber(vp.getProperty("buildNumber"));
 		persistentSession.setChanges(changes);
 		persistentSession.setSessionPath(persitentSessionPath);
 		persistentSession.setSoundCanvasList(persistentWrappers);

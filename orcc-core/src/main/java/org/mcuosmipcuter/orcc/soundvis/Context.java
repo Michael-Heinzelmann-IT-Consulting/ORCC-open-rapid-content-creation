@@ -18,10 +18,12 @@
 package org.mcuosmipcuter.orcc.soundvis;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -511,4 +513,15 @@ public abstract class Context {
 		}
 		return frameStart;
 	}
+		
+	public static Properties getVersionProperties() {
+		Properties vp = new Properties();
+		try(InputStream is = Context.class.getResourceAsStream("/version.properties")){
+			vp.load(is);
+		} catch (IOException e) {
+			IOUtil.log(e.getMessage());
+		}
+		return vp;
+	}
+
 }
