@@ -81,6 +81,8 @@
              <appversion>${project.version}</appversion>
              <copyright>GNU General Public License v3.0</copyright>
              <licensefile>${project.build.directory}/orcc-dist-${project.version}-distribution-${JPACKAGE_OS}/orcc-dist-${project.version}/LICENSE.txt</licensefile>
+             <icon>${project.build.directory}/orcc-dist-${project.version}-distribution-${JPACKAGE_OS}/orcc-dist-${project.version}/${JPACKAGE_ICON}</icon>
+            <verbose>true</verbose>
             </configuration>
           </execution>
         </executions>

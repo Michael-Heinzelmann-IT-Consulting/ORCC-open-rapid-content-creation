@@ -30,6 +30,11 @@
       <filtered>true</filtered>
     </file>
     <file>
+      <source>src/main/icons/soundvis.icns</source>
+      <outputDirectory>/</outputDirectory>
+      <filtered>false</filtered>
+    </file>
+    <file>
       <source>src/main/scripts/mac/run.command</source>
       <outputDirectory>/</outputDirectory>
       <filtered>true</filtered>
