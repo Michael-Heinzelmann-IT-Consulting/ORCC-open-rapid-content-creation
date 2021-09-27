@@ -118,6 +118,19 @@ public abstract class Context {
 		sessionToken.changeOccurred(propertyKey, oldValue, newValue);
 		notifyListeners(PropertyName.SessionChanged);
 	}
+	public static void changeSoundCanvasList(SoundCanvasWrapper[] listBefore, SoundCanvasWrapper[] listAfter) {
+		String[] keysBefore = new String[listBefore.length];
+		int i = 0;
+		for(SoundCanvasWrapper scw : listBefore) {
+			keysBefore[i++] = scw.getSessionId();
+		}
+		String[] keysAfter = new String[listAfter.length];
+		i = 0;
+		for(SoundCanvasWrapper scw : listAfter) {
+			keysAfter[i++] = scw.getSessionId();
+		}
+		changeSession("SoundCanvasList", keysBefore, keysAfter);
+	}
 
 	// listener list
 	private static List<Listener> listeners = new ArrayList<Listener>();
@@ -253,22 +266,17 @@ public abstract class Context {
 		}
 		soundCanvasWrapper.setFrameFrom(0);
 		soundCanvasWrapper.setFrameTo(0); // TODO frames without audio
+		SoundCanvasWrapper[] listBefore = soundCanvasList.toArray(new SoundCanvasWrapper[] {});
 		soundCanvasList.add(soundCanvasWrapper);
 		notifyListeners(PropertyName.SoundCanvasAdded);
 		changeSession(soundCanvasWrapper.getSessionId(), null, soundCanvas);
+		changeSoundCanvasList(listBefore, soundCanvasList.toArray(new SoundCanvasWrapper[] {}));
 	}
 	public static synchronized  void addCanvasWrapper(SoundCanvasWrapper soundCanvasWrapper) {
 		soundCanvasList.add(soundCanvasWrapper);
 		notifyListeners(PropertyName.SoundCanvasAdded);
 	}
-	/**
-	 * Removes the given canvas from the list and notifies listeners
-	 * @param soundCanvas the canvas to remove
-	 */
-	public static synchronized void removeCanvas(SoundCanvasWrapper soundCanvas) {
-		soundCanvasList.remove(soundCanvas);
-		notifyListeners(PropertyName.SoundCanvasRemoved);
-	}
+
 	/**
 	 * Removes the all canvas from the list and notifies listeners
 	 * @param soundCanvas the canvas to remove
@@ -302,6 +310,7 @@ public abstract class Context {
 				}
 			}
 		}
+		changeSoundCanvasList(soundCanvasList.toArray(new SoundCanvasWrapper[] {}), newList.toArray(new SoundCanvasWrapper[] {}));
 		soundCanvasList.clear();
 		soundCanvasList.addAll(newList);
 		notifyListeners(PropertyName.SoundCanvasList);

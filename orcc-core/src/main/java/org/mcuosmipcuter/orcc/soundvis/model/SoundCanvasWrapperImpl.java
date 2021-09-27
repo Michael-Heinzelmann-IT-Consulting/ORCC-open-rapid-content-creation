@@ -82,7 +82,7 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 	
 	public SoundCanvasWrapperImpl(SoundCanvas soundCanvas, String sessionId) {
 		this.soundCanvas = soundCanvas;
-		this.sessionId = sessionId != null ? sessionId : soundCanvas.getClass().getSimpleName() + UUID.randomUUID().toString();
+		this.sessionId = sessionId != null ? sessionId : soundCanvas.getClass().getSimpleName() + "_"+ UUID.randomUUID().toString();
 	}
 	@Override
 	public void nextSample(int[] amplitudes) {
