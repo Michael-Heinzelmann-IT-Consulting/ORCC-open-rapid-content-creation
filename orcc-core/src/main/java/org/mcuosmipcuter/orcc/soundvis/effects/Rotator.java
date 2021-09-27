@@ -37,11 +37,20 @@ public class Rotator implements DisplayObject {
 	@UserProperty(description="rotate out speed", unit = Unit.DEGREES_PER_FRAME)
 	private int rotateOutSpeed;
 	
+	@UserProperty(description="rotate permanent", unit = Unit.DEGREES)
+	private int permanentRotation;
 	
 	public AffineTransform rotate(int posInSlideDuration, int numberOfFramesSlideIsVisible, int centerX, int centerY) {
 		AffineTransform transform = new AffineTransform();
+		
 		double theta = 0;
 		double rotatePosition = 0;
+		
+		if(permanentRotation != 0) {
+			double permRotation = Math.PI * permanentRotation / 180;
+			transform.rotate(permRotation, centerX , centerY);
+		}
+		
 		if(rotateInFrames != 0 && posInSlideDuration <= Math.abs(rotateInFrames)) {
 			
 			theta = Math.PI * rotateInSpeed / 180;
