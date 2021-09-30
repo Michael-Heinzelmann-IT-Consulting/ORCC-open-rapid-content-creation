@@ -532,5 +532,16 @@ public abstract class Context {
 		}
 		return vp;
 	}
-
+	public static void memoryReport(StringBuilder stringBuilder) {
+		Runtime rt = Runtime.getRuntime();
+		long maxMb = rt.maxMemory() / 1024 / 1024;
+		long totalMb = rt.totalMemory() / 1024 / 1024;
+		long freeMb = rt.freeMemory()  / 1024 / 1024;
+		
+		stringBuilder.append("max memory Mb: " + maxMb);
+		stringBuilder.append("\n");
+		stringBuilder.append("total memory Mb: " + totalMb);
+		stringBuilder.append("\n");
+		stringBuilder.append(" free memory Mb: " + freeMb);
+	}
 }

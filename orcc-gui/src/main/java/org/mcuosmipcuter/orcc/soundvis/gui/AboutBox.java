@@ -89,7 +89,9 @@ public class AboutBox {
 			stringBuilder.append("\n");
 			stringBuilder.append("appDir=" + FileConfiguration.getAppDir());
 			stringBuilder.append("\n");
-			
+			stringBuilder.append("\n");
+			Context.memoryReport(stringBuilder);
+			stringBuilder.append("\n");
 			stringBuilder.append("\n");
 			List<String> envList = new ArrayList<>();
 			Map <String, String> envMap = System.getenv();
