@@ -98,7 +98,7 @@ import org.mcuosmipcuter.orcc.util.IOUtil;
  */
 public class Main {
 	
-	static final int infoW = 690;
+	static final int infoW = 800;
 	static final int infoH = 200;
 	static final int playBackH = 240;
 	static final int minCells = 3;
@@ -141,7 +141,7 @@ public class Main {
 		});
 		
 		final JDesktopPane deskTop = new JDesktopPane();
-		final JInternalFrame playBackFrame = new JInternalFrame("Audio Timeline");
+		final JInternalFrame playBackFrame = new JInternalFrame("Audio Timeline", true, false, false);
 		final GraphicsJInternalFrame graphicFrame = new GraphicsJInternalFrame("Video", true, false, false, false);
 		final GraphPanel graphicPanel = new GraphPanel(new Supplier<Dimension>() {
 			@Override
@@ -433,6 +433,8 @@ public class Main {
 		deskTop.setVisible(true);
 		
 		frame.getContentPane().add(deskTop);
+		frame.setSize(1400, 800);
+		if(false) {
 		frame.setExtendedState(Frame.MAXIMIZED_BOTH);
 		frame.addWindowStateListener(new WindowStateListener() {
 			
@@ -444,9 +446,10 @@ public class Main {
 				}
 			}
 		});
+		}
 		frame.setVisible(true);
 		synchronized(frame) {
-			frame.wait(30000);
+			frame.wait(3000);
 		}
 		
 		final PlayBackPanel playBackPanel = new PlayBackPanel(graphicPanel);
@@ -518,7 +521,7 @@ public class Main {
 			propertiesFrame.setLocation(0, playBackH);
 			propertiesFrame.setResizable(true);
 			propertiesFrame.setVisible(true);
-			propertiesFrame.setSize(infoW, deskTop.getHeight() - playBackH);
+			propertiesFrame.setSize(infoW, deskTop.getHeight() - playBackH - 10);
 			deskTop.add(propertiesFrame);
 		}	
 
@@ -586,7 +589,7 @@ public class Main {
 			{
 				graphicFrame.getContentPane().add(graphicPanel);
 			}
-			graphicFrame.setSize(deskTop.getWidth() - infoW, deskTop.getHeight() - playBackH);
+			graphicFrame.setSize(deskTop.getWidth() - infoW, deskTop.getHeight() - playBackH - 10);
 			graphicFrame.setLocation(infoW, playBackH);
 			graphicFrame.setVisible(true);
 			

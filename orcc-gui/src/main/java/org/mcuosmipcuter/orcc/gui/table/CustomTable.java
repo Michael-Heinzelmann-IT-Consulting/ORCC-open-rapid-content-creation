@@ -22,10 +22,10 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -234,8 +234,8 @@ public class CustomTable extends JPanel implements Context.Listener{
 		setLayout(new GridBagLayout());
 	}
 	private  BufferedImage getImage() {
-		int width = 120;
-		int height = 30;
+		int width = 100;
+		int height = 40;
 		
 		BufferedImage frameImage = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
 		Graphics2D graphics = frameImage.createGraphics();
@@ -249,18 +249,20 @@ public class CustomTable extends JPanel implements Context.Listener{
 	 * @param soundCanvasWrapper the wrapped canvas 
 	 */
 	public void addLayer(final SoundCanvasWrapper soundCanvasWrapper) {
+		int rowH = 72;
 		final Row row = new Row(soundCanvasWrapper);
-		row.setPreferredSize(new Dimension(640, 92));
+		row.setPreferredSize(new Dimension(740, rowH));
 		row.setLayout(new BorderLayout());
+		//row.setLayout(new FlowLayout());
 		TitledBorder tb = new TitledBorder(new LineBorder(Color.WHITE, 8));
 		tb.setTitle(soundCanvasWrapper.getDisplayName());
 		tb.setTitlePosition(TitledBorder.TOP);
 		row.setBorder(tb);
 		row.setBackground(Color.WHITE);
-		final JLabel layer = new JLabel(/*soundCanvasWrapper.getDisplayName()*/);
-		layer.setOpaque(true);
+		final JLabel layer = new JLabel();
+		layer.setOpaque(false);
 		layer.setName("icon_label");
-		layer.setPreferredSize(new Dimension(140, 16));
+		layer.setPreferredSize(new Dimension(120, rowH - 16));
 		layer.setToolTipText("edit or move " + soundCanvasWrapper.getDisplayName());
 		soundCanvasWrapper.setIconImage(getImage());
 		soundCanvasWrapper.addPropertyChangeListener(new PropertyListener() {
@@ -270,7 +272,7 @@ public class CustomTable extends JPanel implements Context.Listener{
 				String name = field.getName();
 				Context.canvasPropertyWritten(name, soundCanvasWrapper.getSoundCanvas());
 				if(field.isAnnotationPresent(TimedChange.class) || field.isAnnotationPresent(ChangesIcon.class)) {
-					soundCanvasWrapper.updateUI(120, 30, (Graphics2D) soundCanvasWrapper.getIconImage().getGraphics());
+					soundCanvasWrapper.updateUI(100, 40, (Graphics2D) soundCanvasWrapper.getIconImage().getGraphics());
 					layer.setIcon(new ImageIcon(soundCanvasWrapper.getIconImage()));
 				}
 			}
@@ -382,27 +384,64 @@ public class CustomTable extends JPanel implements Context.Listener{
 			}
 		});
 
-		
+		int boxH = 24;
 		final JPanel timeline = new JPanel();
-		timeline.setLayout(new GridLayout(2, 4, 2, 2));
-		timeline.setBorder(new LineBorder(timeline.getBackground(), 2));
+		//timeline.setLayout(new GridLayout(1, 4, 2, 2));
+		GridBagLayout gl = new GridBagLayout();
+		GridBagConstraints gc = new GridBagConstraints();
+		gc.fill = GridBagConstraints.BOTH;
+		//gc.anchor = GridBagConstraints.LINE_START;
+        gc.weightx = 0;
+        FlowLayout fll = new FlowLayout();
+        fll.setVgap(10);
+		timeline.setLayout(fll);
+		//timeline.setBorder(new LineBorder(timeline.getBackground(), 10));
 		
-		
-		timeline.add(showCheckBox);
-		timeline.add(fromFrame);
-		timeline.add(toFrame);
-		timeline.add(xorCheckBox);
+		//JPanel mains = new JPanel();
+		//mains.setLayout(new GridLayout(1, 2, 1, 1));
+		gl.setConstraints(expandButton, gc);
 		timeline.add(expandButton);
+		gl.setConstraints(showCheckBox, gc);
+		timeline.add(showCheckBox);
+		
+		//timeline.add(mains);
+		//int wTenThou = transparency.getPreferredSize().width ;
+		fromFrame.setPreferredSize(new Dimension(80, boxH));
+		//fromFrame.setMaximumSize(new Dimension(100, 22));
+		gl.setConstraints(fromFrame, gc);
+		timeline.add(fromFrame);
+		toFrame.setPreferredSize(new Dimension(80, boxH));
+		gl.setConstraints(toFrame, gc);
+		timeline.add(toFrame);
+		
+		//JPanel pos = new JPanel();
+		//pos.setLayout(new GridLayout(1, 2, 0, 0));
+		posX.setPreferredSize(new Dimension(60, boxH));
+		gl.setConstraints(posX, gc);
 		timeline.add(posX);
+		posY.setPreferredSize(new Dimension(60, boxH));
+		gl.setConstraints(posY, gc);
 		timeline.add(posY);
+		//timeline.add(pos);
+		
+		//JPanel graphs = new JPanel();
+		//graphs.setLayout(new GridLayout(1, 2, 0, 0));
+		transparency.setPreferredSize(new Dimension(60, boxH));
+		gl.setConstraints(transparency, gc);
 		timeline.add(transparency);
+		gl.setConstraints(xorCheckBox, gc);
+		//xorCheckBox.setPreferredSize(new Dimension(40, boxH));
+		timeline.add(xorCheckBox);
+
+		//timeline.add(graphs);
+
 		//timeline.add(threshold);
 		
 
 		
 		
 		BufferedImage image = getImage();
-		soundCanvasWrapper.updateUI(120, 30, image.createGraphics());
+		soundCanvasWrapper.updateUI(100, 40, image.createGraphics());
 		layer.setIcon(new ImageIcon(image));
 
 		final JLabel remove = new JLabel(" x ");

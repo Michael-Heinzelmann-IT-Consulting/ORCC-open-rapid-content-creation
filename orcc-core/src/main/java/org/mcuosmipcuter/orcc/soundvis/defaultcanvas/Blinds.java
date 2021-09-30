@@ -243,7 +243,7 @@ public class Blinds implements SoundCanvas {
 
 	@Override
 	public int getEditorColumns() {
-		return 2;
+		return 3;
 	}
 	
 
