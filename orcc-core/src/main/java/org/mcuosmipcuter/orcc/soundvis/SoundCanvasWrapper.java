@@ -106,4 +106,6 @@ public interface SoundCanvasWrapper extends SoundCanvas, PropertyListener {
 	void setPosY(int posY);
 	void changeSession(String propertyName, Object oldValue, Object newValue);
 	String getSessionId();
+	int getScale();
+	void setScale(int scale);
 }

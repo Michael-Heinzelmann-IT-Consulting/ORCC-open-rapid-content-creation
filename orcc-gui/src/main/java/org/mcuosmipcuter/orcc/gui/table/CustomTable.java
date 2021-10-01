@@ -354,6 +354,15 @@ public class CustomTable extends JPanel implements Context.Listener{
 				Context.touch();
 			}
 		});
+		final JSpinner scale = new JSpinner();
+		scale.setToolTipText("scale in % of video");
+		scale.setValue(soundCanvasWrapper.getScale());		
+		scale.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent arg0) {
+				soundCanvasWrapper.setScale(((((Number)scale.getValue()).intValue())));
+				Context.touch();
+			}
+		});
 		
 		final JSpinner posX = new JSpinner();
 		posX.setToolTipText("position X");
@@ -387,11 +396,11 @@ public class CustomTable extends JPanel implements Context.Listener{
 		int boxH = 24;
 		final JPanel timeline = new JPanel();
 		//timeline.setLayout(new GridLayout(1, 4, 2, 2));
-		GridBagLayout gl = new GridBagLayout();
-		GridBagConstraints gc = new GridBagConstraints();
-		gc.fill = GridBagConstraints.BOTH;
+		//GridBagLayout gl = new GridBagLayout();
+		//GridBagConstraints gc = new GridBagConstraints();
+		//gc.fill = GridBagConstraints.BOTH;
 		//gc.anchor = GridBagConstraints.LINE_START;
-        gc.weightx = 0;
+        //gc.weightx = 0;
         FlowLayout fll = new FlowLayout();
         fll.setVgap(10);
 		timeline.setLayout(fll);
@@ -399,37 +408,38 @@ public class CustomTable extends JPanel implements Context.Listener{
 		
 		//JPanel mains = new JPanel();
 		//mains.setLayout(new GridLayout(1, 2, 1, 1));
-		gl.setConstraints(expandButton, gc);
+		//gl.setConstraints(expandButton, gc);
 		timeline.add(expandButton);
-		gl.setConstraints(showCheckBox, gc);
+		//gl.setConstraints(showCheckBox, gc);
 		timeline.add(showCheckBox);
 		
 		//timeline.add(mains);
 		//int wTenThou = transparency.getPreferredSize().width ;
 		fromFrame.setPreferredSize(new Dimension(80, boxH));
 		//fromFrame.setMaximumSize(new Dimension(100, 22));
-		gl.setConstraints(fromFrame, gc);
+		//gl.setConstraints(fromFrame, gc);
 		timeline.add(fromFrame);
 		toFrame.setPreferredSize(new Dimension(80, boxH));
-		gl.setConstraints(toFrame, gc);
+		//gl.setConstraints(toFrame, gc);
 		timeline.add(toFrame);
-		
+		scale.setPreferredSize(new Dimension(60, boxH));
+		timeline.add(scale);
 		//JPanel pos = new JPanel();
 		//pos.setLayout(new GridLayout(1, 2, 0, 0));
 		posX.setPreferredSize(new Dimension(60, boxH));
-		gl.setConstraints(posX, gc);
+		//gl.setConstraints(posX, gc);
 		timeline.add(posX);
 		posY.setPreferredSize(new Dimension(60, boxH));
-		gl.setConstraints(posY, gc);
+		//gl.setConstraints(posY, gc);
 		timeline.add(posY);
 		//timeline.add(pos);
 		
 		//JPanel graphs = new JPanel();
 		//graphs.setLayout(new GridLayout(1, 2, 0, 0));
 		transparency.setPreferredSize(new Dimension(60, boxH));
-		gl.setConstraints(transparency, gc);
+		//gl.setConstraints(transparency, gc);
 		timeline.add(transparency);
-		gl.setConstraints(xorCheckBox, gc);
+		//gl.setConstraints(xorCheckBox, gc);
 		//xorCheckBox.setPreferredSize(new Dimension(40, boxH));
 		timeline.add(xorCheckBox);
 

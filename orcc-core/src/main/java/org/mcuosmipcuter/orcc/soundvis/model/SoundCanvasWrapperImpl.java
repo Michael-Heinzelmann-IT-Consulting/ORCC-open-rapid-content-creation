@@ -62,6 +62,7 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 	private static Graphics2D devNullGraphics;
 	private boolean selected;
 	private boolean editorOpen;
+	private int scale = 100;
 	private int posX;
 	private int posY;
 	protected AmplitudeHelper amplitudeHelper;
@@ -104,18 +105,26 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 				origComposite = graphics2d.getComposite();
 				graphics2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, transparency / 100f));  
 			}
-			if(posX != 0 || posY != 0) {
+			if(scale != 100  || posX != 0 || posY != 0) {
+				Area fillArea = new Area(screen);
+				AffineTransform ats = new AffineTransform();
+				double sc = (double)scale / 100d;
+				ats.scale(sc, sc);
+				if(scale < 0) {
+					ats.translate(-fillArea.getBounds().width , -fillArea.getBounds().height);
+				}
+				fillArea.transform(ats);
 				positioner.setCenterX(posX);
 				positioner.setCenterY(posY);
-				Area fillArea = new Area(screen);
 				AffineTransform atp = positioner.position(dimensionHelper, fillArea.getBounds());
 				graphics2d.transform(atp);
+				graphics2d.transform(ats);
+
 			}
 
 			// draws to the real graphics
 			soundCanvas.newFrame(frameCount, graphics2d);
-			
-			if(posX != 0 || posY != 0) {
+			if(scale != 100 || posX != 0 || posY != 0) {
 				graphics2d.setTransform(new AffineTransform());
 			}
 			if(transparency != 100) {
@@ -221,6 +230,18 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 		this.selected = selected;
 	}
 
+	@Override
+	public int getScale() {
+		return scale;
+	}
+
+	@Override
+	public void setScale(int scale) {
+		int oldScale = this.scale;
+		this.scale = scale;
+		changeSession("scale", oldScale, scale);
+	}
+	
 	@Override
 	public int getPosX() {
 		return posX;

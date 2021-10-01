@@ -37,6 +37,7 @@ public class PersistentSoundCanvasWrapper {
 	private long frameFrom;
 	private long frameTo;
 	private boolean frameToAuto;
+	private int scale;
 	private int posX;
 	private int posY;
 	private int repaintThreshold; // no longer supported
@@ -59,6 +60,7 @@ public class PersistentSoundCanvasWrapper {
 		this.frameFrom = s.getFrameFrom();
 		this.frameTo = s.getFrameTo();
 		this.frameToAuto = s.isFrameToAuto();
+		this.scale = s.getScale();
 		this.posX = s.getPosX();
 		this.posY = s.getPosY();
 		this.transparency = s.getTransparency();
@@ -92,6 +94,7 @@ public class PersistentSoundCanvasWrapper {
 		SoundCanvasWrapper soundCanvasWrapper = new SoundCanvasWrapperImpl(sc, sessionId);
 		soundCanvasWrapper.setFrameFrom(frameFrom);
 		soundCanvasWrapper.setFrameTo(frameToAuto ? 0 : frameTo);
+		soundCanvasWrapper.setScale(scale != 0 ? scale : 100);
 		soundCanvasWrapper.setPosX(posX);
 		soundCanvasWrapper.setPosY(posY);
 		soundCanvasWrapper.setTransparency(transparency);
@@ -163,6 +166,14 @@ public class PersistentSoundCanvasWrapper {
 
 	public void setFrameToAuto(boolean frameToAuto) {
 		this.frameToAuto = frameToAuto;
+	}
+
+	public int getScale() {
+		return scale;
+	}
+
+	public void setScale(int scale) {
+		this.scale = scale;
 	}
 
 	public int getPosX() {
