@@ -136,7 +136,7 @@ public class Main {
 		frame.setMinimumSize(new Dimension(infoW, infoH + playBackH));
 		frame.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
-				exitRoutine();
+				exitRoutine(frame.getSize());
 			}
 		});
 		
@@ -182,7 +182,7 @@ public class Main {
 			fileMenu.add(exit);
 			exit.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
-					exitRoutine();
+					exitRoutine(frame.getSize());
 				}
 			});
 		}
@@ -433,23 +433,28 @@ public class Main {
 		deskTop.setVisible(true);
 		
 		frame.getContentPane().add(deskTop);
-		frame.setSize(1400, 800);
-		if(false) {
-		frame.setExtendedState(Frame.MAXIMIZED_BOTH);
-		frame.addWindowStateListener(new WindowStateListener() {
-			
-			@Override
-			public void windowStateChanged(WindowEvent e) {
-				IOUtil.log("window state " + e);
-				synchronized(frame) {
-					frame.notify();
+		
+		if("true".equals(FileConfiguration.getProperties().get(FileConfiguration.SOUNDVIS_PROPERTY_APP_SIZE_MAXIMIZED))) {
+			frame.setExtendedState(Frame.MAXIMIZED_BOTH);
+			frame.addWindowStateListener(new WindowStateListener() {
+				
+				@Override
+				public void windowStateChanged(WindowEvent e) {
+					IOUtil.log("window state " + e);
+					synchronized(frame) {
+						frame.notify();
+					}
 				}
+			});
+			
+			frame.setVisible(true);
+			synchronized(frame) {
+				frame.wait(30000);
 			}
-		});
 		}
-		frame.setVisible(true);
-		synchronized(frame) {
-			frame.wait(3000);
+		else {
+			frame.setSize(1400, 800);
+			frame.setVisible(true);
 		}
 		
 		final PlayBackPanel playBackPanel = new PlayBackPanel(graphicPanel);
@@ -688,7 +693,7 @@ public class Main {
 		}
 		return true;
 	}
-	private static void exitRoutine() {
+	private static void exitRoutine(Dimension frameSize) {
 		if(Context.getAppState() != AppState.READY) {
 			int res = JOptionPane.showOptionDialog(null, "Confirm exit in state " 
 		+ Context.getAppState(), "Do you want to exit in state " + Context.getAppState() + " ?", 
@@ -699,6 +704,7 @@ public class Main {
 		}
 
 		try {
+			
 			SessionToken st = Context.getSessionToken();
 
 			 if (st.isChanged() && st.isNamed()) {

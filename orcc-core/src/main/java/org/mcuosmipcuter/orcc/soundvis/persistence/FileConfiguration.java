@@ -35,6 +35,7 @@ public class FileConfiguration {
 	public static final String SOUNDVIS_PROPERTY_APP_DIR = "appDir";
 	public static final String SOUNDVIS_PROPERTY_ASK_APP_DIR_ON_STARTUP = "askAppDirOnStartup";
 	public static final String SOUNDVIS_PROPERTY_LOOK_AND_FEEL = "lookAndFeel";
+	public static final String SOUNDVIS_PROPERTY_APP_SIZE_MAXIMIZED = "appSize";
 	
 	public static final String SOUNDVIS_PROPERTIES_FILE_NAME = "soundvis.properties";
 	private static final String TARGET_CONF_DIR_NAME = ".config";

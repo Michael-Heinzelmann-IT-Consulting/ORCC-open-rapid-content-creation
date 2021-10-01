@@ -78,8 +78,20 @@ public class PreferencesBox {
 			lfGroug.add(lf);
 			panelLookAndFeel.add(lf);
 		}
+		JPanel panelSize = new JPanel();
+		JCheckBox maximized = new JCheckBox();
+		maximized.setSelected("true".equals(config.get(FileConfiguration.SOUNDVIS_PROPERTY_APP_SIZE_MAXIMIZED)));
+		maximized.addChangeListener(new ChangeListener() {		
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				config.setProperty(FileConfiguration.SOUNDVIS_PROPERTY_APP_SIZE_MAXIMIZED, String.valueOf(maximized.isSelected()));
+				FileConfiguration.storeProperties(config);
+			}
+		});
+		panelSize.add(new JLabel("window maximized on startup: "));
+		panelSize.add(maximized);
 		
-		Object[] array = {panelAskApdir, panelLookAndFeel}; 
+		Object[] array = {panelAskApdir, panelLookAndFeel, panelSize}; 
 		JOptionPane jp = new JOptionPane(array, JOptionPane.PLAIN_MESSAGE);		
 		jp.setOptionType(JOptionPane.DEFAULT_OPTION);
 		JDialog jd = jp.createDialog("preferences");
