@@ -73,6 +73,10 @@ public class Session implements Serializable {
 	
 	public static boolean restoreSession( List<String> reportList) {
 		File defaultFile = new File(FileConfiguration.getTargetConfDir() + FileConfiguration.getSep() + DEFAULT_FILE_NAME + FILE_EXTENSION);
+		if(!defaultFile.exists()){
+			// attempt loading from backup
+			defaultFile = new File(FileConfiguration.getTargetConfDir() + FileConfiguration.getSep() + DEFAULT_BACkUP_FILE_NAME + FILE_EXTENSION);
+		}
 		PersistentSession persistentSession;
 		try {
 			persistentSession = loadSessionImpl(defaultFile, reportList);
