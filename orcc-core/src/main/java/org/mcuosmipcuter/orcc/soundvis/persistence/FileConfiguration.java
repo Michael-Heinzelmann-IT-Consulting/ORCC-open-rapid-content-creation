@@ -17,10 +17,12 @@
 */
 package org.mcuosmipcuter.orcc.soundvis.persistence;
 
+import java.awt.Dimension;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.function.Supplier;
 
@@ -35,7 +37,8 @@ public class FileConfiguration {
 	public static final String SOUNDVIS_PROPERTY_APP_DIR = "appDir";
 	public static final String SOUNDVIS_PROPERTY_ASK_APP_DIR_ON_STARTUP = "askAppDirOnStartup";
 	public static final String SOUNDVIS_PROPERTY_LOOK_AND_FEEL = "lookAndFeel";
-	public static final String SOUNDVIS_PROPERTY_APP_SIZE_MAXIMIZED = "appSize";
+	public static final String SOUNDVIS_PROPERTY_APP_SIZE_MAXIMIZED = "appSizeMaximized";
+	public static final String SOUNDVIS_PROPERTY_APP_SIZE_USER_DEFINED = "appSizeUserDefined";
 	
 	public static final String SOUNDVIS_PROPERTIES_FILE_NAME = "soundvis.properties";
 	private static final String TARGET_CONF_DIR_NAME = ".config";
@@ -159,5 +162,24 @@ public class FileConfiguration {
 	public static String getTargetConfDir() {
 		return targetConfDir;
 	}
-
+	
+	public static boolean isAppsizeMaximized() {
+		return "true".equals(getProperties().get(FileConfiguration.SOUNDVIS_PROPERTY_APP_SIZE_MAXIMIZED));
+	}
+	
+	public static void storeUserDefinedAppsize(Dimension latest) {
+		String value = latest.width + "x" + latest.height;
+		Properties cp = getProperties();
+		cp.setProperty(SOUNDVIS_PROPERTY_APP_SIZE_USER_DEFINED, value);
+		storeProperties(cp);
+	}
+	public static Optional<Dimension> loadUserDefinedAppsize() {
+		Properties cp = getProperties();
+		String value = cp.getProperty(SOUNDVIS_PROPERTY_APP_SIZE_USER_DEFINED);
+		if(value != null) {
+			String[] wh = value.split("x");
+			return Optional.of(new Dimension(Integer.valueOf(wh[0]), Integer.valueOf(wh[1])));
+		}
+		return Optional.empty();
+	}
 }

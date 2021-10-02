@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import javax.imageio.ImageIO;
@@ -434,7 +435,8 @@ public class Main {
 		
 		frame.getContentPane().add(deskTop);
 		
-		if("true".equals(FileConfiguration.getProperties().get(FileConfiguration.SOUNDVIS_PROPERTY_APP_SIZE_MAXIMIZED))) {
+		if(FileConfiguration.isAppsizeMaximized()) {
+			IOUtil.log("opening frame maximized");
 			frame.setExtendedState(Frame.MAXIMIZED_BOTH);
 			frame.addWindowStateListener(new WindowStateListener() {
 				
@@ -446,14 +448,24 @@ public class Main {
 					}
 				}
 			});
-			
+			final long start = System.currentTimeMillis();
 			frame.setVisible(true);
 			synchronized(frame) {
 				frame.wait(30000);
+				IOUtil.log("frame maximized after " + (System.currentTimeMillis() - start) + " ms.");
 			}
 		}
 		else {
-			frame.setSize(1400, 800);
+			Optional<Dimension> userDefined = FileConfiguration.loadUserDefinedAppsize();
+			if(userDefined.isPresent()) {
+				Dimension d = userDefined.get();
+				IOUtil.log("opening frame user defined " + d);
+				frame.setSize(d.width, d.height);
+			}
+			else {
+				IOUtil.log("opening frame default size");
+				frame.setSize(1400, 800);
+			}
 			frame.setVisible(true);
 		}
 		
@@ -704,6 +716,7 @@ public class Main {
 		}
 
 		try {
+			FileConfiguration.storeUserDefinedAppsize(frameSize);
 			
 			SessionToken st = Context.getSessionToken();
 
