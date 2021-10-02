@@ -17,6 +17,8 @@
 */
 package org.mcuosmipcuter.orcc.soundvis.gui;
 
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.Properties;
 
 import javax.swing.ButtonGroup;
@@ -28,8 +30,6 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import org.mcuosmipcuter.orcc.soundvis.persistence.FileConfiguration;
 
@@ -50,9 +50,9 @@ public class PreferencesBox {
 		JPanel panelAskApdir = new JPanel();
 		JCheckBox ask = new JCheckBox();
 		ask.setSelected("true".equals(config.get(FileConfiguration.SOUNDVIS_PROPERTY_ASK_APP_DIR_ON_STARTUP)));
-		ask.addChangeListener(new ChangeListener() {		
+		ask.addItemListener(new ItemListener() {		
 			@Override
-			public void stateChanged(ChangeEvent e) {
+			public void itemStateChanged(ItemEvent e)  {
 				config.setProperty(FileConfiguration.SOUNDVIS_PROPERTY_ASK_APP_DIR_ON_STARTUP, String.valueOf(ask.isSelected()));
 				FileConfiguration.storeProperties(config);
 			}
@@ -66,9 +66,9 @@ public class PreferencesBox {
 		Object configuredLf = config.get(FileConfiguration.SOUNDVIS_PROPERTY_LOOK_AND_FEEL);
 		for(LookAndFeelInfo lfi : UIManager.getInstalledLookAndFeels()) {
 			JRadioButton lf = new JRadioButton(lfi.getName(), lfi.getClassName().equals(configuredLf));
-			lf.addChangeListener(new ChangeListener() {
+			lf.addItemListener(new ItemListener() {
 				@Override
-				public void stateChanged(ChangeEvent e) {
+				public void itemStateChanged(ItemEvent e) {
 					if(lf.isSelected()) {
 						config.setProperty(FileConfiguration.SOUNDVIS_PROPERTY_LOOK_AND_FEEL, lfi.getClassName());
 						FileConfiguration.storeProperties(config);
@@ -81,13 +81,14 @@ public class PreferencesBox {
 		JPanel panelSize = new JPanel();
 		JCheckBox maximized = new JCheckBox();
 		maximized.setSelected("true".equals(config.get(FileConfiguration.SOUNDVIS_PROPERTY_APP_SIZE_MAXIMIZED)));
-		maximized.addChangeListener(new ChangeListener() {		
+		maximized.addItemListener(new ItemListener() {		
 			@Override
-			public void stateChanged(ChangeEvent e) {
+			public void itemStateChanged(ItemEvent e)  {
 				config.setProperty(FileConfiguration.SOUNDVIS_PROPERTY_APP_SIZE_MAXIMIZED, String.valueOf(maximized.isSelected()));
 				FileConfiguration.storeProperties(config);
 			}
 		});
+
 		panelSize.add(new JLabel("window maximized on startup: "));
 		panelSize.add(maximized);
 		
