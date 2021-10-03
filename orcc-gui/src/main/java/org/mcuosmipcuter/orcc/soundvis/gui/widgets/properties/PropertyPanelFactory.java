@@ -167,6 +167,16 @@ public class PropertyPanelFactory {
 						IOUtil.log(ex.getMessage());
 					}
 				}
+				int origValue = value;
+				if(value < minimum) {
+					value = minimum;
+				}
+				if(value > maximum) {
+					value = maximum;
+				}
+				if(value != origValue) {
+					IOUtil.log(field + " value out of bounds [" + minimum + " =< " + origValue + " >= " + maximum + "] using: " + value);
+				}
 
 				i = new IntegerPropertyPanel(soundCanvasWrapper, valueOwner, timed, value, minimum, maximum, l.stepSize(), unit, numberMeaning);
 			}

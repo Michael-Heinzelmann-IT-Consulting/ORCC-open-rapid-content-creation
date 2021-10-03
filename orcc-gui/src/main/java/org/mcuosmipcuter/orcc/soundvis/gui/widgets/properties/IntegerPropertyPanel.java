@@ -113,12 +113,12 @@ public class IntegerPropertyPanel extends PropertyPanel<Integer> {
 							if(text.equals(numberMeaning.meanings()[i])) {
 								int number = i < numberMeaning.numbers().length ? numberMeaning.numbers()[i] : 0;
 								pos.setIndex(text.length());
-								return Integer.valueOf(number);
+								return checked(Integer.valueOf(number), minimum, maximum);
 							}
 						}
 					}
 					try {
-						Number number = Integer.parseInt(text);
+						Number number = checked(Integer.parseInt(text), minimum, maximum);
 						pos.setIndex(text.length());
 						return number;
 					}
@@ -126,7 +126,7 @@ public class IntegerPropertyPanel extends PropertyPanel<Integer> {
 						// forward to super
 					}
 					Number num = super.parse(text, pos);
-					return Integer.valueOf(num != null ? num.intValue() : (int)0); // convert oversized Long
+					return checked(Integer.valueOf(num != null ? num.intValue() : (int)0), minimum, maximum); // convert oversized Long
 				}});
 
 			DefaultFormatterFactory factory = new DefaultFormatterFactory(displayFormat, displayFormat, displayFormat);
@@ -137,6 +137,17 @@ public class IntegerPropertyPanel extends PropertyPanel<Integer> {
 
 		add(jSpinner);
 		this.timed = timed;
+	}
+	private Integer checked(Integer value, int min, int max) {
+		if(value != null) {
+			if(value.intValue() < min) {
+				return min;
+			}
+			if(value > max) {
+				return max;
+			}
+		}
+		return value;
 	}
 	/**
 	 * Constructor with no limits
