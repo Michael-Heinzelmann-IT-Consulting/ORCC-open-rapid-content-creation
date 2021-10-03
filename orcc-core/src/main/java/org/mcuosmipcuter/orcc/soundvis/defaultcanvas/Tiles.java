@@ -56,8 +56,10 @@ public class Tiles implements SoundCanvas, ExtendedFrameHistory {
 	boolean fillBeforeStart = false;
 
 	@UserProperty(description="x size of tile", unit = Unit.PIXEL)
+	@LimitedIntProperty(minimum=1, description="at least 1 pixel")
 	int tileX = 240;
 	@UserProperty(description="y size of tile", unit = Unit.PIXEL)
+	@LimitedIntProperty(minimum=1, description="at least 1 pixel")
 	int tileY = 180;
 	
 	int size;
