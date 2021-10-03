@@ -162,7 +162,12 @@ public class Session implements Serializable {
 
 		Context.clearCanvasList();
 		for(PersistentSoundCanvasWrapper psw : persistentSession.getSoundCanvasList()) {
-			Context.addCanvasWrapper(psw.restore(reportList));
+			try {
+				Context.addCanvasWrapper(psw.restore(reportList));
+			}
+			catch(Exception ex) {
+				reportList.add(psw.getSoundCanvas().getDelegate() + ": " +  ex.getMessage());
+			}
 		}
 	}
 	
