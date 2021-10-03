@@ -24,6 +24,7 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
+import org.mcuosmipcuter.orcc.api.soundvis.ChangesIcon;
 import org.mcuosmipcuter.orcc.api.soundvis.ExtendedFrameHistory;
 import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.NestedProperty;
@@ -47,9 +48,10 @@ public class RotatingAmplitudes implements SoundCanvas, ExtendedFrameHistory {
 	public static enum AMP_MODE {
 		SIGNED, UNSIGNED
 	}
-	
+	@ChangesIcon
 	@UserProperty(description="degrees per frame speed", unit = Unit.DEGREES_PER_FRAME)
 	private int degreesPerFrame = 30;
+	@ChangesIcon
 	@UserProperty(description="foreground color")
 	private Color foreGround = Color.BLACK;
 	@LimitedIntProperty(description="size must be greater zero", minimum=1)
@@ -64,15 +66,18 @@ public class RotatingAmplitudes implements SoundCanvas, ExtendedFrameHistory {
 	@UserProperty(description="amp zoom in %", unit = Unit.PERCENT_OBJECT)
 	int ampZoom = 100;
 	
+	@ChangesIcon
 	@UserProperty(description="first polygon from center")
 	boolean startFromCenter = false;
 	
+	@ChangesIcon
 	@UserProperty(description="mode for drawing")
 	private DRAW_MODE drawMode = DRAW_MODE.LINE;
 	
 	@UserProperty(description="mode for amplitude calculation")
 	private AMP_MODE ampMode = AMP_MODE.UNSIGNED;
 	
+	@ChangesIcon
 	@LimitedIntProperty(description="limits for dot size", minimum=2, stepSize= 2)
 	@UserProperty(description="dot size for dot mode for drawing", unit = Unit.PIXEL)
 	private int dotSize = 2;
@@ -156,7 +161,7 @@ public class RotatingAmplitudes implements SoundCanvas, ExtendedFrameHistory {
 	public void newFrame(long frameCount, Graphics2D graphics2D) {
 		
 		graphics2D.setColor(foreGround);
-		int prevX = centerX + shiftX;;
+		int prevX = centerX + shiftX;
 		int prevY = centerY + shiftY;
 		boolean begin = true;
 		
@@ -207,9 +212,40 @@ public class RotatingAmplitudes implements SoundCanvas, ExtendedFrameHistory {
 	}
 
 	@Override
-	public void updateUI(int width, int height, Graphics2D graphics) {
-		// TODO Auto-generated method stub
-		
+	public void updateUI(int width, int height, Graphics2D graphics2D) {
+		graphics2D.setColor(foreGround);
+
+		boolean begin = true;
+		int localCenterX = width / 2;
+		int localCenterY = height / 2;
+		int[] drawAmps = new int[] { height /2, height / 4, height / 2, height / 3, 0}; 
+		Point[] localQueue = new Point[drawAmps.length];
+		long localDegrees = 0;
+		for(int i = 0; i < localQueue.length; i++) {
+			int x = localCenterX + (int)(drawAmps[i] * Math.cos(localDegrees * (Math.PI / 180)));
+			int y = localCenterY + (int)(drawAmps[i] * Math.sin(localDegrees * (Math.PI / 180)));
+			localQueue[i] = new Point(x, y);
+			localDegrees += degreesPerFrame;
+		}
+		int prevX = localCenterX;
+		int prevY = localCenterY;
+		for(Point p : localQueue) {
+			if(drawMode == DRAW_MODE.LINE || drawMode == DRAW_MODE.DOT_LINE) {
+				graphics2D.drawLine(localCenterX, localCenterY, p.x, p.y);
+			}
+			if(drawMode == DRAW_MODE.DOT || drawMode == DRAW_MODE.DOT_LINE) {
+				int localDotSize = dotSize < height / 2 ? dotSize : height / 2;
+				graphics2D.fillOval(p.x  - localDotSize / 2, p.y  - localDotSize / 2, localDotSize, localDotSize);
+			}
+			if(drawMode == DRAW_MODE.POLY_LINE) {
+				if(! begin ||startFromCenter) {
+					graphics2D.drawLine(prevX, prevY, p.x, p.y);
+				}
+				prevX = p.x;
+				prevY = p.y;
+			}
+			begin = false;
+		}
 	}
 
 	@Override
