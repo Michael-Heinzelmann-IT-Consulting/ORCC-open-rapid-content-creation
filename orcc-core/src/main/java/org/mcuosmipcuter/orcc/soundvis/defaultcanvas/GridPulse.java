@@ -161,10 +161,10 @@ public class GridPulse implements SoundCanvas {
 		graphics.setColor(new Color(foreGround.getRed(), foreGround.getGreen(), foreGround.getBlue()));	
 		int amp = Math.min(width, height) / 5;
 		for(int x = 0; x < width; x += amp) {
-			graphics.drawLine(x, 0, x, height);
+			graphics.drawLine(amp / 2 + x, 0, amp / 2 + x, height);
 		}
 		for(int y = 0; y < height; y += amp) {
-			graphics.drawLine(0, y, width, y);
+			graphics.drawLine(0, amp / 2 + y, width, amp / 2 + y);
 		}
 	}
 
