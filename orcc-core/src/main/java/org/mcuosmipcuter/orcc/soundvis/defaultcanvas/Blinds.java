@@ -95,8 +95,10 @@ public class Blinds implements SoundCanvas {
 	@UserProperty(description = "color of the vertical blades")
 	private Color colorVertical = Color.BLACK;
 	
+	@ChangesIcon
 	@UserProperty(description = "shape of the horizontal blades")
 	private BLADE_SHAPE bladeShapeHorizontal = BLADE_SHAPE.RECTANGLE;
+	@ChangesIcon
 	@UserProperty(description = "shape of the vertical blades")
 	private BLADE_SHAPE bladeShapeVertical = BLADE_SHAPE.RECTANGLE;
 	
@@ -217,7 +219,12 @@ public class Blinds implements SoundCanvas {
 			h = h < 2 ? 2 : h;
 			graphics.setColor(colorHorizontal);
 			for(int i = 0; h * i * 2 < height; i++) {
-				graphics.fillRect(0, h * i * 2, width, h);
+				if(bladeShapeHorizontal == BLADE_SHAPE.ELLIPSE) {
+					graphics.fillOval(0, h/2 + h * i * 2, width, h);
+				}
+				else {
+					graphics.fillRect(0, h/2 + h * i * 2, width, h);
+				}
 			}
 		}
 		if(numberVertical != 0) {
@@ -225,7 +232,12 @@ public class Blinds implements SoundCanvas {
 			w = w < 1 ? 1 : w;
 			graphics.setColor(colorVertical);
 			for(int i = 0; w * i * 2 < width; i++) {
-				graphics.fillRect(w * i * 2, 0 , w, height);
+				if(bladeShapeVertical == BLADE_SHAPE.ELLIPSE) {
+					graphics.fillOval(w/2 + w * i * 2, 0 , w, height);
+				}
+				else {
+					graphics.fillRect(w/2 + w * i * 2, 0 , w, height);
+				}
 			}
 		}
 	}

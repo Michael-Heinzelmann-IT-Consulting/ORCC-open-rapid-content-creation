@@ -28,6 +28,7 @@ import java.awt.geom.Area;
 import java.awt.geom.Ellipse2D;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
+import org.mcuosmipcuter.orcc.api.soundvis.ChangesIcon;
 import org.mcuosmipcuter.orcc.api.soundvis.DisplayDuration;
 import org.mcuosmipcuter.orcc.api.soundvis.DisplayUnit;
 import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
@@ -44,7 +45,7 @@ import org.mcuosmipcuter.orcc.soundvis.effects.Rotator;
 import org.mcuosmipcuter.orcc.soundvis.effects.Scaler;
 
 /**
- * Displays a solid color
+ * simulates a camera shutter
  * 
  * @author Michael Heinzelmann
  */
@@ -54,10 +55,14 @@ public class Shutter implements SoundCanvas {
 		RECTANGLE, ELLIPSE, DIAMOND,
 	}
 
+	@ChangesIcon
 	@UserProperty(description = "color of the area")
 	private Color color = Color.BLACK;
-	@UserProperty(description = "color of the area")
+	
+	@ChangesIcon
+	@UserProperty(description = "shape of the area")
 	private CLIP_SHAPE clipShape = CLIP_SHAPE.RECTANGLE;
+	
 	@LimitedIntProperty(description = "limits", minimum = 1, maximum = 36)
 	@UserProperty(description = "rotate multiply the area", unit = Unit.TIMES)
 	private int multiPlyRotated = 1;
@@ -92,63 +97,57 @@ public class Shutter implements SoundCanvas {
 	@Override
 	public void newFrame(long frameCount, Graphics2D graphics2D) {
 		
-//		int posInSlideDuration = repeater.repeat(frameFrom, frameTo, frameCount);
-//		int repeatDurationFrames = repeater.getRepeatDurationFrames(frameFrom, frameTo);
 		for(DisplayUnit displayUnit : repeater.repeat(frameFrom, frameTo, frameCount)) {
-
-		Shape clip;
-
-		if (clipShape == CLIP_SHAPE.ELLIPSE) {
-			clip = new Ellipse2D.Float(0, 0, width, height);
-		} else if (clipShape == CLIP_SHAPE.DIAMOND) {
-			clip = diamond;
-		} else {
-			clip = new Rectangle(width, height);
-		}
-
-		Area clipAreaInside = new Area(clip);
-
-		AffineTransform atsc = scaler.scale(displayUnit, clipAreaInside.getBounds().width, clipAreaInside.getBounds().height);
-		clipAreaInside.transform(atsc);
-
-		AffineTransform atp = positioner.position(dimensionHelper, clipAreaInside.getBounds());
-		clipAreaInside.transform(atp);
-
-		int centerX = clipAreaInside.getBounds().x + clipAreaInside.getBounds().width / 2;
-		int centerY = clipAreaInside.getBounds().y + clipAreaInside.getBounds().height / 2;
-
-		// System.err.println(centerX + "-" + centerY);
-		AffineTransform atr = rotator.rotate(displayUnit.currentPosition, displayUnit.duration, centerX, centerY);
-		clipAreaInside.transform(atr);
-
-		double theta = Math.PI / (double) multiPlyRotated;
-
-		Area fillArea = new Area(screen);
-		fillArea.subtract(clipAreaInside);
-
-		for (int i = 2; i <= multiPlyRotated; i++) {
-			AffineTransform tr = new AffineTransform();
-			tr.rotate(theta, centerX, centerY);
-			clipAreaInside.transform(tr);
-			if (multiplyXor) {
-				fillArea.exclusiveOr(clipAreaInside);
+	
+			Shape clip;
+	
+			if (clipShape == CLIP_SHAPE.ELLIPSE) {
+				clip = new Ellipse2D.Float(0, 0, width, height);
+			} else if (clipShape == CLIP_SHAPE.DIAMOND) {
+				clip = diamond;
 			} else {
-				fillArea.subtract(clipAreaInside);
+				clip = new Rectangle(width, height);
 			}
-		}
-
-		graphics2D.setColor(color);
-
-		graphics2D.setClip(fillArea);
-		final Composite saveComposite = fader.fade(graphics2D, displayUnit);
-
-		// graphics2D.setPaint(new GrayFilter(false, 50).);
-
-		graphics2D.fillRect(0, 0, width, height);
-		// graphics2D.fill(fillArea);
-
-		graphics2D.setClip(null);
-		graphics2D.setComposite(saveComposite);
+	
+			Area clipAreaInside = new Area(clip);
+	
+			AffineTransform atsc = scaler.scale(displayUnit, clipAreaInside.getBounds().width, clipAreaInside.getBounds().height);
+			clipAreaInside.transform(atsc);
+	
+			AffineTransform atp = positioner.position(dimensionHelper, clipAreaInside.getBounds());
+			clipAreaInside.transform(atp);
+	
+			int centerX = clipAreaInside.getBounds().x + clipAreaInside.getBounds().width / 2;
+			int centerY = clipAreaInside.getBounds().y + clipAreaInside.getBounds().height / 2;
+	
+			AffineTransform atr = rotator.rotate(displayUnit.currentPosition, displayUnit.duration, centerX, centerY);
+			clipAreaInside.transform(atr);
+	
+			double theta = Math.PI / (double) multiPlyRotated;
+	
+			Area fillArea = new Area(screen);
+			fillArea.subtract(clipAreaInside);
+	
+			for (int i = 2; i <= multiPlyRotated; i++) {
+				AffineTransform tr = new AffineTransform();
+				tr.rotate(theta, centerX, centerY);
+				clipAreaInside.transform(tr);
+				if (multiplyXor) {
+					fillArea.exclusiveOr(clipAreaInside);
+				} else {
+					fillArea.subtract(clipAreaInside);
+				}
+			}
+	
+			graphics2D.setColor(color);
+	
+			graphics2D.setClip(fillArea);
+			final Composite saveComposite = fader.fade(graphics2D, displayUnit);
+	
+			graphics2D.fillRect(0, 0, width, height);
+	
+			graphics2D.setClip(null);
+			graphics2D.setComposite(saveComposite);
 		}
 
 	}
@@ -168,13 +167,29 @@ public class Shutter implements SoundCanvas {
 	}
 
 	@Override
-	public void updateUI(int width, int height, Graphics2D graphics) {
+	public void updateUI(int widthToUse, int heightToUse, Graphics2D graphics) {
+
 		graphics.setColor(color);
 		graphics.fillRect(0, 0, width, height);
 		if (color.getRed() > 245 && color.getGreen() > 245 && color.getBlue() > 245) {
 			graphics.setColor(Color.BLACK);
-			graphics.drawRect(0, 0, width - 1, height - 1);
+			graphics.drawRect(0, 0, widthToUse - 1, heightToUse - 1);
 		}
+		Shape clip;
+		
+		if (clipShape == CLIP_SHAPE.ELLIPSE) {
+			clip = new Ellipse2D.Float(0, 0, widthToUse, heightToUse);
+		} else if (clipShape == CLIP_SHAPE.DIAMOND) {
+			clip =  new Polygon(new int[] { 0, widthToUse / 2, widthToUse, widthToUse / 2 },
+					new int[] { heightToUse / 2, heightToUse, heightToUse / 2, 0, }, 4);
+		} else {
+			int w = (int) (widthToUse * .8f);
+			int h = (int)(heightToUse * .8f);
+			clip = new Rectangle(w,  h);
+			graphics.translate((widthToUse - w) / 2, (heightToUse - h) / 2);
+		}
+		graphics.setColor(Color.WHITE);
+		graphics.fill(clip);
 	}
 
 	@Override
