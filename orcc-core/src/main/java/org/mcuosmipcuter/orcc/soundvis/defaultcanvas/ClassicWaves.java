@@ -31,6 +31,7 @@ import org.mcuosmipcuter.orcc.api.soundvis.Unit;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.api.util.AmplitudeHelper;
+import org.mcuosmipcuter.orcc.api.util.ColorHelper;
 import org.mcuosmipcuter.orcc.soundvis.effects.MovingAverage;
 
 
@@ -197,6 +198,10 @@ public class ClassicWaves implements SoundCanvas {
 
 	@Override
 	public void updateUI(int width, int height, Graphics2D graphics) {
+		if(ColorHelper.averageRGB(foreGroundColor) > 230) {
+			graphics.setColor(Color.LIGHT_GRAY);
+			graphics.fillRect(0, 0, width, height);
+		}
 		graphics.setColor(foreGroundColor);
 		int x = 1;
 		int prevAmp = 0;

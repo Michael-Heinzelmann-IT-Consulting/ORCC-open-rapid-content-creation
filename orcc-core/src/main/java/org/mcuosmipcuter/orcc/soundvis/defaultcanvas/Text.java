@@ -46,6 +46,7 @@ import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.Unit;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
+import org.mcuosmipcuter.orcc.api.util.ColorHelper;
 import org.mcuosmipcuter.orcc.api.util.DimensionHelper;
 import org.mcuosmipcuter.orcc.api.util.TextHelper;
 import org.mcuosmipcuter.orcc.soundvis.FontStore;
@@ -450,6 +451,10 @@ public class Text implements SoundCanvas, PropertyListener {
 		if(backGround.isDrawingEnabled()) {
 			Color bg = backGround.getColorToUse(textColor);
 			graphics.setColor(bg);
+			graphics.fillRect(0, 0, width, height);
+		}
+		else if(ColorHelper.averageRGB(textColor) > 230) {
+			graphics.setColor(Color.LIGHT_GRAY);
 			graphics.fillRect(0, 0, width, height);
 		}
 		graphics.setColor(textColor);

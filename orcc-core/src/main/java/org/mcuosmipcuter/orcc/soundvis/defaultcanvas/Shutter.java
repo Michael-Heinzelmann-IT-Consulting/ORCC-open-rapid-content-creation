@@ -170,7 +170,7 @@ public class Shutter implements SoundCanvas {
 	public void updateUI(int widthToUse, int heightToUse, Graphics2D graphics) {
 
 		graphics.setColor(color);
-		graphics.fillRect(0, 0, width, height);
+		graphics.fillRect(0, 0, widthToUse, heightToUse);
 		if (color.getRed() > 245 && color.getGreen() > 245 && color.getBlue() > 245) {
 			graphics.setColor(Color.BLACK);
 			graphics.drawRect(0, 0, widthToUse - 1, heightToUse - 1);

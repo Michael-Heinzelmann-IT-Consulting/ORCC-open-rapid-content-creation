@@ -73,4 +73,13 @@ public class ColorHelper {
 		graphics2D.setColor(new Color(rr, rg, rb));
 	}
 	
+	/**
+	 * return the average of the given colors RGB values
+	 * @param color for the average
+	 * @return between 0 and 255
+	 */
+	public static int averageRGB(Color color) {
+		return color == null ? 0 : (color.getRed() +  color.getGreen() + color.getBlue()) / 3;
+	}
+	
 }
