@@ -41,15 +41,18 @@ import javax.swing.JDesktopPane;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
 import javax.swing.Popup;
 import javax.swing.PopupFactory;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.filechooser.FileFilter;
 
@@ -72,7 +75,6 @@ import org.mcuosmipcuter.orcc.soundvis.gui.AboutBox;
 import org.mcuosmipcuter.orcc.soundvis.gui.AudioOutputLayoutMenu;
 import org.mcuosmipcuter.orcc.soundvis.gui.CanvasClassMenu;
 import org.mcuosmipcuter.orcc.soundvis.gui.ChangsBox;
-import org.mcuosmipcuter.orcc.soundvis.gui.FrameModulusMenu;
 import org.mcuosmipcuter.orcc.soundvis.gui.FrameRateMenu;
 import org.mcuosmipcuter.orcc.soundvis.gui.GraphPanel;
 import org.mcuosmipcuter.orcc.soundvis.gui.PlayBackPanel;
@@ -587,10 +589,34 @@ public class Main {
 			final JMenu viewMenu = new JMenu("View");
 			//graphicMenuBar.add(viewMenu);
 			mb.add(viewMenu);
-			viewMenu.add(new ZoomMenu("zoom", 0.0f, graphicPanel));
+			viewMenu.add(new ZoomMenu("video zoom", 0.0f, graphicPanel));
 			graphicPanel.setZoomFactor(0.0f);
+			
+			SpinnerNumberModel modelZoom = new SpinnerNumberModel(100, 10, 60000, 10);
+			final JSpinner framesToZoom = new JSpinner(modelZoom);
+			final JPanel fz = new JPanel();
+			fz.setLayout(new BorderLayout());
+			fz.add(framesToZoom, BorderLayout.WEST);
+			fz.add(new JLabel("samples"));
+			JMenuItem zoom = new JMenuItem("wave zoom");
+			viewMenu.add(zoom);
+
+			zoom.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					final int ftzOld = (Integer)framesToZoom.getValue();
+					JOptionPane.showMessageDialog(null, fz, "wave zoom to number of samples", 
+							JOptionPane.PLAIN_MESSAGE);
+					int ftz = (Integer)framesToZoom.getValue(); 
+					if(ftz != ftzOld) {
+						playBackPanel.changeFrameZoom(ftz);
+					}
+				}
+			});
+			
 			graphicPanel.setOpaque(true);
-			viewMenu.add(new FrameModulusMenu("realtime framerate reduction", 1, graphicPanel));
+
 			graphicPanel.addSettingsListener(new SettingsListener() {
 				
 				@Override

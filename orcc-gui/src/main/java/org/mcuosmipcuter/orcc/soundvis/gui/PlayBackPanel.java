@@ -28,16 +28,10 @@ import java.awt.event.ActionListener;
 import javax.sound.sampled.FloatControl;
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
-import javax.swing.JSpinner;
 import javax.swing.JToggleButton;
-import javax.swing.SpinnerNumberModel;
 import javax.swing.border.LineBorder;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
@@ -78,8 +72,6 @@ public class PlayBackPanel extends JPanel implements Mixin{
 	private long sampleCount;
 	private int samplesPerFrame;
 	
-	private int progressPaintState;
-	
 	private TimeLinePanel timeLine = new TimeLinePanel();
 	private JScrollPane timeLineScrollPane = new JScrollPane(timeLine);
 	private VolumeSlider volumeSlider;
@@ -88,7 +80,7 @@ public class PlayBackPanel extends JPanel implements Mixin{
 	private JLabel stateLabel = new JLabel();
 	private JProgressBar jProgressBar = new JProgressBar();
 	private PlayPauseButton playPause;
-	private JToggleButton autoZoom = new JToggleButton("fit/zoom");
+	private JToggleButton autoZoom = new JToggleButton("zoom wave");
 	
 	/**
 	 * Sets up a stop, play/pause button and a status label
@@ -98,7 +90,6 @@ public class PlayBackPanel extends JPanel implements Mixin{
 		PlayPauseStopFactory np = new PlayPauseStopFactory() {		
 			@Override
 			public PlayPauseStop newPlayPauseStop() {
-				progressPaintState = 1;
 				return new PlayThread(renderer);
 			}
 		};
@@ -137,7 +128,6 @@ public class PlayBackPanel extends JPanel implements Mixin{
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				progressPaintState = 0;
 				playPause.reset();
 				long startFrame = Context.getSongPositionPointer();
 				frameCountlabel.update(startFrame);
@@ -159,7 +149,6 @@ public class PlayBackPanel extends JPanel implements Mixin{
 					}
 					playPause.setEnabled(appState != AppState.EXPORTING && appState != AppState.LOADING);
 					if(appState == AppState.EXPORTING) {
-						progressPaintState = 1;
 						playPause.reset();
 						frameCountlabel.update(0);
 						sampleCount = 0;
@@ -201,36 +190,10 @@ public class PlayBackPanel extends JPanel implements Mixin{
 				timeLine.setInputOutputData();			
 				if( autoZoom.isSelected()) {
 					scrollToSelection();	
+					autoZoom.setText("fit wave");
 				}
-			}
-		});
-
-		SpinnerNumberModel modelZoom = new SpinnerNumberModel(100, 10, 60000, 10);
-		final JSpinner framesToZoom = new JSpinner(modelZoom);
-		final JPanel fz = new JPanel();
-		fz.setLayout(new BorderLayout());
-		fz.add(framesToZoom, BorderLayout.WEST);
-		fz.add(new JLabel("samples"));
-		
-		JMenu waveSettings = new JMenu("wave");
-		JMenu set = new JMenu("set");
-		waveSettings.add(set);
-		JMenuItem zoom = new JMenuItem("zoom");
-		set.add(zoom);
-		zoom.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				final int ftzOld = (Integer)framesToZoom.getValue();
-				JOptionPane.showMessageDialog(null, fz, "wave zoom to number of samples", 
-						JOptionPane.PLAIN_MESSAGE);
-				int ftz = (Integer)framesToZoom.getValue(); 
-				if(ftz != ftzOld) {
-					timeLine.setAutoZoom(false);
-					autoZoom.setSelected(true);
-					timeLine.setSamplesToZoom(ftz);
-					timeLine.setInputOutputData();	
-					scrollToSelection();
+				else {
+					autoZoom.setText("zoom wave");
 				}
 			}
 		});
@@ -246,11 +209,6 @@ public class PlayBackPanel extends JPanel implements Mixin{
 		commands.add(stateLabel);
 		commands.add(volumeSlider);
 		commands.add(autoZoom);
-		
-		JMenuBar waveBar = new JMenuBar();
-		waveBar.add(waveSettings);
-		commands.add(waveBar);
-
 		commands.add(frameCountlabel);
 		commands.add(timeLabel);
 		commands.add(jProgressBar);
@@ -269,14 +227,16 @@ public class PlayBackPanel extends JPanel implements Mixin{
 	public void newFrame(long frameCount, boolean sendPost) {
 		frameCountlabel.update(frameCount);
 		updateProgress();
-		if(progressPaintState == 1) {
-			timeLine.repaint();
-			progressPaintState = 2;
+		if( autoZoom.isSelected()) {
+			int s = timeLine.getCurrentPosition();
+			int extent = timeLineScrollPane.getViewport().getExtentSize().width;
+			int center = timeLineScrollPane.getHorizontalScrollBar().getValue()+ extent/2;
+			if(s > center + extent/4 || s < center - extent/4) {
+				timeLineScrollPane.getHorizontalScrollBar().setValue(s -  extent/4);
+			}
 		}
-		if(progressPaintState == 2) {
-			timeLine.repaint();
-		}
-		
+
+		timeLine.repaint();	
 	}
 	@Override
 	public boolean nextSample(int[] amplitudes, byte[] rawData, long sampleCount) {
@@ -292,6 +252,13 @@ public class PlayBackPanel extends JPanel implements Mixin{
 	public void start(AudioInputInfo audioInputInfo, VideoOutputInfo videoOutputInfo) {
 		sampleLength = audioInputInfo.getFrameLength();
 		sampleRate = audioInputInfo.getAudioFormat().getSampleRate();
+	}
+	public void changeFrameZoom(int ftz) {
+			timeLine.setAutoZoom(false);
+			autoZoom.setSelected(true);
+			timeLine.setSamplesToZoom(ftz);
+			timeLine.setInputOutputData();	
+			scrollToSelection();
 	}
 	private void updateProgress() {
 		if(sampleRate != 0) {

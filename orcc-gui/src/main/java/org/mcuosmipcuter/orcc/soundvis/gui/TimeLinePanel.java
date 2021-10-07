@@ -526,6 +526,8 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 		return selectPos;
 	}
 	
-	
+	public int getCurrentPosition() {
+		return noOfSamples != 0 ? (int)(samplePosition / noOfSamples) : 0;
+	}
 
 }
