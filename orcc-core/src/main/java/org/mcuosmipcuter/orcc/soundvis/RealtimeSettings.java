@@ -33,12 +33,6 @@ public interface RealtimeSettings {
 	public void setZoomFactor(float zoomFactor);
 	
 	/**
-	 * Reduce the refresh rate by modulus
-	 * @param reductionModulus
-	 */
-	public void setVideoRefresh(int reductionModulus);
-	
-	/**
 	 * add listener for updates
 	 * @param settingsListener
 	 */

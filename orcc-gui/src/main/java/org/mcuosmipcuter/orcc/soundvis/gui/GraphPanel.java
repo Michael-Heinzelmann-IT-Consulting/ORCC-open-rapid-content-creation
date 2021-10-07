@@ -74,8 +74,6 @@ public class GraphPanel extends JPanel implements Renderer, RealtimeSettings, Li
 	
 	private float zoomFactor = 0.5f;
 	private boolean autoZoom;
-	int reductionModulus = 1;
-	int backupReductionModulus = 1;
 	
 
 	ProgressPainterThread progressPainterThread = new ProgressPainterThread();
@@ -203,13 +201,11 @@ public class GraphPanel extends JPanel implements Renderer, RealtimeSettings, Li
 		frameImage = new BufferedImage(videoOutputInfo.getWidth(), videoOutputInfo.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
 		graphics = frameImage.createGraphics();
 		if(Context.getAppState() == AppState.EXPORTING) {
-			reductionModulus = 1; // always use original frame rate
 			graphics.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 			graphics.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
 			graphics.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
 		}
 		else {
-			reductionModulus = backupReductionModulus; // reset
 			graphics.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_SPEED);
 			graphics.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_SPEED);
 			graphics.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_SPEED);
@@ -274,7 +270,7 @@ public class GraphPanel extends JPanel implements Renderer, RealtimeSettings, Li
 					soundCanvas.postFrame();
 				}
 			}
-			if(frameCount < 2 || frameCount % reductionModulus == 0) {
+			
 			if(frameCount > Context.getSongPositionPointer()) {
 				this.repaint(); // standard asynchronous painting
 				//paintComponent(getGraphics());// synchronous on some systems better graphics but can slow down audio
@@ -283,7 +279,7 @@ public class GraphPanel extends JPanel implements Renderer, RealtimeSettings, Li
 			if(mixin != null) {
 				mixin.newFrame(frameCount, sendPost);
 			}
-		}
+		
 	}
 
 	@Override
@@ -330,16 +326,9 @@ public class GraphPanel extends JPanel implements Renderer, RealtimeSettings, Li
 		updateSettingListeners();
 	}
 
-	@Override
-	public void setVideoRefresh(int reductionModulus) {
-		this.reductionModulus = reductionModulus;
-		this.backupReductionModulus = reductionModulus;
-		updateSettingListeners();
-	}
 
 	private void updateSettingListeners() {
-		String settingsString = "frame reduction: " + (reductionModulus == 1 ? "none" : "" + reductionModulus)
-		+ " zoom: " + zoomFactor;
+		String settingsString = " zoom: " + ((int)(zoomFactor * 100) + "%");
 		for(SettingsListener sl : settingsListeners) {
 			sl.update(settingsString);
 		}
