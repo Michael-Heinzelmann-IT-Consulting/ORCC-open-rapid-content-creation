@@ -18,13 +18,16 @@
 package org.mcuosmipcuter.orcc.gui.table;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.util.Set;
 
 import javax.swing.JPanel;
+import javax.swing.border.LineBorder;
 
 import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
 import org.mcuosmipcuter.orcc.soundvis.gui.widgets.properties.EditorLifeCycle;
@@ -77,13 +80,14 @@ public class Row extends JPanel {
 		else {
 			if(panel == null) {
 				panel = new JPanel();
-
+				panel.setBorder(new LineBorder(panel.getBackground(), 8, true));
 				GridBagConstraints gc = new GridBagConstraints();
 				GridBagLayout gl = new GridBagLayout();
 				panel.setLayout(gl);
 				gc.fill = GridBagConstraints.BOTH;
 				gc.anchor = GridBagConstraints.LINE_START;
-		         gc.weightx = 1;
+				gc.insets = new Insets(3, 0, 0, 0);
+		        gc.weightx = 1;
 
 				int maxCols = soundCanvasWrapper.getSoundCanvas().getEditorColumns();
 				int c = 0;
@@ -102,7 +106,7 @@ public class Row extends JPanel {
 			}
 			int h = headerHeight + panel.getPreferredSize().height;
 			add(panel, BorderLayout.SOUTH);
-			setPreferredSize(new Dimension(getPreferredSize().width, h));
+			setPreferredSize(new Dimension(getPreferredSize().width, h + 2));
 			setMaximumSize(getPreferredSize());
 		}
 		panelVisible = !panelVisible;
@@ -113,7 +117,7 @@ public class Row extends JPanel {
 			if(c == p) {
 				panel.revalidate();
 				int h = headerHeight + panel.getPreferredSize().height;
-				setPreferredSize(new Dimension(getPreferredSize().width, h));
+				setPreferredSize(new Dimension(getPreferredSize().width, h + 2));
 				revalidate();
 				break;
 			}
