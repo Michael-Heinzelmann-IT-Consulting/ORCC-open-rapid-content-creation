@@ -82,25 +82,23 @@ public class Session implements Serializable {
 			persistentSession = loadSessionImpl(defaultFile, reportList);
 			SessionToken st;
 			if(persistentSession.getSessionPath() != null) {
-//				File file = new File(persistentSession.getSessionPath());
-//				return userLoadSession(file, reportList);
 				st = new SessionToken(persistentSession.getSessionPath(), reportList);
-				for(Map.Entry<String, ValueChanges> e : persistentSession.getChanges().entrySet()) {
-					if(e.getValue().isLogicallyChanged()) {
-						st.changeOccurred(e.getKey(), e.getValue().getOriginal(), e.getValue().getCurrent());
+				if(persistentSession.getChanges() != null) {
+					for(Map.Entry<String, ValueChanges> e : persistentSession.getChanges().entrySet()) {
+						if(e.getValue().isLogicallyChanged()) {
+							st.changeOccurred(e.getKey(), e.getValue().getOriginal(), e.getValue().getCurrent());
+						}
 					}
 				}
 			}
 			else {
 				st = new SessionToken();
 			}
-//			else {
-				setUpApplication(persistentSession, reportList);
 
+			setUpApplication(persistentSession, reportList);
 
-				Context.setSessionToken(st);
-//			}
-			
+			Context.setSessionToken(st);
+
 			return persistentSession != null;
 		} catch (Exception e) {
 			e.printStackTrace();
