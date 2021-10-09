@@ -165,7 +165,7 @@ public class Row extends JPanel {
 		//p.setBorder(new LineBorder(getBackground(), 2));
 		p.setLayout(new GridLayout(1 , 2, 12, 12));
 		JLabel nameLabel = new JLabel(name);
-		nameLabel.setPreferredSize(new Dimension(200, 10));
+		//nameLabel.setPreferredSize(new Dimension(200, 10));
 		nameLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 		p.add(nameLabel);
 		p.add(c);
