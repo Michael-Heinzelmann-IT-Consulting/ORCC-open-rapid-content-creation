@@ -251,7 +251,7 @@ public class CustomTable extends JPanel implements Context.Listener{
 	public void addLayer(final SoundCanvasWrapper soundCanvasWrapper) {
 		int rowH = 78;
 		final Row row = new Row(soundCanvasWrapper);
-		row.setPreferredSize(new Dimension(740, rowH));
+		row.setPreferredSize(new Dimension(630, rowH));
 		row.setLayout(new BorderLayout());
 		//row.setLayout(new FlowLayout());
 		TitledBorder tb = new TitledBorder(new LineBorder(Color.WHITE, 8));
@@ -415,23 +415,23 @@ public class CustomTable extends JPanel implements Context.Listener{
 		
 		//timeline.add(mains);
 		//int wTenThou = transparency.getPreferredSize().width ;
-		fromFrame.setPreferredSize(new Dimension(78, boxH));
+		fromFrame.setPreferredSize(new Dimension(80, boxH));
 		//fromFrame.setMaximumSize(new Dimension(100, 22));
 		//gl.setConstraints(fromFrame, gc);
 		timeline.add(fromFrame);
-		toFrame.setPreferredSize(new Dimension(78, boxH));
+		toFrame.setPreferredSize(new Dimension(80, boxH));
 		//gl.setConstraints(toFrame, gc);
 		timeline.add(toFrame);
 		scale.setPreferredSize(new Dimension(58, boxH));
-		timeline.add(scale);
+		//timeline.add(scale);
 		//JPanel pos = new JPanel();
 		//pos.setLayout(new GridLayout(1, 2, 0, 0));
 		posX.setPreferredSize(new Dimension(58, boxH));
 		//gl.setConstraints(posX, gc);
-		timeline.add(posX);
+		//timeline.add(posX);
 		posY.setPreferredSize(new Dimension(58, boxH));
 		//gl.setConstraints(posY, gc);
-		timeline.add(posY);
+		//timeline.add(posY);
 		//timeline.add(pos);
 		
 		//JPanel graphs = new JPanel();
@@ -440,7 +440,7 @@ public class CustomTable extends JPanel implements Context.Listener{
 		//gl.setConstraints(transparency, gc);
 		timeline.add(transparency);
 		//gl.setConstraints(xorCheckBox, gc);
-		//xorCheckBox.setPreferredSize(new Dimension(40, boxH));
+		xorCheckBox.setPreferredSize(new Dimension(58, boxH));
 		timeline.add(xorCheckBox);
 
 		//timeline.add(graphs);
