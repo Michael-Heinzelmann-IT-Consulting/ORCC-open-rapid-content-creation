@@ -124,17 +124,25 @@ public class Row extends JPanel {
 					}
 				});
 		
-				JPanel scaleP = commonPanel("scale", scale);
-				gl.setConstraints(scaleP, gc);
-				panel.add(scaleP);
+				JPanel commonP = new JPanel();
+				commonP.setLayout(new GridLayout(1, 3));
+				JPanel scaleP = commonPanel("scale X/Y", scale);
+				//gl.setConstraints(scaleP, gc);
+				commonP.add(scaleP);
 				JPanel posxP = commonPanel("position X", posX);
-				gl.setConstraints(posxP, gc);
-				panel.add(posxP);
+				//gl.setConstraints(posxP, gc);
+				commonP.add(posxP);
 				JPanel posyP = commonPanel("position Y", posY);
-				gc.gridwidth = GridBagConstraints.REMAINDER;
-				gl.setConstraints(posyP, gc);
-				panel.add(posyP);
+				//gc.gridwidth = GridBagConstraints.REMAINDER;
+				//gl.setConstraints(posyP, gc);
+				commonP.add(posyP);
 				
+				gc.gridwidth = GridBagConstraints.REMAINDER;
+				gl.setConstraints(commonP, gc);
+				panel.add(commonP);
+				
+				//gc.gridx = 0;
+				gc.gridwidth = 1;
 				gc.insets = new Insets(3, 0, 0, 0);
 
 				int maxCols = soundCanvasWrapper.getSoundCanvas().getEditorColumns();
