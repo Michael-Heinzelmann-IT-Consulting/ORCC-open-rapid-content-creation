@@ -253,7 +253,7 @@ public class CustomTable extends JPanel implements Context.Listener{
 		final Row row = new Row(soundCanvasWrapper);
 		row.setPreferredSize(new Dimension(630, rowH));
 		row.setLayout(new BorderLayout());
-		//row.setLayout(new FlowLayout());
+
 		TitledBorder tb = new TitledBorder(new LineBorder(Color.WHITE, 8));
 		tb.setTitle(soundCanvasWrapper.getDisplayName());
 		tb.setTitlePosition(TitledBorder.TOP);
@@ -354,34 +354,6 @@ public class CustomTable extends JPanel implements Context.Listener{
 				Context.touch();
 			}
 		});
-		final JSpinner scale = new JSpinner();
-		scale.setToolTipText("scale in % of video");
-		scale.setValue(soundCanvasWrapper.getScale());		
-		scale.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent arg0) {
-				soundCanvasWrapper.setScale(((((Number)scale.getValue()).intValue())));
-				Context.touch();
-			}
-		});
-		
-		final JSpinner posX = new JSpinner();
-		posX.setToolTipText("position X");
-		posX.setValue(soundCanvasWrapper.getPosX());		
-		posX.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent arg0) {
-				soundCanvasWrapper.setPosX(((((Number)posX.getValue()).intValue())));
-				Context.touch();
-			}
-		});
-		final JSpinner posY = new JSpinner();
-		posY.setToolTipText("position Y");
-		posY.setValue(soundCanvasWrapper.getPosY());		
-		posY.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent arg0) {
-				soundCanvasWrapper.setPosY(((((Number)posY.getValue()).intValue())));
-				Context.touch();
-			}
-		});
 		
 		final JCheckBox xorCheckBox = new JCheckBox(soundCanvasWrapper.isXor() ? "xor": "std", soundCanvasWrapper.isXor());
 		xorCheckBox.addActionListener(new ActionListener() {
@@ -395,60 +367,26 @@ public class CustomTable extends JPanel implements Context.Listener{
 
 		int boxH = 24;
 		final JPanel timeline = new JPanel();
-		//timeline.setLayout(new GridLayout(1, 4, 2, 2));
-		//GridBagLayout gl = new GridBagLayout();
-		//GridBagConstraints gc = new GridBagConstraints();
-		//gc.fill = GridBagConstraints.BOTH;
-		//gc.anchor = GridBagConstraints.LINE_START;
-        //gc.weightx = 0;
+		
         FlowLayout fll = new FlowLayout();
         fll.setVgap(10);
 		timeline.setLayout(fll);
-		//timeline.setBorder(new LineBorder(timeline.getBackground(), 10));
-		
-		//JPanel mains = new JPanel();
-		//mains.setLayout(new GridLayout(1, 2, 1, 1));
-		//gl.setConstraints(expandButton, gc);
+
 		timeline.add(expandButton);
-		//gl.setConstraints(showCheckBox, gc);
 		timeline.add(showCheckBox);
-		
-		//timeline.add(mains);
-		//int wTenThou = transparency.getPreferredSize().width ;
+
 		fromFrame.setPreferredSize(new Dimension(80, boxH));
-		//fromFrame.setMaximumSize(new Dimension(100, 22));
-		//gl.setConstraints(fromFrame, gc);
 		timeline.add(fromFrame);
-		toFrame.setPreferredSize(new Dimension(80, boxH));
-		//gl.setConstraints(toFrame, gc);
-		timeline.add(toFrame);
-		scale.setPreferredSize(new Dimension(58, boxH));
-		//timeline.add(scale);
-		//JPanel pos = new JPanel();
-		//pos.setLayout(new GridLayout(1, 2, 0, 0));
-		posX.setPreferredSize(new Dimension(58, boxH));
-		//gl.setConstraints(posX, gc);
-		//timeline.add(posX);
-		posY.setPreferredSize(new Dimension(58, boxH));
-		//gl.setConstraints(posY, gc);
-		//timeline.add(posY);
-		//timeline.add(pos);
 		
-		//JPanel graphs = new JPanel();
-		//graphs.setLayout(new GridLayout(1, 2, 0, 0));
+		toFrame.setPreferredSize(new Dimension(80, boxH));
+		timeline.add(toFrame);
+
 		transparency.setPreferredSize(new Dimension(58, boxH));
-		//gl.setConstraints(transparency, gc);
 		timeline.add(transparency);
-		//gl.setConstraints(xorCheckBox, gc);
+
 		xorCheckBox.setPreferredSize(new Dimension(58, boxH));
 		timeline.add(xorCheckBox);
 
-		//timeline.add(graphs);
-
-		//timeline.add(threshold);
-		
-
-		
 		
 		BufferedImage image = getImage();
 		soundCanvasWrapper.updateUI(100, 40, image.createGraphics());

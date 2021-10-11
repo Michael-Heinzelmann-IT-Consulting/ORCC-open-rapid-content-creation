@@ -126,22 +126,18 @@ public class Row extends JPanel {
 		
 				JPanel commonP = new JPanel();
 				commonP.setLayout(new GridLayout(1, 3));
+				
 				JPanel scaleP = commonPanel("scale X/Y", scale);
-				//gl.setConstraints(scaleP, gc);
 				commonP.add(scaleP);
 				JPanel posxP = commonPanel("position X", posX);
-				//gl.setConstraints(posxP, gc);
 				commonP.add(posxP);
 				JPanel posyP = commonPanel("position Y", posY);
-				//gc.gridwidth = GridBagConstraints.REMAINDER;
-				//gl.setConstraints(posyP, gc);
 				commonP.add(posyP);
 				
 				gc.gridwidth = GridBagConstraints.REMAINDER;
 				gl.setConstraints(commonP, gc);
 				panel.add(commonP);
-				
-				//gc.gridx = 0;
+
 				gc.gridwidth = 1;
 				gc.insets = new Insets(3, 0, 0, 0);
 
@@ -170,10 +166,8 @@ public class Row extends JPanel {
 	private JPanel commonPanel(String name, Component c) {
 		JPanel p = new JPanel();
 		p.setBackground(getBackground());
-		//p.setBorder(new LineBorder(getBackground(), 2));
 		p.setLayout(new GridLayout(1 , 2, 12, 12));
 		JLabel nameLabel = new JLabel(name);
-		//nameLabel.setPreferredSize(new Dimension(200, 10));
 		nameLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 		p.add(nameLabel);
 		p.add(c);
