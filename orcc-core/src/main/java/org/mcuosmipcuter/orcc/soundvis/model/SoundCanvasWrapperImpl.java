@@ -93,7 +93,7 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 	@Override
 	public void newFrame(long frameCount, Graphics2D graphics2d) {
 
-		if(enabled && frameCount >= Math.min(displayFrameFrom, frameFrom) 
+		if(enabled && scale != 0 && frameCount >= Math.min(displayFrameFrom, frameFrom) 
 				&& (frameCount <= Math.max(displayFrameTo, frameTo) || frameTo <= 0))
 		{
 			if(xor) {
