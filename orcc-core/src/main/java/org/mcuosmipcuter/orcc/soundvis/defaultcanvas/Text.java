@@ -324,7 +324,8 @@ public class Text implements SoundCanvas, PropertyListener {
 
 			final AffineTransform saveTransfrom = graphics2d.getTransform();
 
-			AffineTransform transform = shearer.shear(displayUnit);
+			AffineTransform transform = graphics2d.getTransform();
+			transform.concatenate(shearer.shear(displayUnit));
 			transform.concatenate(mover.move(displayUnit.currentPosition, displayUnit.duration));
 			transform.concatenate(positioner.position(dimensionHelper));
 
