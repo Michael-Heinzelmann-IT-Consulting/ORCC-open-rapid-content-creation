@@ -42,6 +42,9 @@ public class Repeater {
 	@NumberMeaning(numbers = 0, meanings = "auto")
 	int frames = 0;
 	
+	@UserProperty(description="index of repeat", unit=Unit.TIMES)	
+	long [] fixedTos = new long[] {};
+	
 	private DisplayObject[] displayObjects;
 	
 	public Repeater(DisplayObject ...displayObjects) {
@@ -51,7 +54,6 @@ public class Repeater {
 	public DisplayUnit[] repeat(long frameFrom, long frameTo, long frameCount) {
 		
 		int relFrameCount = (int) (frameCount - frameFrom);
-		int repeatDurationFrames = getRepeatDurationFrames(frameFrom, frameTo);
 		
 		int oLapBef = 0;
 		int oLapAft = 0;
@@ -59,12 +61,16 @@ public class Repeater {
 			oLapBef = (int) Math.min(oLapBef, d.getDisplayDuration(frameFrom, frameTo).getOverlapBefore());
 			oLapAft = (int) Math.max(oLapAft, d.getDisplayDuration(frameFrom, frameTo).getOverlapAfter());
 		}
-		int duration = repeatDurationFrames + Math.abs(oLapBef) + oLapAft;
+		
 		List<DisplayUnit> units = new ArrayList<>();
 		int index = 0;
+		int relStart = 0;
 		for(int r = 0; r < repeat; r++) {
+			int repeatDurationFrames = getRepeatDurationFrames(frameFrom, frameTo, r);
+			int duration = repeatDurationFrames + Math.abs(oLapBef) + oLapAft;
 			if(relFrameCount  <= frameTo + oLapAft) {
-				int start = repeatDurationFrames * r + oLapBef;
+				int start = relStart + oLapBef;
+				relStart += repeatDurationFrames;
 				int end = start + duration - 1;
 
 				if(relFrameCount >= start && relFrameCount <= end ) {
@@ -85,8 +91,65 @@ public class Repeater {
 		return units.toArray(new DisplayUnit[] {});
 	}
 
-	private int getRepeatDurationFrames(long frameFrom, long frameTo) {
+	private int getRepeatDurationFrames(long frameFrom, long frameTo, int index) {
 		int duration = (int) (frameTo - frameFrom);
+		if(fixedTos.length > 0 && repeat > 1) {
+			int maxTo = 0;
+			int configured = 0;
+			int i = 0;
+//			for(long to : fixedTos) {
+//				int toi = (int) to;
+//				if(toi > 0 && i < repeat) {
+//				if(r == index ) {
+//					System.err.println(toi + " currentTo: " + currentTo);
+//					return toi - currentTo;
+//				}
+//				currentTo = toi;
+//				r++;
+//				}
+//				i++;
+//			}
+//			if(repeat - r > 0) {
+//				System.err.println(" 1 currentTo: " + currentTo);
+//				return (duration - currentTo) / (repeat - r);
+//			}
+//			else {
+//				System.err.println(r + " 2 currentTo: " + currentTo);
+//			}
+			
+			
+			for(long to : fixedTos) {
+				int toi = (int) to;
+				if(toi > 0 && toi > maxTo && i < repeat) {
+					maxTo = toi;
+					configured++;
+				}
+				i++;
+			}
+			if(configured > 0) {
+			int autoAvg = 0;
+			if(repeat - configured > 0) {
+				autoAvg = (duration - maxTo) / (repeat - configured);
+			}
+			int currentTo = 0;
+			int prevTo = 0;
+			for(int j = 0; j < repeat; j++) {
+				//System.err.println(j + " " + index);
+				
+
+				if(j < fixedTos.length) {
+					int toi = (int)fixedTos[j];
+					currentTo = toi != 0 ? toi : currentTo + autoAvg;
+				}
+				if(j == index) {
+					return currentTo - prevTo;
+				
+				}
+				prevTo = currentTo;
+			}
+			
+		}
+		}
 		int repeatDurationFrames;
 		if(frames == 0) {
 			repeatDurationFrames = duration / repeat;
@@ -108,17 +171,20 @@ public class Repeater {
 			oLapAft = (int) Math.max(oLapAft, d.getDisplayDuration(frameFrom, frameTo).getOverlapAfter());
 		}
 		int effects = displayObjects.length;
-		int repeatDurationFrames = getRepeatDurationFrames(frameFrom, frameTo);
+		
 		DisplayDuration<?>[]result = new DisplayDuration<?>[repeat * effects];
 		int c = 0;
+		int relStart = 0;
 		for(int r = 0; r < repeat * effects; r += effects) {
-			long end = repeat == 1 ? frameTo : frameFrom + repeatDurationFrames * (c + 1) - 1;
+			int repeatDurationFrames = getRepeatDurationFrames(frameFrom, frameTo, c);
+			long end = repeat == 1 ? frameTo : frameFrom + relStart + repeatDurationFrames - 1;
 			for(int j = 0; j < effects; j++) {
-				DisplayDuration<?> dd = displayObjects[j].getDisplayDuration(frameFrom + repeatDurationFrames * c, end);
+				DisplayDuration<?> dd = displayObjects[j].getDisplayDuration(frameFrom + relStart, end);
 				dd.setFrom(dd.getFrom() + oLapBef);
 				dd.setTo(dd.getTo() + oLapAft);
 				result[r + j] = dd;
 			}
+			relStart += repeatDurationFrames;
 			c++;
 		}
 		return result;

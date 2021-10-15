@@ -57,9 +57,15 @@ public class  ValueChanges  {
 	}
 	
 	private boolean handleArrays() {
+		if(original.getClass().isInstance(Object[].class)) {
 		Object[] currArr = (Object[])current;
 		Object[] origArr = (Object[])original;
 		return Arrays.equals(currArr, origArr);
+		}
+		else if(original instanceof long[]){
+			return Arrays.equals((long[])current, (long[])original);
+		}
+		return false;
 	}
 	public Object getOriginal() {
 		return original;
