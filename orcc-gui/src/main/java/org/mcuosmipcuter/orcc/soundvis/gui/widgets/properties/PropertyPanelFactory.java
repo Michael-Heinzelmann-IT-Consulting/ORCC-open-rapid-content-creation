@@ -36,6 +36,7 @@ import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.TimedChange;
 import org.mcuosmipcuter.orcc.api.soundvis.Unit;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
+import org.mcuosmipcuter.orcc.api.types.LongSequence;
 import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
 import org.mcuosmipcuter.orcc.soundvis.defaultcanvas.model.Slide;
 import org.mcuosmipcuter.orcc.util.IOUtil;
@@ -209,7 +210,7 @@ public class PropertyPanelFactory {
 			Set<MappedValue<?>> values = vs;
 			return new MappedValuePropertyPanel(soundCanvasWrapper, valueOwner, values, value);
 		}
-		if(long[].class.equals(type)) {
+		if(LongSequence.class.equals(type)) {
 			return new LongArrayPropertyPanel(soundCanvasWrapper, valueOwner);
 		}
 		throw new RuntimeException(type + " type not supported");

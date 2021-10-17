@@ -15,12 +15,12 @@
 *   You should have received a copy of the GNU General Public License
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-module orcc.api {
-	exports org.mcuosmipcuter.orcc.api.util;
-	exports org.mcuosmipcuter.orcc.api.soundvis;
-	exports org.mcuosmipcuter.orcc.api.types;
-	exports org.mcuosmipcuter.orcc.api;
+package org.mcuosmipcuter.orcc.api;
 
-	requires transitive java.desktop;
-	
+/**
+ * @author Michael Heinzelmann
+ *
+ */
+public interface LogicalEqual {
+	public boolean isLogicalEqual(Object other);
 }

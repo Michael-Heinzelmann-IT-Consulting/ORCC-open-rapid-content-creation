@@ -18,7 +18,6 @@
 package org.mcuosmipcuter.orcc.soundvis.effects;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.mcuosmipcuter.orcc.api.soundvis.DisplayDuration;
@@ -28,6 +27,7 @@ import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.NumberMeaning;
 import org.mcuosmipcuter.orcc.api.soundvis.Unit;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
+import org.mcuosmipcuter.orcc.api.types.LongSequence;
 
 /**
  * @author user
@@ -44,8 +44,8 @@ public class Repeater {
 	@NumberMeaning(numbers = 0, meanings = "auto")
 	int frames = 0;
 	
-	@UserProperty(description="index of repeat", unit=Unit.TIMES)	
-	long [] fixedTos = new long[0];
+	@UserProperty(description="sequence of fixed tos to repeat over", unit=Unit.TIMES)	
+	LongSequence fixedTos = new LongSequence();
 	
 	private DisplayObject[] displayObjects;
 	
@@ -95,7 +95,7 @@ public class Repeater {
 
 	private int getRepeatDurationFrames(long frameFrom, long frameTo, int index) {
 		int duration = (int) (frameTo - frameFrom);
-		long[] validTos = validFixedTos();
+		long[] validTos = fixedTos.validSequence();
 		if(validTos.length > 0 && repeat == 0) {
 			int currentTo = 0;
 			int prevTo = 0;
@@ -149,27 +149,27 @@ public class Repeater {
 	}
 	
 	private int repeats() {
-		return repeat > 0 ? repeat : validFixedTos().length;
+		return repeat > 0 ? repeat : fixedTos.validSequence().length;
 	}
 	
-	private long[] validFixedTos() {
-		if(fixedTos.length == 0) {
-			return fixedTos;
-		}
-			
-		int maxValidLen = 0;
-		long currentTo = 0;
-		for(long ft : fixedTos) {
-			if(ft > 0 && ft > currentTo) {
-				maxValidLen++;
-				currentTo = ft;
-			}
-			else {
-				break;
-			}
-		}
-		return Arrays.copyOf(fixedTos, maxValidLen);
-	}
+//	private long[] validFixedTos() {
+//		if(fixedTos.length == 0) {
+//			return fixedTos;
+//		}
+//			
+//		int maxValidLen = 0;
+//		long currentTo = 0;
+//		for(long ft : fixedTos) {
+//			if(ft > 0 && ft > currentTo) {
+//				maxValidLen++;
+//				currentTo = ft;
+//			}
+//			else {
+//				break;
+//			}
+//		}
+//		return Arrays.copyOf(fixedTos, maxValidLen);
+//	}
 
 	public void setFrames(int frames) {
 		this.frames = frames;

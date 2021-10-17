@@ -21,7 +21,6 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.Arrays;
 
 import javax.swing.JSpinner;
 import javax.swing.JSpinner.DefaultEditor;
@@ -29,6 +28,7 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.mcuosmipcuter.orcc.api.types.LongSequence;
 import org.mcuosmipcuter.orcc.soundvis.Context;
 import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
 
@@ -37,7 +37,7 @@ import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
  * @param <T>
  *
  */
-public class LongArrayPropertyPanel extends PropertyPanel<long[]> {
+public class LongArrayPropertyPanel extends PropertyPanel<LongSequence> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -66,44 +66,48 @@ public class LongArrayPropertyPanel extends PropertyPanel<long[]> {
 			
 			@Override
 			public void stateChanged(ChangeEvent e) {
-				long[] current = getCurrentValue();
-				System.err.println(Arrays.toString(current));
-				int i = (int) index.getValue() - 1;
-				long[] newv;
-				if(i >= current.length) {
-					newv = new long[i + 1];
-					
-				}
-				else {
-					newv = new long[current.length];
-				}
-				System.arraycopy(current, 0, newv, 0, current.length);
-				
-				newv[i] = ((Number) valueAt.getValue()).longValue();
-				System.err.println(Arrays.toString(newv));
-				setNewValue(newv);
+//				long[] current = getCurrentValue();
+//				System.err.println(Arrays.toString(current));
+//				int i = (int) index.getValue() - 1;
+//				long[] newv;
+//				if(i >= current.length) {
+//					newv = new long[i + 1];
+//					
+//				}
+//				else {
+//					newv = new long[current.length];
+//				}
+//				System.arraycopy(current, 0, newv, 0, current.length);
+//				
+//				newv[i] = ((Number) valueAt.getValue()).longValue();
+//				System.err.println(Arrays.toString(newv));
+				LongSequence current = getCurrentValue();
+				long newv = ((Number) valueAt.getValue()).longValue();
+				int i = (int) index.getValue();
+				LongSequence newSequence = new LongSequence(current, newv, i);
+				setNewValue(newSequence);
 			}
 		};
 		indexChanged = new ChangeListener() {
 			
 			@Override
 			public void stateChanged(ChangeEvent e) {
-				long[] current = getCurrentValue();
-				System.err.println(Arrays.toString(current));
-				int i = (int) index.getValue() - 1;
-				valueAt.setValue(i <current.length ? current[i] : 0);
+				LongSequence current = getCurrentValue();
+				System.err.println(current);
+				int i = (int) index.getValue();
+				valueAt.setValue(current.getValueAt(i, 0));
 			}
 		};
 	}
 
 	@Override
-	public long[] getCurrentValue() {
+	public LongSequence getCurrentValue() {
 		// TODO Auto-generated method stub
 		return super.getCurrentValue();
 	}
 
 	@Override
-	public void setCurrentValue(long[] currentValue) {
+	public void setCurrentValue(LongSequence currentValue) {
 		super.setCurrentValue(currentValue);
 	}
 	@Override
