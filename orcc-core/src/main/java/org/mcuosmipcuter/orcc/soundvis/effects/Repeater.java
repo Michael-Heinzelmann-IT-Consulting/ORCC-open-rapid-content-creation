@@ -18,6 +18,7 @@
 package org.mcuosmipcuter.orcc.soundvis.effects;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.mcuosmipcuter.orcc.api.soundvis.DisplayDuration;
@@ -34,8 +35,9 @@ import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
  */
 public class Repeater {
 	
-	@LimitedIntProperty(minimum=1, description="number cannot be lower than 1")
+	@LimitedIntProperty(minimum=0, description="number cannot be lower than 1")
 	@UserProperty(description="number of repeat", unit=Unit.TIMES)
+	@NumberMeaning(numbers = 0, meanings = "fixed tos")
 	int repeat = 1;
 	@LimitedIntProperty(minimum=0, description="number cannot be lower than 0 = auto")
 	@UserProperty(description="number of repeat", unit = Unit.FRAMES)
@@ -43,7 +45,7 @@ public class Repeater {
 	int frames = 0;
 	
 	@UserProperty(description="index of repeat", unit=Unit.TIMES)	
-	long [] fixedTos = new long[] {};
+	long [] fixedTos = new long[0];
 	
 	private DisplayObject[] displayObjects;
 	
@@ -65,7 +67,7 @@ public class Repeater {
 		List<DisplayUnit> units = new ArrayList<>();
 		int index = 0;
 		int relStart = 0;
-		for(int r = 0; r < repeat; r++) {
+		for(int r = 0; r < repeats(); r++) {
 			int repeatDurationFrames = getRepeatDurationFrames(frameFrom, frameTo, r);
 			int duration = repeatDurationFrames + Math.abs(oLapBef) + oLapAft;
 			if(relFrameCount  <= frameTo + oLapAft) {
@@ -75,7 +77,7 @@ public class Repeater {
 
 				if(relFrameCount >= start && relFrameCount <= end ) {
 					//IOUtil.log(start + " * " + end + " = " + (relFrameCount - start));
-					if(index >= repeat ) {
+					if(index >= repeats() ) {
 						index = 0;
 					}
 					DisplayUnit d = new DisplayUnit(relFrameCount - start, duration, oLapBef, oLapAft, index);
@@ -93,66 +95,22 @@ public class Repeater {
 
 	private int getRepeatDurationFrames(long frameFrom, long frameTo, int index) {
 		int duration = (int) (frameTo - frameFrom);
-		if(fixedTos.length > 0 && repeat > 1) {
-			int maxTo = 0;
-			int configured = 0;
-			int i = 0;
-//			for(long to : fixedTos) {
-//				int toi = (int) to;
-//				if(toi > 0 && i < repeat) {
-//				if(r == index ) {
-//					System.err.println(toi + " currentTo: " + currentTo);
-//					return toi - currentTo;
-//				}
-//				currentTo = toi;
-//				r++;
-//				}
-//				i++;
-//			}
-//			if(repeat - r > 0) {
-//				System.err.println(" 1 currentTo: " + currentTo);
-//				return (duration - currentTo) / (repeat - r);
-//			}
-//			else {
-//				System.err.println(r + " 2 currentTo: " + currentTo);
-//			}
-			
-			
-			for(long to : fixedTos) {
-				int toi = (int) to;
-				if(toi > 0 && toi > maxTo && i < repeat) {
-					maxTo = toi;
-					configured++;
-				}
-				i++;
-			}
-			if(configured > 0) {
-			int autoAvg = 0;
-			if(repeat - configured > 0) {
-				autoAvg = (duration - maxTo) / (repeat - configured);
-			}
+		long[] validTos = validFixedTos();
+		if(validTos.length > 0 && repeat == 0) {
 			int currentTo = 0;
 			int prevTo = 0;
-			for(int j = 0; j < repeat; j++) {
-				//System.err.println(j + " " + index);
-				
-
-				if(j < fixedTos.length) {
-					int toi = (int)fixedTos[j];
-					currentTo = toi != 0 ? toi : currentTo + autoAvg;
-				}
-				if(j == index) {
+			for(int i = 0; i < validTos.length; i++) {
+				int toi = (int)validTos[i];
+				currentTo = toi != 0 ? toi : currentTo;
+				if(i == index) {
 					return currentTo - prevTo;
-				
 				}
 				prevTo = currentTo;
 			}
-			
-		}
 		}
 		int repeatDurationFrames;
 		if(frames == 0) {
-			repeatDurationFrames = duration / repeat;
+			repeatDurationFrames = duration / repeats();
 		}
 		else {
 			repeatDurationFrames = frames;
@@ -172,12 +130,12 @@ public class Repeater {
 		}
 		int effects = displayObjects.length;
 		
-		DisplayDuration<?>[]result = new DisplayDuration<?>[repeat * effects];
+		DisplayDuration<?>[]result = new DisplayDuration<?>[repeats() * effects];
 		int c = 0;
 		int relStart = 0;
-		for(int r = 0; r < repeat * effects; r += effects) {
+		for(int r = 0; r < repeats() * effects; r += effects) {
 			int repeatDurationFrames = getRepeatDurationFrames(frameFrom, frameTo, c);
-			long end = repeat == 1 ? frameTo : frameFrom + relStart + repeatDurationFrames - 1;
+			long end = repeats() == 1 ? frameTo : frameFrom + relStart + repeatDurationFrames - 1;
 			for(int j = 0; j < effects; j++) {
 				DisplayDuration<?> dd = displayObjects[j].getDisplayDuration(frameFrom + relStart, end);
 				dd.setFrom(dd.getFrom() + oLapBef);
@@ -188,6 +146,29 @@ public class Repeater {
 			c++;
 		}
 		return result;
+	}
+	
+	private int repeats() {
+		return repeat > 0 ? repeat : validFixedTos().length;
+	}
+	
+	private long[] validFixedTos() {
+		if(fixedTos.length == 0) {
+			return fixedTos;
+		}
+			
+		int maxValidLen = 0;
+		long currentTo = 0;
+		for(long ft : fixedTos) {
+			if(ft > 0 && ft > currentTo) {
+				maxValidLen++;
+				currentTo = ft;
+			}
+			else {
+				break;
+			}
+		}
+		return Arrays.copyOf(fixedTos, maxValidLen);
 	}
 
 	public void setFrames(int frames) {

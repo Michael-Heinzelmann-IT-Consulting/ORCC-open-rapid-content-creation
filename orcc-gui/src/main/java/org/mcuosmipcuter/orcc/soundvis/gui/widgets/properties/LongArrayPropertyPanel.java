@@ -19,13 +19,17 @@ package org.mcuosmipcuter.orcc.soundvis.gui.widgets.properties;
 
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.Arrays;
 
 import javax.swing.JSpinner;
+import javax.swing.JSpinner.DefaultEditor;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.mcuosmipcuter.orcc.soundvis.Context;
 import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
 
 /**
@@ -49,6 +53,15 @@ public class LongArrayPropertyPanel extends PropertyPanel<long[]> {
 		add(index);
 		valueAt.setPreferredSize(new Dimension(200, 10));
 		add(valueAt);
+		((DefaultEditor)valueAt.getEditor()).getTextField().addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent e) {
+				if(e.getClickCount() >= 2) {
+					long sp = Context.getSongPositionPointer() - soundCanvasWrapper.getFrameFrom();
+					valueAt.setValue(sp );
+				}
+			}
+		});
+		
 		valueChanged = new ChangeListener() {
 			
 			@Override

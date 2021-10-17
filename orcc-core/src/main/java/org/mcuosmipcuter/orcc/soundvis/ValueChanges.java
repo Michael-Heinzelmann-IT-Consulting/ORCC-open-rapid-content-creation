@@ -53,14 +53,24 @@ public class  ValueChanges  {
 	}
 	@Override
 	public String toString() {
-		return "ValueChanges [o=" + original +  " c=" + current + " changed=" + isLogicallyChanged() + "]";
+		String o; 
+		String c;
+		if(original instanceof long[]) {
+			o = Arrays.toString((long[])original);
+			c = Arrays.toString((long[])current);
+		}
+		else {
+			o = String.valueOf(original);
+			c = String.valueOf(current);
+		}
+		return "ValueChanges [o=" + o +  " c=" + c + " changed=" + isLogicallyChanged() + "]";
 	}
 	
 	private boolean handleArrays() {
 		if(original.getClass().isInstance(Object[].class)) {
-		Object[] currArr = (Object[])current;
-		Object[] origArr = (Object[])original;
-		return Arrays.equals(currArr, origArr);
+			Object[] currArr = (Object[])current;
+			Object[] origArr = (Object[])original;
+			return Arrays.equals(currArr, origArr);
 		}
 		else if(original instanceof long[]){
 			return Arrays.equals((long[])current, (long[])original);
