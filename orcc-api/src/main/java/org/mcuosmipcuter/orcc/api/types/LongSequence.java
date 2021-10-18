@@ -38,12 +38,10 @@ public class LongSequence implements LogicalEqual{
 	}
 	public LongSequence(LongSequence base, long newValue, int atUserIndex) {
 		long[] baseSequence = base.rawSequence;
-		System.err.println(Arrays.toString(baseSequence));
 		int i = atUserIndex - 1;
 
 		if(i >= baseSequence.length) {
-			this.rawSequence = new long[i + 1];
-			
+			this.rawSequence = new long[i + 1];	
 		}
 		else {
 			this.rawSequence = new long[baseSequence.length];
@@ -51,7 +49,6 @@ public class LongSequence implements LogicalEqual{
 		System.arraycopy(baseSequence, 0, this.rawSequence, 0, baseSequence.length);
 		
 		this.rawSequence[i] = newValue;
-		System.err.println(Arrays.toString(rawSequence));
 	}
 
 	public long[] validSequence() {

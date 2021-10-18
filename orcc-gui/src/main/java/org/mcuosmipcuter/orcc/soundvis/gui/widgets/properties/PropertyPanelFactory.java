@@ -211,7 +211,7 @@ public class PropertyPanelFactory {
 			return new MappedValuePropertyPanel(soundCanvasWrapper, valueOwner, values, value);
 		}
 		if(LongSequence.class.equals(type)) {
-			return new LongArrayPropertyPanel(soundCanvasWrapper, valueOwner);
+			return new LongSequencePropertyPanel(soundCanvasWrapper, valueOwner);
 		}
 		throw new RuntimeException(type + " type not supported");
 	}

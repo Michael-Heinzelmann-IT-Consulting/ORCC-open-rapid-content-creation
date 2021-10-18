@@ -37,7 +37,7 @@ import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
  * @param <T>
  *
  */
-public class LongArrayPropertyPanel extends PropertyPanel<LongSequence> {
+public class LongSequencePropertyPanel extends PropertyPanel<LongSequence> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -46,7 +46,7 @@ public class LongArrayPropertyPanel extends PropertyPanel<LongSequence> {
 	ChangeListener valueChanged;
 	ChangeListener indexChanged;
 
-	public LongArrayPropertyPanel(SoundCanvasWrapper soundCanvasWrapper, Object valueOwner) {
+	public LongSequencePropertyPanel(SoundCanvasWrapper soundCanvasWrapper, Object valueOwner) {
 		super(soundCanvasWrapper, valueOwner);
 		setLayout(new GridLayout(1 , 2, 2, 2));
 		index.setPreferredSize(new Dimension(30, 10));
@@ -66,21 +66,6 @@ public class LongArrayPropertyPanel extends PropertyPanel<LongSequence> {
 			
 			@Override
 			public void stateChanged(ChangeEvent e) {
-//				long[] current = getCurrentValue();
-//				System.err.println(Arrays.toString(current));
-//				int i = (int) index.getValue() - 1;
-//				long[] newv;
-//				if(i >= current.length) {
-//					newv = new long[i + 1];
-//					
-//				}
-//				else {
-//					newv = new long[current.length];
-//				}
-//				System.arraycopy(current, 0, newv, 0, current.length);
-//				
-//				newv[i] = ((Number) valueAt.getValue()).longValue();
-//				System.err.println(Arrays.toString(newv));
 				LongSequence current = getCurrentValue();
 				long newv = ((Number) valueAt.getValue()).longValue();
 				int i = (int) index.getValue();
@@ -93,23 +78,12 @@ public class LongArrayPropertyPanel extends PropertyPanel<LongSequence> {
 			@Override
 			public void stateChanged(ChangeEvent e) {
 				LongSequence current = getCurrentValue();
-				System.err.println(current);
 				int i = (int) index.getValue();
 				valueAt.setValue(current.getValueAt(i, 0));
 			}
 		};
 	}
 
-	@Override
-	public LongSequence getCurrentValue() {
-		// TODO Auto-generated method stub
-		return super.getCurrentValue();
-	}
-
-	@Override
-	public void setCurrentValue(LongSequence currentValue) {
-		super.setCurrentValue(currentValue);
-	}
 	@Override
 	public void activate() {
 		index.addChangeListener(indexChanged);

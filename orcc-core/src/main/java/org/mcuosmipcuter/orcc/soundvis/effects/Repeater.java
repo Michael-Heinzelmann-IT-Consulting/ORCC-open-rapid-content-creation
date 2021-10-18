@@ -135,7 +135,7 @@ public class Repeater {
 		int relStart = 0;
 		for(int r = 0; r < repeats() * effects; r += effects) {
 			int repeatDurationFrames = getRepeatDurationFrames(frameFrom, frameTo, c);
-			long end = repeats() == 1 ? frameTo : frameFrom + relStart + repeatDurationFrames - 1;
+			long end = repeat == 1 ? frameTo : frameFrom + relStart + repeatDurationFrames - 1;
 			for(int j = 0; j < effects; j++) {
 				DisplayDuration<?> dd = displayObjects[j].getDisplayDuration(frameFrom + relStart, end);
 				dd.setFrom(dd.getFrom() + oLapBef);
@@ -151,25 +151,6 @@ public class Repeater {
 	private int repeats() {
 		return repeat > 0 ? repeat : fixedTos.validSequence().length;
 	}
-	
-//	private long[] validFixedTos() {
-//		if(fixedTos.length == 0) {
-//			return fixedTos;
-//		}
-//			
-//		int maxValidLen = 0;
-//		long currentTo = 0;
-//		for(long ft : fixedTos) {
-//			if(ft > 0 && ft > currentTo) {
-//				maxValidLen++;
-//				currentTo = ft;
-//			}
-//			else {
-//				break;
-//			}
-//		}
-//		return Arrays.copyOf(fixedTos, maxValidLen);
-//	}
 
 	public void setFrames(int frames) {
 		this.frames = frames;
@@ -178,7 +159,5 @@ public class Repeater {
 	public void setRepeat(int repeat) {
 		this.repeat = repeat;
 	}
-
-	
 	
 }
