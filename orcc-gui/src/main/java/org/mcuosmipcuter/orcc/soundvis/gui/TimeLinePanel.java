@@ -275,11 +275,19 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 					DisplayDuration<?>[] fromTos = scw.getFrameFromTos();
 					if(fromTos.length > 0) {
 						//g.setColor(new Color(delta*100, false));
+						long oldFtf = Long.MIN_VALUE;
+						int userIdx = 1;
 						for(int i = 0; i < fromTos.length; i++) {
+							long ftf = fromTos[i].getFrom();
+
 							int subFrom = margin +  (int)fromTos[i].getFrom()* samplesPerFrame / noOfSamples;
 							int subTo = margin + (int)(fromTos[i].getTo() +1)* samplesPerFrame / noOfSamples;
 							//g.drawRoundRect(subFrom, y + delta, subTo - subFrom, b  + delta, 16, 16);
-							//g.drawString("" + (i+1), subFrom + 6, y + delta + 12);
+							if(ftf != oldFtf) {
+								g.drawString("" + (userIdx), subFrom + 6, y + delta + 12);
+								userIdx++;
+							}
+							oldFtf = ftf;
 							if(fromTos[i].getOverlapBefore() == 0 && fromTos[i].getOverlapAfter() == 0 && fromTos[i].getDegreesBefore() == 0 && fromTos[i].getDegreesAfter() == 0) {
 								g.drawRoundRect(subFrom, y + delta, subTo - subFrom, b  + delta, 16, 16);
 							}
