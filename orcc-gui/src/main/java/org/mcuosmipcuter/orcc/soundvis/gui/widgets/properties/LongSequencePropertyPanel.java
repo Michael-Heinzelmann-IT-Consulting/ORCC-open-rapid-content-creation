@@ -57,7 +57,7 @@ public class LongSequencePropertyPanel extends PropertyPanel<LongSequence> {
 			public void mouseClicked(MouseEvent e) {
 				if(e.getClickCount() >= 2) {
 					long sp = Context.getSongPositionPointer() - soundCanvasWrapper.getFrameFrom();
-					valueAt.setValue(sp );
+					valueAt.setValue(((Number) sp).intValue() );
 				}
 			}
 		});
@@ -79,7 +79,7 @@ public class LongSequencePropertyPanel extends PropertyPanel<LongSequence> {
 			public void stateChanged(ChangeEvent e) {
 				LongSequence current = getCurrentValue();
 				int i = (int) index.getValue();
-				valueAt.setValue(current.getValueAt(i, 0));
+				valueAt.setValue(((Number)current.getValueAt(i, 0)).intValue());
 			}
 		};
 	}
