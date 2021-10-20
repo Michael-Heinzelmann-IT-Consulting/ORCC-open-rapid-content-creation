@@ -19,6 +19,7 @@ package org.mcuosmipcuter.orcc.soundvis.gui;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
@@ -284,7 +285,14 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 							int subTo = margin + (int)(fromTos[i].getTo() +1)* samplesPerFrame / noOfSamples;
 							//g.drawRoundRect(subFrom, y + delta, subTo - subFrom, b  + delta, 16, 16);
 							if(ftf != oldFtf) {
-								g.drawString("" + (userIdx), subFrom + 6, y + delta + 12);
+								String idxStr = "" + (userIdx);
+								Font oldFont = g.getFont();
+								g.setFont(oldFont.deriveFont((float)Math.min(subTo - subFrom, b)));
+								g.setColor(Color.GREEN.darker());
+								g.setXORMode(Color.GRAY);
+								g.drawString(idxStr, subFrom + (subTo - subFrom) / 2 - (g.getFontMetrics().stringWidth(idxStr)/ 2),y + b/2 + g.getFontMetrics().getAscent() / 2);
+								g.setFont(oldFont);
+								g.setPaintMode();
 								userIdx++;
 							}
 							oldFtf = ftf;
