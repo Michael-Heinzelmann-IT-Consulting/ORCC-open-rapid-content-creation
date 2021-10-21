@@ -367,25 +367,23 @@ public class TimeLinePanel extends JPanel implements CustomTableListener {
 								}
 								g.setColor(GUIDesignUtil.getEffectBgColor(fromTos[i].getDisplayObject().getClass(), Color.WHITE));
 								g.drawPolygon(xPoints, yPoints, nPoints);
-								//g.drawString(fromTos[i].getDisplayObject().getDisplayText(), x1 + 6, y + delta + 12);
+								//g.drawString(fromTos[i].getDisplayObject().getDisplayKey(), x1 + 6, y + delta + 12);
 							}
 						}
 					}
-					//else {
-						selectedCanvas = new Rectangle(from, y + delta, to - from, b);
-					//}
 
+
+				}
+				if(scw.isSelected()) {
+					selectedCanvas = new Rectangle(from, y + delta, to - from, b);
+					g.setColor(selectedCanvasColor);
+					g.fillRoundRect(selectedCanvas.x, selectedCanvas.y, selectedCanvas.width, selectedCanvas.height, 16, 16);
 				}
 				
 				count++;
 				y += b;
 			}
-			if(selectedCanvas != null) {
-				g.setColor(selectedCanvasColor);
-				//g.fillRoundRect(selectedCanvas.x, selectedCanvas.y, selectedCanvas.width, selectedCanvas.height, 16, 16);
-				//selectedCanvas = null;
-			}
-			
+
 			int strLength = g.getFontMetrics().stringWidth("00:00");
 			int gap = strLength;
 			int numMarkersPossible = (w - margin *2 ) / (strLength + gap);

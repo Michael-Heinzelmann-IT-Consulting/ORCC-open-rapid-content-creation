@@ -203,7 +203,7 @@ public class CustomTable extends JPanel implements Context.Listener{
 		public void mouseReleased(MouseEvent e) {
 			if(source != null) {
 				source.setBackground(originalBackground);
-				source.getSoundCanvasWrapper().setSelected(owner.isPanelVisible());
+				source.getSoundCanvasWrapper().setSelected(false);
 			}
 			if(source != null || target != null) {
 				tableListener.rowSelected(false);			
