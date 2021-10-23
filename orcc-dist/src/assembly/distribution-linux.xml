@@ -40,6 +40,11 @@
       <source>../LICENSE.txt</source>
       <outputDirectory>/</outputDirectory>
     </file>
+    <file>
+      <source>src/main/icons/soundvis_icon_512px.png</source>
+      <outputDirectory>/</outputDirectory>
+      <filtered>false</filtered>
+    </file>
   </files>
   <moduleSets>
     <moduleSet>
