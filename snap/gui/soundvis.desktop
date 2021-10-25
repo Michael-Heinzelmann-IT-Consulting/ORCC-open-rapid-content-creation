@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=soundvis
+Version=1.0
+Exec=soundvis
+Comment=sound visualizer
+Icon=${SNAP}/meta/gui/soundvis.png
+Type=Application
+Terminal=false
+StartupNotify=true
+Encoding=UTF-8
+Categories=GNOME;GTK;Audio;Midi;AudioVideoEditing;Music;AudioVideo;Utility;
+Name[en_GB]=soundvis
