@@ -59,6 +59,7 @@ import org.mcuosmipcuter.orcc.soundvis.ImageStore.Key;
 import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
 import org.mcuosmipcuter.orcc.soundvis.defaultcanvas.model.Slide;
 import org.mcuosmipcuter.orcc.soundvis.gui.listeners.FileDialogActionListener;
+import org.mcuosmipcuter.orcc.soundvis.gui.widgets.ImagePreview;
 import org.mcuosmipcuter.orcc.util.IOUtil;
 
 /**
@@ -88,6 +89,7 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 		public void actionPerformed(ActionEvent e) {
 
 			chooser.setMultiSelectionEnabled(true);
+			chooser.setAccessory(new ImagePreview(chooser));
 			IOUtil.log(System.currentTimeMillis() + " chooser return " + e);
 			Context.beforePropertyUpdate(name);
 
