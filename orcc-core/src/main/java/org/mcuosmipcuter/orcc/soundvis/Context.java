@@ -504,7 +504,9 @@ public abstract class Context {
 				}
 			}
 		}
-		IOUtil.log("forAllCanvas: " +  forAllCanvas + " preRun: " + preRun);
+		if(forAllCanvas ) {
+			IOUtil.log("forAllCanvas: " +  forAllCanvas + " preRun: " + preRun);
+		}
 		final long frameStart = songPos - preRun >= 0 ? Context.getSongPositionPointer() - preRun : 0;
 		
 		if( frameStart >= 0) {	
