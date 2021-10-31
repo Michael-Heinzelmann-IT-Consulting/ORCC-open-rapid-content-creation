@@ -18,6 +18,7 @@
 package org.mcuosmipcuter.orcc.gui.table;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -31,6 +32,7 @@ import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
+import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -49,6 +51,12 @@ public class Row extends JPanel {
 	private static final long serialVersionUID = 1L;
 	
 	private final SoundCanvasWrapper soundCanvasWrapper;
+	private final TitledBorder titledBorder;
+	private final LineBorder unselectedBorder;
+//	private final LineBorder selectedBorder;
+//	private final LineBorder removeBorder;
+//	private final LineBorder moveBorder;
+	private final int borderSize;
 	private JPanel panel;
 	private final Set<JPanel> props ;
 	private boolean panelVisible;
@@ -61,8 +69,17 @@ public class Row extends JPanel {
 	 * New row containing the given wrapped canvas
 	 * @param soundCanvasWrapper the wrapped canvas that belongs to this layer row
 	 */
-	public Row(SoundCanvasWrapper soundCanvasWrapper) {
+	public Row(SoundCanvasWrapper soundCanvasWrapper, Color defaultColor, int borderSize) {
 		this.soundCanvasWrapper = soundCanvasWrapper;
+		this.unselectedBorder = new LineBorder(defaultColor, borderSize);
+		this.borderSize = borderSize;
+//		this.selectedBorder = new LineBorder(selected, borderSize);
+//		this.moveBorder = new LineBorder(move, borderSize);
+//		this.removeBorder = new LineBorder(remove, borderSize);
+		titledBorder = new TitledBorder(unselectedBorder);
+		titledBorder.setTitle(soundCanvasWrapper.getDisplayName());
+		titledBorder.setTitlePosition(TitledBorder.TOP);
+		setBorder(titledBorder);
 		props = PropertyPanelFactory.getCanvasPanels(soundCanvasWrapper);
 	}
 
@@ -163,6 +180,27 @@ public class Row extends JPanel {
 		}
 		panelVisible = !panelVisible;
 	}
+	
+	@Override
+	public void setBackground(Color bg) {
+		if(titledBorder != null) {
+			titledBorder.setBorder(new LineBorder(bg, borderSize));
+		}
+		super.setBackground(bg);
+	}
+
+//	public void setSelected(boolean selected) {
+//		titledBorder.setBorder(selected ? selectedBorder: unselectedBorder);
+//		repaint();
+//	}
+//	public void setMove() {
+//		titledBorder.setBorder(moveBorder);
+//		repaint();
+//	}
+//	public void setRemove() {
+//		titledBorder.setBorder(removeBorder);
+//		repaint();
+//	}
 	private JPanel commonPanel(String name, Component c) {
 		JPanel p = new JPanel();
 		p.setBackground(getBackground());

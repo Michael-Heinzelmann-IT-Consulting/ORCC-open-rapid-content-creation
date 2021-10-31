@@ -23,6 +23,7 @@ import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -44,8 +45,6 @@ import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JSpinner.DefaultEditor;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.border.LineBorder;
-import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -68,51 +67,68 @@ public class CustomTable extends JPanel implements Context.Listener{
 	private CustomTableListener tableListener;
 	private boolean moveEnabled = true;
 	
+	private final Color UNSELECTED = Color.WHITE;
+	private final Color SELECTED = Color.GREEN.brighter();
+	private final Color MOVE = Color.CYAN.brighter();
+	private final Color REMOVE = Color.RED;
+	
 	// specialized internal class for handling the mouse actions
 	private class Mover extends MouseAdapter {
 		
 		private final JComponent container;
 		private final  Row owner;
 		private final Cursor moveCursor;
+		private final Component grabComponent;
 		 
 		private  Row source;
 		private  Row target;
 		private Cursor cursor;
 		private final Color originalBackground;
 		
-		private Color selectColor = Color.GRAY;
+		
+		//private Color selectColor = Color.GRAY;
 		
 		
-		private Mover(JComponent container, Row owner, Cursor moveCursor, final Component grabComponent) {
+		private Mover(JComponent container, Row owner, Cursor moveCursor, final Component grabComponent, Component selectComponent) {
+			grabComponent.addMouseMotionListener(this);
+			grabComponent.addMouseListener(this);
+			//selectComponent.addMouseListener(this);
 			this.container = container;
 			this.owner = owner;
 			this.moveCursor = moveCursor;
 			this.originalBackground = owner.getBackground();
-			grabComponent.addMouseListener(new MouseAdapter() {
+			this.grabComponent = grabComponent;
+			selectComponent.addMouseListener(new MouseAdapter() {
 				boolean mouseDown;
 				@Override
 				public void mousePressed(MouseEvent e) {
 					mouseDown = true;
 					if(moveEnabled) {
-						grabComponent.setCursor(Mover.this.moveCursor);	
+						//grabComponent.setCursor(Mover.this.moveCursor);	
 					}
+					owner.setBackground(SELECTED);
+					owner.getSoundCanvasWrapper().setSelected(true);
+					tableListener.rowSelected(true);
 				}
 				@Override
 				public void mouseReleased(MouseEvent e) {
 					mouseDown = false;
-					grabComponent.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));	
+					selectComponent.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));	
+					owner.setBackground(originalBackground);
+					owner.getSoundCanvasWrapper().setSelected(false);
+					tableListener.rowSelected(false);
 				}
 				@Override
 				public void mouseEntered(MouseEvent arg0) {
 					if(!mouseDown) {
-						cursor = grabComponent.getCursor();
-						grabComponent.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+						cursor = selectComponent.getCursor();
+						selectComponent.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 					}
 				}
 				@Override
 				public void mouseExited(MouseEvent e) {
 					if(!mouseDown) {
-						grabComponent.setCursor(cursor);
+						selectComponent.setCursor(cursor);
 					}
 				}
 				
@@ -124,6 +140,7 @@ public class CustomTable extends JPanel implements Context.Listener{
 			if(!moveEnabled) {
 				return;
 			}
+			grabComponent.setCursor(Mover.this.moveCursor);	
 			final Component oldTarget = target;
 			Component c = container.getComponentAt(owner.getX() + e.getX(), owner.getY() + e.getY());
 			if(c instanceof Row) {
@@ -133,13 +150,15 @@ public class CustomTable extends JPanel implements Context.Listener{
 			if(oldTarget != null && oldTarget != target) {
 				oldTarget.setBackground(originalBackground);
 				if(target != null) {
-				target.setBackground(Color.ORANGE);
-				move();
+					move();
 				}
 			}
 
 			if(source != null) {
-				source.setBackground(selectColor);
+				//source.setMove();
+				source.setBackground(MOVE);
+				//source.setSelected(true);
+				
 			}
 
 		}
@@ -188,7 +207,9 @@ public class CustomTable extends JPanel implements Context.Listener{
 		@Override
 		public void mousePressed(MouseEvent e) {
 			
-			owner.setBackground(selectColor);
+			//owner.setBackground(selectColor);
+			//owner.setSelected(true);
+			owner.setBackground(SELECTED);
 			owner.getSoundCanvasWrapper().setSelected(true);
 			source = owner;
 			
@@ -203,6 +224,7 @@ public class CustomTable extends JPanel implements Context.Listener{
 		public void mouseReleased(MouseEvent e) {
 			if(source != null) {
 				source.setBackground(originalBackground);
+				//source.setSelected(false);
 				source.getSoundCanvasWrapper().setSelected(false);
 			}
 			if(source != null || target != null) {
@@ -214,11 +236,12 @@ public class CustomTable extends JPanel implements Context.Listener{
 			if( cursor != null) {
 				container.setCursor(cursor);
 			}
-			if( cursor != null) {
-				container.setCursor(cursor);
-			}
+//			if( cursor != null) {
+//				container.setCursor(cursor);
+//			}
 			if(target != null) {
 				target.setBackground(originalBackground);
+				//target.setSelected(false);
 				target.getSoundCanvasWrapper().setSelected(false);
 			}
 
@@ -249,21 +272,18 @@ public class CustomTable extends JPanel implements Context.Listener{
 	 * @param soundCanvasWrapper the wrapped canvas 
 	 */
 	public void addLayer(final SoundCanvasWrapper soundCanvasWrapper) {
-		int rowH = 78;
-		final Row row = new Row(soundCanvasWrapper);
-		row.setPreferredSize(new Dimension(630, rowH));
+		
+		final Row row = new Row(soundCanvasWrapper, UNSELECTED, 8);
+		row.setPreferredSize(new Dimension(630, 78));
 		row.setLayout(new BorderLayout());
-
-		TitledBorder tb = new TitledBorder(new LineBorder(Color.WHITE, 8));
-		tb.setTitle(soundCanvasWrapper.getDisplayName());
-		tb.setTitlePosition(TitledBorder.TOP);
-		row.setBorder(tb);
-		row.setBackground(Color.WHITE);
+		row.setBackground(Color.WHITE);	
+		
 		final JLabel layer = new JLabel();
 		layer.setOpaque(false);
 		layer.setName("icon_label");
-		layer.setPreferredSize(new Dimension(120, rowH - 16));
-		layer.setToolTipText("edit or move " + soundCanvasWrapper.getDisplayName());
+		//layer.setPreferredSize(new Dimension(100, 40));
+		layer.setToolTipText("select " + soundCanvasWrapper.getDisplayName());
+		//layer.setBorder(new EtchedBorder());
 		soundCanvasWrapper.setIconImage(getImage());
 		soundCanvasWrapper.addPropertyChangeListener(new PropertyListener() {
 			
@@ -278,7 +298,40 @@ public class CustomTable extends JPanel implements Context.Listener{
 			}
 		});
 
-		row.add(layer, BorderLayout.WEST);
+		//row.add(layer, BorderLayout.WEST);
+		
+		
+		JLabel grab = new JLabel("") {
+
+			@Override
+			protected void paintComponent(Graphics g) {
+				super.paintComponent(g);
+				g.setColor(Color.WHITE);
+				int marg = 4;
+				for(int i = 1; i < getHeight(); i+=3) {
+					int d = i < getHeight() / 2 ? -6 : 6;
+					if(i+ d < 1 ) {
+						continue;
+					}
+				if(i + d > getHeight()) {
+					break;
+				}
+				//g.drawLine(marg, i, getWidth() - marg, i);
+				g.drawLine(marg, i, getWidth() / 2, i + d);
+					g.drawLine(getWidth() / 2, i + d, getWidth() - marg , i);
+					//g.fillPolygon(new int[] {marg, getWidth() / 2, getWidth() - marg}, new int[] {i, i + d, i}, 3);
+				}
+			}};
+		grab.setPreferredSize(new Dimension(20, 36));
+		//grab.setBackground(new Color(125, 125, 125));
+		//grab.setOpaque(true);
+		
+		grab.setBackground(MOVE);
+		grab.setToolTipText("move");
+		JPanel gp = new JPanel();
+		gp.add(grab);
+		gp.add(layer);
+		row.add(gp, BorderLayout.WEST);
 		
 		
 		final JCheckBox showCheckBox = new JCheckBox(soundCanvasWrapper.isVisible() ? "on" : "off", soundCanvasWrapper.isVisible());
@@ -404,13 +457,15 @@ public class CustomTable extends JPanel implements Context.Listener{
 			public void mousePressed(MouseEvent e) {
 				originalBackground = row.getBackground();
 				if(moveEnabled) {
-					row.setBackground(Color.RED);
+					//row.setRemove();
+					row.setBackground(REMOVE);
 				}
 			}
 
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				if(moveEnabled && originalBackground != null) {
+					//row.setSelected(false);
 					row.setBackground(originalBackground);
 				}
 			}
@@ -433,9 +488,10 @@ public class CustomTable extends JPanel implements Context.Listener{
 			}
 		});
 		
-		Mover mgm = new Mover(this, row, Cursor.getPredefinedCursor(Cursor.S_RESIZE_CURSOR), layer);
-		layer.addMouseMotionListener(mgm);
-		layer.addMouseListener(mgm);
+		//Mover mgm = new Mover(this, row, Cursor.getPredefinedCursor(Cursor.S_RESIZE_CURSOR), gp);
+		Mover mgm = new Mover(this, row, Cursor.getPredefinedCursor(Cursor.N_RESIZE_CURSOR), grab, layer);
+//		layer.addMouseMotionListener(mgm);
+//		layer.addMouseListener(mgm);
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridwidth = GridBagConstraints.REMAINDER; //end row
 
