@@ -53,9 +53,6 @@ public class Row extends JPanel {
 	private final SoundCanvasWrapper soundCanvasWrapper;
 	private final TitledBorder titledBorder;
 	private final LineBorder unselectedBorder;
-//	private final LineBorder selectedBorder;
-//	private final LineBorder removeBorder;
-//	private final LineBorder moveBorder;
 	private final int borderSize;
 	private JPanel panel;
 	private final Set<JPanel> props ;
@@ -73,9 +70,6 @@ public class Row extends JPanel {
 		this.soundCanvasWrapper = soundCanvasWrapper;
 		this.unselectedBorder = new LineBorder(defaultColor, borderSize);
 		this.borderSize = borderSize;
-//		this.selectedBorder = new LineBorder(selected, borderSize);
-//		this.moveBorder = new LineBorder(move, borderSize);
-//		this.removeBorder = new LineBorder(remove, borderSize);
 		titledBorder = new TitledBorder(unselectedBorder);
 		titledBorder.setTitle(soundCanvasWrapper.getDisplayName());
 		titledBorder.setTitlePosition(TitledBorder.TOP);
@@ -189,18 +183,6 @@ public class Row extends JPanel {
 		super.setBackground(bg);
 	}
 
-//	public void setSelected(boolean selected) {
-//		titledBorder.setBorder(selected ? selectedBorder: unselectedBorder);
-//		repaint();
-//	}
-//	public void setMove() {
-//		titledBorder.setBorder(moveBorder);
-//		repaint();
-//	}
-//	public void setRemove() {
-//		titledBorder.setBorder(removeBorder);
-//		repaint();
-//	}
 	private JPanel commonPanel(String name, Component c) {
 		JPanel p = new JPanel();
 		p.setBackground(getBackground());

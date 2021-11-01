@@ -68,9 +68,12 @@ public class CustomTable extends JPanel implements Context.Listener{
 	private boolean moveEnabled = true;
 	
 	private final Color UNSELECTED = Color.WHITE;
-	private final Color SELECTED = Color.GREEN.brighter();
-	private final Color MOVE = Color.CYAN.brighter();
+	private final Color SELECTED = new Color(215, 240, 215);
+	private final Color MOVE = new Color(215, 215, 240);
 	private final Color REMOVE = Color.RED;
+	
+	int iconWidth = 84;
+	int iconHeight = 32;
 	
 	// specialized internal class for handling the mouse actions
 	private class Mover extends MouseAdapter {
@@ -82,17 +85,13 @@ public class CustomTable extends JPanel implements Context.Listener{
 		 
 		private  Row source;
 		private  Row target;
-		private Cursor cursor;
+		private Cursor selectCursor;
+
 		private final Color originalBackground;
 		
 		
-		//private Color selectColor = Color.GRAY;
-		
-		
 		private Mover(JComponent container, Row owner, Cursor moveCursor, final Component grabComponent, Component selectComponent) {
-			grabComponent.addMouseMotionListener(this);
-			grabComponent.addMouseListener(this);
-			//selectComponent.addMouseListener(this);
+
 			this.container = container;
 			this.owner = owner;
 			this.moveCursor = moveCursor;
@@ -103,9 +102,6 @@ public class CustomTable extends JPanel implements Context.Listener{
 				@Override
 				public void mousePressed(MouseEvent e) {
 					mouseDown = true;
-					if(moveEnabled) {
-						//grabComponent.setCursor(Mover.this.moveCursor);	
-					}
 					owner.setBackground(SELECTED);
 					owner.getSoundCanvasWrapper().setSelected(true);
 					tableListener.rowSelected(true);
@@ -121,14 +117,14 @@ public class CustomTable extends JPanel implements Context.Listener{
 				@Override
 				public void mouseEntered(MouseEvent arg0) {
 					if(!mouseDown) {
-						cursor = selectComponent.getCursor();
+						selectCursor = selectComponent.getCursor();
 						selectComponent.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 					}
 				}
 				@Override
 				public void mouseExited(MouseEvent e) {
 					if(!mouseDown) {
-						selectComponent.setCursor(cursor);
+						selectComponent.setCursor(selectCursor);
 					}
 				}
 				
@@ -155,10 +151,7 @@ public class CustomTable extends JPanel implements Context.Listener{
 			}
 
 			if(source != null) {
-				//source.setMove();
 				source.setBackground(MOVE);
-				//source.setSelected(true);
-				
 			}
 
 		}
@@ -207,15 +200,12 @@ public class CustomTable extends JPanel implements Context.Listener{
 		@Override
 		public void mousePressed(MouseEvent e) {
 			
-			//owner.setBackground(selectColor);
-			//owner.setSelected(true);
-			owner.setBackground(SELECTED);
+			owner.setBackground(MOVE);
 			owner.getSoundCanvasWrapper().setSelected(true);
 			source = owner;
-			
+
 			if(moveEnabled) {
-				cursor = container.getCursor();
-				container.setCursor(moveCursor);	
+				grabComponent.setCursor(moveCursor);	
 			}
 			tableListener.rowSelected(true);
 		}
@@ -224,24 +214,20 @@ public class CustomTable extends JPanel implements Context.Listener{
 		public void mouseReleased(MouseEvent e) {
 			if(source != null) {
 				source.setBackground(originalBackground);
-				//source.setSelected(false);
 				source.getSoundCanvasWrapper().setSelected(false);
 			}
 			if(source != null || target != null) {
 				tableListener.rowSelected(false);			
 			}
+
+			grabComponent.setCursor(container.getCursor());	
+
 			if(!moveEnabled) {
 				return;
 			}
-			if( cursor != null) {
-				container.setCursor(cursor);
-			}
-//			if( cursor != null) {
-//				container.setCursor(cursor);
-//			}
+
 			if(target != null) {
 				target.setBackground(originalBackground);
-				//target.setSelected(false);
 				target.getSoundCanvasWrapper().setSelected(false);
 			}
 
@@ -257,8 +243,8 @@ public class CustomTable extends JPanel implements Context.Listener{
 		setLayout(new GridBagLayout());
 	}
 	private  BufferedImage getImage() {
-		int width = 100;
-		int height = 40;
+		int width = iconWidth;
+		int height = iconHeight;
 		
 		BufferedImage frameImage = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
 		Graphics2D graphics = frameImage.createGraphics();
@@ -281,9 +267,9 @@ public class CustomTable extends JPanel implements Context.Listener{
 		final JLabel layer = new JLabel();
 		layer.setOpaque(false);
 		layer.setName("icon_label");
-		//layer.setPreferredSize(new Dimension(100, 40));
+		layer.setPreferredSize(new Dimension(iconWidth, iconHeight));
 		layer.setToolTipText("select " + soundCanvasWrapper.getDisplayName());
-		//layer.setBorder(new EtchedBorder());
+
 		soundCanvasWrapper.setIconImage(getImage());
 		soundCanvasWrapper.addPropertyChangeListener(new PropertyListener() {
 			
@@ -292,46 +278,47 @@ public class CustomTable extends JPanel implements Context.Listener{
 				String name = field.getName();
 				Context.canvasPropertyWritten(name, soundCanvasWrapper.getSoundCanvas());
 				if(field.isAnnotationPresent(TimedChange.class) || field.isAnnotationPresent(ChangesIcon.class)) {
-					soundCanvasWrapper.updateUI(100, 40, (Graphics2D) soundCanvasWrapper.getIconImage().getGraphics());
+					soundCanvasWrapper.updateUI(iconWidth, iconHeight, (Graphics2D) soundCanvasWrapper.getIconImage().getGraphics());
 					layer.setIcon(new ImageIcon(soundCanvasWrapper.getIconImage()));
 				}
 			}
 		});
+		
+		
+		JLabel grab = new JLabel() {
 
-		//row.add(layer, BorderLayout.WEST);
-		
-		
-		JLabel grab = new JLabel("") {
+			private static final long serialVersionUID = 1L;
 
 			@Override
 			protected void paintComponent(Graphics g) {
 				super.paintComponent(g);
-				g.setColor(Color.WHITE);
-				int marg = 4;
-				for(int i = 1; i < getHeight(); i+=3) {
-					int d = i < getHeight() / 2 ? -6 : 6;
-					if(i+ d < 1 ) {
+				int num = 6;
+				int n = 0;
+				int marg = 3;
+
+				for (int i = 0; i < getHeight(); i += 7) {
+					int d = i < getHeight() / 2 ? -4 : 4;
+					if (i + d < 1) {
 						continue;
 					}
-				if(i + d > getHeight()) {
-					break;
+					n++;
+					if (n > num) {
+						break;
+					}
+					g.setColor(Color.WHITE);
+					g.fillPolygon(new int[] { marg, getWidth() / 2, getWidth() - marg }, new int[] { i, i + d, i }, 3);
+					g.setColor(new Color(165, 165, 185));
+					g.drawLine(marg, i, getWidth() - marg, i);
+					g.drawLine(marg, i, getWidth() / 2, i + d);
+					g.drawLine(getWidth() / 2, i + d, getWidth() - marg, i);
+
 				}
-				//g.drawLine(marg, i, getWidth() - marg, i);
-				g.drawLine(marg, i, getWidth() / 2, i + d);
-					g.drawLine(getWidth() / 2, i + d, getWidth() - marg , i);
-					//g.fillPolygon(new int[] {marg, getWidth() / 2, getWidth() - marg}, new int[] {i, i + d, i}, 3);
-				}
-			}};
+			}
+		};
 		grab.setPreferredSize(new Dimension(20, 36));
-		//grab.setBackground(new Color(125, 125, 125));
-		//grab.setOpaque(true);
-		
-		grab.setBackground(MOVE);
 		grab.setToolTipText("move");
-		JPanel gp = new JPanel();
-		gp.add(grab);
-		gp.add(layer);
-		row.add(gp, BorderLayout.WEST);
+
+		row.add(grab, BorderLayout.WEST);
 		
 		
 		final JCheckBox showCheckBox = new JCheckBox(soundCanvasWrapper.isVisible() ? "on" : "off", soundCanvasWrapper.isVisible());
@@ -423,7 +410,10 @@ public class CustomTable extends JPanel implements Context.Listener{
 		
         FlowLayout fll = new FlowLayout();
         fll.setVgap(10);
+        fll.setHgap(10);
 		timeline.setLayout(fll);
+		
+		timeline.add(layer);
 
 		timeline.add(expandButton);
 		timeline.add(showCheckBox);
@@ -442,7 +432,7 @@ public class CustomTable extends JPanel implements Context.Listener{
 
 		
 		BufferedImage image = getImage();
-		soundCanvasWrapper.updateUI(100, 40, image.createGraphics());
+		soundCanvasWrapper.updateUI(iconWidth, iconHeight, image.createGraphics());
 		layer.setIcon(new ImageIcon(image));
 
 		final JLabel remove = new JLabel(" x ");
@@ -457,7 +447,6 @@ public class CustomTable extends JPanel implements Context.Listener{
 			public void mousePressed(MouseEvent e) {
 				originalBackground = row.getBackground();
 				if(moveEnabled) {
-					//row.setRemove();
 					row.setBackground(REMOVE);
 				}
 			}
@@ -465,7 +454,6 @@ public class CustomTable extends JPanel implements Context.Listener{
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				if(moveEnabled && originalBackground != null) {
-					//row.setSelected(false);
 					row.setBackground(originalBackground);
 				}
 			}
@@ -488,10 +476,9 @@ public class CustomTable extends JPanel implements Context.Listener{
 			}
 		});
 		
-		//Mover mgm = new Mover(this, row, Cursor.getPredefinedCursor(Cursor.S_RESIZE_CURSOR), gp);
 		Mover mgm = new Mover(this, row, Cursor.getPredefinedCursor(Cursor.N_RESIZE_CURSOR), grab, layer);
-//		layer.addMouseMotionListener(mgm);
-//		layer.addMouseListener(mgm);
+		grab.addMouseMotionListener(mgm);
+		grab.addMouseListener(mgm);
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridwidth = GridBagConstraints.REMAINDER; //end row
 
