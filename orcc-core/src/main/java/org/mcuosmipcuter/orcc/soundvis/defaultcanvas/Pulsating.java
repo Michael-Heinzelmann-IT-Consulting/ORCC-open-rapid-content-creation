@@ -21,6 +21,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
+import org.mcuosmipcuter.orcc.api.soundvis.ChangesIcon;
 import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.NestedProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
@@ -38,10 +39,12 @@ public class Pulsating implements SoundCanvas {
 		CIRCLE, SQARE, RECTANGLE, ELLIPSE
 	}
 	
+	@ChangesIcon
 	@UserProperty(description="foreground color")
 	private Color foreGround = Color.BLACK;	@LimitedIntProperty(description="alpha is limited from 0 to 255", minimum=0, maximum=255)
 	@UserProperty(description="if reverse the low amplituses are large and high amplitudes small")
 	boolean reverse = false;
+	@ChangesIcon
 	@UserProperty(description="mode of fill")
 	DRAW_MODE drawMode = DRAW_MODE.CIRCLE;
 	
@@ -136,7 +139,7 @@ public class Pulsating implements SoundCanvas {
 			graphics.fillOval(0,  0, width, height);
 			break;
 		case RECTANGLE:
-			graphics.fillRect(0,  0, width, height);
+			graphics.fillRect((int)(width * 0.1),  (int)(height * 0.1), (int)(width * 0.8), (int)(height * 0.8));
 			break;
 		default:
 
