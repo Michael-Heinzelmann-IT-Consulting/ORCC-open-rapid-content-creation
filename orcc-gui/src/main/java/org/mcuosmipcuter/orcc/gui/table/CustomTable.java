@@ -32,6 +32,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,12 +50,15 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.mcuosmipcuter.orcc.api.soundvis.ChangesIcon;
+import org.mcuosmipcuter.orcc.api.soundvis.NumberMeaning;
 import org.mcuosmipcuter.orcc.api.soundvis.PropertyListener;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.TimedChange;
+import org.mcuosmipcuter.orcc.api.soundvis.Unit;
 import org.mcuosmipcuter.orcc.soundvis.Context;
 import org.mcuosmipcuter.orcc.soundvis.Context.PropertyName;
 import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
+import org.mcuosmipcuter.orcc.soundvis.gui.widgets.WidgetUtil;
 
 /**
  * Custom table for GUI handling of the soundvis canvas layers
@@ -66,6 +70,9 @@ public class CustomTable extends JPanel implements Context.Listener{
 	
 	private CustomTableListener tableListener;
 	private boolean moveEnabled = true;
+	
+	private final Color HIGHLIGHT =  new Color(240, 240, 240);
+	private final Color SHADOW = new Color(165, 165, 185);
 	
 	private final Color UNSELECTED = Color.WHITE;
 	private final Color SELECTED = new Color(215, 240, 215);
@@ -268,7 +275,7 @@ public class CustomTable extends JPanel implements Context.Listener{
 		layer.setOpaque(false);
 		layer.setName("icon_label");
 		layer.setPreferredSize(new Dimension(iconWidth, iconHeight));
-		layer.setToolTipText("select " + soundCanvasWrapper.getDisplayName());
+		layer.setToolTipText("show in timeline");
 
 		soundCanvasWrapper.setIconImage(getImage());
 		soundCanvasWrapper.addPropertyChangeListener(new PropertyListener() {
@@ -296,8 +303,8 @@ public class CustomTable extends JPanel implements Context.Listener{
 				int n = 0;
 				int marg = 3;
 
-				for (int i = 0; i < getHeight(); i += 7) {
-					int d = i < getHeight() / 2 ? -4 : 4;
+				for (int i = 3; i < getHeight(); i += 6) {
+					int d = i < getHeight() / 2 ? -3 : 3;
 					if (i + d < 1) {
 						continue;
 					}
@@ -305,19 +312,18 @@ public class CustomTable extends JPanel implements Context.Listener{
 					if (n > num) {
 						break;
 					}
-					g.setColor(Color.WHITE);
-					g.fillPolygon(new int[] { marg, getWidth() / 2, getWidth() - marg }, new int[] { i, i + d, i }, 3);
-					g.setColor(new Color(165, 165, 185));
+					g.setColor(HIGHLIGHT);
+					g.fillPolygon(new int[] { marg, getWidth() / 2, getWidth() - marg },
+								  new int[] { i, i + d, i }, 3);
+					g.setColor(SHADOW);
 					g.drawLine(marg, i, getWidth() - marg, i);
-					g.drawLine(marg, i, getWidth() / 2, i + d);
-					g.drawLine(getWidth() / 2, i + d, getWidth() - marg, i);
 
 				}
 			}
 		};
 		grab.setPreferredSize(new Dimension(20, 36));
-		grab.setToolTipText("move");
-
+		grab.setToolTipText("move layer");
+		grab.setOpaque(true);
 		row.add(grab, BorderLayout.WEST);
 		
 		
@@ -333,7 +339,7 @@ public class CustomTable extends JPanel implements Context.Listener{
 		
 		SpinnerNumberModel modelFrom = new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1);
 		final JSpinner fromFrame = new JSpinner(modelFrom);
-		fromFrame.setToolTipText("from");
+		fromFrame.setToolTipText("frame from");
 		fromFrame.setValue((int)soundCanvasWrapper.getFrameFrom());
 		fromFrame.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent arg0) {
@@ -350,9 +356,21 @@ public class CustomTable extends JPanel implements Context.Listener{
 				}
 			}
 		});
-		SpinnerNumberModel modelTo = new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1);
-		final JSpinner toFrame = new JSpinner(modelTo);
-		toFrame.setToolTipText("to");
+		final JSpinner toFrame = WidgetUtil.getIntegerSpinner(0, 0, Integer.MAX_VALUE, 1, Unit.OTHER, new NumberMeaning() {
+			@Override
+			public Class<? extends Annotation> annotationType() {
+				return NumberMeaning.class;
+			}
+			@Override
+			public int[] numbers() {
+				return new int[] {0};
+			}
+			@Override
+			public String[] meanings() {
+				return new String[] {"end"};
+			}
+		});
+		toFrame.setToolTipText("frame to");
 		toFrame.setValue(soundCanvasWrapper.isFrameToAuto() ? (int)0 : (int)soundCanvasWrapper.getFrameTo());
 		toFrame.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent arg0) {
@@ -370,6 +388,7 @@ public class CustomTable extends JPanel implements Context.Listener{
 			}
 		});
 		final JButton expandButton = new JButton(" + ");
+		expandButton.setToolTipText("expand properties");
 		
 		expandButton.addActionListener(new ActionListener() {
 			
@@ -377,6 +396,7 @@ public class CustomTable extends JPanel implements Context.Listener{
 			public void actionPerformed(ActionEvent arg0) {
 				row.toggleProperties();
 				expandButton.setText(row.isPanelVisible() ? " - " : " + ");
+				expandButton.setToolTipText(row.isPanelVisible() ? "collapse properties" : "expand properties");
 				soundCanvasWrapper.setEditorOpen(row.isPanelVisible());
 				row.revalidate();
 				CustomTable.this.revalidate();
@@ -396,6 +416,7 @@ public class CustomTable extends JPanel implements Context.Listener{
 		});
 		
 		final JCheckBox xorCheckBox = new JCheckBox(soundCanvasWrapper.isXor() ? "xor": "std", soundCanvasWrapper.isXor());
+		xorCheckBox.setToolTipText("paint standard or xor");
 		xorCheckBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -531,7 +552,7 @@ public class CustomTable extends JPanel implements Context.Listener{
 			if (c instanceof Row) {
 				SoundCanvasWrapper soundCanvasWrapper = ((Row) c).getSoundCanvasWrapper();
 				if (soundCanvasWrapper.getSoundCanvas() == soundCanvas) {
-					soundCanvasWrapper.updateUI(120, 30, (Graphics2D) soundCanvasWrapper.getIconImage().getGraphics());
+					soundCanvasWrapper.updateUI(iconWidth, iconHeight, (Graphics2D) soundCanvasWrapper.getIconImage().getGraphics());
 					for (Component ci : ((Row) c).getComponents()) {
 						if("icon_label".equals(ci.getName())){
 							((JLabel)ci).setIcon(new ImageIcon(soundCanvasWrapper.getIconImage()));

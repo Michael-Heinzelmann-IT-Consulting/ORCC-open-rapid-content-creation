@@ -36,8 +36,10 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.mcuosmipcuter.orcc.api.soundvis.Unit;
 import org.mcuosmipcuter.orcc.soundvis.Context;
 import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
+import org.mcuosmipcuter.orcc.soundvis.gui.widgets.WidgetUtil;
 import org.mcuosmipcuter.orcc.soundvis.gui.widgets.properties.EditorLifeCycle;
 import org.mcuosmipcuter.orcc.soundvis.gui.widgets.properties.PropertyPanel;
 import org.mcuosmipcuter.orcc.soundvis.gui.widgets.properties.PropertyPanelFactory;
@@ -106,9 +108,8 @@ public class Row extends JPanel {
 				gc.insets = new Insets(3, 0, 10, 0);
 		        gc.weightx = 1;
 		        
-				final JSpinner scale = new JSpinner();
-				scale.setToolTipText("scale in % of video");
-				scale.setValue(soundCanvasWrapper.getScale());		
+				final JSpinner scale = WidgetUtil.getIntegerSpinner(soundCanvasWrapper.getScale(), Integer.MIN_VALUE, Integer.MAX_VALUE, 1, Unit.PERCENT_VIDEO, null);
+				scale.setToolTipText("scale in % of video");		
 				scale.addChangeListener(new ChangeListener() {
 					public void stateChanged(ChangeEvent arg0) {
 						soundCanvasWrapper.setScale(((((Number)scale.getValue()).intValue())));
