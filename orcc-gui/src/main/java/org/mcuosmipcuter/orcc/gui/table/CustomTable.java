@@ -20,6 +20,7 @@ package org.mcuosmipcuter.orcc.gui.table;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -554,8 +555,12 @@ public class CustomTable extends JPanel implements Context.Listener{
 				if (soundCanvasWrapper.getSoundCanvas() == soundCanvas) {
 					soundCanvasWrapper.updateUI(iconWidth, iconHeight, (Graphics2D) soundCanvasWrapper.getIconImage().getGraphics());
 					for (Component ci : ((Row) c).getComponents()) {
-						if("icon_label".equals(ci.getName())){
-							((JLabel)ci).setIcon(new ImageIcon(soundCanvasWrapper.getIconImage()));
+						if(ci instanceof Container) {
+							for (Component cii : ((Container)ci).getComponents()) {
+								if("icon_label".equals(cii.getName())){
+									((JLabel)cii).setIcon(new ImageIcon(soundCanvasWrapper.getIconImage()));
+								}
+							}
 						}
 					}
 				}
