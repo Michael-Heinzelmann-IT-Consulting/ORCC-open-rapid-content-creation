@@ -644,14 +644,11 @@ public class Main {
 						String changed = Context.getSessionToken().isChanged() ? complete + " * " : complete;
 						graphicFrame.setInputTitle(inputTitle + changed);
 					}
-					if(PropertyName.SoundCanvasAdded.equals(propertyName)||
-							PropertyName.SoundCanvasRemoved.equals(propertyName)||
-							PropertyName.VideoDimension.equals(propertyName) || 
-							PropertyName.VideoFrameRate.equals(propertyName)) { 
+					if(	PropertyName.VideoDimension.equals(propertyName) || 
+						PropertyName.VideoFrameRate.equals(propertyName)) { 
 						String title = "Video " + Context.getVideoOutputInfo().getWidth() 
 								+ "x" + Context.getVideoOutputInfo().getHeight() + "p  @"
-								+ Context.getVideoOutputInfo().getFramesPerSecond() + "fps | " +
-								Context.getSoundCanvasList();
+								+ Context.getVideoOutputInfo().getFramesPerSecond() + "fps";
 						graphicFrame.setOutputTitle(title);
 					}
 				}

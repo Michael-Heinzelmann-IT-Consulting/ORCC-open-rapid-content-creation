@@ -28,7 +28,17 @@ public class GraphicsJInternalFrame extends JInternalFrame {
 		return realtimeTitle;
 	}
 	private void setTitle() {
-		setTitle("[" + inputTitle + "] " + realtimeTitle + " " + outputTitle);
+		StringBuilder sb = new StringBuilder();
+		if(inputTitle != null) {
+			sb.append("[ " + inputTitle + " ]");
+		}
+		if(outputTitle != null) {
+			sb.append(" "  + outputTitle + " ");
+		}
+		if(realtimeTitle != null) {
+			sb.append("[ " + realtimeTitle + " ]");
+		}
+		setTitle(sb.toString());
 	}
 	public void setRealtimeTitle(String realtimeTitle) {
 		this.realtimeTitle = realtimeTitle;
