@@ -41,7 +41,6 @@ import org.mcuosmipcuter.orcc.soundvis.Context;
 import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
 import org.mcuosmipcuter.orcc.soundvis.gui.widgets.WidgetUtil;
 import org.mcuosmipcuter.orcc.soundvis.gui.widgets.properties.EditorLifeCycle;
-import org.mcuosmipcuter.orcc.soundvis.gui.widgets.properties.PropertyPanel;
 import org.mcuosmipcuter.orcc.soundvis.gui.widgets.properties.PropertyPanelFactory;
 
 /**
@@ -109,6 +108,7 @@ public class Row extends JPanel {
 		        gc.weightx = 1;
 		        
 				final JSpinner scale = WidgetUtil.getIntegerSpinner(soundCanvasWrapper.getScale(), Integer.MIN_VALUE, Integer.MAX_VALUE, 1, Unit.PERCENT_VIDEO, null);
+				scale.setPreferredSize(new Dimension(80, 26));
 				scale.setToolTipText("scale in % of video");		
 				scale.addChangeListener(new ChangeListener() {
 					public void stateChanged(ChangeEvent arg0) {
@@ -117,18 +117,18 @@ public class Row extends JPanel {
 					}
 				});
 				
-				final JSpinner posX = new JSpinner();
-				posX.setToolTipText("position X");
-				posX.setValue(soundCanvasWrapper.getPosX());		
+				final JSpinner posX = WidgetUtil.getIntegerSpinner(soundCanvasWrapper.getPosX(), Integer.MIN_VALUE, Integer.MAX_VALUE, 1, Unit.PERCENT_VIDEO, null);
+				posX.setPreferredSize(new Dimension(80, 26));
+				posX.setToolTipText("position X");	
 				posX.addChangeListener(new ChangeListener() {
 					public void stateChanged(ChangeEvent arg0) {
 						soundCanvasWrapper.setPosX(((((Number)posX.getValue()).intValue())));
 						Context.touch();
 					}
 				});
-				final JSpinner posY = new JSpinner();
-				posY.setToolTipText("position Y");
-				posY.setValue(soundCanvasWrapper.getPosY());		
+				final JSpinner posY = WidgetUtil.getIntegerSpinner(soundCanvasWrapper.getPosY(), Integer.MIN_VALUE, Integer.MAX_VALUE, 1, Unit.PERCENT_VIDEO, null);
+				posY.setPreferredSize(new Dimension(80, 26));
+				posY.setToolTipText("position Y");	
 				posY.addChangeListener(new ChangeListener() {
 					public void stateChanged(ChangeEvent arg0) {
 						soundCanvasWrapper.setPosY(((((Number)posY.getValue()).intValue())));
@@ -186,7 +186,6 @@ public class Row extends JPanel {
 
 	private JPanel commonPanel(String name, Component c) {
 		JPanel p = new JPanel();
-		p.setBackground(getBackground());
 		p.setLayout(new GridLayout(1 , 2, 12, 12));
 		JLabel nameLabel = new JLabel(name);
 		nameLabel.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -195,19 +194,7 @@ public class Row extends JPanel {
 	
 		return p;
 	}
-	public void changeSize(PropertyPanel<?> p) {
 
-		for(Component c : panel.getComponents()) {
-			if(c == p) {
-				panel.revalidate();
-				int h = headerHeight + panel.getPreferredSize().height;
-				setPreferredSize(new Dimension(getPreferredSize().width, h));
-				revalidate();
-				break;
-			}
-		}
-		
-	}
 	public void passivatePropertyEditors() {
 		if(panel != null) {
 			for(Component c : panel.getComponents()) {
