@@ -19,6 +19,7 @@ package org.mcuosmipcuter.orcc.soundvis.defaultcanvas.model;
 
 import java.awt.Image;
 import java.beans.Transient;
+import java.util.UUID;
 
 import org.mcuosmipcuter.orcc.api.soundvis.DisplayDuration;
 import org.mcuosmipcuter.orcc.api.soundvis.DisplayObject;
@@ -31,12 +32,19 @@ import org.mcuosmipcuter.orcc.soundvis.ImageStore.Key;
  */
 public class Slide implements DisplayObject {
 
+	private String id = UUID.randomUUID().toString();
 	private Image image;
 	private String text;
 	private int position;
 	private Key key;
 	
 
+	public String getId() {
+		return id;
+	}
+	public void setId(String id) {
+		this.id = id;
+	}
 	@Transient
 	public Image getImage() {
 		return image;
@@ -86,7 +94,7 @@ public class Slide implements DisplayObject {
 
 	@Override
 	public String toString() {
-		return "Slide [image=" + System.identityHashCode(image) + ", text=" + text + ", position=" + position + "]";
+		return "Slide [id=" + id + "image=" + System.identityHashCode(image) + ", text=" + text + ", position=" + position + "]";
 	}
 	
 }

@@ -272,10 +272,14 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 				int res = JOptionPane.showConfirmDialog(null, array, "set value for text", 
 						JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 				if(res == JOptionPane.OK_OPTION) {
+					String oldText = slide.getText();
 					slide.setText(text.getText());
 					textButton.setText(text.getText());
-					// TODO Context.touchSession();
-				}		
+					MultiImagePropertyPanel.this.changeSession(slide.getId() + "::text", oldText, text.getText());
+				}	
+				else {
+					text.setText(slide.getText());
+				}
 			}
 		});
 
@@ -392,7 +396,7 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 		ib.setIcon(new ImageIcon(ImageStore.getOrLoadScaledImage(slide.getKey(), 80, 80)));
 		ib.setSelectedIcon(new ImageIcon(ImageStore.getOrLoadScaledImage(slide.getKey(), 60, 60)));
 		Context.setSongPositionPointer(Context.getSongPositionPointer());
-		changeSession(slide.getDisplayKey(), oldKey, newKey);
+		changeSession(slide.getId() + "::key", oldKey, newKey);
 	}
 	
 	private void removeSlide(Slide slide) {
@@ -425,7 +429,7 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 	private void moveSlide(Slide slide, int step) {
 		Slide[] currentValue = getCurrentValue();
 		if(currentValue == null || currentValue.length == 0) {
-			IOUtil.log("No slides to remove!");
+			IOUtil.log("No slides to move!");
 			return;
 		}
 		int oldIdx = -1;

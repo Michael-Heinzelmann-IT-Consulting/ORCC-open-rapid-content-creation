@@ -47,7 +47,7 @@ public class  ValueChanges  {
 		if(original == null) {
 			return current != null;
 		}
-		if(original.getClass().isInstance(Object[].class)) {
+		if(Object[].class.isAssignableFrom(original.getClass())) {
 			return !handleObjectArrays();
 		}
 		if(original instanceof LogicalEqual) {
