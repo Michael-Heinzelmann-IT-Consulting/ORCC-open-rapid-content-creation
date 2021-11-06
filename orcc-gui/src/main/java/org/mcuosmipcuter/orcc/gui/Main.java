@@ -107,8 +107,6 @@ public class Main {
 	static final int minCells = 3;
 	private static boolean exitCalled;
 	
-	private static ChangsBox changesBox = new ChangsBox();
-	
 	/**
 	 * @param args
 	 * @throws UnsupportedLookAndFeelException 
@@ -132,6 +130,8 @@ public class Main {
 		});
 		
 		org.mcuosmipcuter.orcc.gui.Configuration.init(args);
+		
+		ChangsBox changesBox = new ChangsBox();
 		
 		final JFrame frame = new JFrame("soundvis");
 		

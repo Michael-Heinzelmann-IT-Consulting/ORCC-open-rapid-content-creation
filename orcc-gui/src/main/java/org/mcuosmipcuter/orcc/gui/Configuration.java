@@ -21,6 +21,7 @@ import java.util.Properties;
 
 import javax.sound.sampled.FloatControl;
 import javax.swing.LookAndFeel;
+import javax.swing.PopupFactory;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -66,6 +67,8 @@ public abstract class Configuration {
 			LookAndFeel def = UIManager.getLookAndFeel();
 			IOUtil.log("look and feel set to default: " + def);		
 		}
+		
+		PopupFactory.setSharedInstance(new PopupFactory()); // force cross platform
 		
 		stage = 1;
 	}
