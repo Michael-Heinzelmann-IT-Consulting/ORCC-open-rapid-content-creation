@@ -53,7 +53,6 @@ import javax.swing.JTextField;
 import javax.swing.Popup;
 import javax.swing.PopupFactory;
 import javax.swing.ScrollPaneConstants;
-import javax.swing.border.EtchedBorder;
 import javax.swing.border.LineBorder;
 
 import org.mcuosmipcuter.orcc.gui.util.GraphicsUtil;
@@ -170,7 +169,7 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 		super(soundCanvasWrapper, valueOwner);
 
 		valueSelect.setLayout(new BorderLayout(2, 2));
-		valueSelect.setBorder(new LineBorder(valueSelect.getBackground(), 2));
+		valueSelect.setBorder(new LineBorder(valueSelect.getBackground(), 6));
 
 		addFileButton.setPreferredSize(new Dimension(80, 80));
 		addFileButton.setFont(getFont().deriveFont(48.0f));
@@ -245,7 +244,7 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 		hideSlideEditPopup(); // hide/remove others
 
 		JPanel editPanel = new JPanel();	
-		editPanel.setBorder(new EtchedBorder(EtchedBorder.RAISED));
+		editPanel.setBorder(new LineBorder(valueSelect.getBackground(), 6));
 		GridBagLayout gridbag = new GridBagLayout();
 		
 		editPanel.setLayout(gridbag);
