@@ -39,6 +39,7 @@ import org.mcuosmipcuter.orcc.api.soundvis.TimedChange;
 import org.mcuosmipcuter.orcc.api.soundvis.Unit;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
+import org.mcuosmipcuter.orcc.api.types.LongSequence;
 import org.mcuosmipcuter.orcc.api.util.DimensionHelper;
 import org.mcuosmipcuter.orcc.soundvis.defaultcanvas.model.Slide;
 import org.mcuosmipcuter.orcc.soundvis.effects.Fader;
@@ -69,9 +70,11 @@ public class SlideShow implements SoundCanvas {
 	@NumberMeaning(numbers = 0, meanings = "auto")
 	private int numberOfFrames = 0;
 	@UserProperty(description="number of frames per image", unit = Unit.TIMES)
-	@LimitedIntProperty(minimum=0, description="cannot be negative")
-	@NumberMeaning(numbers = 0, meanings = "auto")
+	@LimitedIntProperty(minimum=-1, description="cannot be negative")
+	@NumberMeaning(numbers = {0, -1}, meanings = {"auto", "fixed tos"})
 	private int repeat = 0;
+	@UserProperty(description="sequence of fixed tos to repeat over", unit=Unit.TIMES)	
+	LongSequence fixedTos = new LongSequence();
 	
 	private DimensionHelper dimensionHelper;
 
@@ -113,11 +116,16 @@ public class SlideShow implements SoundCanvas {
 	public void newFrame(long frameCount, Graphics2D graphics2D) {
 		
 
+		if(slides != null && slides.length > 0) {
 
-		if(slides != null && slides.length > 0 /*&& frameCount >= frameFrom && (frameCount <= frameTo || frameTo ==0)*/) {
-
-			repeater.setRepeat(repeat==0 ? slides.length : repeat);
+			if(repeat == -1) {
+				repeater.setRepeat(0);
+			}
+			else {
+				repeater.setRepeat(repeat == 0 ? slides.length : repeat);
+			}
 			repeater.setFrames(numberOfFrames);
+			repeater.setFixedTos(fixedTos);
 
 			for(DisplayUnit displayUnit : repeater.repeat(frameFrom, frameTo, frameCount)) {
 

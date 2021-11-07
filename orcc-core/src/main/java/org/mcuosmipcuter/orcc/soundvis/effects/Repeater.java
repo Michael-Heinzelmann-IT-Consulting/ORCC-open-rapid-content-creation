@@ -159,5 +159,9 @@ public class Repeater {
 	public void setRepeat(int repeat) {
 		this.repeat = repeat;
 	}
+
+	public void setFixedTos(LongSequence fixedTos) {
+		this.fixedTos = fixedTos;
+	}
 	
 }
