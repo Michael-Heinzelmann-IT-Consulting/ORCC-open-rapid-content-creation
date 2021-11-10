@@ -401,6 +401,7 @@ public class CustomTable extends JPanel implements Context.Listener{
 				soundCanvasWrapper.setEditorOpen(row.isPanelVisible());
 				row.revalidate();
 				CustomTable.this.revalidate();
+				tableListener.rowSelected(true);
 				Context.touch();
 			}
 		});
