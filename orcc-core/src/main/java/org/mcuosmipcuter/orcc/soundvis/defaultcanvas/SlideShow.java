@@ -42,6 +42,7 @@ import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.api.types.LongSequence;
 import org.mcuosmipcuter.orcc.api.util.DimensionHelper;
 import org.mcuosmipcuter.orcc.soundvis.defaultcanvas.model.Slide;
+import org.mcuosmipcuter.orcc.soundvis.effects.AutoFit;
 import org.mcuosmipcuter.orcc.soundvis.effects.Fader;
 import org.mcuosmipcuter.orcc.soundvis.effects.Mover;
 import org.mcuosmipcuter.orcc.soundvis.effects.Positioner;
@@ -86,16 +87,14 @@ public class SlideShow implements SoundCanvas {
 	@UserProperty(description="cout out")
 	private CLIP_SHAPE cutOut = CLIP_SHAPE.NONE;
 	
-	
-	public static enum SCALE_RULE {
-		HORIZONTAL, VERTICAL, BOTH
-	}
-	
 	public static enum CLIP_SHAPE {
 		NONE, ELLIPSE, CIRCLE, ROUND_RECTANGLE,
 	}
+
+	@UserProperty(description="automatic fit mode")
+	private AutoFit.Mode autoFit = AutoFit.Mode.OFF;
 	@NestedProperty(description = "x and y position")
-	Positioner positioner = new Positioner();
+	private Positioner positioner = new Positioner();
 	@NestedProperty(description = "fading in and out")
 	private Fader fader = new Fader();
 	@NestedProperty(description = "moving in and out")
@@ -135,9 +134,12 @@ public class SlideShow implements SoundCanvas {
 
 				BufferedImage image = (BufferedImage) slides[displayUnit.index % slides.length].getImage();
 				final AffineTransform saveAT = graphics2D.getTransform();
-
+				
 				Area imageArea = new Area(new Rectangle(image.getWidth(), image.getHeight()));
-
+				
+				AffineTransform transformF = AutoFit.autoZoom(dimensionHelper, image.getWidth(), image.getHeight(), autoFit);
+				imageArea.transform(transformF);
+				
 				AffineTransform transformS = scaler.scale(displayUnit, imageArea.getBounds().width, imageArea.getBounds().height);
 				imageArea.transform(transformS);
 
@@ -177,17 +179,18 @@ public class SlideShow implements SoundCanvas {
 				final Composite saveComposite = fader.fade(graphics2D, displayUnit);
 
 
-				try {	
-					//graphics2D.setXORMode(Color.BLACK);
-
+				try {
+					
 					graphics2D.transform(transformM);
 					graphics2D.transform(transformR);
 
 					graphics2D.setClip(clip);
 					graphics2D.transform(transformP);
-					graphics2D.transform(transformS);
-					graphics2D.drawImage(image, 0, 0, null, null);
 					
+					graphics2D.transform(transformS);
+					graphics2D.transform(transformF);
+					
+					graphics2D.drawImage(image, 0, 0, null, null);
 
 				}
 				finally {
@@ -195,9 +198,6 @@ public class SlideShow implements SoundCanvas {
 					graphics2D.setTransform(saveAT);
 					graphics2D.setClip(null);
 					slideText.writeText(graphics2D, dimensionHelper, slides[displayUnit.index % slides.length].getText());
-//					graphics2D.setXORMode(graphics2D.getColor());
-//					TextHelper.writeText(slides[displayUnit.index % slides.length].getText(), graphics2D, 30, Color.GRAY, videoOutputInfo.getWidth(), videoOutputInfo.getHeight() / 10);
-//					graphics2D.setPaintMode();
 				}
 			}
 		}
