@@ -275,6 +275,7 @@ public abstract class Context {
 	public static synchronized  void addCanvasWrapper(SoundCanvasWrapper soundCanvasWrapper) {
 		soundCanvasList.add(soundCanvasWrapper);
 		notifyListeners(PropertyName.SoundCanvasAdded);
+		notifyListeners("added " + soundCanvasWrapper.getDisplayName());
 	}
 
 	/**

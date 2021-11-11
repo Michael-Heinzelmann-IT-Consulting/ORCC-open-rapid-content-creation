@@ -174,6 +174,7 @@ public class ImageStore {
 			File imageFile = new File(key.getAbsolutePath());
 			if (imageFile.exists()) {
 				try {
+					Context.progressUpdate("loading " + imageFile.getName());
 					image = ImageIO.read(imageFile);
 				} catch (Exception ex) {
 					IOUtil.log("problem loading image for " + key.getAbsolutePath() + ": " + ex.getMessage());

@@ -20,6 +20,7 @@ package org.mcuosmipcuter.orcc.soundvis.gui.widgets;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.GridLayout;
 import java.text.DecimalFormat;
 import java.text.FieldPosition;
 import java.text.ParsePosition;
@@ -34,7 +35,6 @@ import javax.swing.text.NumberFormatter;
 
 import org.mcuosmipcuter.orcc.api.soundvis.NumberMeaning;
 import org.mcuosmipcuter.orcc.api.soundvis.Unit;
-import org.mcuosmipcuter.orcc.api.util.TextHelper;
 
 /**
  * @author Michael Heinzelmann
@@ -44,19 +44,27 @@ public class WidgetUtil  {
 
 	public static JPanel getMessagePanel(String msg, int fontSize, Graphics graphics) {
 		JPanel popUpContentPanel = new JPanel();
-		popUpContentPanel.setBackground(Color.YELLOW);
+		//popUpContentPanel.setBackground(Color.YELLOW);
+		popUpContentPanel.setLayout(new GridLayout(2, 1));
 		popUpContentPanel.setBorder(new  LineBorder(Color.YELLOW, 8, false));
 		JLabel label = new JLabel(msg);
+		label.setBorder(new  LineBorder(Color.YELLOW, 8, false));
 		Font font = new Font("dialog", Font.PLAIN, fontSize);
 		label.setOpaque(true);
 		label.setFont(font);
-		label.setForeground(Color.RED);
-		label.setBackground(Color.YELLOW);
+		//label.setForeground(Color.RED);
+		//label.setBackground(Color.YELLOW);
 		Graphics copy = graphics.create();
 		copy.setFont(font);
-		label.setPreferredSize(TextHelper.getTextDimesion(new String[] {msg}, copy));
+		//label.setPreferredSize(TextHelper.getTextDimesion(new String[] {msg}, copy));
 		popUpContentPanel.add(label);
 
+
+		JLabel update = new JLabel(".... update ....");
+		Font fontU = new Font("dialog", Font.PLAIN, fontSize/2);
+		update.setFont(fontU);
+		popUpContentPanel.add(update);
+		
 		return popUpContentPanel;
 	}
 	

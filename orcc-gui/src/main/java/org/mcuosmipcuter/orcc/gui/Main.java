@@ -86,8 +86,8 @@ import org.mcuosmipcuter.orcc.soundvis.gui.listeners.FileDialogActionListener.Ca
 import org.mcuosmipcuter.orcc.soundvis.gui.listeners.FileDialogActionListener.PreSelectCallBack;
 import org.mcuosmipcuter.orcc.soundvis.gui.listeners.StopActionListener;
 import org.mcuosmipcuter.orcc.soundvis.gui.widgets.GraphicsJInternalFrame;
+import org.mcuosmipcuter.orcc.soundvis.gui.widgets.LoadMessage;
 import org.mcuosmipcuter.orcc.soundvis.gui.widgets.TimeLabel;
-import org.mcuosmipcuter.orcc.soundvis.gui.widgets.WidgetUtil;
 import org.mcuosmipcuter.orcc.soundvis.persistence.FileConfiguration;
 import org.mcuosmipcuter.orcc.soundvis.persistence.Session;
 import org.mcuosmipcuter.orcc.soundvis.threads.SaveThread;
@@ -194,23 +194,29 @@ public class Main {
 			JMenuItem openSession = new JMenuItem("open session");
 			JMenuItem saveSessionAs = new JMenuItem("save session as");
 			JMenuItem saveSession = new JMenuItem("save session");
-			{
+			
+			LoadMessage loadMessage = new LoadMessage();
+			Context.addListener(loadMessage);
+			
+//			{
 				
 				
 				CallBack openSessionCallback = new CallBack() {
-					Popup popup = null;;
+					Popup popup = null;
+
+					
 
 					public void fileSelected(File file) {
 						
 						List<String> reportList = new ArrayList<String>();
 
 						String msg = "loading " + file.getName() + " ...";
-
-						JPanel popUpContentPanel = WidgetUtil.getMessagePanel(msg, 72, frame.getGraphics());
+						loadMessage.setHeader(msg);
+						
 						Rectangle screen = GraphicsUtil.getRootComponentOutline(frame);
 
-						popup = PopupFactory.getSharedInstance().getPopup(frame, popUpContentPanel,
-								screen.x + screen.width / 2 - popUpContentPanel.getPreferredSize().width / 2,
+						popup = PopupFactory.getSharedInstance().getPopup(frame, loadMessage,
+								screen.x + screen.width / 2 - loadMessage.getPreferredSize().width / 2,
 								screen.y + screen.height / 2);
 						final AppState before = Context.getAppState();
 						Context.setAppState(AppState.LOADING);
@@ -430,7 +436,7 @@ public class Main {
 					}
 				});
 			}
-		}
+//		}
 
 		//deskTop.setDesktopManager(new CustomDeskTopManager(playBackFrame, graphicFrame));
 		deskTop.setVisible(true);
@@ -686,9 +692,10 @@ public class Main {
 			}
 		});
 
-		JPanel popUpContentPanel = WidgetUtil.getMessagePanel("loading last session ...", 72, frame.getGraphics());
+		//JPanel popUpContentPanel = loadMessage; // WidgetUtil.getMessagePanel("loading last session ...", 72, frame.getGraphics());
+		loadMessage.setHeader("loading last session ...");
 		Rectangle screen = frame.getBounds();
-		Popup popup = PopupFactory.getSharedInstance().getPopup(frame, popUpContentPanel, screen.x + screen.width / 2 - popUpContentPanel.getPreferredSize().width / 2, screen.y + screen.height / 2);
+		Popup popup = PopupFactory.getSharedInstance().getPopup(frame, loadMessage, screen.x + screen.width / 2 - loadMessage.getPreferredSize().width / 2, screen.y + screen.height / 2);
 		popup.show();
 		Context.setAppState(AppState.LOADING);
 		List<String> reportList = new ArrayList<String>();
