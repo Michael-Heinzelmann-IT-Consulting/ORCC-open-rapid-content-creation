@@ -94,47 +94,45 @@ import org.mcuosmipcuter.orcc.soundvis.threads.SaveThread;
 import org.mcuosmipcuter.orcc.soundvis.util.ExportUtil;
 import org.mcuosmipcuter.orcc.util.IOUtil;
 
-
 /**
  * Main method class
+ * 
  * @author Michael Heinzelmann
  */
 public class Main {
-	
+
 	static final int infoW = 690;
 	static final int infoH = 200;
 	static final int playBackH = 240;
-	static final int minCells = 3;
 	private static boolean exitCalled;
-	
+
 	/**
 	 * @param args
-	 * @throws UnsupportedLookAndFeelException 
-	 * @throws IllegalAccessException 
-	 * @throws InstantiationException 
-	 * @throws ClassNotFoundException 
+	 * @throws UnsupportedLookAndFeelException
+	 * @throws IllegalAccessException
+	 * @throws InstantiationException
+	 * @throws ClassNotFoundException
 	 */
 	public static void main(String[] args) throws Exception {
-		
+
 		Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler() {
 			public void uncaughtException(Thread thread, Throwable t) {
 				System.err.println("UNCAUGHT Exception in " + thread);
 				t.printStackTrace();
-				if(!exitCalled) {
+				if (!exitCalled) {
 					String msg = t.getClass().getSimpleName() + ": " + t.getMessage();
-					JOptionPane.showConfirmDialog(null, msg, "Error",
-		                    JOptionPane.DEFAULT_OPTION,
-		                    JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showConfirmDialog(null, msg, "Error", JOptionPane.DEFAULT_OPTION,
+							JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		});
-		
+
 		org.mcuosmipcuter.orcc.gui.Configuration.init(args);
-		
+
 		ChangsBox changesBox = new ChangsBox();
-		
+
 		final JFrame frame = new JFrame("soundvis");
-		
+
 		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		frame.setMinimumSize(new Dimension(infoW, infoH + playBackH));
 		frame.addWindowListener(new WindowAdapter() {
@@ -142,7 +140,7 @@ public class Main {
 				exitRoutine(frame.getSize());
 			}
 		});
-		
+
 		final JDesktopPane deskTop = new JDesktopPane();
 		final JInternalFrame playBackFrame = new JInternalFrame("Audio Timeline", true, false, false);
 		final GraphicsJInternalFrame graphicFrame = new GraphicsJInternalFrame("Video", true, false, false, false);
@@ -154,517 +152,498 @@ public class Main {
 			}
 		});
 
-		
 		org.mcuosmipcuter.orcc.gui.Configuration.stage1(args);
-		
+
 		JMenuBar mb = new JMenuBar();
 		frame.setJMenuBar(mb);
-		
+
 		JMenuItem openAudio = new JMenuItem("open audio");
-		{
-			mb.add(new JMenu("  "));
-			
-			JMenu fileMenu = new JMenu("File");
-			mb.add(fileMenu);
-			
-			fileMenu.add(openAudio);
-			CallBack openAudioCallback = new CallBack() {
-				public void fileSelected(File file) {
-					try {
-						Context.setAudioFromFile(file.getAbsolutePath());
-					} catch (AppLogicException ex) {
-						throw new RuntimeException(ex);
-					}
+
+		mb.add(new JMenu("  "));
+
+		JMenu fileMenu = new JMenu("File");
+		mb.add(fileMenu);
+
+		fileMenu.add(openAudio);
+		CallBack openAudioCallback = new CallBack() {
+			public void fileSelected(File file) {
+				try {
+					Context.setAudioFromFile(file.getAbsolutePath());
+				} catch (AppLogicException ex) {
+					throw new RuntimeException(ex);
 				}
-			};
-			FileDialogActionListener importActionListener 
-				= new FileDialogActionListener(null, openAudioCallback, "open as audio input");
-			openAudio.addActionListener(importActionListener);
-			fileMenu.addSeparator();
-			JMenuItem exit = new JMenuItem("exit");
-			fileMenu.add(exit);
-			exit.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent arg0) {
-					exitRoutine(frame.getSize());
-				}
-			});
-		}
+			}
+		};
+		FileDialogActionListener importActionListener = new FileDialogActionListener(null, openAudioCallback,
+				"open as audio input");
+		openAudio.addActionListener(importActionListener);
+		fileMenu.addSeparator();
+		JMenuItem exit = new JMenuItem("exit");
+		fileMenu.add(exit);
+		exit.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				exitRoutine(frame.getSize());
+			}
+		});
+
 		JMenu sessionMenu = new JMenu("Session");
 		mb.add(sessionMenu);
-			JMenuItem openSession = new JMenuItem("open session");
-			JMenuItem saveSessionAs = new JMenuItem("save session as");
-			JMenuItem saveSession = new JMenuItem("save session");
-			
-			LoadMessage loadMessage = new LoadMessage();
-			Context.addListener(loadMessage);
-			
-//			{
-				
-				
-				CallBack openSessionCallback = new CallBack() {
-					Popup popup = null;
+		JMenuItem openSession = new JMenuItem("open session");
+		JMenuItem saveSessionAs = new JMenuItem("save session as");
+		JMenuItem saveSession = new JMenuItem("save session");
 
-					
+		LoadMessage loadMessage = new LoadMessage();
+		Context.addListener(loadMessage);
 
-					public void fileSelected(File file) {
-						
-						List<String> reportList = new ArrayList<String>();
+		CallBack openSessionCallback = new CallBack() {
+			Popup popup = null;
 
-						String msg = "loading " + file.getName() + " ...";
-						loadMessage.setHeader(msg);
-						
-						Rectangle screen = GraphicsUtil.getRootComponentOutline(frame);
+			public void fileSelected(File file) {
 
-						popup = PopupFactory.getSharedInstance().getPopup(frame, loadMessage,
-								screen.x + screen.width / 2 - loadMessage.getPreferredSize().width / 2,
-								screen.y + screen.height / 2);
-						final AppState before = Context.getAppState();
-						Context.setAppState(AppState.LOADING);
-						popup.show();
-						Thread t = new Thread() {
+				List<String> reportList = new ArrayList<String>();
 
-							@Override
-							public void run() {
-								try {
-									boolean loaded = Session.userLoadSession(file, reportList);
-									errorsOnSessionLoadRoutine(reportList);
-									if(!loaded) {
-										throw new RuntimeException("could not load session: " + reportList);
-									}
-								} finally {
-									Context.setAppState(before);
-									if (popup != null) {
-										popup.hide();
-									}
-								}
-							}
+				String msg = "loading " + file.getName() + " ...";
+				loadMessage.setHeader(msg);
 
-						};
-						t.start();
+				Rectangle screen = GraphicsUtil.getRootComponentOutline(frame);
 
-					}
-				};
-				///fileMenu.addSeparator();
-				
-				sessionMenu.add(openSession);
-				FileDialogActionListener openSessionActionListener = new FileDialogActionListener(null, openSessionCallback, "open session");
-				openSessionActionListener.setFileFilter(new ExtensionsFileFilter(Session.FILE_EXTENSION));
-				openSession.addActionListener(new ActionListener() {				
+				popup = PopupFactory.getSharedInstance().getPopup(frame, loadMessage,
+						screen.x + screen.width / 2 - loadMessage.getPreferredSize().width / 2,
+						screen.y + screen.height / 2);
+				final AppState before = Context.getAppState();
+				Context.setAppState(AppState.LOADING);
+				popup.show();
+				Thread t = new Thread() {
+
 					@Override
-					public void actionPerformed(ActionEvent e) {
-						if(allowSessionOpenRoutine()) {
-							openSessionActionListener.actionPerformed(e);
-						}	
-					}
-				});
-				
-				CallBack saveSessionAsCallback = new CallBack() {
-					public void fileSelected(File file) {
+					public void run() {
 						try {
-							Session.userSaveSession(file);
-						} catch (IllegalArgumentException | IllegalAccessException | IOException e) {
-							throw new RuntimeException(e);
-						}
-					}
-				};
-				sessionMenu.addSeparator();
-				sessionMenu.add(saveSessionAs);
-				FileDialogActionListener saveSessionAsActionListener = new FileDialogActionListener(null, saveSessionAsCallback, "save session");
-				saveSessionAsActionListener.setFileFilter(new ExtensionsFileFilter(Session.FILE_EXTENSION));
-				saveSessionAsActionListener.setForcedExtension(Session.FILE_EXTENSION);
-				saveSessionAs.addActionListener(saveSessionAsActionListener);
-				
-				sessionMenu.addSeparator();
-				sessionMenu.add(saveSession);
-				saveSession.addActionListener(new ActionListener() {
-					
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						if(Context.getSessionToken().isNamed()) {
-							try {
-								File file = new File(Context.getSessionToken().getFullPath());
-								Session.userSaveSession(file);
-							} catch (IllegalArgumentException | IllegalAccessException | IOException e1) {
-								throw new RuntimeException(e1);
+							boolean loaded = Session.userLoadSession(file, reportList);
+							errorsOnSessionLoadRoutine(reportList);
+							if (!loaded) {
+								throw new RuntimeException("could not load session: " + reportList);
+							}
+						} finally {
+							Context.setAppState(before);
+							if (popup != null) {
+								popup.hide();
 							}
 						}
-						else {
-							saveSessionAsActionListener.actionPerformed(e);
-						}
 					}
-				});
-			
-			JMenuItem newSession = new JMenuItem("new");
-			newSession.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					if(allowSessionOpenRoutine()) {
-						Session.newSession();
-					}
-				}
-			});
-			sessionMenu.addSeparator();
-			sessionMenu.add(newSession);
-			JMenuItem showChanges = new JMenuItem("show changes");
-			showChanges.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					changesBox.showUnsavedChanges(false);
-				}
-			});
-			Context.addListener(changesBox);
-			sessionMenu.addSeparator();
-			sessionMenu.add(showChanges);
-			
-			final JMenu exportMenu = new JMenu("Export");
-			final JMenuItem exportStart = new JMenuItem("start");
-			final JMenuItem exportStop = new JMenuItem("stop");
-			final JMenuItem exportFrameImage = new JMenuItem("frame as image");
-			mb.add(exportMenu);
-			{
-				CallBack exportVideo = new CallBack() {
-					public void fileSelected(File file) {
-						if(file.exists()) {
-							int res = JOptionPane.showConfirmDialog(null, file + " exists, are you sure you want to overwrite it ?", "", JOptionPane.OK_CANCEL_OPTION);
-							if(res != JOptionPane.OK_OPTION) {
-								return;
-							}
-						}
-						Context.setExportFileName(file.getAbsolutePath());
-						final PlayPauseStop exportThread = ExportUtil.getExportPlayPause(graphicPanel);
-						for(ActionListener a : exportStop.getActionListeners()) {
-							exportStop.removeActionListener(a);
-						}
-						exportStop.addActionListener(new StopActionListener(new PlayPauseStopHolder() {		
-							@Override
-							public PlayPauseStop getPlayPauseStop() {
-								return exportThread;
-							}
-						}));
-						exportThread.startPlaying();
-					}
-				};
-				FileDialogActionListener exportActionListener = new FileDialogActionListener(frame, exportVideo, "set as export file");
-				exportActionListener.addChoosableFilter(new ExtensionsFileFilter(".mov"));
-				exportActionListener.addChoosableFilter(new ExtensionsFileFilter(".mp4"));
-				exportActionListener.setForcedExtension(".mov");
-				exportStart.addActionListener(exportActionListener);
-				
-				CallBack exportFrameImageCallback= new CallBack() {
-					public void fileSelected(File file) {
-						if(file.exists()) {
-							int res = JOptionPane.showConfirmDialog(null, file + " exists, are you sure you want to overwrite it ?", "", JOptionPane.OK_CANCEL_OPTION);
-							if(res != JOptionPane.OK_OPTION) {
-								return;
-							}
-						}
-						BufferedImage image = graphicPanel.getFrameImage();
-						try {
-							String name = file.getName();
-							int idx = name.length() - 3;
-							String type = idx > 0 ? name.substring(idx) : "jpg";
-							ImageIO.write(image, type, file);
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
-					}
-				};
-				FileDialogActionListener exportFrameActionListener = new FileDialogActionListener(frame, exportFrameImageCallback, "set as export image file");
-				exportFrameActionListener.addChoosableFilter(new ExtensionsFileFilter(".jpg"));
-				exportFrameActionListener.addChoosableFilter(new ExtensionsFileFilter(".png"));
-				exportFrameActionListener.addChoosableFilter(new ExtensionsFileFilter(".gif"));
-				exportFrameActionListener.setPreSelectCallBack(new PreSelectCallBack() {				
-					@Override
-					public File preSelected() {
-						String preselected = "frame" + Context.getSongPositionPointer() + ".jpg";
-						return new File(preselected);
-					}
-				});
-				exportFrameImage.addActionListener(exportFrameActionListener);
-				
-				if(ExportUtil.isExportEnabled()) {
-					exportMenu.add(exportStart);
-					exportMenu.addSeparator();
-					exportMenu.add(exportStop);
-					exportMenu.addSeparator();
-					exportMenu.add(exportFrameImage);
-				}
-				else {
-					exportMenu.add(new JMenuItem("not enabled"));
-				}
-				Context.addListener(new Listener() {
-					public void contextChanged(PropertyName propertyName) {
-						if(PropertyName.AppState.equals(propertyName)) {
-							AppState current = Context.getAppState();
-							exportMenu.setEnabled(current == AppState.READY || current == AppState.EXPORTING);
-							exportStart.setEnabled(current != AppState.INIT && current != AppState.EXPORTING && current != AppState.LOADING);
-							exportStop.setEnabled(current == AppState.EXPORTING);
-							openAudio.setEnabled(current == AppState.READY);
-							openSession.setEnabled(current == AppState.READY);
-							newSession.setEnabled(current == AppState.READY);
-							saveSession.setEnabled(current != AppState.INIT && current != AppState.LOADING);
-							saveSessionAs.setEnabled(current != AppState.INIT && current != AppState.LOADING);
-						}
-					}
-				});
-			}
-			
-			final JMenu helpMenu = new JMenu("Help");
-			mb.add(helpMenu);
-			{
-				JMenuItem basics = new JMenuItem("basics");
-				helpMenu.add(basics);
-				basics.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent e) {
-						AboutBox.showFileText("/help.txt", false);
-					}
-				});
-				JMenuItem system = new JMenuItem("system environment");
-				helpMenu.addSeparator();
-				helpMenu.add(system);
-				system.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent e) {
-						AboutBox.showSystemProperties(true);
-					}
-				});
-				JMenuItem about = new JMenuItem("about");
-				helpMenu.addSeparator();
-				helpMenu.add(about);
-				about.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent e) {
-						AboutBox.showFileText("/license.txt", true);
-					}
-				});
-			}
-//		}
 
-		//deskTop.setDesktopManager(new CustomDeskTopManager(playBackFrame, graphicFrame));
+				};
+				t.start();
+
+			}
+		};
+
+		sessionMenu.add(openSession);
+		FileDialogActionListener openSessionActionListener = new FileDialogActionListener(null, openSessionCallback,
+				"open session");
+		openSessionActionListener.setFileFilter(new ExtensionsFileFilter(Session.FILE_EXTENSION));
+		openSession.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (allowSessionOpenRoutine()) {
+					openSessionActionListener.actionPerformed(e);
+				}
+			}
+		});
+
+		CallBack saveSessionAsCallback = new CallBack() {
+			public void fileSelected(File file) {
+				try {
+					Session.userSaveSession(file);
+				} catch (IllegalArgumentException | IllegalAccessException | IOException e) {
+					throw new RuntimeException(e);
+				}
+			}
+		};
+		sessionMenu.addSeparator();
+		sessionMenu.add(saveSessionAs);
+		FileDialogActionListener saveSessionAsActionListener = new FileDialogActionListener(null, saveSessionAsCallback,
+				"save session");
+		saveSessionAsActionListener.setFileFilter(new ExtensionsFileFilter(Session.FILE_EXTENSION));
+		saveSessionAsActionListener.setForcedExtension(Session.FILE_EXTENSION);
+		saveSessionAs.addActionListener(saveSessionAsActionListener);
+
+		sessionMenu.addSeparator();
+		sessionMenu.add(saveSession);
+		saveSession.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (Context.getSessionToken().isNamed()) {
+					try {
+						File file = new File(Context.getSessionToken().getFullPath());
+						Session.userSaveSession(file);
+					} catch (IllegalArgumentException | IllegalAccessException | IOException e1) {
+						throw new RuntimeException(e1);
+					}
+				} else {
+					saveSessionAsActionListener.actionPerformed(e);
+				}
+			}
+		});
+
+		JMenuItem newSession = new JMenuItem("new");
+		newSession.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (allowSessionOpenRoutine()) {
+					Session.newSession();
+				}
+			}
+		});
+		sessionMenu.addSeparator();
+		sessionMenu.add(newSession);
+		JMenuItem showChanges = new JMenuItem("show changes");
+		showChanges.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				changesBox.showUnsavedChanges(false);
+			}
+		});
+		Context.addListener(changesBox);
+		sessionMenu.addSeparator();
+		sessionMenu.add(showChanges);
+
+		final JMenu exportMenu = new JMenu("Export");
+		final JMenuItem exportStart = new JMenuItem("start");
+		final JMenuItem exportStop = new JMenuItem("stop");
+		final JMenuItem exportFrameImage = new JMenuItem("frame as image");
+		mb.add(exportMenu);
+
+		CallBack exportVideo = new CallBack() {
+			public void fileSelected(File file) {
+				if (file.exists()) {
+					int res = JOptionPane.showConfirmDialog(null,
+							file + " exists, are you sure you want to overwrite it ?", "",
+							JOptionPane.OK_CANCEL_OPTION);
+					if (res != JOptionPane.OK_OPTION) {
+						return;
+					}
+				}
+				Context.setExportFileName(file.getAbsolutePath());
+				final PlayPauseStop exportThread = ExportUtil.getExportPlayPause(graphicPanel);
+				for (ActionListener a : exportStop.getActionListeners()) {
+					exportStop.removeActionListener(a);
+				}
+				exportStop.addActionListener(new StopActionListener(new PlayPauseStopHolder() {
+					@Override
+					public PlayPauseStop getPlayPauseStop() {
+						return exportThread;
+					}
+				}));
+				exportThread.startPlaying();
+			}
+		};
+		FileDialogActionListener exportActionListener = new FileDialogActionListener(frame, exportVideo,
+				"set as export file");
+		exportActionListener.addChoosableFilter(new ExtensionsFileFilter(".mov"));
+		exportActionListener.addChoosableFilter(new ExtensionsFileFilter(".mp4"));
+		exportActionListener.setForcedExtension(".mov");
+		exportStart.addActionListener(exportActionListener);
+
+		CallBack exportFrameImageCallback = new CallBack() {
+			public void fileSelected(File file) {
+				if (file.exists()) {
+					int res = JOptionPane.showConfirmDialog(null,
+							file + " exists, are you sure you want to overwrite it ?", "",
+							JOptionPane.OK_CANCEL_OPTION);
+					if (res != JOptionPane.OK_OPTION) {
+						return;
+					}
+				}
+				BufferedImage image = graphicPanel.getFrameImage();
+				try {
+					String name = file.getName();
+					int idx = name.length() - 3;
+					String type = idx > 0 ? name.substring(idx) : "jpg";
+					ImageIO.write(image, type, file);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		};
+		FileDialogActionListener exportFrameActionListener = new FileDialogActionListener(frame,
+				exportFrameImageCallback, "set as export image file");
+		exportFrameActionListener.addChoosableFilter(new ExtensionsFileFilter(".jpg"));
+		exportFrameActionListener.addChoosableFilter(new ExtensionsFileFilter(".png"));
+		exportFrameActionListener.addChoosableFilter(new ExtensionsFileFilter(".gif"));
+		exportFrameActionListener.setPreSelectCallBack(new PreSelectCallBack() {
+			@Override
+			public File preSelected() {
+				String preselected = "frame" + Context.getSongPositionPointer() + ".jpg";
+				return new File(preselected);
+			}
+		});
+		exportFrameImage.addActionListener(exportFrameActionListener);
+
+		if (ExportUtil.isExportEnabled()) {
+			exportMenu.add(exportStart);
+			exportMenu.addSeparator();
+			exportMenu.add(exportStop);
+			exportMenu.addSeparator();
+			exportMenu.add(exportFrameImage);
+		} else {
+			exportMenu.add(new JMenuItem("not enabled"));
+		}
+		Context.addListener(new Listener() {
+			public void contextChanged(PropertyName propertyName) {
+				if (PropertyName.AppState.equals(propertyName)) {
+					AppState current = Context.getAppState();
+					exportMenu.setEnabled(current == AppState.READY || current == AppState.EXPORTING);
+					exportStart.setEnabled(
+							current != AppState.INIT && current != AppState.EXPORTING && current != AppState.LOADING);
+					exportStop.setEnabled(current == AppState.EXPORTING);
+					openAudio.setEnabled(current == AppState.READY);
+					openSession.setEnabled(current == AppState.READY);
+					newSession.setEnabled(current == AppState.READY);
+					saveSession.setEnabled(current != AppState.INIT && current != AppState.LOADING);
+					saveSessionAs.setEnabled(current != AppState.INIT && current != AppState.LOADING);
+				}
+			}
+		});
+
+		final JMenu helpMenu = new JMenu("Help");
+		mb.add(helpMenu);
+
+		JMenuItem basics = new JMenuItem("basics");
+		helpMenu.add(basics);
+		basics.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				AboutBox.showFileText("/help.txt", false);
+			}
+		});
+		JMenuItem system = new JMenuItem("system environment");
+		helpMenu.addSeparator();
+		helpMenu.add(system);
+		system.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				AboutBox.showSystemProperties(true);
+			}
+		});
+		JMenuItem about = new JMenuItem("about");
+		helpMenu.addSeparator();
+		helpMenu.add(about);
+		about.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				AboutBox.showFileText("/license.txt", true);
+			}
+		});
+
 		deskTop.setVisible(true);
-		
+
 		frame.getContentPane().add(deskTop);
-		
-		if(FileConfiguration.isAppsizeMaximized()) {
+
+		if (FileConfiguration.isAppsizeMaximized()) {
 			IOUtil.log("opening frame maximized");
 			frame.setExtendedState(Frame.MAXIMIZED_BOTH);
 			frame.addWindowStateListener(new WindowStateListener() {
-				
+
 				@Override
 				public void windowStateChanged(WindowEvent e) {
 					IOUtil.log("window state " + e);
-					synchronized(frame) {
+					synchronized (frame) {
 						frame.notify();
 					}
 				}
 			});
 			final long start = System.currentTimeMillis();
 			frame.setVisible(true);
-			synchronized(frame) {
+			synchronized (frame) {
 				frame.wait(30000);
 				IOUtil.log("frame maximized after " + (System.currentTimeMillis() - start) + " ms.");
 			}
-		}
-		else {
+		} else {
 			Optional<Dimension> userDefined = FileConfiguration.loadUserDefinedAppsize();
-			if(userDefined.isPresent()) {
+			if (userDefined.isPresent()) {
 				Dimension d = userDefined.get();
 				IOUtil.log("opening frame user defined " + d);
 				frame.setSize(d.width, d.height);
-			}
-			else {
+			} else {
 				IOUtil.log("opening frame default size");
 				frame.setSize(1400, 800);
 			}
 			frame.setVisible(true);
 		}
-		
+
 		final PlayBackPanel playBackPanel = new PlayBackPanel(graphicPanel);
 		IOUtil.log("frame size: " + frame.getSize());
-		{
-			deskTop.add(playBackFrame);
-			
-			{
-				playBackFrame.getContentPane().add(playBackPanel, BorderLayout.SOUTH);
-				graphicPanel.setMixin(playBackPanel);
-			}
-			
-			playBackFrame.setSize(deskTop.getWidth(), playBackH);
-			playBackFrame.setVisible(true);
 
-			Context.addListener(new Listener() {		
-				@Override
-				public void contextChanged(PropertyName propertyName) {
-					if(PropertyName.AudioInputInfo.equals(propertyName)) {
-						AudioInput audioInput = Context.getAudioInput();
-						final AudioFormat audioFormat = audioInput.getAudioInputInfo().getAudioFormat();
-						TimeLabel tl = new TimeLabel();
-						tl.update(audioInput.getAudioInputInfo().getFrameLength(), audioFormat.getSampleRate());
-						playBackFrame.setTitle(audioInput.getAudioInputInfo().getLayout() + ": " +audioInput.getName() + " | " + ((int)audioFormat.getSampleRate()) + " HZ | " + audioFormat.getSampleSizeInBits() + " bit | length " + tl.getText());
-					}
+		deskTop.add(playBackFrame);
+
+		playBackFrame.getContentPane().add(playBackPanel, BorderLayout.SOUTH);
+		graphicPanel.setMixin(playBackPanel);
+
+		playBackFrame.setSize(deskTop.getWidth(), playBackH);
+		playBackFrame.setVisible(true);
+
+		Context.addListener(new Listener() {
+			@Override
+			public void contextChanged(PropertyName propertyName) {
+				if (PropertyName.AudioInputInfo.equals(propertyName)) {
+					AudioInput audioInput = Context.getAudioInput();
+					final AudioFormat audioFormat = audioInput.getAudioInputInfo().getAudioFormat();
+					TimeLabel tl = new TimeLabel();
+					tl.update(audioInput.getAudioInputInfo().getFrameLength(), audioFormat.getSampleRate());
+					playBackFrame.setTitle(audioInput.getAudioInputInfo().getLayout() + ": " + audioInput.getName()
+							+ " | " + ((int) audioFormat.getSampleRate()) + " HZ | " + audioFormat.getSampleSizeInBits()
+							+ " bit | length " + tl.getText());
 				}
-			});
-		}
+			}
+		});
 
-		{
-			final JInternalFrame propertiesFrame = new JInternalFrame("Layers");
-			JMenuBar layersMenuBar = new JMenuBar();
-			final JMenu canvas = new JMenu("canvas");
-			layersMenuBar.add(canvas);
-			CanvasClassMenu classes = new CanvasClassMenu("add canvas");
-			canvas.add(classes);
-			propertiesFrame.setJMenuBar(layersMenuBar);
-			final CustomTable propTable = new CustomTable();
-			propTable.setListener(playBackPanel.getCustomTableListener());
-			Context.addListener(propTable);
-			
-	        JPanel container = new JPanel();
-	        container.setOpaque(true);
-	        container.setLayout(new BorderLayout());
-	        container.add(propTable, BorderLayout.NORTH);     
-	        JScrollPane scrollPane = new JScrollPane(container);
-	        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-	        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-			propertiesFrame.add(scrollPane);
-			
-			{
-				Context.addListener(new Listener() {	
-					@Override
-					public void contextChanged(PropertyName propertyName) {
-						if(PropertyName.SoundCanvasAdded.equals(propertyName)) {
-							List<SoundCanvasWrapper> list = Context.getSoundCanvasList();
-							
-							propTable.addLayer(list.get(list.size() - 1));
-						}
-						if(PropertyName.AppState.equals(propertyName)) {
-							propTable.setEnabled(Context.getAppState() == AppState.READY || Context.getAppState() == AppState.PAUSED);
-							canvas.setEnabled(Context.getAppState() == AppState.READY);
-						}
-					}
-				});
+		final JInternalFrame propertiesFrame = new JInternalFrame("Layers");
+		JMenuBar layersMenuBar = new JMenuBar();
+		final JMenu canvas = new JMenu("canvas");
+		layersMenuBar.add(canvas);
+		CanvasClassMenu classes = new CanvasClassMenu("add canvas");
+		canvas.add(classes);
+		propertiesFrame.setJMenuBar(layersMenuBar);
+		final CustomTable propTable = new CustomTable();
+		propTable.setListener(playBackPanel.getCustomTableListener());
+		Context.addListener(propTable);
+
+		JPanel container = new JPanel();
+		container.setOpaque(true);
+		container.setLayout(new BorderLayout());
+		container.add(propTable, BorderLayout.NORTH);
+		JScrollPane scrollPane = new JScrollPane(container);
+		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		propertiesFrame.add(scrollPane);
+
+		Context.addListener(new Listener() {
+			@Override
+			public void contextChanged(PropertyName propertyName) {
+				if (PropertyName.SoundCanvasAdded.equals(propertyName)) {
+					List<SoundCanvasWrapper> list = Context.getSoundCanvasList();
+
+					propTable.addLayer(list.get(list.size() - 1));
+				}
+				if (PropertyName.AppState.equals(propertyName)) {
+					propTable.setEnabled(
+							Context.getAppState() == AppState.READY || Context.getAppState() == AppState.PAUSED);
+					canvas.setEnabled(Context.getAppState() == AppState.READY);
+				}
+			}
+		});
+
+		propertiesFrame.setLocation(0, playBackH);
+		propertiesFrame.setResizable(true);
+		propertiesFrame.setVisible(true);
+		propertiesFrame.setSize(infoW, deskTop.getHeight() - playBackH - 10);
+		deskTop.add(propertiesFrame);
+
+		final JMenu configMenu = new JMenu("Configuration");
+		mb.add(configMenu);
+
+		VideoOutputInfo v = Context.getVideoOutputInfo();
+		ResolutionMenu resolutions = new ResolutionMenu("video size", v.getWidth(), v.getHeight());
+		configMenu.add(resolutions);
+		Context.addListener(resolutions);
+
+		AudioOutputLayoutMenu audioOutputLayoutMenu = new AudioOutputLayoutMenu("audio output");
+		configMenu.addSeparator();
+		configMenu.add(audioOutputLayoutMenu);
+		Context.addListener(audioOutputLayoutMenu);
+
+		final FrameRateMenu frameRates = new FrameRateMenu("frame rate", v.getFramesPerSecond());
+		configMenu.addSeparator();
+		configMenu.add(frameRates);
+		Context.addListener(frameRates);
+
+		JMenuItem preferences = new JMenuItem("preferences (startup)");
+		preferences.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				PreferencesBox.showPreferncesDialog();
+			}
+		});
+		configMenu.addSeparator();
+		configMenu.add(preferences);
+
+		// context listener for menu enabling
+		Context.addListener(new Listener() {
+			public void contextChanged(PropertyName propertyName) {
+				if (PropertyName.AppState.equals(propertyName)) {
+					configMenu.setEnabled(Context.getAppState() == AppState.READY);
+				}
+				if (PropertyName.AudioInputInfo.equals(propertyName)) {
+					frameRates.checkFrameRatesEnabled(Context.getAudioInput().getAudioInputInfo());
+				}
+			}
+		});
+
+		final JMenu viewMenu = new JMenu("View");
+		mb.add(viewMenu);
+		viewMenu.add(new ZoomMenu("video zoom", 0.0f, graphicPanel));
+		graphicPanel.setZoomFactor(0.0f);
+
+		SpinnerNumberModel modelZoom = new SpinnerNumberModel(100, 10, 60000, 10);
+		final JSpinner framesToZoom = new JSpinner(modelZoom);
+		final JPanel fz = new JPanel();
+		fz.setLayout(new BorderLayout());
+		fz.add(framesToZoom, BorderLayout.WEST);
+		fz.add(new JLabel("samples"));
+		JMenuItem zoom = new JMenuItem("wave zoom");
+		viewMenu.add(zoom);
+
+		zoom.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				final int ftzOld = (Integer) framesToZoom.getValue();
+				JOptionPane.showMessageDialog(null, fz, "wave zoom to number of samples", JOptionPane.PLAIN_MESSAGE);
+				int ftz = (Integer) framesToZoom.getValue();
+				if (ftz != ftzOld) {
+					playBackPanel.changeFrameZoom(ftz);
+				}
+			}
+		});
+
+		graphicPanel.setOpaque(true);
+
+		graphicPanel.addSettingsListener(new SettingsListener() {
+
+			@Override
+			public void update(String description) {
+				graphicFrame.setRealtimeTitle(description);
 
 			}
-			
-			propertiesFrame.setLocation(0, playBackH);
-			propertiesFrame.setResizable(true);
-			propertiesFrame.setVisible(true);
-			propertiesFrame.setSize(infoW, deskTop.getHeight() - playBackH - 10);
-			deskTop.add(propertiesFrame);
-		}	
+		});
+		Context.addListener(graphicPanel);
 
-		{
-			{			
-				
-				final JMenu configMenu = new JMenu("Configuration");
-				mb.add(configMenu);
+		deskTop.add(graphicFrame);
 
-				VideoOutputInfo v = Context.getVideoOutputInfo();
-				ResolutionMenu resolutions = new ResolutionMenu("video size", v.getWidth(), v.getHeight());
-				configMenu.add(resolutions);
-				Context.addListener(resolutions);
-				
-				AudioOutputLayoutMenu audioOutputLayoutMenu = new AudioOutputLayoutMenu("audio output");
-				configMenu.addSeparator();
-				configMenu.add(audioOutputLayoutMenu);
-				Context.addListener(audioOutputLayoutMenu);
-				
-				final FrameRateMenu frameRates = new FrameRateMenu("frame rate", v.getFramesPerSecond());
-				configMenu.addSeparator();
-				configMenu.add(frameRates);
-				Context.addListener(frameRates);
-				
-				JMenuItem preferences = new JMenuItem("preferences (startup)");
-				preferences.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent e) {
-						PreferencesBox.showPreferncesDialog();
-					}
-				});
-				configMenu.addSeparator();
-				configMenu.add(preferences);
+		graphicFrame.getContentPane().add(graphicPanel);
 
-				// context listener for menu enabling
-				Context.addListener(new Listener() {
-					public void contextChanged(PropertyName propertyName) {
-						if(PropertyName.AppState.equals(propertyName)) {
-							configMenu.setEnabled(Context.getAppState() == AppState.READY);
-						}
-						if(PropertyName.AudioInputInfo.equals(propertyName)) {
-							frameRates.checkFrameRatesEnabled(Context.getAudioInput().getAudioInputInfo());
-						}
-					}
-				});
+		graphicFrame.setSize(deskTop.getWidth() - infoW, deskTop.getHeight() - playBackH - 10);
+		graphicFrame.setLocation(infoW, playBackH);
+		graphicFrame.setVisible(true);
+
+		Context.addListener(new Listener() {
+			public void contextChanged(PropertyName propertyName) {
+				if (PropertyName.NewSession.equals(propertyName) || PropertyName.SessionChanged.equals(propertyName)) {
+					String inputTitle = Context.getSessionToken().isNamed() ? Context.getSessionToken().getFullPath()
+							: "unnamed session";
+					String complete = Context.getSessionToken().hasLoadErrors() ? " !!incomplete!! " : "";
+					String changed = Context.getSessionToken().isChanged() ? complete + " * " : complete;
+					graphicFrame.setInputTitle(inputTitle + changed);
+				}
+				if (PropertyName.VideoDimension.equals(propertyName)
+						|| PropertyName.VideoFrameRate.equals(propertyName)) {
+					String title = "Video " + Context.getVideoOutputInfo().getWidth() + "x"
+							+ Context.getVideoOutputInfo().getHeight() + "p  @"
+							+ Context.getVideoOutputInfo().getFramesPerSecond() + "fps";
+					graphicFrame.setOutputTitle(title);
+				}
 			}
-			final JMenu viewMenu = new JMenu("View");
-			//graphicMenuBar.add(viewMenu);
-			mb.add(viewMenu);
-			viewMenu.add(new ZoomMenu("video zoom", 0.0f, graphicPanel));
-			graphicPanel.setZoomFactor(0.0f);
-			
-			SpinnerNumberModel modelZoom = new SpinnerNumberModel(100, 10, 60000, 10);
-			final JSpinner framesToZoom = new JSpinner(modelZoom);
-			final JPanel fz = new JPanel();
-			fz.setLayout(new BorderLayout());
-			fz.add(framesToZoom, BorderLayout.WEST);
-			fz.add(new JLabel("samples"));
-			JMenuItem zoom = new JMenuItem("wave zoom");
-			viewMenu.add(zoom);
-
-			zoom.addActionListener(new ActionListener() {
-				
-				@Override
-				public void actionPerformed(ActionEvent arg0) {
-					final int ftzOld = (Integer)framesToZoom.getValue();
-					JOptionPane.showMessageDialog(null, fz, "wave zoom to number of samples", 
-							JOptionPane.PLAIN_MESSAGE);
-					int ftz = (Integer)framesToZoom.getValue(); 
-					if(ftz != ftzOld) {
-						playBackPanel.changeFrameZoom(ftz);
-					}
-				}
-			});
-			
-			graphicPanel.setOpaque(true);
-
-			graphicPanel.addSettingsListener(new SettingsListener() {
-				
-				@Override
-				public void update(String description) {
-					graphicFrame.setRealtimeTitle(description);
-					
-				}
-			});
-			Context.addListener(graphicPanel);
-
-			
-			deskTop.add(graphicFrame);
-			{
-				graphicFrame.getContentPane().add(graphicPanel);
-			}
-			graphicFrame.setSize(deskTop.getWidth() - infoW, deskTop.getHeight() - playBackH - 10);
-			graphicFrame.setLocation(infoW, playBackH);
-			graphicFrame.setVisible(true);
-			
-			Context.addListener(new Listener() {
-				public void contextChanged(PropertyName propertyName) {
-					if(PropertyName.NewSession.equals(propertyName)||PropertyName.SessionChanged.equals(propertyName)) {
-						String inputTitle = Context.getSessionToken().isNamed() ? Context.getSessionToken().getFullPath() : "unnamed session";
-						String complete = Context.getSessionToken().hasLoadErrors() ? " !!incomplete!! " : "";
-						String changed = Context.getSessionToken().isChanged() ? complete + " * " : complete;
-						graphicFrame.setInputTitle(inputTitle + changed);
-					}
-					if(	PropertyName.VideoDimension.equals(propertyName) || 
-						PropertyName.VideoFrameRate.equals(propertyName)) { 
-						String title = "Video " + Context.getVideoOutputInfo().getWidth() 
-								+ "x" + Context.getVideoOutputInfo().getHeight() + "p  @"
-								+ Context.getVideoOutputInfo().getFramesPerSecond() + "fps";
-						graphicFrame.setOutputTitle(title);
-					}
-				}
-			});
-		}
-		
-		
+		});
 
 		org.mcuosmipcuter.orcc.gui.Configuration.stage2(args);
-		
+
 		FileConfiguration.ensureAppDir(new Supplier<File>() {
 
 			@Override
@@ -673,34 +652,34 @@ public class Main {
 				chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 				chooser.setDialogType(JFileChooser.CUSTOM_DIALOG);
 				chooser.setFileFilter(new FileFilter() {
-					
+
 					@Override
 					public String getDescription() {
 						return "directories";
 					}
-					
+
 					@Override
 					public boolean accept(File f) {
 						return f != null && f.isDirectory();
 					}
 				});
 				int res = chooser.showDialog(frame, "Appdir for soundvis");
-				if(res == JFileChooser.APPROVE_OPTION) {
+				if (res == JFileChooser.APPROVE_OPTION) {
 					return chooser.getSelectedFile();
 				}
 				return null;
 			}
 		});
 
-		//JPanel popUpContentPanel = loadMessage; // WidgetUtil.getMessagePanel("loading last session ...", 72, frame.getGraphics());
 		loadMessage.setHeader("loading last session ...");
 		Rectangle screen = frame.getBounds();
-		Popup popup = PopupFactory.getSharedInstance().getPopup(frame, loadMessage, screen.x + screen.width / 2 - loadMessage.getPreferredSize().width / 2, screen.y + screen.height / 2);
+		Popup popup = PopupFactory.getSharedInstance().getPopup(frame, loadMessage,
+				screen.x + screen.width / 2 - loadMessage.getPreferredSize().width / 2, screen.y + screen.height / 2);
 		popup.show();
 		Context.setAppState(AppState.LOADING);
 		List<String> reportList = new ArrayList<String>();
 		boolean restoredSession = Session.restoreSession(reportList);
-		if(!restoredSession) {
+		if (!restoredSession) {
 			Session.newSession();
 		}
 		errorsOnSessionLoadRoutine(reportList);
@@ -710,50 +689,50 @@ public class Main {
 		Context.addListener(saveThread);
 		saveThread.start();
 		Context.setAppState(AppState.READY);
-		
+
 	}
+
 	private static void errorsOnSessionLoadRoutine(List<String> reportList) {
-		if(!reportList.isEmpty()) {
+		if (!reportList.isEmpty()) {
 			StringBuilder messages = new StringBuilder("Errors during session restore:");
-			for(String m : reportList) {
+			for (String m : reportList) {
 				messages.append("\n" + m);
 			}
 			JOptionPane.showMessageDialog(null, messages.toString());
 		}
 	}
+
 	private static boolean allowSessionOpenRoutine() {
 		SessionToken st = Context.getSessionToken();
 		if (st.isDefault() || st.isChanged()) {
 			String message = "Do you want to continue ?";
-			int res = JOptionPane.showOptionDialog(null,
-					message, "session not saved!",
-					JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null,
-					new String[] { "yes", "no" }, "no");
-			if(res == JOptionPane.NO_OPTION) {
+			int res = JOptionPane.showOptionDialog(null, message, "session not saved!", JOptionPane.YES_NO_OPTION,
+					JOptionPane.QUESTION_MESSAGE, null, new String[] { "yes", "no" }, "no");
+			if (res == JOptionPane.NO_OPTION) {
 				return false;
 			}
 		}
 		return true;
 	}
+
 	private static void exitRoutine(Dimension frameSize) {
-		if(Context.getAppState() != AppState.READY) {
-			int res = JOptionPane.showOptionDialog(null, "Confirm exit in state " 
-		+ Context.getAppState(), "Do you want to exit in state " + Context.getAppState() + " ?", 
-		JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[] {"ok", "cancel"}, "cancel");
-			if(res != JOptionPane.OK_OPTION) {
+		if (Context.getAppState() != AppState.READY) {
+			int res = JOptionPane.showOptionDialog(null, "Confirm exit in state " + Context.getAppState(),
+					"Do you want to exit in state " + Context.getAppState() + " ?", JOptionPane.OK_CANCEL_OPTION,
+					JOptionPane.QUESTION_MESSAGE, null, new String[] { "ok", "cancel" }, "cancel");
+			if (res != JOptionPane.OK_OPTION) {
 				return;
 			}
 		}
 
 		try {
 			FileConfiguration.storeUserDefinedAppsize(frameSize);
-			
+
 			SessionToken st = Context.getSessionToken();
 
-			 if (st.isChanged() && st.isNamed()) {
-				int res = JOptionPane.showOptionDialog(null,
-						"save session " + Context.getSessionToken().getFullPath(), "Do you want to save ?",
-						JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null,
+			if (st.isChanged() && st.isNamed()) {
+				int res = JOptionPane.showOptionDialog(null, "save session " + Context.getSessionToken().getFullPath(),
+						"Do you want to save ?", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null,
 						new String[] { "yes", "no", "cancel" }, "cancel");
 				if (res == JOptionPane.OK_OPTION) {
 					File file = new File(Context.getSessionToken().getFullPath());
@@ -778,4 +757,3 @@ public class Main {
 		System.exit(0);
 	}
 }
-
