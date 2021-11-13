@@ -86,7 +86,7 @@ public class AudioFileInputImpl implements AudioInput {
 				AudioFormat audioFormat = ais.getFormat();
 				frameLength = ais.getFrameLength();
 				audioInputInfoTemp = new AudioInputInfoImpl(audioFormat, frameLength, AudioLayout.LINEAR);
-				if("audio/midi".equals(mimeType)) {
+				if("audio/midi".equals(mimeType) || "audio/mid".equals(mimeType)) {
 					IOUtil.log("buffering midi as wave ...");
 					data = ais.readAllBytes();
 					IOUtil.log("buffered midi with " + data.length + " bytes.");
