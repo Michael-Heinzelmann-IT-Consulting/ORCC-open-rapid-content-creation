@@ -40,6 +40,9 @@ import org.mcuosmipcuter.orcc.util.IOUtil;
  * @author Michael Heinzelmann
  */
 public class AboutBox {
+	
+	public static final int MAX_ROWS_WO_SCROLLING = 20;
+	public static final int MAX_COLS_WO_SCROLLING = 100;
 	/**
 	 * Show modal about box using the /license.txt resource file as model
 	 * and  {@link JTextArea} {@link JScrollPane} and a {@link JOptionPane} view components
@@ -49,12 +52,16 @@ public class AboutBox {
 		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(is));
 		try {
 			StringBuilder stringBuilder = new StringBuilder();
+			int max = 0;
 			String line;
 			while((line = bufferedReader.readLine()) != null){
 				stringBuilder.append(line);
 				stringBuilder.append("\n");
+				if(line.length() > max) {
+					max = line.length();
+				}
 			}
-			JTextArea ta = new JTextArea(20, 50);
+			JTextArea ta = new JTextArea(MAX_ROWS_WO_SCROLLING, max < MAX_COLS_WO_SCROLLING ? max + 1 : MAX_COLS_WO_SCROLLING);
 			ta.setEditable(false);
 			JScrollPane sp = new JScrollPane(ta);
 			ta.setText(stringBuilder.toString());
@@ -116,7 +123,7 @@ public class AboutBox {
 				stringBuilder.append(s);
 				stringBuilder.append("\n");
 			}
-			JTextArea ta = new JTextArea(20, 50);
+			JTextArea ta = new JTextArea(MAX_ROWS_WO_SCROLLING, MAX_COLS_WO_SCROLLING);
 			ta.setEditable(false);
 			JScrollPane sp = new JScrollPane(ta);
 			ta.setText(stringBuilder.toString());
