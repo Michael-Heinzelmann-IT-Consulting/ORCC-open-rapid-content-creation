@@ -25,7 +25,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowStateListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -438,24 +437,12 @@ public class Main {
 		frame.getContentPane().add(deskTop);
 
 		if (FileConfiguration.isAppsizeMaximized()) {
-			IOUtil.log("opening frame maximized");
 			frame.setExtendedState(Frame.MAXIMIZED_BOTH);
-			frame.addWindowStateListener(new WindowStateListener() {
-
-				@Override
-				public void windowStateChanged(WindowEvent e) {
-					IOUtil.log("window state " + e);
-					synchronized (frame) {
-						frame.notify();
-					}
-				}
-			});
-			final long start = System.currentTimeMillis();
+			Dimension screen = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+			frame.setSize(screen);
+			IOUtil.log("opening frame maximized, screen size=" + screen);
 			frame.setVisible(true);
-			synchronized (frame) {
-				frame.wait(30000);
-				IOUtil.log("frame maximized after " + (System.currentTimeMillis() - start) + " ms.");
-			}
+
 		} else {
 			Optional<Dimension> userDefined = FileConfiguration.loadUserDefinedAppsize();
 			if (userDefined.isPresent()) {
@@ -468,12 +455,10 @@ public class Main {
 			}
 			frame.setVisible(true);
 		}
-
-		final PlayBackPanel playBackPanel = new PlayBackPanel(graphicPanel);
 		IOUtil.log("frame size: " + frame.getSize());
 
 		deskTop.add(playBackFrame);
-
+		final PlayBackPanel playBackPanel = new PlayBackPanel(graphicPanel);
 		playBackFrame.getContentPane().add(playBackPanel, BorderLayout.SOUTH);
 		graphicPanel.setMixin(playBackPanel);
 
