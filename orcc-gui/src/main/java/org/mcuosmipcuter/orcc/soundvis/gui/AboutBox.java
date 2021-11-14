@@ -55,6 +55,7 @@ public class AboutBox {
 				stringBuilder.append("\n");
 			}
 			JTextArea ta = new JTextArea(20, 50);
+			ta.setEditable(false);
 			JScrollPane sp = new JScrollPane(ta);
 			ta.setText(stringBuilder.toString());
 			ta.setCaretPosition(0);
@@ -116,6 +117,7 @@ public class AboutBox {
 				stringBuilder.append("\n");
 			}
 			JTextArea ta = new JTextArea(20, 50);
+			ta.setEditable(false);
 			JScrollPane sp = new JScrollPane(ta);
 			ta.setText(stringBuilder.toString());
 			ta.setCaretPosition(0);
