@@ -17,6 +17,8 @@
 */
 package org.mcuosmipcuter.orcc.soundvis.gui;
 
+import java.awt.Dimension;
+import java.awt.Font;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -54,24 +56,34 @@ public class AboutBox {
 			StringBuilder stringBuilder = new StringBuilder();
 			int max = 0;
 			String line;
+			String longest = "";
 			while((line = bufferedReader.readLine()) != null){
-				stringBuilder.append(line);
+				String lineU = " " + line + " ";
+				stringBuilder.append(lineU);
 				stringBuilder.append("\n");
-				if(line.length() > max) {
-					max = line.length();
+				if(lineU.length() > max) {
+					max = lineU.length();
+					longest = lineU;
 				}
 			}
-			JTextArea ta = new JTextArea(MAX_ROWS_WO_SCROLLING, max < MAX_COLS_WO_SCROLLING ? max + 1 : MAX_COLS_WO_SCROLLING);
+			JTextArea ta = new JTextArea();
 			ta.setEditable(false);
+			Font font = new Font("dialog", Font.PLAIN, 16);
+			ta.setFont(font);
+			ta.setRows(MAX_ROWS_WO_SCROLLING);
+			
 			JScrollPane sp = new JScrollPane(ta);
 			ta.setText(stringBuilder.toString());
 			ta.setCaretPosition(0);
 			Object[] array = {sp}; 
 			JOptionPane jp = new JOptionPane(array, JOptionPane.PLAIN_MESSAGE);		
-			JDialog jd = jp.createDialog("ORCC is free software and comes WITHOUT ANY WARRANTY see license");
+			JDialog jd = jp.createDialog("ORCC soundvis is free software and comes WITHOUT ANY WARRANTY see license");
 			jd.setModal(modal);
 			jd.setAlwaysOnTop(!modal);
 			jd.setVisible(true);
+			int d = ta.getFontMetrics(font).stringWidth(longest);
+			int h = ta.getPreferredSize().height;
+			ta.setPreferredSize(new Dimension( d, h));
 		}
 		catch(Exception ex) {
 			ex.printStackTrace();
