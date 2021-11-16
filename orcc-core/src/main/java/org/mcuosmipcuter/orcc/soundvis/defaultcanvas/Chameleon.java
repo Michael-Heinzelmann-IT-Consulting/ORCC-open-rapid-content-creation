@@ -197,7 +197,7 @@ public class Chameleon implements SoundCanvas {
 
 	@Override
 	public void updateUI(int w, int h, Graphics2D graphics2D) {
-		setColors(graphics2D, 50, 50);
+		setColors(graphics2D, 50, -50);
 		int radius = Math.min(w, h);
 		int x = (w - radius) / 2;
 		int y = (h - radius) / 2;
