@@ -22,6 +22,7 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -143,6 +144,200 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 			}
 		}
 	}
+	
+	private final class EditPanel extends JPanel {
+
+		private static final long serialVersionUID = 1L;
+		
+		private Point loc;
+		private Slide slide;
+		JButton prevButton = new JButton("<");
+		JButton nextButton = new JButton(">");
+		JLabel pos = new JLabel();
+ 		JTextField infoPath = new JTextField();
+ 		private JTextArea text = new JTextArea(3, 20);
+		private JButton moveLeftButton = new JButton("< move");
+		private JButton moveRightButton = new JButton("move >");
+		private JLabel infoDim = new JLabel();
+		
+		public EditPanel() {
+				
+			setBorder(new LineBorder(valueSelect.getBackground(), 6));
+			GridBagLayout gridbag = new GridBagLayout();
+			
+			setLayout(gridbag);
+			GridBagConstraints gc = new GridBagConstraints();
+			
+			gc.insets = new Insets(3, 3, 3, 3);
+			gc.fill = GridBagConstraints.HORIZONTAL;
+			gc.weightx = GridBagConstraints.CENTER;
+			gc.gridwidth = GridBagConstraints.REMAINDER;
+			
+			prevButton.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					Slide[] slides = getCurrentValue();
+					int idx = slide.getPosition() - 1;
+					showSlideEditPopup(loc, slides[idx - 1], false);
+				}
+			});
+			
+			nextButton.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					Slide[] slides = getCurrentValue();
+					int idx = slide.getPosition() - 1;
+					showSlideEditPopup(loc, slides[idx + 1], false);			
+				}
+			});
+			
+			JButton closeButton = new JButton("close");
+			closeButton.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					hideSlideEditPopup();			
+				}
+			});
+			
+			JPanel buttons = new JPanel();
+			buttons.add(prevButton);
+			buttons.add(nextButton);
+			buttons.add(pos);
+			buttons.add(closeButton);
+			add(buttons, gc);
+			
+	 		infoPath.setEditable(false);
+	 		infoPath.setPreferredSize(new Dimension(280, 24));
+	 		JScrollPane infoSp = new JScrollPane(infoPath);
+	 		add(infoSp, gc);
+	 		
+	 		add(infoDim, gc);
+	 		
+	 		JLabel label = new JLabel("slide text:");
+	 		add(label, gc);
+
+			text.setEnabled(true);
+			text.setEditable(true);			
+			text.addKeyListener(new KeyAdapter() {
+				@Override
+				public void keyReleased(KeyEvent e) {
+					final String oldText = slide.getText();
+					slide.setText(text.getText());
+					MultiImagePropertyPanel.this.changeSession(slide.getId() + "::text", oldText, text.getText());
+				}		
+			});
+			
+			JScrollPane sp = new JScrollPane(text);
+			add(sp, gc);
+
+			JPanel imagePanel = new JPanel() {
+				private static final long serialVersionUID = 1L;
+				@Override
+				public void paint(Graphics g) {				
+					super.paint(g);
+					Image image = slide.getImage();
+					float h = image.getHeight(null);
+					float w = image.getWidth(null);
+					float hf = 300f / h;
+					float wf = 300f / w;
+					float f = Math.min(hf, wf);
+					((Graphics2D)g).scale(f, f);
+					g.drawImage(image, (int)(10 / f), (int)(10 / f), null);
+					setToolTipText(slide.getText() + ": " + image.getHeight(null) + " x " + image.getWidth(null));
+				}};
+			imagePanel.setPreferredSize(new Dimension(320, 320));
+			imagePanel.setBackground(Color.BLACK);
+			gridbag.setConstraints(imagePanel, gc);
+			add(imagePanel, gc);
+
+			gc.gridwidth = 2;
+			gridbag.setConstraints(moveLeftButton, gc);
+			add(moveLeftButton, gc);
+			
+			gc.gridwidth = GridBagConstraints.REMAINDER;
+			gridbag.setConstraints(moveRightButton, gc);
+			add(moveRightButton, gc);
+
+			JButton rotateButton = new JButton("rotate");
+			gridbag.setConstraints(rotateButton, gc);
+			add(rotateButton, gc);	
+			
+			rotateButton.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					Key oldKey = slide.getKey();
+					Key newKey = oldKey.rotateClockWise();
+					updateSlideImage(slide, oldKey, newKey);
+					imagePanel.repaint();
+					update(loc, slide);
+				}
+			});
+			
+			JButton mirrorButton = new JButton("mirror");
+			gridbag.setConstraints(mirrorButton, gc);
+			add(mirrorButton, gc);	
+			
+			mirrorButton.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					Key oldKey = slide.getKey();
+					Key newKey = oldKey.mirrorY();
+					updateSlideImage(slide, oldKey, newKey);
+					imagePanel.repaint();
+					update(loc, slide);
+				}
+			});
+			
+			JButton removeButton = new JButton("remove");
+			gridbag.setConstraints(removeButton, gc);
+			add(removeButton, gc);
+
+			moveLeftButton.addActionListener(new ActionListener() {	
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					moveSlide(slide, -1);
+					update(loc, slide);
+				}
+			});
+			moveRightButton.addActionListener(new ActionListener() {	
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					moveSlide(slide, 1);
+					update(loc, slide);
+				}
+			});
+			removeButton.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					hideSlideEditPopup();
+					removeSlide(slide);
+				}
+			});	
+		}
+		
+		public void update(Point loc, Slide slide) {
+			this.loc = loc;
+			this.slide = slide;
+			int idx = slide.getPosition() - 1;
+			prevButton.setEnabled(idx > 0);
+			Slide[] slides = getCurrentValue();	
+			nextButton.setEnabled(idx < slides.length - 1);
+			pos.setText("slide " + (idx + 1));
+	    	String infoText = slide.getKey().getAbsolutePath();
+	    	infoPath.setText(infoText);
+			text.setText(slide.getText());
+	 		if(slide.getImage() != null) {
+		    	int w = slide.getImage().getWidth(null);
+		    	int h = slide.getImage().getHeight(null);
+		    	String m = slide.getKey().isMirrored() ? " | mirrored" : "";
+		 		infoDim.setText("orig size: " + w + "x" + h + " | rotation: " + slide.getKey().getQuadrantRotation() + m );
+	 		}
+			moveLeftButton.setEnabled(slide.getPosition() > 1);
+			moveRightButton.setEnabled(getCurrentValue() != null && slide.getPosition() < getCurrentValue().length);
+		}
+	}
 
 	private static final long serialVersionUID = 1L;
 	private JButton fileButton = new JButton("+");
@@ -159,6 +354,7 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 	boolean isPopupShowing;
 	final Set<JButton> jbuttons = new LinkedHashSet<JButton>();
 
+	private EditPanel editPanel = new EditPanel();
 
 	/**
 	 * Constructor
@@ -206,6 +402,7 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 		fileButton.addActionListener(new FileLoadActionListener(false));
 		addFileButton.addActionListener(new FileLoadActionListener(true));
 		setCurrentValue(new Slide[] {});
+		
 	}
 
 	private void showPopup() {
@@ -240,150 +437,11 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 		isPopupShowing = false;
 	}
 	
-	private void showSlideEditPopup(Point loc, Slide slide){
-		hideSlideEditPopup(); // hide/remove others
-
-		JPanel editPanel = new JPanel();	
-		editPanel.setBorder(new LineBorder(valueSelect.getBackground(), 6));
-		GridBagLayout gridbag = new GridBagLayout();
-		
-		editPanel.setLayout(gridbag);
-		GridBagConstraints gc = new GridBagConstraints();
-		
-		gc.insets = new Insets(3, 3, 3, 3);
-		gc.fill = GridBagConstraints.HORIZONTAL;
-		gc.weightx = GridBagConstraints.CENTER;
-		gc.gridwidth = GridBagConstraints.REMAINDER;
-		
-		Slide[] slides = getCurrentValue();	
-		int idx = slide.getPosition() - 1;
-		JButton prevButton = new JButton("<");
-		prevButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				showSlideEditPopup(loc, slides[idx - 1]);
-			}
-		});
-		prevButton.setEnabled(idx > 0);
-		JButton nextButton = new JButton(">");
-		nextButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				showSlideEditPopup(loc, slides[idx + 1]);			
-			}
-		});
-		nextButton.setEnabled(idx < slides.length - 1);
-		
-		JLabel pos = new JLabel("slide " + (idx + 1));
-		
-		JButton closeButton = new JButton("close");
-		closeButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				hideSlideEditPopup();			
-			}
-		});
-		
-		JPanel buttons = new JPanel();
-		buttons.add(prevButton);
-		buttons.add(nextButton);
-		buttons.add(pos);
-		buttons.add(closeButton);
-		editPanel.add(buttons, gc);
-		
-    	String infoText = slide.getKey().getAbsolutePath();
- 		JTextField infoPath = new JTextField(infoText);
- 		infoPath.setEditable(false);
- 		infoPath.setPreferredSize(new Dimension(280, 24));
- 		JScrollPane infoSp = new JScrollPane(infoPath);
- 		editPanel.add(infoSp, gc);
- 		
- 		if(slide.getImage() != null) {
-	    	int w = slide.getImage().getWidth(null);
-	    	int h = slide.getImage().getHeight(null);
-	 		String date = new Date(slide.getKey().getLastModified()).toString();
-	 		JLabel infoDim = new JLabel(date + " size: " + w + "x" + h);
-	 		editPanel.add(infoDim, gc);
- 		}
- 		JLabel label = new JLabel("slide text:");
- 		editPanel.add(label, gc);
-		JTextArea text = new JTextArea(3, 20);
-		text.setEnabled(true);
-		text.setEditable(true);
-		text.setText(slide.getText());
-		final String oldText = slide.getText();
-		text.addKeyListener(new KeyAdapter() {
-			@Override
-			public void keyReleased(KeyEvent e) {
-				slide.setText(text.getText());
-				MultiImagePropertyPanel.this.changeSession(slide.getId() + "::text", oldText, text.getText());
-			}		
-		});
-		
-		JScrollPane sp = new JScrollPane(text);
-		editPanel.add(sp, gc);
-
-		JPanel imagePanel = new JPanel() {
-			private static final long serialVersionUID = 1L;
-			@Override
-			public void paint(Graphics g) {				
-				super.paint(g);
-				Image image = slide.getImage();
-				g.drawImage(GraphicsUtil.getScaledInstanceKeepRatio(image, 300, Image.SCALE_FAST), 10, 10, null);
-				setToolTipText(slide.getText() + ": " + image.getHeight(null) + " x " + image.getWidth(null));
-			}};
-		imagePanel.setPreferredSize(new Dimension(320, 320));
-		imagePanel.setBackground(Color.BLACK);
-		gridbag.setConstraints(imagePanel, gc);
-		editPanel.add(imagePanel, gc);
-
-		gc.gridwidth = 2;
-		JButton moveLeftButton = new JButton("< move");
-		gridbag.setConstraints(moveLeftButton, gc);
-		editPanel.add(moveLeftButton, gc);
-		moveLeftButton.setEnabled(slide.getPosition() > 1);
-		
-		gc.gridwidth = GridBagConstraints.REMAINDER;
-		
-		JButton moveRightButton = new JButton("move >");
-		gridbag.setConstraints(moveRightButton, gc);
-		editPanel.add(moveRightButton, gc);
-		moveRightButton.setEnabled(getCurrentValue() != null && slide.getPosition() < getCurrentValue().length);
-
-		JButton rotateButton = new JButton("rotate");
-		gridbag.setConstraints(rotateButton, gc);
-		editPanel.add(rotateButton, gc);	
-		
-		rotateButton.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				Key oldKey = slide.getKey();
-				Key newKey = oldKey.rotateClockWise();
-				updateSlideImage(slide, oldKey, newKey);
-				imagePanel.repaint();
-			}
-		});
-		
-		JButton mirrorButton = new JButton("mirror");
-		gridbag.setConstraints(mirrorButton, gc);
-		editPanel.add(mirrorButton, gc);	
-		
-		mirrorButton.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				Key oldKey = slide.getKey();
-				Key newKey = oldKey.mirrorY();
-				updateSlideImage(slide, oldKey, newKey);
-				imagePanel.repaint();
-			}
-		});
-		
-		JButton removeButton = new JButton("remove");
-		gridbag.setConstraints(removeButton, gc);
-		editPanel.add(removeButton, gc);
-		
+	private void showSlideEditPopup(Point loc, Slide slide, boolean hide){
+		if(hide) {
+			hideSlideEditPopup(); // hide/remove others
+		}
+		editPanel.update(loc, slide);
 		Rectangle screen = GraphicsUtil.getRootComponentOutline(MultiImagePropertyPanel.this);
 		int lowLimit = screen.y + screen.height;
 		editPanel.doLayout();
@@ -391,28 +449,9 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 		// debug: System.err.println("extentY " + extentY  + " lowLimit " + lowLimit);
 		int yToUse = extentY < lowLimit ? loc.y : loc.y - (extentY - lowLimit) - 10;
 		
-		editPopup = PopupFactory.getSharedInstance().getPopup(this, editPanel, loc.x, yToUse);
-		moveLeftButton.addActionListener(new ActionListener() {	
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				hideSlideEditPopup();
-				moveSlide(slide, -1);
-			}
-		});
-		moveRightButton.addActionListener(new ActionListener() {	
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				hideSlideEditPopup();
-				moveSlide(slide, 1);
-			}
-		});
-		removeButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				hideSlideEditPopup();
-				removeSlide(slide);
-			}
-		});		
+		if(hide || editPopup == null) {
+			editPopup = PopupFactory.getSharedInstance().getPopup(this, editPanel, loc.x, yToUse);
+		}
 
 		editPopup.show();
 		
@@ -429,7 +468,6 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 		slide.setImage(newKey, newImage);
 		JButton ib = (JButton) jbuttons.toArray()[slide.getPosition() - 1];
 		ib.setIcon(new ImageIcon(ImageStore.getOrLoadScaledImage(slide.getKey(), 80, 80)));
-		ib.setSelectedIcon(new ImageIcon(ImageStore.getOrLoadScaledImage(slide.getKey(), 60, 60)));
 		Context.setSongPositionPointer(Context.getSongPositionPointer());
 		changeSession(slide.getId() + "::key", oldKey, newKey);
 	}
@@ -537,7 +575,7 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						jbuttons.stream().forEach(jb -> jb.setSelected(jb == e.getSource()));
-						showSlideEditPopup(ib.getLocationOnScreen(), slide);
+						showSlideEditPopup(ib.getLocationOnScreen(), slide, true);
 					}
 				});
 				ib.addMouseListener(new MouseListener() {
@@ -561,7 +599,7 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 					public void mouseClicked(MouseEvent e) {
 						ib.setToolTipText(slide.getText());
 						if(e.getButton() == MouseEvent.BUTTON3) {
-							showSlideEditPopup(ib.getLocationOnScreen(), slide);
+							showSlideEditPopup(ib.getLocationOnScreen(), slide, true);
 						}
 					}
 				});
@@ -601,13 +639,7 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 		images.add(addFileButton, gc);
 
 		imagebar.add(images, BorderLayout.LINE_START);
-		
-
 		imagebar.revalidate();
-		if (isPopupShowing) {
-			hidePopup(); // remove old
-			showPopup(); // show new
-		}
 
 		this.repaint();
 	}
@@ -617,7 +649,6 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 		if(getCurrentValue() != null) {
 			for(Slide slide : getCurrentValue()) {
 				ImageStore.getOrLoadScaledImage(slide.getKey(), 80, 80);
-				ImageStore.getOrLoadScaledImage(slide.getKey(), 60, 60);
 			}
 		}
 	}
