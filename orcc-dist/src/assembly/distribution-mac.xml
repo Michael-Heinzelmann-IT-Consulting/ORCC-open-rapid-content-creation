@@ -72,6 +72,7 @@
     	<include>io.humble:humble-video-all</include>
     	<include>io.humble:humble-video-noarch</include>
     	<include>io.humble:humble-video-arch-x86_64-apple-darwin12</include>
+    	<include>io.humble:humble-video-arch-i686-apple-darwin12</include>
     </includes>
    </dependencySet>
    </dependencySets>
