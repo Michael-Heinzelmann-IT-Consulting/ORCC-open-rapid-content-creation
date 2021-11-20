@@ -64,7 +64,7 @@ public class Session implements Serializable {
 		Context.clearCanvasList();
 		Context.setSessionToken(new SessionToken());
 		try {
-			Context.setAudioFromClasspath("/silence_pcm_16bit_wav_30s.wav");
+			Context.setAudioFromClasspath("/audio/metronome_pcm_16bit_wav_30s.wav");
 			Context.addCanvas("org.mcuosmipcuter.orcc.soundvis.defaultcanvas.SolidColor");
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);

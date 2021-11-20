@@ -22,6 +22,7 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.lang.ref.SoftReference;
 import java.util.HashMap;
 import java.util.Map;
@@ -39,6 +40,14 @@ import org.mcuosmipcuter.orcc.util.IOUtil;
  *
  */
 public class ImageStore {
+	
+	public final static String CLASSPATH_PREFIX = "classpath://";
+	
+	public static final Key[] CLASSPATH_IMAGES = new Key[] {
+			new Key(0, CLASSPATH_PREFIX + "/images/clouds1.jpg", 0, false, 0, 0),
+			new Key(0, CLASSPATH_PREFIX + "/images/clouds2.jpg", 0, false, 0, 0),
+			new Key(0, CLASSPATH_PREFIX + "/images/clouds3.jpg", 0, false, 0, 0)
+	};
 	
 	public static class Key{
 		private final long lastModified; //  to detect changes
@@ -171,19 +180,25 @@ public class ImageStore {
 			return fromStore;
 		} else {
 			BufferedImage image = null;
-			File imageFile = new File(key.getAbsolutePath());
-			if (imageFile.exists()) {
-				try {
-					Context.progressUpdate("loading " + imageFile.getName());
-					image = ImageIO.read(imageFile);
-				} catch (Exception ex) {
-					IOUtil.log("problem loading image for " + key.getAbsolutePath() + ": " + ex.getMessage());
-				}
-			} else {
-				IOUtil.log(key.getAbsolutePath() + " does not exist.");
+			if(key.getAbsolutePath().startsWith(CLASSPATH_PREFIX)){
+				image = classpathImage(key.absolutePath);
 			}
-			if (image == null) {
-				image = createPlaceHolderImage(imageFile);
+			else {
+				File imageFile = new File(key.getAbsolutePath());
+				if (imageFile.exists()) {
+					try {
+						Context.progressUpdate("loading " + imageFile.getName());
+						image = ImageIO.read(imageFile);
+					} catch (Exception ex) {
+						IOUtil.log("problem loading image for " + key.getAbsolutePath() + ": " + ex.getMessage());
+					}
+				} else {
+					IOUtil.log(key.getAbsolutePath() + " does not exist.");
+				}
+			
+				if (image == null) {
+					image = createPlaceHolderImage(imageFile.getName());
+				}
 			}
 			Key originalKey = key.toOriginal();
 			if(getImage(originalKey) == null) {
@@ -248,7 +263,7 @@ public class ImageStore {
 			return newImage;
 		}	
 	}
-	public static BufferedImage createPlaceHolderImage(File file) {
+	public static BufferedImage createPlaceHolderImage(String name) {
 		int width = 600;
 		int height = 400;
 		BufferedImage placeholderImage = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
@@ -256,9 +271,20 @@ public class ImageStore {
 		graphics.setColor(Color.WHITE);
 		graphics.fillRect(0, 0, width, height);
 
-		TextHelper.writeText(file.getName(), graphics, height / 10, Color.BLUE, width, height / 2);
+		TextHelper.writeText(name, graphics, height / 10, Color.BLUE, width, height / 2);
 		
 		return placeholderImage;
+	}
+	public static BufferedImage classpathImage(String path) {
+		try {
+			String p = path.startsWith(CLASSPATH_PREFIX) ?	path.substring(CLASSPATH_PREFIX.length()) : path;
+			BufferedImage ci = ImageIO.read(ImageStore.class.getResourceAsStream(p));
+			IOUtil.log("loaded classpath image: " + path + " " + ci);
+			return ci;
+		} catch (IOException e) {
+			IOUtil.log("error loading classpath image: "  + path + " " + e);
+		}
+		return null;
 	}
 
 }

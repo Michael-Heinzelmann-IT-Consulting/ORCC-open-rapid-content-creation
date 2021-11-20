@@ -31,12 +31,18 @@
   <build>
     <resources>
       <resource>
-        <directory>src/main/resources</directory>
+        <directory>src/main/resources/text</directory>
         <filtering>true</filtering>
       </resource>
       <resource>
         <directory>src/main/resources/audio</directory>
         <filtering>false</filtering>
+        <targetPath>audio</targetPath>
+      </resource>
+       <resource>
+        <directory>src/main/resources/images</directory>
+        <filtering>false</filtering>
+        <targetPath>images</targetPath>
       </resource>
     </resources>
   </build>
