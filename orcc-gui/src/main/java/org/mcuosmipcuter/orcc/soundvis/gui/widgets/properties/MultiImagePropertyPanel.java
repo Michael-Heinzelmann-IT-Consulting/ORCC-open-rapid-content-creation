@@ -46,6 +46,7 @@ import java.util.Set;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -76,24 +77,50 @@ import org.mcuosmipcuter.orcc.util.IOUtil;
  */
 public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 	private final class ClassPathLoadActionListener implements ActionListener {
-		private boolean append;
+		private boolean append = true;
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			JPanel panel = new JPanel();
-			panel.setLayout(new GridLayout(ImageStore.CLASSPATH_IMAGES.length, 1));
+			panel.setLayout(new GridLayout(0, 1));
+			JCheckBox[] checkboxes = new JCheckBox [ImageStore.CLASSPATH_IMAGES.length];
+			int idx = 0;
 			for(Key key : ImageStore.CLASSPATH_IMAGES) {
-				//BufferedImage bi = ImageStore.classpathImage(key.getAbsolutePath());
 				JPanel p = new JPanel();
 				JLabel l = new JLabel();
-				ImageIcon icon = new ImageIcon(ImageStore.getOrLoadScaledImage(key, BUTTON_SIZE.width, BUTTON_SIZE.height));
+				ImageIcon icon = new ImageIcon(ImageStore.getOrLoadScaledImage(key, CP_IMAGE_PREVIEW_SIZE, CP_IMAGE_PREVIEW_SIZE));
 				l.setIcon(icon);
+				JCheckBox c = new JCheckBox();
+				checkboxes[idx++] = c;
+				p.add(c);
 				p.add(l);
-				p.add(new JLabel(key.getAbsolutePath()));
+				String path = key.getAbsolutePath();
+				p.add(new JLabel(path.substring(path.lastIndexOf("/") + 1)));
 				panel.add(p);
 			}
 			
-			JOptionPane.showInputDialog(panel);
+			int res = JOptionPane.showConfirmDialog(null,panel, "built in images",
+					JOptionPane.OK_CANCEL_OPTION);
+			if (res == JOptionPane.OK_OPTION) {
+				List<Key> selected = new ArrayList<>();
+				for(int i = 0; i < checkboxes.length; i++) {
+					if(checkboxes[i].isSelected()) {
+						selected.add(ImageStore.CLASSPATH_IMAGES[i]);
+					}
+				}
+				if(!selected.isEmpty()) {
+					Slide[] slides = new Slide[selected.size()];
+					int j = 0;
+					for (Key key : selected) {
+						slides[j] = new Slide();
+						slides[j].setText(key.getAbsolutePath());
+						slides[j].setKey(key);
+						j++;
+					}
+					setOrAppendSlides(slides, append);
+				}
+			}
+			
 		}
 	}
 
@@ -389,6 +416,7 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 	boolean isPopupShowing;
 	final Set<JButton> imageButtons = new LinkedHashSet<JButton>();
 	private final static Dimension BUTTON_SIZE = new Dimension(80, 80);
+	private final static int CP_IMAGE_PREVIEW_SIZE = 40;
 
 	private EditPanel editPanel = new EditPanel();
 
@@ -692,6 +720,9 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 			for(Slide slide : getCurrentValue()) {
 				ImageStore.getOrLoadScaledImage(slide.getKey(), BUTTON_SIZE.width, BUTTON_SIZE.height);
 			}
+		}
+		for(Key key : ImageStore.CLASSPATH_IMAGES) {
+			ImageStore.getOrLoadScaledImage(key, CP_IMAGE_PREVIEW_SIZE, CP_IMAGE_PREVIEW_SIZE);
 		}
 	}
 
