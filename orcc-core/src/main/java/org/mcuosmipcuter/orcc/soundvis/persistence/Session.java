@@ -158,7 +158,7 @@ public class Session implements Serializable {
 		} catch (Exception e) {
 			IOUtil.log(e.getMessage() + " " + e.getCause());
 			reportList.add(e.getMessage() + " " + e.getCause());
-			Context.setAudioFromClasspath("/silence_pcm_16bit_wav_30s.wav");
+			Context.setAudioFromClasspath("/audio/metronome_pcm_16bit_wav_30s.wav");
 		}
 
 		Context.clearCanvasList();
