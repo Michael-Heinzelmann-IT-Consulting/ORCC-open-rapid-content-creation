@@ -18,7 +18,9 @@
 package org.mcuosmipcuter.orcc.soundvis.model;
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.net.URL;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -27,6 +29,7 @@ import javax.sound.sampled.AudioSystem;
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
 import org.mcuosmipcuter.orcc.api.soundvis.AudioLayout;
 import org.mcuosmipcuter.orcc.soundvis.AudioInput;
+import org.mcuosmipcuter.orcc.soundvis.SoundReader;
 import org.mcuosmipcuter.orcc.util.IOUtil;
 
 /**
@@ -37,6 +40,7 @@ public class AudioClasspathInputImpl implements AudioInput {
 	
 	private final AudioInputInfo audioInputInfo;
 	private final String audioResourcePath;
+	private byte[] data;
 	
 	/**
 	 * Creates an audio input instance from the given resource name,
@@ -46,26 +50,47 @@ public class AudioClasspathInputImpl implements AudioInput {
 	 * @param audioFileName the full path to the audio file
 	 */
 	public AudioClasspathInputImpl(String audioResourcePath) {
+		this.audioResourcePath = audioResourcePath;
 		InputStream is = null;
 		AudioInputStream ais = null;
+		long frameLength;
+		AudioInputInfo audioInputInfoTemp = null;
 		try{
-			AudioClasspathInputImpl.class.getResource(audioResourcePath);
+			Class.forName("org.mcuosmipcuter.orcc.ert.humble_video.JavaURLProtocolHandler")
+			.getDeclaredConstructor().newInstance();
+			SoundReader sr = (SoundReader) Class.forName("org.mcuosmipcuter.orcc.ert.humble_video.AudiImportHelper")
+					.getDeclaredConstructor().newInstance();
+
+			data = sr.readSound(audioResourcePath);
 			
-			is = AudioClasspathInputImpl.class.getResourceAsStream(audioResourcePath);
+			frameLength = data.length / 4;
+			AudioFormat audioFormat = new AudioFormat(22050, 16, 2, true, false); // from humble
+			audioInputInfoTemp = new AudioInputInfoImpl(audioFormat, frameLength, AudioLayout.COMPRESSED);
+		}
+		catch(Exception ex) {
+				// try java audio
+		
+		try {
+			URL url = new URL(audioResourcePath);
+			is = url.openStream();
+			//is = AudioClasspathInputImpl.class.getResourceAsStream(audioResourcePath);
 			BufferedInputStream buf = new BufferedInputStream(is);
 			ais = AudioSystem.getAudioInputStream(buf);
 			AudioFormat audioFormat = ais.getFormat();
-			long frameLength = ais.getFrameLength();
-			audioInputInfo = new AudioInputInfoImpl(audioFormat, frameLength, AudioLayout.LINEAR);
-			this.audioResourcePath = audioResourcePath;
+			 frameLength = ais.getFrameLength();
+			 audioInputInfoTemp = new AudioInputInfoImpl(audioFormat, frameLength, AudioLayout.LINEAR);
 		}
-		catch(Exception ex) {
-			throw new RuntimeException(ex);
+		catch(Exception ex1) {
+			ex1.printStackTrace();
+			throw new RuntimeException(audioResourcePath + "\n" + ex1);
 		}
 		finally {
+
 			IOUtil.safeClose(is);
 			IOUtil.safeClose(ais);
 		}
+		}
+		audioInputInfo = audioInputInfoTemp;
 	}
 
 	/**
@@ -83,9 +108,17 @@ public class AudioClasspathInputImpl implements AudioInput {
 
 	@Override
 	public AudioInputStream getAudioStream() {
+		if(data != null) {
+			ByteArrayInputStream bis = new ByteArrayInputStream(data);
+			AudioInputStream ais = new AudioInputStream(bis, audioInputInfo.getAudioFormat(), audioInputInfo.getFrameLength());
+			return ais;
+		}
 		InputStream is;
 		try {
-			is = AudioClasspathInputImpl.class.getResourceAsStream(audioResourcePath);
+			URL url = new URL(audioResourcePath);
+			
+			is = url.openStream();
+			//is = AudioClasspathInputImpl.class.getResourceAsStream(audioResourcePath);
 		}
 		catch(Exception ex) {
 			throw new RuntimeException(ex);
@@ -106,5 +139,8 @@ public class AudioClasspathInputImpl implements AudioInput {
 		return audioInputInfo;
 	}
 
+	public static URL getUrl(String path) {
+		return AudioClasspathInputImpl.class.getResource(path);
+	}
 	
 }

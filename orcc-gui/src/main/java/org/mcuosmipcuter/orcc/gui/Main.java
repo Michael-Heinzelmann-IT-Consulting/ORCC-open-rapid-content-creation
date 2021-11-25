@@ -29,6 +29,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.lang.Thread.UncaughtExceptionHandler;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -87,6 +88,7 @@ import org.mcuosmipcuter.orcc.soundvis.gui.listeners.StopActionListener;
 import org.mcuosmipcuter.orcc.soundvis.gui.widgets.GraphicsJInternalFrame;
 import org.mcuosmipcuter.orcc.soundvis.gui.widgets.LoadMessage;
 import org.mcuosmipcuter.orcc.soundvis.gui.widgets.TimeLabel;
+import org.mcuosmipcuter.orcc.soundvis.model.AudioClasspathInputImpl;
 import org.mcuosmipcuter.orcc.soundvis.persistence.FileConfiguration;
 import org.mcuosmipcuter.orcc.soundvis.persistence.Session;
 import org.mcuosmipcuter.orcc.soundvis.threads.SaveThread;
@@ -156,14 +158,12 @@ public class Main {
 		JMenuBar mb = new JMenuBar();
 		frame.setJMenuBar(mb);
 
-		JMenuItem openAudio = new JMenuItem("open audio");
-
 		mb.add(new JMenu("  "));
 
 		JMenu fileMenu = new JMenu("File");
 		mb.add(fileMenu);
-
-		fileMenu.add(openAudio);
+		JMenu openAudio = new JMenu("open audio");
+		JMenuItem fromFile = new JMenuItem("from file");
 		CallBack openAudioCallback = new CallBack() {
 			public void fileSelected(File file) {
 				try {
@@ -175,7 +175,40 @@ public class Main {
 		};
 		FileDialogActionListener importActionListener = new FileDialogActionListener(null, openAudioCallback,
 				"open as audio input");
-		openAudio.addActionListener(importActionListener);
+		fromFile.addActionListener(importActionListener);
+		JMenuItem metronome = new JMenuItem("metronome 30s");
+		metronome.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				URL url = null;
+				try {
+					url = AudioClasspathInputImpl.getUrl("/audio/metronome_pcm_16bit_wav_30s.wav");
+					Context.setAudioFromClasspath(url.toString());
+				} catch (AppLogicException e1) {
+					e1.printStackTrace();
+					throw new RuntimeException(url + "\n" + e1);
+				}
+			}
+		});
+		JMenuItem machine = new JMenuItem("machine_learning.mp3");
+		machine.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				URL url = null;
+				try {
+					url = AudioClasspathInputImpl.getUrl("/audio/machine_learning.mp3");
+					Context.setAudioFromClasspath(url.toString());
+				} catch (Exception e1) {
+					e1.printStackTrace();
+					throw new RuntimeException(url + "\n" + e1);
+				}
+			}
+		});
+		openAudio.add(fromFile);
+		openAudio.add(metronome);
+		openAudio.add(machine);
+		fileMenu.add(openAudio);
+		
 		fileMenu.addSeparator();
 		JMenuItem exit = new JMenuItem("exit");
 		fileMenu.add(exit);
@@ -396,7 +429,7 @@ public class Main {
 					exportStart.setEnabled(
 							current != AppState.INIT && current != AppState.EXPORTING && current != AppState.LOADING);
 					exportStop.setEnabled(current == AppState.EXPORTING);
-					openAudio.setEnabled(current == AppState.READY);
+					fromFile.setEnabled(current == AppState.READY);
 					openSession.setEnabled(current == AppState.READY);
 					newSession.setEnabled(current == AppState.READY);
 					saveSession.setEnabled(current != AppState.INIT && current != AppState.LOADING);
