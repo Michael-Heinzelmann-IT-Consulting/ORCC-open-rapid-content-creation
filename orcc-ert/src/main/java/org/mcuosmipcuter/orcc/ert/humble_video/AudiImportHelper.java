@@ -49,6 +49,8 @@ public class AudiImportHelper implements SoundReader {
 	 *            format c) other reasons
 	 */
 	public byte[] readSound(String filename) throws InterruptedException, IOException, LineUnavailableException {
+		
+		JavaURLProtocolHandler.init();
 
 		Demuxer demuxer = null;
 

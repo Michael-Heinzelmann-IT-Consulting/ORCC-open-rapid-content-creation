@@ -29,7 +29,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.lang.Thread.UncaughtExceptionHandler;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -88,7 +87,6 @@ import org.mcuosmipcuter.orcc.soundvis.gui.listeners.StopActionListener;
 import org.mcuosmipcuter.orcc.soundvis.gui.widgets.GraphicsJInternalFrame;
 import org.mcuosmipcuter.orcc.soundvis.gui.widgets.LoadMessage;
 import org.mcuosmipcuter.orcc.soundvis.gui.widgets.TimeLabel;
-import org.mcuosmipcuter.orcc.soundvis.model.AudioClasspathInputImpl;
 import org.mcuosmipcuter.orcc.soundvis.persistence.FileConfiguration;
 import org.mcuosmipcuter.orcc.soundvis.persistence.Session;
 import org.mcuosmipcuter.orcc.soundvis.threads.SaveThread;
@@ -180,13 +178,13 @@ public class Main {
 		metronome.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				URL url = null;
+				//URL url = null;
 				try {
-					url = AudioClasspathInputImpl.getUrl("/audio/metronome_pcm_16bit_wav_30s.wav");
-					Context.setAudioFromClasspath(url.toString());
+					//url = AudioClasspathInputImpl.getUrl("/audio/metronome_pcm_16bit_wav_30s.wav");
+					Context.setAudioFromClasspath("/audio/metronome_pcm_16bit_wav_30s.wav");
 				} catch (AppLogicException e1) {
 					e1.printStackTrace();
-					throw new RuntimeException(url + "\n" + e1);
+					throw new RuntimeException( e1);
 				}
 			}
 		});
@@ -194,13 +192,13 @@ public class Main {
 		machine.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				URL url = null;
+				//URL url = null;
 				try {
-					url = AudioClasspathInputImpl.getUrl("/audio/machine_learning.mp3");
-					Context.setAudioFromClasspath(url.toString());
+					//url = AudioClasspathInputImpl.getUrl("/audio/machine_learning.mp3");
+					Context.setAudioFromClasspath("/audio/machine_learning.mp3");
 				} catch (Exception e1) {
 					e1.printStackTrace();
-					throw new RuntimeException(url + "\n" + e1);
+					throw new RuntimeException( e1);
 				}
 			}
 		});

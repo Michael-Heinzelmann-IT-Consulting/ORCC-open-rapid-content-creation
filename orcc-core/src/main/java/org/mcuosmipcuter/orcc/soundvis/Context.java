@@ -20,6 +20,8 @@ package org.mcuosmipcuter.orcc.soundvis;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -40,9 +42,8 @@ import org.mcuosmipcuter.orcc.api.soundvis.ExtendedFrameHistory;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.soundvis.AudioInput.Type;
-import org.mcuosmipcuter.orcc.soundvis.model.AudioClasspathInputImpl;
-import org.mcuosmipcuter.orcc.soundvis.model.AudioFileInputImpl;
 import org.mcuosmipcuter.orcc.soundvis.model.AudioOutputInfoImpl;
+import org.mcuosmipcuter.orcc.soundvis.model.AudioURLInputImpl;
 import org.mcuosmipcuter.orcc.soundvis.model.SoundCanvasWrapperImpl;
 import org.mcuosmipcuter.orcc.soundvis.model.VideoOutputInfoImpl;
 import org.mcuosmipcuter.orcc.soundvis.util.AudioUtil;
@@ -321,32 +322,55 @@ public abstract class Context {
 	 * @param audioFileName full path to the file
 	 */
 	public static synchronized void setAudioFromFile(String audioFileName) throws AppLogicException {
+			String urlString = audioFileName.startsWith("file:") ? audioFileName : "file:" + audioFileName;
+			URL url;
+			try {
+				url = new URL(urlString);
+			} catch (MalformedURLException e) {
+				throw new RuntimeException(e);
+			}
+			loadAudio(url);
+
+	}
+	private static void loadAudio(URL url) throws AppLogicException {
 		final AppState before  = appState;
-		try {
+		IOUtil.log(before + " loading " + url);
+
 			if(before != AppState.LOADING) {
 				setAppState(AppState.LOADING);
 			}
-			AudioInput a = new AudioFileInputImpl(audioFileName);
-			setAudio(a);
-		}
-		finally {
-			if(before != AppState.LOADING) {
-				setAppState(before);
+
+			try {
+				AudioInput a = new AudioURLInputImpl(url);
+				setAudio(a);
+			} catch (Exception ex) {
+				IOUtil.log("exception loading audio: " + ex);
 			}
-		}
+			finally {
+				if(before != AppState.LOADING) {
+					setAppState(before);
+				}
+			}
 	}
 	/**
 	 * Sets the audio from a classpath resource and notifies listeners
 	 * @param audioFileName full path to the file
 	 */
 	public static synchronized void setAudioFromClasspath(String audioResourcePath) throws AppLogicException {
-		AudioInput a = new AudioClasspathInputImpl(audioResourcePath);
-		setAudio(a);
+		URL url = AudioURLInputImpl.getUrl(audioResourcePath);
+		if(url == null) {
+			try {
+				url = new URL(audioResourcePath);
+			} catch (MalformedURLException e) {
+				throw new RuntimeException(e);
+			}
+		}
+		loadAudio(url);
 	}
 	public static synchronized void setAudio(Type inputType, String audioInputName, int outPutFrameRate) throws AppLogicException {
 		switch(inputType) {
 		case FILE:
-				setAudioFromFile(audioInputName);
+			setAudioFromFile(audioInputName);
 				break;
 			case STREAM:
 				setAudioFromClasspath(audioInputName);

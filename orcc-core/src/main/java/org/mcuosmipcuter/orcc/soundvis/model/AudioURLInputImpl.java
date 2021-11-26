@@ -36,10 +36,10 @@ import org.mcuosmipcuter.orcc.util.IOUtil;
  * Implementation of a classpath based audio input
  * @author Michael Heinzelmann
  */
-public class AudioClasspathInputImpl implements AudioInput {
+public class AudioURLInputImpl implements AudioInput {
 	
 	private final AudioInputInfo audioInputInfo;
-	private final String audioResourcePath;
+	private final URL url;
 	private byte[] data;
 	
 	/**
@@ -47,48 +47,48 @@ public class AudioClasspathInputImpl implements AudioInput {
 	 * and extracts header information {@link AudioFormat}.
 	 * Invalid files caused by programming or build error
 	 * are rejected with a {@link RuntimeException} wrapping the cause.
-	 * @param audioFileName the full path to the audio file
+	 * @param url the url of the audio file
 	 */
-	public AudioClasspathInputImpl(String audioResourcePath) {
-		this.audioResourcePath = audioResourcePath;
-		InputStream is = null;
-		AudioInputStream ais = null;
+	public AudioURLInputImpl(URL url) {
+		this.url = url;
 		long frameLength;
 		AudioInputInfo audioInputInfoTemp = null;
 		try{
-			Class.forName("org.mcuosmipcuter.orcc.ert.humble_video.JavaURLProtocolHandler")
-			.getDeclaredConstructor().newInstance();
 			SoundReader sr = (SoundReader) Class.forName("org.mcuosmipcuter.orcc.ert.humble_video.AudiImportHelper")
 					.getDeclaredConstructor().newInstance();
 
-			data = sr.readSound(audioResourcePath);
+			data = sr.readSound(url.toString());
 			
 			frameLength = data.length / 4;
 			AudioFormat audioFormat = new AudioFormat(22050, 16, 2, true, false); // from humble
 			audioInputInfoTemp = new AudioInputInfoImpl(audioFormat, frameLength, AudioLayout.COMPRESSED);
+			IOUtil.log("loaded with humble: " + audioInputInfoTemp);
 		}
 		catch(Exception ex) {
-				// try java audio
-		
-		try {
-			URL url = new URL(audioResourcePath);
-			is = url.openStream();
-			//is = AudioClasspathInputImpl.class.getResourceAsStream(audioResourcePath);
-			BufferedInputStream buf = new BufferedInputStream(is);
-			ais = AudioSystem.getAudioInputStream(buf);
-			AudioFormat audioFormat = ais.getFormat();
-			 frameLength = ais.getFrameLength();
-			 audioInputInfoTemp = new AudioInputInfoImpl(audioFormat, frameLength, AudioLayout.LINEAR);
+			IOUtil.log("humble could not read audio: " + ex);
 		}
-		catch(Exception ex1) {
-			ex1.printStackTrace();
-			throw new RuntimeException(audioResourcePath + "\n" + ex1);
-		}
-		finally {
-
-			IOUtil.safeClose(is);
-			IOUtil.safeClose(ais);
-		}
+		if(data == null) {
+			// try java audio
+			InputStream is = null;
+			AudioInputStream ais = null;
+			try {
+				is = url.openStream();
+				BufferedInputStream buf = new BufferedInputStream(is);
+				ais = AudioSystem.getAudioInputStream(buf);
+				AudioFormat audioFormat = ais.getFormat();
+				frameLength = ais.getFrameLength();
+				audioInputInfoTemp = new AudioInputInfoImpl(audioFormat, frameLength, AudioLayout.LINEAR);
+				data = ais.readAllBytes();
+				IOUtil.log("loaded with java audio: " + audioInputInfoTemp);
+			}
+			catch(Exception ex) {
+				ex.printStackTrace();
+				throw new RuntimeException(url + "\n" + ex);
+			}
+			finally {
+				IOUtil.safeClose(is);
+				IOUtil.safeClose(ais);
+			}
 		}
 		audioInputInfo = audioInputInfoTemp;
 	}
@@ -98,7 +98,7 @@ public class AudioClasspathInputImpl implements AudioInput {
 	 */
 	@Override
 	public String getName() {
-		return audioResourcePath;
+		return url.toString();
 	}
 
 	@Override
@@ -108,30 +108,9 @@ public class AudioClasspathInputImpl implements AudioInput {
 
 	@Override
 	public AudioInputStream getAudioStream() {
-		if(data != null) {
-			ByteArrayInputStream bis = new ByteArrayInputStream(data);
-			AudioInputStream ais = new AudioInputStream(bis, audioInputInfo.getAudioFormat(), audioInputInfo.getFrameLength());
-			return ais;
-		}
-		InputStream is;
-		try {
-			URL url = new URL(audioResourcePath);
-			
-			is = url.openStream();
-			//is = AudioClasspathInputImpl.class.getResourceAsStream(audioResourcePath);
-		}
-		catch(Exception ex) {
-			throw new RuntimeException(ex);
-		}
-		try {
-			BufferedInputStream buf = new BufferedInputStream(is);
-			return AudioSystem.getAudioInputStream(buf);
-		}
-		catch(Exception ex) {
-			// resource existed but was no (supported) audio file - programming or build error
-			IOUtil.safeClose(is); 
-			throw new RuntimeException(ex);
-		}
+		ByteArrayInputStream bis = new ByteArrayInputStream(data);
+		AudioInputStream ais = new AudioInputStream(bis, audioInputInfo.getAudioFormat(), audioInputInfo.getFrameLength());
+		return ais;
 	}
 
 	@Override
@@ -140,7 +119,7 @@ public class AudioClasspathInputImpl implements AudioInput {
 	}
 
 	public static URL getUrl(String path) {
-		return AudioClasspathInputImpl.class.getResource(path);
+		return AudioURLInputImpl.class.getResource(path);
 	}
 	
 }
