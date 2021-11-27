@@ -164,47 +164,54 @@ public class Main {
 		JMenuItem fromFile = new JMenuItem("from file");
 		CallBack openAudioCallback = new CallBack() {
 			public void fileSelected(File file) {
-				try {
-					Context.setAudioFromFile(file.getAbsolutePath());
-				} catch (AppLogicException ex) {
-					throw new RuntimeException(ex);
-				}
+				final AppState before = Context.getAppState();
+				Context.setAppState(AppState.LOADING);
+				Thread t = new Thread() {
+					@Override
+					public void run() {
+						try {
+							Context.setAudioFromFile(file.getAbsolutePath());
+						} catch (AppLogicException ex) {
+							throw new RuntimeException(ex);
+						}
+						finally {
+							Context.setAppState(before);
+						}
+					}
+				};
+				t.start();
 			}
 		};
 		FileDialogActionListener importActionListener = new FileDialogActionListener(null, openAudioCallback,
 				"open as audio input");
 		fromFile.addActionListener(importActionListener);
-		JMenuItem metronome = new JMenuItem("metronome 30s");
-		metronome.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				//URL url = null;
-				try {
-					//url = AudioClasspathInputImpl.getUrl("/audio/metronome_pcm_16bit_wav_30s.wav");
-					Context.setAudioFromClasspath("/audio/metronome_pcm_16bit_wav_30s.wav");
-				} catch (AppLogicException e1) {
-					e1.printStackTrace();
-					throw new RuntimeException( e1);
-				}
-			}
-		});
-		JMenuItem machine = new JMenuItem("machine_learning.mp3");
-		machine.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				//URL url = null;
-				try {
-					//url = AudioClasspathInputImpl.getUrl("/audio/machine_learning.mp3");
-					Context.setAudioFromClasspath("/audio/machine_learning.mp3");
-				} catch (Exception e1) {
-					e1.printStackTrace();
-					throw new RuntimeException( e1);
-				}
-			}
-		});
 		openAudio.add(fromFile);
-		openAudio.add(metronome);
-		openAudio.add(machine);
+		String[] BUILT_IN = new String[] {"/audio/metronome_pcm_16bit_wav_30s.wav", "/audio/machine_learning.mp3"};
+		for(String path : BUILT_IN) {
+			JMenuItem item = new JMenuItem(path.substring(path.lastIndexOf("/") + 1));
+			item.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					final AppState before = Context.getAppState();
+					Context.setAppState(AppState.LOADING);
+					Thread t = new Thread() {
+						@Override
+						public void run() {
+							try {
+								Context.setAudioFromClasspath(path);
+							} catch (AppLogicException ex) {
+								throw new RuntimeException(ex);
+							}
+							finally {
+								Context.setAppState(before);
+							}
+						}
+					};
+					t.start();
+				}
+			});
+			openAudio.add(item);
+		}
 		fileMenu.add(openAudio);
 		
 		fileMenu.addSeparator();
@@ -427,7 +434,7 @@ public class Main {
 					exportStart.setEnabled(
 							current != AppState.INIT && current != AppState.EXPORTING && current != AppState.LOADING);
 					exportStop.setEnabled(current == AppState.EXPORTING);
-					fromFile.setEnabled(current == AppState.READY);
+					openAudio.setEnabled(current == AppState.READY);
 					openSession.setEnabled(current == AppState.READY);
 					newSession.setEnabled(current == AppState.READY);
 					saveSession.setEnabled(current != AppState.INIT && current != AppState.LOADING);

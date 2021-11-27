@@ -335,14 +335,17 @@ public abstract class Context {
 	private static void loadAudio(URL url) throws AppLogicException {
 		final AppState before  = appState;
 		IOUtil.log(before + " loading " + url);
+		progressUpdate("loading " + url);
 
 			if(before != AppState.LOADING) {
 				setAppState(AppState.LOADING);
 			}
 
 			try {
+				long start = System.currentTimeMillis();
 				AudioInput a = new AudioURLInputImpl(url);
 				setAudio(a);
+				IOUtil.log("loaded in " + (System.currentTimeMillis() - start) + "ms");
 			} catch (Exception ex) {
 				IOUtil.log("exception loading audio: " + ex);
 			}

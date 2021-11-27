@@ -33,7 +33,7 @@ import org.mcuosmipcuter.orcc.soundvis.SoundReader;
 import org.mcuosmipcuter.orcc.util.IOUtil;
 
 /**
- * Implementation of a classpath based audio input
+ * Implementation of a URL based audio input
  * @author Michael Heinzelmann
  */
 public class AudioURLInputImpl implements AudioInput {
@@ -43,7 +43,7 @@ public class AudioURLInputImpl implements AudioInput {
 	private byte[] data;
 	
 	/**
-	 * Creates an audio input instance from the given resource name,
+	 * Creates an audio input instance from the given URL
 	 * and extracts header information {@link AudioFormat}.
 	 * Invalid files caused by programming or build error
 	 * are rejected with a {@link RuntimeException} wrapping the cause.

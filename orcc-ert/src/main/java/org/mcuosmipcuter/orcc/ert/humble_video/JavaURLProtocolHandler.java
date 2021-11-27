@@ -35,7 +35,7 @@ import io.humble.video.customio.URLProtocolManager;
 public class JavaURLProtocolHandler implements IURLProtocolHandler {
 	private static boolean init;
 	
-	byte[] data;
+	int size;
 	ByteArrayInputStream in;
 	/**
 	 * 
@@ -46,11 +46,12 @@ public class JavaURLProtocolHandler implements IURLProtocolHandler {
 
 	@Override
 	public int open(String url, int flags) {
-		System.err.println("open()" + url + " " + flags);
+		IOUtil.log("open()" + url + " " + flags);
 		try {
 			URL url1 = new URL(url);
 			InputStream is = url1.openStream();
-			data = is.readAllBytes();
+			byte[]data = is.readAllBytes();
+			size = data.length;
 			in = new ByteArrayInputStream(data);
 		} catch (Exception e) {
 			IOUtil.log("error opening " + url + " " + e);
@@ -61,10 +62,8 @@ public class JavaURLProtocolHandler implements IURLProtocolHandler {
 
 	@Override
 	public int read(byte[] buf, int size) {
-		//System.err.println("read() " + size);
 		try {
 			int ret = in.read(buf, 0, size);
-			//System.err.println("read() " + size + " ret=" + ret);
 			return ret == -1 ? 0 : ret;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -74,31 +73,30 @@ public class JavaURLProtocolHandler implements IURLProtocolHandler {
 
 	@Override
 	public int write(byte[] buf, int size) {
-		//System.err.println("write() " + size + " [" + (new String(buf)) + "]" + Arrays.toString(buf));
+		IOUtil.log("write() " + size + " [" + (new String(buf)) + "]");
 		// write request ignored
 		return size;
 	}
 
 	@Override
 	public long seek(long offset, int whence) {
-		System.err.println("seek() " + offset + ", " + whence);
+		IOUtil.log("seek() " + offset + ", " + whence);
 		if(whence == 0) {
 			in.reset();
 			return 0;
 		}
 		else if(whence == 65536) {
-			return data.length;
+			return size;
 		}
 		return -1;
 	}
 
 	@Override
 	public int close() {
-		System.err.println("close()");
+		IOUtil.log("close()");
 		try {
 			in.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return 0;
@@ -106,7 +104,7 @@ public class JavaURLProtocolHandler implements IURLProtocolHandler {
 
 	@Override
 	public boolean isStreamed(String url, int flags) {
-		System.err.println("isStreamed() " + url);
+		IOUtil.log("isStreamed() " + url);
 		return false;
 	}
 	
@@ -115,7 +113,7 @@ public class JavaURLProtocolHandler implements IURLProtocolHandler {
 			IURLProtocolHandlerFactory factory = new IURLProtocolHandlerFactory() {
 				@Override
 				public IURLProtocolHandler getHandler(String protocol, String url, int flags) {
-					System.err.println("getHandler(" + protocol + ", " + url + ", " + flags + ")");
+					IOUtil.log("getHandler(" + protocol + ", " + url + ", " + flags + ")");
 					return new JavaURLProtocolHandler();
 				}};
 			URLProtocolManager.getManager().registerFactory("jar", factory);
