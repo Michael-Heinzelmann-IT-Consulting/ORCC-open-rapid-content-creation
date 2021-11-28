@@ -38,6 +38,13 @@ public interface AudioInput  {
 	public String getName();
 	
 	/**
+	 * Additional information whether this input 
+	 * should be available from the classpath
+	 * @return classpath or null
+	 */
+	public String getClasspath();
+	
+	/**
 	 * @return get the type
 	 */
 	public Type getType();

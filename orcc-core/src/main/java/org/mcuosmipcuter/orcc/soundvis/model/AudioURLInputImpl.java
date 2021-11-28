@@ -40,6 +40,7 @@ public class AudioURLInputImpl implements AudioInput {
 	
 	private final AudioInputInfo audioInputInfo;
 	private final URL url;
+	private final String classpath;
 	private byte[] data;
 	
 	/**
@@ -49,8 +50,9 @@ public class AudioURLInputImpl implements AudioInput {
 	 * are rejected with a {@link RuntimeException} wrapping the cause.
 	 * @param url the url of the audio file
 	 */
-	public AudioURLInputImpl(URL url) {
+	public AudioURLInputImpl(URL url, String classpath) {
 		this.url = url;
+		this.classpath = classpath;
 		long frameLength;
 		AudioInputInfo audioInputInfoTemp = null;
 		try{
@@ -118,8 +120,13 @@ public class AudioURLInputImpl implements AudioInput {
 		return audioInputInfo;
 	}
 
-	public static URL getUrl(String path) {
+	public static URL getClasspathUrl(String path) {
 		return AudioURLInputImpl.class.getResource(path);
+	}
+
+	@Override
+	public String getClasspath() {
+		return classpath;
 	}
 	
 }

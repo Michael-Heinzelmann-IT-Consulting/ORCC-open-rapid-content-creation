@@ -154,7 +154,8 @@ public class Session implements Serializable {
 	private static void setUpApplication(PersistentSession persistentSession, List<String> reportList) throws AppLogicException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, NoSuchFieldException {
 		Context.loadFrameRateAndOutputDimension(persistentSession.getVideoOutPutFrames(), persistentSession.getVideoOutPutWidth(), persistentSession.getVideoOutPutHeight());
 		try {
-			Context.setAudio(persistentSession.getAudioInputType(), persistentSession.getAudioInputName(), persistentSession.getVideoOutPutFrames());
+			String name = persistentSession.getAudioInputClasspath() != null ? persistentSession.getAudioInputClasspath() : persistentSession.getAudioInputName();
+			Context.setAudio(persistentSession.getAudioInputType(), name, persistentSession.getVideoOutPutFrames());
 		} catch (Exception e) {
 			IOUtil.log(e.getMessage() + " " + e.getCause());
 			reportList.add(e.getMessage() + " " + e.getCause());
@@ -206,6 +207,7 @@ public class Session implements Serializable {
 		persistentSession.setSoundCanvasList(persistentWrappers);
 		persistentSession.setAudioInputType(Context.getAudioInput().getType());
 		persistentSession.setAudioInputName(Context.getAudioInput().getName());
+		persistentSession.setAudioInputClasspath(Context.getAudioInput().getClasspath());
 		persistentSession.setVideoOutPutFrames(Context.getVideoOutputInfo().getFramesPerSecond());
 		persistentSession.setVideoOutPutHeight(Context.getVideoOutputInfo().getHeight());
 		persistentSession.setVideoOutPutWidth(Context.getVideoOutputInfo().getWidth());

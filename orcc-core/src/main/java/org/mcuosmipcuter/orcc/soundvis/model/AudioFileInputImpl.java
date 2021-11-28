@@ -149,5 +149,10 @@ public class AudioFileInputImpl implements AudioInput {
 		return audioInputInfo;
 	}
 
+	@Override
+	public String getClasspath() {
+		return null;
+	}
+
 	
 }

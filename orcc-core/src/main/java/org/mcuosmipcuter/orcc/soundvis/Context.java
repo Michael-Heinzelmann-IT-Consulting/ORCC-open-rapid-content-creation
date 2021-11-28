@@ -329,10 +329,10 @@ public abstract class Context {
 			} catch (MalformedURLException e) {
 				throw new RuntimeException(e);
 			}
-			loadAudio(url);
+			loadAudio(url, null);
 
 	}
-	private static void loadAudio(URL url) throws AppLogicException {
+	private static void loadAudio(URL url, String classpath) throws AppLogicException {
 		final AppState before  = appState;
 		IOUtil.log(before + " loading " + url);
 		progressUpdate("loading " + url);
@@ -343,7 +343,7 @@ public abstract class Context {
 
 			try {
 				long start = System.currentTimeMillis();
-				AudioInput a = new AudioURLInputImpl(url);
+				AudioInput a = new AudioURLInputImpl(url, classpath);
 				setAudio(a);
 				IOUtil.log("loaded in " + (System.currentTimeMillis() - start) + "ms");
 			} catch (Exception ex) {
@@ -360,15 +360,19 @@ public abstract class Context {
 	 * @param audioFileName full path to the file
 	 */
 	public static synchronized void setAudioFromClasspath(String audioResourcePath) throws AppLogicException {
-		URL url = AudioURLInputImpl.getUrl(audioResourcePath);
-		if(url == null) {
+		URL url = AudioURLInputImpl.getClasspathUrl(audioResourcePath);
+		String classpath = null;
+		if(url != null) {
+			classpath = audioResourcePath;
+		}
+		else {
 			try {
 				url = new URL(audioResourcePath);
 			} catch (MalformedURLException e) {
 				throw new RuntimeException(e);
 			}
 		}
-		loadAudio(url);
+		loadAudio(url, classpath);
 	}
 	public static synchronized void setAudio(Type inputType, String audioInputName, int outPutFrameRate) throws AppLogicException {
 		switch(inputType) {

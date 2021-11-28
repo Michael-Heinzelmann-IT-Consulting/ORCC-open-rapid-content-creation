@@ -47,6 +47,7 @@ public class PersistentSession implements Serializable {
 	private List<PersistentSoundCanvasWrapper> soundCanvasList = new ArrayList<PersistentSoundCanvasWrapper>();
 	private AudioInput.Type audioInputType;
 	private String audioInputName;
+	private String audioInputClasspath;
 	private int videoOutPutHeight;
 	private int videoOutPutWidth;
 	private int videoOutPutFrames;
@@ -89,6 +90,14 @@ public class PersistentSession implements Serializable {
 
 	public void setAudioInputName(String audioInputName) {
 		this.audioInputName = audioInputName;
+	}
+
+	public String getAudioInputClasspath() {
+		return audioInputClasspath;
+	}
+
+	public void setAudioInputClasspath(String audioInputClasspath) {
+		this.audioInputClasspath = audioInputClasspath;
 	}
 
 	public int getVideoOutPutHeight() {
