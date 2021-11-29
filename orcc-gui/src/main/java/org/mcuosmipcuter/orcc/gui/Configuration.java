@@ -37,6 +37,11 @@ import org.mcuosmipcuter.orcc.util.IOUtil;
  * @author Michael Heinzelmann
  */
 public abstract class Configuration {
+	
+	public final static String[] BUILT_IN_AUDIO = new String[] {"/audio/metronome_pcm_16bit_wav_30s.wav", 
+																"/audio/machine_learning.mp3"};
+	
+	public final static String[] BUILT_IN_SESSIONS = new String[] {"/sessions/demo.xml"};
 
 	private static int stage;
 	

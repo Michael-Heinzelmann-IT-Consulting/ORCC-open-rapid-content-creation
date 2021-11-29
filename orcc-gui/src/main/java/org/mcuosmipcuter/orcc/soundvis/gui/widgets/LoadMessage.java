@@ -17,23 +17,26 @@ public class LoadMessage extends JPanel implements Listener{
 	 */
 	private static final long serialVersionUID = 1L;
 
-	int fontSize = 64;
+	int headerFontSize = 64;
+	int progressFontSize = 32;
 	
 	JLabel label = new JLabel();
 	
 	JLabel update = new JLabel("...");
 
-	public LoadMessage() {
+	public LoadMessage(int fontSize, int progressFontSize) {
+		this.headerFontSize = fontSize;
+		this.progressFontSize = progressFontSize;
 		setLayout(new GridLayout(2, 1));
 		setBorder(new  LineBorder(getBackground().darker(), 8, false));
 
 		label.setBorder(new  LineBorder(getBackground(), 8, false));
-		Font font = new Font("dialog", Font.PLAIN, fontSize);
+		Font font = new Font("dialog", Font.PLAIN, headerFontSize);
 		label.setOpaque(true);
 		label.setFont(font);
 		add(label);
 
-		Font fontU = new Font("dialog", Font.PLAIN, fontSize/2);
+		Font fontU = new Font("dialog", Font.PLAIN, progressFontSize);
 		update.setFont(fontU);
 		add(update);
 	}

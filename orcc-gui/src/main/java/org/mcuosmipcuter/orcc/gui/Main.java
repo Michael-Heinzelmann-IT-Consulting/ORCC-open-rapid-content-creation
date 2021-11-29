@@ -29,9 +29,12 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.lang.Thread.UncaughtExceptionHandler;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import javax.imageio.ImageIO;
@@ -186,8 +189,8 @@ public class Main {
 				"open as audio input");
 		fromFile.addActionListener(importActionListener);
 		openAudio.add(fromFile);
-		String[] BUILT_IN = new String[] {"/audio/metronome_pcm_16bit_wav_30s.wav", "/audio/machine_learning.mp3"};
-		for(String path : BUILT_IN) {
+		
+		for(String path : Configuration.BUILT_IN_AUDIO) {
 			JMenuItem item = new JMenuItem(path.substring(path.lastIndexOf("/") + 1));
 			item.addActionListener(new ActionListener() {
 				@Override
@@ -229,17 +232,17 @@ public class Main {
 		JMenuItem saveSessionAs = new JMenuItem("save session as");
 		JMenuItem saveSession = new JMenuItem("save session");
 
-		LoadMessage loadMessage = new LoadMessage();
+		LoadMessage loadMessage = new LoadMessage(32, 32);
 		Context.addListener(loadMessage);
 
-		CallBack openSessionCallback = new CallBack() {
+		Function<URL, Void> sessionLoader = new Function<URL, Void>() {
 			Popup popup = null;
-
-			public void fileSelected(File file) {
-
+			
+			@Override
+			public Void apply(URL url) {
 				List<String> reportList = new ArrayList<String>();
 
-				String msg = "loading " + file.getName() + " ...";
+				String msg = "loading " + url + " ...";
 				loadMessage.setHeader(msg);
 
 				Rectangle screen = GraphicsUtil.getRootComponentOutline(frame);
@@ -255,7 +258,7 @@ public class Main {
 					@Override
 					public void run() {
 						try {
-							boolean loaded = Session.userLoadSession(file, reportList);
+							boolean loaded = Session.userLoadSession(url, reportList);
 							errorsOnSessionLoadRoutine(reportList);
 							if (!loaded) {
 								throw new RuntimeException("could not load session: " + reportList);
@@ -270,7 +273,19 @@ public class Main {
 
 				};
 				t.start();
+				IOUtil.log("session loader startet for " + url);
+				return null;
+			}
+		};
 
+		CallBack openSessionCallback = new CallBack() {
+
+			public void fileSelected(File file) {
+				try {
+					sessionLoader.apply(file.toURI().toURL());
+				} catch (MalformedURLException e) {
+					e.printStackTrace();
+				}
 			}
 		};
 
@@ -334,6 +349,23 @@ public class Main {
 		});
 		sessionMenu.addSeparator();
 		sessionMenu.add(newSession);
+		
+		JMenu demoSession = new JMenu("demos");
+		for(String path : Configuration.BUILT_IN_SESSIONS) {
+			JMenuItem item = new JMenuItem(path.substring(path.lastIndexOf("/") + 1));
+			item.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					if (allowSessionOpenRoutine()) {
+						Session.newSession();
+					}
+				}
+			});
+			demoSession.add(item);
+		}
+		sessionMenu.addSeparator();
+		sessionMenu.add(demoSession);
+		
 		JMenuItem showChanges = new JMenuItem("show changes");
 		showChanges.addActionListener(new ActionListener() {
 			@Override
@@ -694,10 +726,12 @@ public class Main {
 			}
 		});
 
-		loadMessage.setHeader("loading last session ...");
+		LoadMessage startUpLoadMessage = new LoadMessage(64, 32);
+		Context.addListener(startUpLoadMessage);
+		startUpLoadMessage.setHeader("loading last session ...");
 		Rectangle screen = frame.getBounds();
-		Popup popup = PopupFactory.getSharedInstance().getPopup(frame, loadMessage,
-				screen.x + screen.width / 2 - loadMessage.getPreferredSize().width / 2, screen.y + screen.height / 2);
+		Popup popup = PopupFactory.getSharedInstance().getPopup(frame, startUpLoadMessage,
+				screen.x + screen.width / 2 - startUpLoadMessage.getPreferredSize().width / 2, screen.y + screen.height / 2);
 		popup.show();
 		Context.setAppState(AppState.LOADING);
 		List<String> reportList = new ArrayList<String>();

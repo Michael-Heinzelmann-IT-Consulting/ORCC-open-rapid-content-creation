@@ -22,11 +22,12 @@ import java.beans.ExceptionListener;
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
@@ -82,7 +83,7 @@ public class Session implements Serializable {
 		}
 		PersistentSession persistentSession;
 		try {
-			persistentSession = loadSessionImpl(defaultFile, reportList);
+			persistentSession = loadSessionImpl(defaultFile.toURI().toURL(), reportList);
 			SessionToken st;
 			if(persistentSession.getSessionPath() != null) {
 				st = new SessionToken(persistentSession.getSessionPath(), reportList);
@@ -109,11 +110,11 @@ public class Session implements Serializable {
 		}
 
 	}
-	public static boolean userLoadSession(File file, List<String> reportList) {
+	public static boolean userLoadSession(URL url, List<String> reportList) {
 		try {
-			PersistentSession persistentSession =  loadSessionImpl(file, reportList);
+			PersistentSession persistentSession =  loadSessionImpl(url, reportList);
 			setUpApplication(persistentSession, reportList);
-			Context.setSessionToken(new SessionToken(file.getAbsolutePath(), reportList));
+			Context.setSessionToken(new SessionToken(url.toString(), reportList));
 			saveDefaultSession(false);
 			return true;
 		} catch (Exception e) {
@@ -126,10 +127,10 @@ public class Session implements Serializable {
 		}
 	}
 
-	private static PersistentSession loadSessionImpl(File file, List<String> reportList) throws Exception {
+	private static PersistentSession loadSessionImpl(URL url, List<String> reportList) throws Exception {
 		
-		IOUtil.log("restore from: " + file.getAbsolutePath());
-		try (FileInputStream fis = new FileInputStream(file);
+		IOUtil.log("restore from: " + url.toString());
+		try (InputStream fis = url.openStream();
 				XMLDecoder in = new XMLDecoder(fis);) {
 			in.setExceptionListener(new ExceptionListener() {		
 				@Override
