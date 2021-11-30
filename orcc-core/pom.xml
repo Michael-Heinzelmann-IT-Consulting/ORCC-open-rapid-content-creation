@@ -44,6 +44,11 @@
         <filtering>false</filtering>
         <targetPath>images</targetPath>
       </resource>
+      <resource>
+        <directory>src/main/resources/sessions</directory>
+        <filtering>false</filtering>
+        <targetPath>sessions</targetPath>
+      </resource>
     </resources>
   </build>
   <dependencies>

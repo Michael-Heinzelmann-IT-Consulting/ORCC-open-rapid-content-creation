@@ -13,6 +13,7 @@ import org.mcuosmipcuter.orcc.util.IOUtil;
 public class SessionToken {
 
 	private final String fullPath;
+	private final String classPath;
 	private final boolean named;
 	private final List<String> reportList;
 	Map<String, ValueChanges> changes = new LinkedHashMap<>();
@@ -27,10 +28,11 @@ public class SessionToken {
 		return reportList;
 	}
 	public SessionToken() {
-		this(null, new ArrayList<>());
+		this(null, null, new ArrayList<>());
 	}
-	public SessionToken(String fullPath, List<String> reportList) {
+	public SessionToken(String fullPath, String classPath, List<String> reportList) {
 		this.fullPath = fullPath;
+		this.classPath = classPath;
 		named = fullPath != null;
 		this.reportList = reportList;
 		IOUtil.log("##################### new session token ###################");
@@ -38,6 +40,9 @@ public class SessionToken {
 
 	public String getFullPath() {
 		return fullPath;
+	}
+	public String getDisplayPath() {
+		return classPath != null ? classPath : fullPath;
 	}
 
 	public boolean isChanged() {
@@ -82,6 +87,10 @@ public class SessionToken {
 			}
 		}
 		return result;
+	}
+	
+	public String getClassPath() {
+		return classPath;
 	}
 	public Map<String, ValueChanges> getChanges() {
 		return changes;

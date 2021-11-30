@@ -71,6 +71,14 @@ public class Session implements Serializable {
 			throw new RuntimeException(ex);
 		}
 	}
+	public static URL fromClasspath(String path) {
+		try {
+			URL url = Session.class.getResource(path);
+			return url;
+		} catch (Exception ex) {
+			throw new RuntimeException(ex);
+		}
+	}
 	
 	public static boolean restoreSession( List<String> reportList) {
 		File defaultFile = new File(FileConfiguration.getTargetConfDir() + FileConfiguration.getSep() + DEFAULT_FILE_NAME + FILE_EXTENSION);
@@ -84,9 +92,14 @@ public class Session implements Serializable {
 		PersistentSession persistentSession;
 		try {
 			persistentSession = loadSessionImpl(defaultFile.toURI().toURL(), reportList);
+			String cp = persistentSession.getClassPath();
+			if(cp != null) {
+				IOUtil.log("restore from classpath: " + cp);
+				return userLoadSession(fromClasspath(cp), cp, reportList);
+			}
 			SessionToken st;
 			if(persistentSession.getSessionPath() != null) {
-				st = new SessionToken(persistentSession.getSessionPath(), reportList);
+				st = new SessionToken(persistentSession.getSessionPath(), persistentSession.getClassPath(), reportList);
 				if(persistentSession.getChanges() != null) {
 					for(Map.Entry<String, ValueChanges> e : persistentSession.getChanges().entrySet()) {
 						if(e.getValue().isLogicallyChanged()) {
@@ -110,11 +123,11 @@ public class Session implements Serializable {
 		}
 
 	}
-	public static boolean userLoadSession(URL url, List<String> reportList) {
+	public static boolean userLoadSession(URL url, String classPath, List<String> reportList) {
 		try {
 			PersistentSession persistentSession =  loadSessionImpl(url, reportList);
 			setUpApplication(persistentSession, reportList);
-			Context.setSessionToken(new SessionToken(url.toString(), reportList));
+			Context.setSessionToken(new SessionToken(url.getPath(), classPath, reportList));
 			saveDefaultSession(false);
 			return true;
 		} catch (Exception e) {
@@ -181,14 +194,14 @@ public class Session implements Serializable {
 		if(file.exists()) {
 			Files.move(file.toPath(), file.toPath().resolveSibling(FileConfiguration.getTargetConfDir() + FileConfiguration.getSep() + DEFAULT_BACkUP_FILE_NAME + FILE_EXTENSION), StandardCopyOption.REPLACE_EXISTING);
 		}
-		saveSessionImpl(file, path, persistChanges ? st.getChanges() : null);
+		saveSessionImpl(file, path, st.getClassPath(), persistChanges ? st.getChanges() : null);
 		return file;
 	}
 	public static void userSaveSession(File file) throws IllegalArgumentException, IllegalAccessException, IOException {
-		saveSessionImpl(file, null, null);
-		Context.setSessionToken(new SessionToken(file.getAbsolutePath(), new ArrayList<>()));
+		saveSessionImpl(file, null, null, null);
+		Context.setSessionToken(new SessionToken(file.getAbsolutePath(), null, new ArrayList<>()));
 	}
-	private static PersistentSession saveSessionImpl(File file, String persitentSessionPath, Map<String, ValueChanges> changes) throws IllegalArgumentException, IllegalAccessException, IOException {
+	private static PersistentSession saveSessionImpl(File file, String persitentSessionPath, String classPath, Map<String, ValueChanges> changes) throws IllegalArgumentException, IllegalAccessException, IOException {
 
 		List<SoundCanvasWrapper> appObjects = Context.getSoundCanvasList();
 		
@@ -205,6 +218,7 @@ public class Session implements Serializable {
 		persistentSession.setBuildNumber(vp.getProperty("buildNumber"));
 		persistentSession.setChanges(changes);
 		persistentSession.setSessionPath(persitentSessionPath);
+		persistentSession.setClassPath(classPath);
 		persistentSession.setSoundCanvasList(persistentWrappers);
 		persistentSession.setAudioInputType(Context.getAudioInput().getType());
 		persistentSession.setAudioInputName(Context.getAudioInput().getName());

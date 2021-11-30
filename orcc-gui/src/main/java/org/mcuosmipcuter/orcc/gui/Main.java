@@ -34,7 +34,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
 import javax.imageio.ImageIO;
@@ -235,14 +235,14 @@ public class Main {
 		LoadMessage loadMessage = new LoadMessage(32, 32);
 		Context.addListener(loadMessage);
 
-		Function<URL, Void> sessionLoader = new Function<URL, Void>() {
+		BiFunction<URL, String, Void> sessionLoader = new BiFunction<URL, String, Void>() {
 			Popup popup = null;
 			
 			@Override
-			public Void apply(URL url) {
+			public Void apply(URL url, String classPath) {
 				List<String> reportList = new ArrayList<String>();
 
-				String msg = "loading " + url + " ...";
+				String msg = "loading " + (classPath != null ? classPath : url.toString()) + " ...";
 				loadMessage.setHeader(msg);
 
 				Rectangle screen = GraphicsUtil.getRootComponentOutline(frame);
@@ -258,7 +258,7 @@ public class Main {
 					@Override
 					public void run() {
 						try {
-							boolean loaded = Session.userLoadSession(url, reportList);
+							boolean loaded = Session.userLoadSession(url, classPath, reportList);
 							errorsOnSessionLoadRoutine(reportList);
 							if (!loaded) {
 								throw new RuntimeException("could not load session: " + reportList);
@@ -282,7 +282,7 @@ public class Main {
 
 			public void fileSelected(File file) {
 				try {
-					sessionLoader.apply(file.toURI().toURL());
+					sessionLoader.apply(file.toURI().toURL(), null);
 				} catch (MalformedURLException e) {
 					e.printStackTrace();
 				}
@@ -350,21 +350,22 @@ public class Main {
 		sessionMenu.addSeparator();
 		sessionMenu.add(newSession);
 		
-		JMenu demoSession = new JMenu("demos");
+		JMenu demoSessions = new JMenu("demos");
 		for(String path : Configuration.BUILT_IN_SESSIONS) {
 			JMenuItem item = new JMenuItem(path.substring(path.lastIndexOf("/") + 1));
 			item.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					if (allowSessionOpenRoutine()) {
-						Session.newSession();
+					if (allowSessionOpenRoutine()) {	
+						URL url = Session.fromClasspath(path);
+						sessionLoader.apply(url, path);
 					}
 				}
 			});
-			demoSession.add(item);
+			demoSessions.add(item);
 		}
 		sessionMenu.addSeparator();
-		sessionMenu.add(demoSession);
+		sessionMenu.add(demoSessions);
 		
 		JMenuItem showChanges = new JMenuItem("show changes");
 		showChanges.addActionListener(new ActionListener() {
@@ -468,9 +469,14 @@ public class Main {
 					exportStop.setEnabled(current == AppState.EXPORTING);
 					openAudio.setEnabled(current == AppState.READY);
 					openSession.setEnabled(current == AppState.READY);
-					newSession.setEnabled(current == AppState.READY);
-					saveSession.setEnabled(current != AppState.INIT && current != AppState.LOADING);
-					saveSessionAs.setEnabled(current != AppState.INIT && current != AppState.LOADING);
+					newSession.setEnabled(current == AppState.READY);				
+					saveSession.setEnabled(Context.getSessionToken().getClassPath() == null && current != AppState.INIT && current != AppState.LOADING);
+					saveSessionAs.setEnabled(current == AppState.READY);
+					demoSessions.setEnabled(current == AppState.READY);
+				}
+				if(PropertyName.NewSession.equals(propertyName)) {
+					AppState current = Context.getAppState();
+					saveSession.setEnabled(Context.getSessionToken().getClassPath() == null && current != AppState.INIT && current != AppState.LOADING);
 				}
 			}
 		});
@@ -681,7 +687,7 @@ public class Main {
 		Context.addListener(new Listener() {
 			public void contextChanged(PropertyName propertyName) {
 				if (PropertyName.NewSession.equals(propertyName) || PropertyName.SessionChanged.equals(propertyName)) {
-					String inputTitle = Context.getSessionToken().isNamed() ? Context.getSessionToken().getFullPath()
+					String inputTitle = Context.getSessionToken().isNamed() ? Context.getSessionToken().getDisplayPath()
 							: "unnamed session";
 					String complete = Context.getSessionToken().hasLoadErrors() ? " !!incomplete!! " : "";
 					String changed = Context.getSessionToken().isChanged() ? complete + " * " : complete;
