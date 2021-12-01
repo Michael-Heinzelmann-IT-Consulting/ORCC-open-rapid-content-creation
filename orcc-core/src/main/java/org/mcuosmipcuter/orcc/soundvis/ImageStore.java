@@ -44,9 +44,10 @@ public class ImageStore {
 	public final static String CLASSPATH_PREFIX = "classpath://";
 	
 	public static final Key[] CLASSPATH_IMAGES = new Key[] {
-			new Key(0, CLASSPATH_PREFIX + "/images/clouds1.jpg", 0, false, 0, 0),
-			new Key(0, CLASSPATH_PREFIX + "/images/clouds2.jpg", 0, false, 0, 0),
-			new Key(0, CLASSPATH_PREFIX + "/images/clouds3.jpg", 0, false, 0, 0)
+			new Key(0, CLASSPATH_PREFIX + "/images/clouds01.jpg", 0, false, 0, 0),
+			new Key(0, CLASSPATH_PREFIX + "/images/clouds02.jpg", 0, false, 0, 0),
+			new Key(0, CLASSPATH_PREFIX + "/images/clouds03.jpg", 0, false, 0, 0),
+			new Key(0, CLASSPATH_PREFIX + "/images/soundvis.png", 0, false, 0, 0)
 	};
 	
 	public static class Key{

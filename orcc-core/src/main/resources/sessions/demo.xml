@@ -2098,7 +2098,7 @@
              <void property="key">
               <object class="org.mcuosmipcuter.orcc.soundvis.ImageStore$Key">
                <object idref="Long0"/>
-               <string>classpath:///images/clouds2.jpg</string>
+               <string>classpath:///images/clouds02.jpg</string>
                <object idref="Integer0"/>
                <object idref="Boolean0"/>
                <object idref="Integer0"/>
@@ -2109,7 +2109,7 @@
               <int>1</int>
              </void>
              <void property="text">
-              <string>classpath:///images/clouds2.jpg</string>
+              <string>classpath:///images/clouds02.jpg</string>
              </void>
             </object>
            </void>
@@ -2121,7 +2121,7 @@
              <void property="key">
               <object class="org.mcuosmipcuter.orcc.soundvis.ImageStore$Key">
                <object idref="Long0"/>
-               <string>classpath:///images/clouds3.jpg</string>
+               <string>classpath:///images/clouds03.jpg</string>
                <object idref="Integer0"/>
                <object idref="Boolean0"/>
                <object idref="Integer0"/>
@@ -2132,7 +2132,7 @@
               <int>2</int>
              </void>
              <void property="text">
-              <string>classpath:///images/clouds3.jpg</string>
+              <string>classpath:///images/clouds03.jpg</string>
              </void>
             </object>
            </void>
@@ -2144,7 +2144,7 @@
              <void property="key">
               <object class="org.mcuosmipcuter.orcc.soundvis.ImageStore$Key">
                <object idref="Long0"/>
-               <string>classpath:///images/clouds1.jpg</string>
+               <string>classpath:///images/clouds01.jpg</string>
                <object idref="Integer0"/>
                <object idref="Boolean0"/>
                <object idref="Integer0"/>
@@ -2155,7 +2155,7 @@
               <int>3</int>
              </void>
              <void property="text">
-              <string>classpath:///images/clouds1.jpg</string>
+              <string>classpath:///images/clouds01.jpg</string>
              </void>
             </object>
            </void>
@@ -5149,7 +5149,7 @@ and media production
              <void property="key">
               <object class="org.mcuosmipcuter.orcc.soundvis.ImageStore$Key">
                <long>1632679119000</long>
-               <string>/Users/user/Development/graphics/soundvis_icon/soundvis_icon_512px.png</string>
+               <string>classpath:///images/soundvis.png</string>
                <object idref="Integer0"/>
                <object idref="Boolean0"/>
                <object idref="Integer0"/>
