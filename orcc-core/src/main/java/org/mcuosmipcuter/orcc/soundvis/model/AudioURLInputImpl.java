@@ -19,7 +19,9 @@ package org.mcuosmipcuter.orcc.soundvis.model;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 import javax.sound.sampled.AudioFormat;
@@ -121,7 +123,17 @@ public class AudioURLInputImpl implements AudioInput {
 	}
 
 	public static URL getClasspathUrl(String path) {
-		return AudioURLInputImpl.class.getResource(path);
+		URL url = AudioURLInputImpl.class.getResource(path);
+		if(url != null && "file".equals(url.getProtocol())) {
+			String fp = url.getFile();
+			try {
+				File f = new File(fp);
+				url = new URL("file:" + f.getAbsolutePath());
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+			}
+		}
+		return url;
 	}
 
 	@Override
