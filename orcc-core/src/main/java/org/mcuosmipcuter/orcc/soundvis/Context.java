@@ -346,8 +346,12 @@ public abstract class Context {
 				AudioInput a = new AudioURLInputImpl(url, classpath);
 				setAudio(a);
 				IOUtil.log("loaded in " + (System.currentTimeMillis() - start) + "ms");
+			}
+			catch(AppLogicException ale) {
+				throw ale;
 			} catch (Exception ex) {
 				IOUtil.log("exception loading audio: " + ex);
+				throw new RuntimeException(ex);
 			}
 			finally {
 				if(before != AppState.LOADING) {
