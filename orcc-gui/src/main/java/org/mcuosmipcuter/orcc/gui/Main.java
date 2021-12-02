@@ -175,7 +175,10 @@ public class Main {
 						try {
 							Context.setAudioFromFile(file.getAbsolutePath());
 						} catch (AppLogicException ex) {
-							throw new RuntimeException(ex);
+							JOptionPane.showMessageDialog(null, ex.getAllowedMessage(Configuration.FRAME_RATES) , ex.getMessage(), JOptionPane.WARNING_MESSAGE);
+						}
+						catch(Exception ex) {
+							JOptionPane.showMessageDialog(null, ex.getMessage() , "error openeing audio", JOptionPane.ERROR_MESSAGE);
 						}
 						finally {
 							Context.setAppState(before);
@@ -203,7 +206,10 @@ public class Main {
 							try {
 								Context.setAudioFromClasspath(path);
 							} catch (AppLogicException ex) {
-								throw new RuntimeException(ex);
+								JOptionPane.showMessageDialog(null, ex.getAllowedMessage(Configuration.FRAME_RATES) , ex.getMessage(), JOptionPane.WARNING_MESSAGE);
+							}
+							catch(Exception ex) {
+								JOptionPane.showMessageDialog(null, ex.getMessage() , "error openeing audio", JOptionPane.ERROR_MESSAGE);
 							}
 							finally {
 								Context.setAppState(before);
@@ -606,15 +612,15 @@ public class Main {
 		configMenu.add(resolutions);
 		Context.addListener(resolutions);
 
-		AudioOutputLayoutMenu audioOutputLayoutMenu = new AudioOutputLayoutMenu("audio output");
-		configMenu.addSeparator();
-		configMenu.add(audioOutputLayoutMenu);
-		Context.addListener(audioOutputLayoutMenu);
-
 		final FrameRateMenu frameRates = new FrameRateMenu("frame rate", v.getFramesPerSecond());
 		configMenu.addSeparator();
 		configMenu.add(frameRates);
 		Context.addListener(frameRates);
+		
+		AudioOutputLayoutMenu audioOutputLayoutMenu = new AudioOutputLayoutMenu("audio output");
+		configMenu.addSeparator();
+		configMenu.add(audioOutputLayoutMenu);
+		Context.addListener(audioOutputLayoutMenu);
 
 		JMenuItem preferences = new JMenuItem("preferences (startup)");
 		preferences.addActionListener(new ActionListener() {

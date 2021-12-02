@@ -239,7 +239,7 @@ public abstract class Context {
 		if(audioInput != null) {
 			final float sampleRate = audioInput.getAudioInputInfo().getAudioFormat().getSampleRate();
 			if(sampleRate % frameRate != 0) {
-				throw new AppLogicException("sample rate " + sampleRate + " % frame rate " + frameRate + " is not 0");
+				throw new AppLogicException(sampleRate, frameRate);
 			}
 		}
 		VideoOutputInfoImpl newVideoOutputInfo = new VideoOutputInfoImpl(frameRate, videoOutputInfo.getWidth(), videoOutputInfo.getHeight());
@@ -397,7 +397,7 @@ public abstract class Context {
 		final float sampleRate = format.getSampleRate();
 		final int frameRate = videoOutputInfo.getFramesPerSecond();
 		if(sampleRate % frameRate != 0) {
-			throw new AppLogicException("sample rate " + sampleRate + " % frame rate " + frameRate + " is not 0");
+			throw new AppLogicException(sampleRate, frameRate);
 		}
 		changeSession(AudioInput.class.getName(), audioInput != null ? audioInput.getName() : null, a != null ? a.getName() : null);
 		audioInput = a;

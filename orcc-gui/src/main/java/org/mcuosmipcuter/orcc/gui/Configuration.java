@@ -42,6 +42,8 @@ public abstract class Configuration {
 																"/audio/machine_learning.mp3"};
 	
 	public final static String[] BUILT_IN_SESSIONS = new String[] {"/sessions/demo.xml"};
+	
+	public final static int[] FRAME_RATES = new int[] {12, 24, 25, 30, 60};
 
 	private static int stage;
 	

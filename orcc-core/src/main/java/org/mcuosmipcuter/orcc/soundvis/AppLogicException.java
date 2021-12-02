@@ -17,6 +17,9 @@
 */
 package org.mcuosmipcuter.orcc.soundvis;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * An exception thrown when application logic is violated
  * @author Michael Heinzelmann
@@ -24,10 +27,24 @@ package org.mcuosmipcuter.orcc.soundvis;
 public class AppLogicException extends Exception {
 
 	private static final long serialVersionUID = 1L;
+	
+	float sampleRate;
+	int frameRate;
 
-	public AppLogicException(String msg) {
-		super(msg);
+	public AppLogicException(float sampleRate, int frameRate) {
+		super("sample rate " + sampleRate + " % frame rate " + frameRate + " is not 0");
+		this.sampleRate = sampleRate;
+		this.frameRate = frameRate;
 	}
 
+	public String getAllowedMessage(int[] configured){
+		List<Integer> result = new ArrayList<>();
+		for(int fr : configured) {
+			if(sampleRate % fr == 0) {
+				result.add(fr);
+			}
+		}
+		return "framerate " + frameRate + " is not allowed for this audio, please use " + result;
+	}
 
 }

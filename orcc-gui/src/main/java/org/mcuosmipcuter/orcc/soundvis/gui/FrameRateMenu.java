@@ -25,6 +25,7 @@ import javax.swing.JMenu;
 import javax.swing.JRadioButtonMenuItem;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
+import org.mcuosmipcuter.orcc.gui.Configuration;
 import org.mcuosmipcuter.orcc.soundvis.Context;
 import org.mcuosmipcuter.orcc.soundvis.Context.PropertyName;
 
@@ -35,8 +36,6 @@ import org.mcuosmipcuter.orcc.soundvis.Context.PropertyName;
 public class FrameRateMenu extends JMenu  implements Context.Listener{
 
 	private static final long serialVersionUID = 1L;
-	
-	private int[] frameRates = new int[] {12,24, 25, 30, 60};
 
 	/**
 	 * Same constructor as for standard menus
@@ -45,7 +44,7 @@ public class FrameRateMenu extends JMenu  implements Context.Listener{
 	public FrameRateMenu(String title, final int initialFrameRate) {
 		super(title);
 		ButtonGroup group = new ButtonGroup();
-		for(final int frameRate : frameRates) {
+		for(final int frameRate : Configuration.FRAME_RATES) {
 			final JRadioButtonMenuItem item = new JRadioButtonMenuItem(frameRate + " fps");
 			item.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
@@ -71,7 +70,7 @@ public class FrameRateMenu extends JMenu  implements Context.Listener{
 	public void checkFrameRatesEnabled(AudioInputInfo audioInputInfo) {
 		float sampleRate = audioInputInfo.getAudioFormat().getSampleRate();
 		int pos = 0;
-		for(int frameRate : frameRates) {
+		for(int frameRate : Configuration.FRAME_RATES) {
 			boolean isWorkingFrameRate = sampleRate % frameRate == 0;
 			getItem(pos).setEnabled(isWorkingFrameRate);
 			pos++;
@@ -83,7 +82,7 @@ public class FrameRateMenu extends JMenu  implements Context.Listener{
 		if(PropertyName.VideoFrameRate.equals(propertyName)) {
 			int f = Context.getVideoOutputInfo().getFramesPerSecond();
 			int c = 0;
-			for(final int  frameRate : frameRates) {
+			for(final int  frameRate : Configuration.FRAME_RATES) {
 				getItem(c++).setSelected(frameRate == f);
 			}
 		}
