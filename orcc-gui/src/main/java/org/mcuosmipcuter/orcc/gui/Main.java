@@ -39,6 +39,7 @@ import java.util.function.Supplier;
 
 import javax.imageio.ImageIO;
 import javax.sound.sampled.AudioFormat;
+import javax.swing.ImageIcon;
 import javax.swing.JDesktopPane;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -134,6 +135,8 @@ public class Main {
 		ChangsBox changesBox = new ChangsBox();
 
 		final JFrame frame = new JFrame("soundvis");
+		ImageIcon imageIcon = new ImageIcon(Main.class.getResource("/img/icon_128x128.png"));
+		frame.setIconImage(imageIcon.getImage());
 
 		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		frame.setMinimumSize(new Dimension(infoW, infoH + playBackH));
