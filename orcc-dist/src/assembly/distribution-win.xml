@@ -39,7 +39,7 @@
       <outputDirectory>/</outputDirectory>
     </file>
     <file>
-    <source>src/main/icons/soundvis_icon_512px.png</source>
+    <source>src/main/icons/soundvis.ico</source>
       <outputDirectory>/</outputDirectory>
       <filtered>false</filtered>
     </file>
