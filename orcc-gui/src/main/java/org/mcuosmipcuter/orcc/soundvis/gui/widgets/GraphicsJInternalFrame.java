@@ -30,13 +30,13 @@ public class GraphicsJInternalFrame extends JInternalFrame {
 	private void setTitle() {
 		StringBuilder sb = new StringBuilder();
 		if(inputTitle != null) {
-			sb.append("| " + inputTitle + " |");
+			sb.append(inputTitle + " |");
 		}
 		if(outputTitle != null) {
 			sb.append(" "  + outputTitle + " ");
 		}
 		if(realtimeTitle != null) {
-			sb.append("| " + realtimeTitle + " |");
+			sb.append("| " + realtimeTitle);
 		}
 		setTitle(sb.toString());
 	}

@@ -148,7 +148,9 @@ public class Main {
 
 		final JDesktopPane deskTop = new JDesktopPane();
 		final JInternalFrame playBackFrame = new JInternalFrame("Audio Timeline", true, false, false);
+		playBackFrame.setFrameIcon(null);
 		final GraphicsJInternalFrame graphicFrame = new GraphicsJInternalFrame("Video", true, false, false, false);
+		graphicFrame.setFrameIcon(null);
 		final GraphPanel graphicPanel = new GraphPanel(new Supplier<Dimension>() {
 			@Override
 			public Dimension get() {
@@ -566,6 +568,7 @@ public class Main {
 		});
 
 		final JInternalFrame propertiesFrame = new JInternalFrame("Layers");
+		propertiesFrame.setFrameIcon(null);
 		JMenuBar layersMenuBar = new JMenuBar();
 		final JMenu canvas = new JMenu("canvas");
 		layersMenuBar.add(canvas);
