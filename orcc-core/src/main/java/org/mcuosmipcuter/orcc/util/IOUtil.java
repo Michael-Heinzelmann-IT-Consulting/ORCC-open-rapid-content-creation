@@ -19,6 +19,7 @@ package org.mcuosmipcuter.orcc.util;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.function.Function;
 
 /**
  * Input Output utilities
@@ -30,6 +31,8 @@ public class IOUtil {
 	 * Boolean flag whether logging is enabled, switch on with -Dorg.mcuosmipcuter.orcc.util.IOUtil.log=true
 	 */
 	public final static boolean isLogOn = "true".equals(System.getProperty(IOUtil.class.getName() + ".log"));
+	
+	public static Function<String, Void> listener;
 
 	/**
 	 * Performs the usual close routine in finally blocks: 
@@ -54,6 +57,17 @@ public class IOUtil {
 		if(isLogOn) {
 			System.out.println(Thread.currentThread().getName() + ": "+ msg);
 		}
+		if(listener != null) {
+			listener.apply(Thread.currentThread().getName() + ": "+ msg);
+		}
+	}
+
+	public static void setListener(Function<String, Void> listener) {
+		IOUtil.listener = listener;
+	}
+
+	public static Function<String, Void> getListener() {
+		return listener;
 	}
 
 }

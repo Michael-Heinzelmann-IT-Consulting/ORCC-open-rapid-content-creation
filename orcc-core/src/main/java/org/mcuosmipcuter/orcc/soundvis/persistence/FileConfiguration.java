@@ -39,6 +39,7 @@ public class FileConfiguration {
 	public static final String SOUNDVIS_PROPERTY_LOOK_AND_FEEL = "lookAndFeel";
 	public static final String SOUNDVIS_PROPERTY_APP_SIZE_MAXIMIZED = "appSizeMaximized";
 	public static final String SOUNDVIS_PROPERTY_APP_SIZE_USER_DEFINED = "appSizeUserDefined";
+	public static final String SOUNDVIS_PROPERTY_LOG_BUFFER_SIZE = "logBufferSize";
 	
 	public static final String SOUNDVIS_PROPERTIES_FILE_NAME = "soundvis.properties";
 	private static final String TARGET_CONF_DIR_NAME = ".config";
@@ -181,5 +182,25 @@ public class FileConfiguration {
 			return Optional.of(new Dimension(Integer.valueOf(wh[0]), Integer.valueOf(wh[1])));
 		}
 		return Optional.empty();
+	}
+	public static int getLogBufferSize(int defaultSize) {
+		try {
+			Properties cp = getProperties();
+			String value = cp.getProperty(SOUNDVIS_PROPERTY_LOG_BUFFER_SIZE);
+			if(value != null) {
+				return Integer.valueOf(value);
+			}
+		}
+		catch(Exception ex) {
+			// do not use IOUtil here
+			ex.printStackTrace();
+		}
+		return defaultSize;
+	}
+	
+	public static void storeLogBufferSize(int newSize) {
+		Properties cp = getProperties();
+		cp.setProperty(SOUNDVIS_PROPERTY_LOG_BUFFER_SIZE, String.valueOf(newSize));
+		storeProperties(cp);
 	}
 }

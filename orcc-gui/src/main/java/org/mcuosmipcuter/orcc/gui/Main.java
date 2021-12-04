@@ -80,6 +80,7 @@ import org.mcuosmipcuter.orcc.soundvis.gui.CanvasClassMenu;
 import org.mcuosmipcuter.orcc.soundvis.gui.ChangsBox;
 import org.mcuosmipcuter.orcc.soundvis.gui.FrameRateMenu;
 import org.mcuosmipcuter.orcc.soundvis.gui.GraphPanel;
+import org.mcuosmipcuter.orcc.soundvis.gui.LogBox;
 import org.mcuosmipcuter.orcc.soundvis.gui.PlayBackPanel;
 import org.mcuosmipcuter.orcc.soundvis.gui.PreferencesBox;
 import org.mcuosmipcuter.orcc.soundvis.gui.ResolutionMenu;
@@ -129,8 +130,12 @@ public class Main {
 				}
 			}
 		});
+		FileConfiguration.init(args != null && args.length > 1 ? args[1] : null);
+		LogBox logBox = new LogBox(FileConfiguration.getLogBufferSize(101));
+		IOUtil.setListener(logBox);
+		IOUtil.log("start");
 
-		org.mcuosmipcuter.orcc.gui.Configuration.init(args);
+		org.mcuosmipcuter.orcc.gui.Configuration.init();
 
 		ChangsBox changesBox = new ChangsBox();
 
@@ -142,7 +147,7 @@ public class Main {
 		frame.setMinimumSize(new Dimension(infoW, infoH + playBackH));
 		frame.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
-				exitRoutine(frame.getSize());
+				exitRoutine(frame.getSize(), logBox.getSize());
 			}
 		});
 
@@ -233,7 +238,7 @@ public class Main {
 		fileMenu.add(exit);
 		exit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				exitRoutine(frame.getSize());
+				exitRoutine(frame.getSize(), logBox.getSize());
 			}
 		});
 
@@ -502,14 +507,6 @@ public class Main {
 				AboutBox.showFileText("/help.txt", false);
 			}
 		});
-		JMenuItem system = new JMenuItem("system environment");
-		helpMenu.addSeparator();
-		helpMenu.add(system);
-		system.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				AboutBox.showSystemProperties(true);
-			}
-		});
 		JMenuItem about = new JMenuItem("about");
 		helpMenu.addSeparator();
 		helpMenu.add(about);
@@ -518,6 +515,25 @@ public class Main {
 				AboutBox.showFileText("/license.txt", true);
 			}
 		});
+		
+		final JMenu infoMenu = new JMenu("Info");
+		mb.add(infoMenu);
+		JMenuItem system = new JMenuItem("system environment");
+		infoMenu.add(system);
+		system.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				AboutBox.showSystemProperties(true);
+			}
+		});
+		JMenuItem showLog = new JMenuItem("show log");
+		showLog.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				logBox.showLog(false);
+			}
+		});
+		infoMenu.addSeparator();
+		infoMenu.add(showLog);
 
 		deskTop.setVisible(true);
 
@@ -790,7 +806,7 @@ public class Main {
 		return true;
 	}
 
-	private static void exitRoutine(Dimension frameSize) {
+	private static void exitRoutine(Dimension frameSize, int logSize) {
 		if (Context.getAppState() != AppState.READY) {
 			int res = JOptionPane.showOptionDialog(null, "Confirm exit in state " + Context.getAppState(),
 					"Do you want to exit in state " + Context.getAppState() + " ?", JOptionPane.OK_CANCEL_OPTION,
@@ -802,6 +818,7 @@ public class Main {
 
 		try {
 			FileConfiguration.storeUserDefinedAppsize(frameSize);
+			FileConfiguration.storeLogBufferSize(logSize);
 
 			SessionToken st = Context.getSessionToken();
 
