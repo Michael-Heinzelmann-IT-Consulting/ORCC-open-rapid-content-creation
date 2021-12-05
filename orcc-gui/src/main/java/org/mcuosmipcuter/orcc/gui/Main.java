@@ -130,18 +130,18 @@ public class Main {
 				}
 			}
 		});
+		final JFrame frame = new JFrame("soundvis");
+		ImageIcon imageIcon = new ImageIcon(Main.class.getResource("/img/icon_64x64.png"));
+		frame.setIconImage(imageIcon.getImage());
+		
 		FileConfiguration.init(args != null && args.length > 1 ? args[1] : null);
-		LogBox logBox = new LogBox(FileConfiguration.getLogBufferSize(101));
+		LogBox logBox = new LogBox(FileConfiguration.getLogBufferSize(100), frame);
 		IOUtil.setListener(logBox);
 		IOUtil.log("start");
 
 		org.mcuosmipcuter.orcc.gui.Configuration.init();
 
 		ChangsBox changesBox = new ChangsBox();
-
-		final JFrame frame = new JFrame("soundvis");
-		ImageIcon imageIcon = new ImageIcon(Main.class.getResource("/img/icon_128x128.png"));
-		frame.setIconImage(imageIcon.getImage());
 
 		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		frame.setMinimumSize(new Dimension(infoW, infoH + playBackH));
@@ -198,7 +198,7 @@ public class Main {
 				t.start();
 			}
 		};
-		FileDialogActionListener importActionListener = new FileDialogActionListener(null, openAudioCallback,
+		FileDialogActionListener importActionListener = new FileDialogActionListener(frame, openAudioCallback,
 				"open as audio input");
 		fromFile.addActionListener(importActionListener);
 		openAudio.add(fromFile);
@@ -306,7 +306,7 @@ public class Main {
 		};
 
 		sessionMenu.add(openSession);
-		FileDialogActionListener openSessionActionListener = new FileDialogActionListener(null, openSessionCallback,
+		FileDialogActionListener openSessionActionListener = new FileDialogActionListener(frame, openSessionCallback,
 				"open session");
 		openSessionActionListener.setFileFilter(new ExtensionsFileFilter(Session.FILE_EXTENSION));
 		openSession.addActionListener(new ActionListener() {
@@ -329,7 +329,7 @@ public class Main {
 		};
 		sessionMenu.addSeparator();
 		sessionMenu.add(saveSessionAs);
-		FileDialogActionListener saveSessionAsActionListener = new FileDialogActionListener(null, saveSessionAsCallback,
+		FileDialogActionListener saveSessionAsActionListener = new FileDialogActionListener(frame, saveSessionAsCallback,
 				"save session");
 		saveSessionAsActionListener.setFileFilter(new ExtensionsFileFilter(Session.FILE_EXTENSION));
 		saveSessionAsActionListener.setForcedExtension(Session.FILE_EXTENSION);
@@ -504,7 +504,7 @@ public class Main {
 		helpMenu.add(basics);
 		basics.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				AboutBox.showFileText("/help.txt", false);
+				AboutBox.showFileText("/help.txt", false, frame);
 			}
 		});
 		JMenuItem about = new JMenuItem("about");
@@ -512,7 +512,7 @@ public class Main {
 		helpMenu.add(about);
 		about.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				AboutBox.showFileText("/license.txt", true);
+				AboutBox.showFileText("/license.txt", true, frame);
 			}
 		});
 		
@@ -522,7 +522,7 @@ public class Main {
 		infoMenu.add(system);
 		system.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				AboutBox.showSystemProperties(true);
+				AboutBox.showSystemProperties(true, frame);
 			}
 		});
 		JMenuItem showLog = new JMenuItem("show log");
@@ -647,7 +647,7 @@ public class Main {
 		JMenuItem preferences = new JMenuItem("preferences (startup)");
 		preferences.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				PreferencesBox.showPreferncesDialog();
+				PreferencesBox.showPreferncesDialog(frame);
 			}
 		});
 		configMenu.addSeparator();

@@ -17,6 +17,7 @@
 */
 package org.mcuosmipcuter.orcc.soundvis.gui;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.text.SimpleDateFormat;
@@ -52,7 +53,7 @@ public class LogBox implements Function<String, Void>{
 	/**
 	 * 
 	 */
-	public LogBox(int size) {
+	public LogBox(int size, Component parent) {
 		sizeSpinner = new JSpinner(new SpinnerNumberModel(size, 0, Integer.MAX_VALUE, 1));
 		ta.setEditable(false);
 		showTime.setSelected(true);
@@ -66,10 +67,9 @@ public class LogBox implements Function<String, Void>{
 		toolBar.add(new JLabel("   show time: "));
 		toolBar.add(showTime);
 		toolBar.setFloatable(false);
-
 		Object[] array = {sp, toolBar}; 
 		JOptionPane jp = new JOptionPane(array, JOptionPane.PLAIN_MESSAGE);		
-		jd = jp.createDialog("application log");
+		jd = jp.createDialog(parent, "application log");
 	}
 	
 	public void showLog(boolean modal) {

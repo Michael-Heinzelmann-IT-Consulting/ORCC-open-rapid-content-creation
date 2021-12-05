@@ -17,6 +17,7 @@
 */
 package org.mcuosmipcuter.orcc.soundvis.gui;
 
+import java.awt.Component;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.Properties;
@@ -45,7 +46,7 @@ public class PreferencesBox {
 	public PreferencesBox() {
 		// TODO Auto-generated constructor stub
 	}
-	public static void showPreferncesDialog() {
+	public static void showPreferncesDialog(Component parent) {
 		Properties config = FileConfiguration.getProperties();
 		JPanel panelAskApdir = new JPanel();
 		JCheckBox ask = new JCheckBox();
@@ -95,7 +96,7 @@ public class PreferencesBox {
 		Object[] array = {panelAskApdir, panelLookAndFeel, panelSize}; 
 		JOptionPane jp = new JOptionPane(array, JOptionPane.PLAIN_MESSAGE);		
 		jp.setOptionType(JOptionPane.DEFAULT_OPTION);
-		JDialog jd = jp.createDialog("preferences");
+		JDialog jd = jp.createDialog(parent, "preferences");
 		
 		jd.setVisible(true);
 	}

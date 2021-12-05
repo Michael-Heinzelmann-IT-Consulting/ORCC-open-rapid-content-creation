@@ -17,6 +17,7 @@
 */
 package org.mcuosmipcuter.orcc.soundvis.gui;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.io.BufferedReader;
@@ -49,7 +50,7 @@ public class AboutBox {
 	 * Show modal about box using the /license.txt resource file as model
 	 * and  {@link JTextArea} {@link JScrollPane} and a {@link JOptionPane} view components
 	 */
-	public static void showFileText(String filePath, boolean modal) {
+	public static void showFileText(String filePath, boolean modal, Component parent) {
 		InputStream is = AboutBox.class.getResourceAsStream(filePath);
 		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(is));
 		try {
@@ -77,7 +78,7 @@ public class AboutBox {
 			ta.setCaretPosition(0);
 			Object[] array = {sp}; 
 			JOptionPane jp = new JOptionPane(array, JOptionPane.PLAIN_MESSAGE);		
-			JDialog jd = jp.createDialog("ORCC soundvis is free software and comes WITHOUT ANY WARRANTY see license");
+			JDialog jd = jp.createDialog(parent, "ORCC soundvis is free software and comes WITHOUT ANY WARRANTY see license");
 			jd.setModal(modal);
 			jd.setAlwaysOnTop(!modal);
 			jd.setVisible(true);
@@ -92,7 +93,7 @@ public class AboutBox {
 			IOUtil.safeClose(bufferedReader);
 		}
 	}
-	public static void showSystemProperties(boolean modal) {
+	public static void showSystemProperties(boolean modal, Component parent) {
 		try {
 
 			Properties vp = Context.getVersionProperties();
@@ -142,7 +143,7 @@ public class AboutBox {
 			ta.setCaretPosition(0);
 			Object[] array = {sp}; 
 			JOptionPane jp = new JOptionPane(array, JOptionPane.PLAIN_MESSAGE);		
-			JDialog jd = jp.createDialog("ORCC is free software and comes WITHOUT ANY WARRANTY see license");
+			JDialog jd = jp.createDialog(parent, "ORCC is free software and comes WITHOUT ANY WARRANTY see license");
 			jd.setModal(modal);
 			jd.setAlwaysOnTop(!modal);
 			jd.setVisible(true);
