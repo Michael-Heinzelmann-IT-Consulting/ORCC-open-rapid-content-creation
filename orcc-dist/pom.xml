@@ -82,6 +82,8 @@
              <copyright>GNU General Public License v3.0</copyright>
              <licensefile>${project.build.directory}/orcc-dist-${project.version}-distribution-${JPACKAGE_OS}/orcc-dist-${project.version}/LICENSE.txt</licensefile>
              <icon>${project.build.directory}/orcc-dist-${project.version}-distribution-${JPACKAGE_OS}/orcc-dist-${project.version}/${JPACKAGE_ICON}</icon>
+             <winmenu>true</winmenu>
+             <winupgradeuuid>e16d0cd5-1aec-4056-917d-39cb1f8c6ccb</winupgradeuuid>
             <verbose>true</verbose>
             </configuration>
           </execution>
