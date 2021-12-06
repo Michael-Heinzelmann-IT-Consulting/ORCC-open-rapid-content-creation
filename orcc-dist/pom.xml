@@ -1,97 +1,225 @@
 <?xml version="1.0"?>
-<!--
-    ORCC rapid content creation for entertainment, education and media production
-    Copyright (C) 2012 Michael Heinzelmann, Michael Heinzelmann IT-Consulting
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
--->
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.mcuosmipcuter.orcc</groupId>
-    <artifactId>orcc</artifactId>
-    <version>1.2.2-SNAPSHOT</version>
-  </parent>
-  <groupId>org.mcuosmipcuter.orcc.dist</groupId>
-  <artifactId>orcc-dist</artifactId>
-  <name>orcc-dist</name>
-  <packaging>pom</packaging>
+<!-- ORCC rapid content creation for entertainment, education and media production 
+	Copyright (C) 2012 Michael Heinzelmann, Michael Heinzelmann IT-Consulting 
+	This program is free software: you can redistribute it and/or modify it under 
+	the terms of the GNU General Public License as published by the Free Software 
+	Foundation, either version 3 of the License, or (at your option) any later 
+	version. This program is distributed in the hope that it will be useful, 
+	but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+	or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for 
+	more details. You should have received a copy of the GNU General Public License 
+	along with this program. If not, see <http://www.gnu.org/licenses/>. -->
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.mcuosmipcuter.orcc</groupId>
+		<artifactId>orcc</artifactId>
+		<version>1.2.2-SNAPSHOT</version>
+	</parent>
+	<groupId>org.mcuosmipcuter.orcc.dist</groupId>
+	<artifactId>orcc-dist</artifactId>
+	<name>orcc-dist</name>
+	<packaging>pom</packaging>
 
 
-  <dependencies>
-    <dependency>
-      <groupId>org.mcuosmipcuter.orcc.gui</groupId>
-      <artifactId>orcc-gui</artifactId>
-      <version>1.2.2-SNAPSHOT</version>
-    </dependency>
-  </dependencies>
+	<dependencies>
+		<dependency>
+			<groupId>org.mcuosmipcuter.orcc.gui</groupId>
+			<artifactId>orcc-gui</artifactId>
+			<version>1.2.2-SNAPSHOT</version>
+		</dependency>
+	</dependencies>
+	
+	<profiles>
+		<profile>
+			<id>profile-linux</id>
+			<activation>
+				<os>
+					<family>unix</family>
+				</os>
+			</activation>
+			<properties>
+				<osName>linux</osName>
+				<jpackageIcon>soundvis_icon_512px.png</jpackageIcon>
+			</properties>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-assembly-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>distro-assembly</id>
+								<phase>package</phase>
+								<goals>
+									<goal>single</goal>
+								</goals>
+								<configuration>
+									<descriptors>
+										<descriptor>src/assembly/distribution-linux.xml</descriptor>
+									</descriptors>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>com.github.akman</groupId>
+						<artifactId>jpackage-maven-plugin</artifactId>
+						<executions>
+							<execution>
+								<phase>verify</phase>
+								<goals>
+									<goal>jpackage</goal>
+								</goals>
+								<configuration>
+									<!-- put your configurations here -->
+									<toolhome>${JPACKAGE_HOME}</toolhome>
+									<dest>${project.build.directory}/jpackage</dest>
+									<input>${project.build.directory}/orcc-dist-${project.version}-distribution-${osName}/orcc-dist-${project.version}</input>
+									<mainjar>orcc-gui-${project.version}.jar</mainjar>
+									<mainclass>org.mcuosmipcuter.orcc.gui.Main</mainclass>
+									<name>soundvis</name>
+									<appversion>1.2.2</appversion>
+									<copyright>GNU General Public License v3.0</copyright>
+									<licensefile>${project.build.directory}/orcc-dist-${project.version}-distribution-${osName}/orcc-dist-${project.version}/LICENSE.txt</licensefile>
+									<icon>${project.build.directory}/orcc-dist-${project.version}-distribution-${osName}/orcc-dist-${project.version}/${jpackageIcon}</icon>
+									<verbose>true</verbose>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		
+		<profile>
+			<id>profile-mac</id>
+			<activation>
+				<os>
+					<family>mac</family>
+				</os>
+			</activation>
+			<properties>
+				<osName>mac</osName>
+				<jpackageIcon>soundvis.icns</jpackageIcon>
+			</properties>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-assembly-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>distro-assembly</id>
+								<phase>package</phase>
+								<goals>
+									<goal>single</goal>
+								</goals>
+								<configuration>
+									<descriptors>
+										<descriptor>src/assembly/distribution-mac.xml</descriptor>
+									</descriptors>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>com.github.akman</groupId>
+						<artifactId>jpackage-maven-plugin</artifactId>
+						<executions>
+							<execution>
+								<phase>verify</phase>
+								<goals>
+									<goal>jpackage</goal>
+								</goals>
+								<configuration>
+									<!-- put your configurations here -->
+									<toolhome>${JPACKAGE_HOME}</toolhome>
+									<dest>${project.build.directory}/jpackage</dest>
+									<input>${project.build.directory}/orcc-dist-${project.version}-distribution-${osName}/orcc-dist-${project.version}</input>
+									<mainjar>orcc-gui-${project.version}.jar</mainjar>
+									<mainclass>org.mcuosmipcuter.orcc.gui.Main</mainclass>
+									<name>soundvis</name>
+									<appversion>1.2.2</appversion>
+									<copyright>GNU General Public License v3.0</copyright>
+									<licensefile>${project.build.directory}/orcc-dist-${project.version}-distribution-${osName}/orcc-dist-${project.version}/LICENSE.txt</licensefile>
+									<icon>${project.build.directory}/orcc-dist-${project.version}-distribution-${osName}/orcc-dist-${project.version}/${jpackageIcon}</icon>
+									<verbose>true</verbose>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
 
-  <build>
-    
-    <plugins>
-	    <plugin>
-	      <artifactId>maven-assembly-plugin</artifactId>
-	      <executions>
-	        <execution>
-	          <id>distro-assembly</id>
-	          <phase>package</phase>
-	          <goals>
-	            <goal>single</goal>
-	          </goals>
-	          <configuration>
-	            <descriptors>
-	              <descriptor>src/assembly/distribution-linux.xml</descriptor>
-	              <descriptor>src/assembly/distribution-mac.xml</descriptor>
-	              <descriptor>src/assembly/distribution-win.xml</descriptor>
-	            </descriptors>
-	          </configuration>
-	        </execution>
-	      </executions>
-	    </plugin>
+		<profile>
+			<id>profile-win</id>
+			<activation>
+				<os>
+					<family>windows</family>
+				</os>
+			</activation>
+			<properties>
+				<osName>win</osName>
+				<jpackageIcon>soundvis.ico</jpackageIcon>
+			</properties>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-assembly-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>distro-assembly</id>
+								<phase>package</phase>
+								<goals>
+									<goal>single</goal>
+								</goals>
+								<configuration>
+									<descriptors>
+										<descriptor>src/assembly/distribution-win.xml</descriptor>
+									</descriptors>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>com.github.akman</groupId>
+						<artifactId>jpackage-maven-plugin</artifactId>
+						<executions>
+							<execution>
+								<phase>verify</phase>
+								<goals>
+									<goal>jpackage</goal>
+								</goals>
+								<configuration>
+									<!-- put your configurations here -->
+									<toolhome>${JPACKAGE_HOME}</toolhome>
+									<dest>${project.build.directory}/jpackage</dest>
+									<input>${project.build.directory}/orcc-dist-${project.version}-distribution-${osName}/orcc-dist-${project.version}</input>
+									<mainjar>orcc-gui-${project.version}.jar</mainjar>
+									<mainclass>org.mcuosmipcuter.orcc.gui.Main</mainclass>
+									<name>soundvis</name>
+									<appversion>1.2.2</appversion>
+									<copyright>GNU General Public License v3.0</copyright>
+									<licensefile>${project.build.directory}/orcc-dist-${project.version}-distribution-${osName}/orcc-dist-${project.version}/LICENSE.txt</licensefile>
+									<icon>${project.build.directory}/orcc-dist-${project.version}-distribution-${osName}/orcc-dist-${project.version}/${jpackageIcon}</icon>
+									<winmenu>true</winmenu>
+									<winupgradeuuid>e16d0cd5-1aec-4056-917d-39cb1f8c6ccb</winupgradeuuid>
+									<verbose>true</verbose>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 
-      <plugin>
-        <groupId>com.github.akman</groupId>
-        <artifactId>jpackage-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <phase>verify</phase>
-            <goals>
-              <goal>jpackage</goal>
-            </goals>
-            <configuration>
-              <!-- put your configurations here -->
-              <toolhome>${JPACKAGE_HOME}</toolhome>
-              <dest>${project.build.directory}/jpackage</dest>
-             <input>${project.build.directory}/orcc-dist-${project.version}-distribution-${JPACKAGE_OS}/orcc-dist-${project.version}</input>
-             <mainjar>orcc-gui-${project.version}.jar</mainjar>
-             <mainclass>org.mcuosmipcuter.orcc.gui.Main</mainclass>
-             <name>soundvis</name>
-             <appversion>1.2.2</appversion>
-             <copyright>GNU General Public License v3.0</copyright>
-             <licensefile>${project.build.directory}/orcc-dist-${project.version}-distribution-${JPACKAGE_OS}/orcc-dist-${project.version}/LICENSE.txt</licensefile>
-             <icon>${project.build.directory}/orcc-dist-${project.version}-distribution-${JPACKAGE_OS}/orcc-dist-${project.version}/${JPACKAGE_ICON}</icon>
-             <winmenu>true</winmenu>
-             <winupgradeuuid>e16d0cd5-1aec-4056-917d-39cb1f8c6ccb</winupgradeuuid>
-            <verbose>true</verbose>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      
-    </plugins>
-    
-  </build>
+	<build>
+		<plugins>
+		</plugins>
+	</build>
 
 </project>
