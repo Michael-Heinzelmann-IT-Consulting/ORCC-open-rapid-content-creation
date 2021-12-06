@@ -21,6 +21,8 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
@@ -44,6 +46,7 @@ public class FileDialogActionListener implements ActionListener {
 	private final JFileChooser chooser = new JFileChooser();
 	private FileFilter fileFilter;
 	private String forcedExtension;
+	private Set<String> choosableExtensions = new HashSet<>();
 	private PreSelectCallBack preSelectCallBack;
 
 	/**
@@ -68,12 +71,31 @@ public class FileDialogActionListener implements ActionListener {
 		}
         int returnVal = chooser.showDialog(owner, buttonText);
         if(returnVal == JFileChooser.APPROVE_OPTION) {
-			File fileToUse = chooser.getSelectedFile();
-			String filterExtension = chooser.getFileFilter() instanceof ExtensionsFileFilter ? 
-					((ExtensionsFileFilter)chooser.getFileFilter()).getSingleExtension() : null;
-			String forcedExtensionToUse = forcedExtension != null ? forcedExtension : filterExtension;
-			if(forcedExtensionToUse != null && !fileToUse.getAbsolutePath().endsWith(forcedExtensionToUse)) {
-				fileToUse = new File(fileToUse.getAbsolutePath() + forcedExtensionToUse);
+			File fileSelected = chooser.getSelectedFile();
+
+			boolean hasChoosableExtension = false;
+			for(String ext : choosableExtensions) {
+				if(fileSelected.getAbsolutePath().endsWith(ext)) {
+					hasChoosableExtension = true;
+				}
+			}
+			File fileToUse;
+			if(hasChoosableExtension) {
+				fileToUse = fileSelected;
+			}
+			else {
+				String filterExtension = chooser.getFileFilter() instanceof ExtensionsFileFilter ? 
+						((ExtensionsFileFilter)chooser.getFileFilter()).getSingleExtension() : null;
+				if(filterExtension != null) {
+					fileToUse = new File(fileSelected.getAbsolutePath() + filterExtension);
+				}
+				else if(forcedExtension != null) {
+					fileToUse = new File(fileSelected.getAbsolutePath() + forcedExtension);
+				}
+				else {
+					fileToUse = fileSelected; // no extension
+				}
+
 			}
         	callBack.fileSelected(fileToUse);
         }
@@ -94,8 +116,12 @@ public class FileDialogActionListener implements ActionListener {
 	public void setPreSelectCallBack(PreSelectCallBack preSelectCallBack) {
 		this.preSelectCallBack = preSelectCallBack;
 	}
-	public void addChoosableFilter(FileFilter fileFilter) {
+	public void addChoosableFilter(ExtensionsFileFilter fileFilter) {
 		chooser.addChoosableFileFilter(fileFilter);
+		String ext = fileFilter.getSingleExtension();
+		if(ext != null) {
+			choosableExtensions.add(ext);
+		}
 	}
 
 
