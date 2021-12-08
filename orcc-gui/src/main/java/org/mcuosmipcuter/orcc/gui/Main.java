@@ -796,7 +796,7 @@ public class Main {
 	private static boolean allowSessionOpenRoutine() {
 		SessionToken st = Context.getSessionToken();
 		if (st.isDefault() || st.isChanged()) {
-			String message = "Do you want to continue ?";
+			String message = st.getDisplayPath() + "\nhas unsaved changes, do you want to continue ?";
 			int res = JOptionPane.showOptionDialog(null, message, "session not saved!", JOptionPane.YES_NO_OPTION,
 					JOptionPane.QUESTION_MESSAGE, null, new String[] { "yes", "no" }, "no");
 			if (res == JOptionPane.NO_OPTION) {
