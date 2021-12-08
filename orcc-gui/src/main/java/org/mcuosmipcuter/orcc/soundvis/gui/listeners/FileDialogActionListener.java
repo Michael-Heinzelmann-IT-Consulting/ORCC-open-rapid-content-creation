@@ -101,8 +101,12 @@ public class FileDialogActionListener implements ActionListener {
         }
 	}
 
-	public void setFileFilter(FileFilter fileFilter) {
+	public void setFileFilter(ExtensionsFileFilter fileFilter) {
 		this.fileFilter = fileFilter;
+		String ext = fileFilter.getSingleExtension();
+		if(ext != null) {
+			choosableExtensions.add(ext);
+		}
 	}
 
 	public String getForcedExtension() {
