@@ -85,7 +85,7 @@ public class FileDialogActionListener implements ActionListener {
 			}
 			else {
 				String filterExtension = chooser.getFileFilter() instanceof ExtensionsFileFilter ? 
-						((ExtensionsFileFilter)chooser.getFileFilter()).getSingleExtension() : null;
+						((ExtensionsFileFilter)chooser.getFileFilter()).getExtension() : null;
 				if(filterExtension != null) {
 					fileToUse = new File(fileSelected.getAbsolutePath() + filterExtension);
 				}
@@ -103,7 +103,7 @@ public class FileDialogActionListener implements ActionListener {
 
 	public void setFileFilter(ExtensionsFileFilter fileFilter) {
 		this.fileFilter = fileFilter;
-		String ext = fileFilter.getSingleExtension();
+		String ext = fileFilter.getExtension();
 		if(ext != null) {
 			choosableExtensions.add(ext);
 		}
@@ -120,9 +120,13 @@ public class FileDialogActionListener implements ActionListener {
 	public void setPreSelectCallBack(PreSelectCallBack preSelectCallBack) {
 		this.preSelectCallBack = preSelectCallBack;
 	}
+	public void addInitialChoosableFilter(ExtensionsFileFilter fileFilter) {
+		addChoosableFilter(fileFilter);
+		chooser.setFileFilter(fileFilter);
+	}
 	public void addChoosableFilter(ExtensionsFileFilter fileFilter) {
 		chooser.addChoosableFileFilter(fileFilter);
-		String ext = fileFilter.getSingleExtension();
+		String ext = fileFilter.getExtension();
 		if(ext != null) {
 			choosableExtensions.add(ext);
 		}

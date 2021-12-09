@@ -454,13 +454,14 @@ public class Main {
 		};
 		FileDialogActionListener exportFrameActionListener = new FileDialogActionListener(frame,
 				exportFrameImageCallback, "set as export image file");
-		exportFrameActionListener.addChoosableFilter(new ExtensionsFileFilter(".jpg"));
+		exportFrameActionListener.addInitialChoosableFilter(new ExtensionsFileFilter(".jpg"));
 		exportFrameActionListener.addChoosableFilter(new ExtensionsFileFilter(".png"));
 		exportFrameActionListener.addChoosableFilter(new ExtensionsFileFilter(".gif"));
+		exportFrameActionListener.setForcedExtension(".jpg");
 		exportFrameActionListener.setPreSelectCallBack(new PreSelectCallBack() {
 			@Override
 			public File preSelected() {
-				String preselected = "frame" + Context.getSongPositionPointer() + ".jpg";
+				String preselected = "frame" + Context.getSongPositionPointer();
 				return new File(preselected);
 			}
 		});
@@ -796,7 +797,7 @@ public class Main {
 	private static boolean allowSessionOpenRoutine() {
 		SessionToken st = Context.getSessionToken();
 		if (st.isDefault() || st.isChanged()) {
-			String message = st.getDisplayPath() + "\nhas unsaved changes, do you want to continue ?";
+			String message = (st.isDefault() ? "session is not saved, " : st .getDisplayPath() + "\nhas unsaved changes,") + " do you want to continue ?";
 			int res = JOptionPane.showOptionDialog(null, message, "session not saved!", JOptionPane.YES_NO_OPTION,
 					JOptionPane.QUESTION_MESSAGE, null, new String[] { "yes", "no" }, "no");
 			if (res == JOptionPane.NO_OPTION) {
