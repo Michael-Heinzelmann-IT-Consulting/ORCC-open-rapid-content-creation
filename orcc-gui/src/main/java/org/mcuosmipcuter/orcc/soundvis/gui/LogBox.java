@@ -107,8 +107,8 @@ public class LogBox implements Function<String, Void>{
 		return null;
 	}
 
-		public int getSize() {
-			return ((Number)sizeSpinner.getValue()).intValue();
-		}
+	public int getSize() {
+		return ((Number)sizeSpinner.getValue()).intValue();
+	}
 
 }
