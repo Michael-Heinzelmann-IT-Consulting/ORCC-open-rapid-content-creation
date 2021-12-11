@@ -1,86 +1,187 @@
-ORCC soundvis GUI help
+ORCC soundvis help
 
-This are the main steps to create a sound video:
+This are the main menu items:
 
-1.) open audio
+Main Menu: File
+
+ File -> open audio
   To create a sound visual animation you need first load an audio file, 
-
-  File -> open audio
-
-  select a file, currently only uncompressed formats .wav and .aiff are supported
-  If you try to open a file with an unsupported audio format you get an error box.
   
-  You can play the audio by pressing the play > button, audio level
+ File -> open audio -> from file
+  select a file, uncompressed formats .wav and .aiff and MIDI are supported
+  via the standard Java audio. The packaged humble video library enables also 
+  compressed formats like mp3. Humble is able to open audio and video containers,
+  so it is possible to extract the audio from a video file if the formats are
+  supported. Note on MIDI: since this is music meta information the actual sound
+  depends on your systems MIDI synthesizer.
+  If you try to open a file with an unsupported audio format you get an error.
+  
+ File -> open audio -> [name of built in audio]
+  opens a built in audio used for demo and examples
+  
+ After loading you can play the audio by pressing the play > button, the volume
+ level can be adjusted with the volume slider (not supported on some formats)
+  
+ File -> exit
+  exits soundvis, displays a warning if there are unsaved changes.
 
-2.) In the 'Video' section change settings in the menu:
+Main Menu: Session
+
+  Session -> open session
+   opens a previously saved session from a file (.xml extension)
+   
+  Session -> save session as
+   opens a dialog to save the session under a different name and/or location  
+  
+  Session -> open session
+   saves the current session if has been saved previously, otherwise it foewards 
+   to 'save session as' 
+   
+  Session -> new
+   creates a basic session, if the current session has unsaved changes a warning
+   is displayed.
+   
+  Session -> demos
+   opens built demo sessions to get a quick start
+   
+  Session -> show changes
+   opens a change log with all changes since the last save, can be used for
+   selective manual undos
+   
+Main Menu: Export
+   
+  Export -> start 
+   A file dialog will appear where you can select the directory and the name
+   of the exported file. Currently only .mov and .mp4 formats are supported as
+   video containers. The properties of the video and audio track are those
+   configured in 2.)
+   
+  Export -> stop
+   stops a running export, the already exported video will be incomplete but 
+   not corrupted.
+  
+  Export -> frame as image
+   saves the current frame as still image
+   
+Main Menu: Configuration
 
   Configuration -> video size
+   sets the output size (pixel)
+   
   Configuration -> frame rate
+   sets the frame rate of the video, depending on the audio input sampling rate
+   some frame rates do not divide evenly and are disabled in the setting
+   
+  It is possible to change video settings on a video work in progress, but some 
+  canvas might appear different on different video sizes and frame rates, so 
+  settings need to be adapted manually when changing these properties, 
+  therefore it is best to decide early on the formats.
   
-  It is possible to change video settings later, but some canvas might appear different on
-  different video sizes and frame settings need to be adapted manually when changing
-  the frame rate, therefore it is best to decide early on the format.
+  Configuration -> audio output 
+   The audio of the video can be compressed (mp3) or uncompressed
+   
+   possible combinations:
+   audio input ->  setting  ->  resulting video-audio
+  
+   LINEAR -> LINEAR -> pcm (pcm_s16be)
+   LINEAR -> COMPRESSED -> mp3 (libmp3lame)
+   COMPRESSED -> COMPRESSED -> taken from input
+   COMPRESSED -> LINEAR -> pcm (pcm_s16be)
+   
+  Configuration -> preferences (startup)
+   
+   look and feel:
+    Allows to choose from the available look and feels
+    
+   window maximized on startup:
+    if checked soundvis starts maximized, otherwise the last user defined size
+    is used
+    
+   both settings require a restart of soundvis to become effective
+  
+Main Menu: View
 
-3.) add canvas layers
- 
-  In the Layers section you select a canvas from the menu:
- 
-  canvas -> add canvas -> <canvas name>
+  View -> video zoom
+   sets the zoom of the realtime monitoring video, does not affect video output.
+
+  View -> wave zoom
+   sets the zoom of the audio wave if 'zoom wave' is selected
+   
+Main Menu: Info
+
+  Info -> system environment
+   shows system settings
+   
+  Info -> show log
+   shows soundvis log file, the buffer size can be increased or reduced, a
+   size of 0 switches logging off.
+   
+Main Menu: Help
+
+  Help -> basics
+   shows this help text
+   
+  Help -> about
+   shows information about soundvis
   
-  Make sure the playback is stopped (showing state READY next to the play button)
+
+Layers Menu: canvas
+
+ to add a canvas to the session select a canvas from the menu:
+ 
+ canvas -> add canvas -> <canvas name>
   
-4.) adjust showing length of canvas
+  Canvas can only be added or removed if the playback is stopped 
+  (showing state READY next to the play button)
+  
+
+Basic configuration on each canvas layer:
+
+ Adjust showing length of canvas
 
   Per default the added canvas is showing from start of the audio until the end
   To adjust the showing duration you can either
   
-    - type the frame number in the 'from' or 'to' box
+    type the frame number in the 'from' or 'to' box
     
     or
     
-    - on the 'Audio Timeline' audio wave form adjust the yellow bar to the right position
-      then double click on 'from' or 'to' box of the canvas and the frame number
-      will automatically be copied from the wave selection
+    on the 'Audio Timeline' audio wave form adjust the yellow bar to the right 
+    position then double click on 'from' or 'to' box of the canvas and the 
+    frame number will automatically be copied from the wave selection.
+    
+    The fit/zoom button will zoom in to the audio so adjustments can be made
+    precisely to the wave form
+    The resolution of the zoom can be set via the menu View -> wave zoom
       
-      The fit/zoom button will zoom in to the audio so adjustments can be made
-      precisely to the wave form
-      The resolution of the zoom can be set via the menu
-      wave -> set -> zoom
-      The 'frames prerun' box will allow to set the number of frames the playback
-      should start before the selection, this will help to find the right frame.
-      
-  The duration and layer position of the canvas can be checked by clicking on the canvas 
-  name, frame duration and layer position is highlighted in the audio wave form display
+  The duration and layer position of the canvas can be checked by clicking on 
+  the canvas name, frame duration and layer position is highlighted in the 
+  audio wave form display.
   
- 5.) Change layer position
+ Change layer position
   
-    Depending on the type of canvas it draws more or less opaque, some canvas are
-    for background use others for foreground, to change the layer position:
+    Depending on the type of canvas it draws more or less opaque, some canvas 
+    are for background use others for foreground, to change the layer position:
     
     drag the canvas row up or down (playback must be READY or PAUSED)
  
- 6.) Change canvas settings
+ Change canvas settings
  
-   Click on the ... button of the canvas to bring up the property editor
+   Click on the + button of the canvas to bring up the property editor
    The editor shows all individual settings for that canvas
-   This is possible in all playback states, some canvas will show the desired
-   changes only in PLAY state while the audio is playing.
+   This is possible in all playback states, on some canvas the desired
+   changes will be obvious only in PLAY state while the audio is playing.
    
- 7.) Disabling or deleting a canvas
+   opening the canvas will also show canvas time effects in the time line if
+   the canvas has any, each effect group has different colors.
+   this can be explored using the demo sessions.
+ 
+   
+ Disabling or deleting a canvas
  
    To disable a canvas click the checkbox 'on' or 'off'
    The canvas will keep all settings but will not be part of the animation
   
-   To delete a canvas click on the X on the right, all settings will be lost
+   To delete a canvas click on the X on the right, all settings of the canvas
+   will be lost.
   
- 8.) Exporting video
- 
-   If you have downloaded and installed the external libraries the export menu
-   is enabled:
-   
-   Export -> start
-   
-   A file dialog will appear where you can select the directory and the name
-   of the exported file. Currently only .mov formats are tested, depending on
-   the external libraries capabilities and your computers system other formats
-   maybe possible.
