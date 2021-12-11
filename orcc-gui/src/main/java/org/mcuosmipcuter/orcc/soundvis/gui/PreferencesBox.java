@@ -48,18 +48,6 @@ public class PreferencesBox {
 	}
 	public static void showPreferncesDialog(Component parent) {
 		Properties config = FileConfiguration.getProperties();
-		JPanel panelAskApdir = new JPanel();
-		JCheckBox ask = new JCheckBox();
-		ask.setSelected("true".equals(config.get(FileConfiguration.SOUNDVIS_PROPERTY_ASK_APP_DIR_ON_STARTUP)));
-		ask.addItemListener(new ItemListener() {		
-			@Override
-			public void itemStateChanged(ItemEvent e)  {
-				config.setProperty(FileConfiguration.SOUNDVIS_PROPERTY_ASK_APP_DIR_ON_STARTUP, String.valueOf(ask.isSelected()));
-				FileConfiguration.storeProperties(config);
-			}
-		});
-		panelAskApdir.add(new JLabel("ask for appdir on startup: "));
-		panelAskApdir.add(ask);
 		
 		JPanel panelLookAndFeel = new JPanel();
 		panelLookAndFeel.add(new JLabel("look and feel: "));
@@ -93,7 +81,7 @@ public class PreferencesBox {
 		panelSize.add(new JLabel("window maximized on startup: "));
 		panelSize.add(maximized);
 		
-		Object[] array = {panelAskApdir, panelLookAndFeel, panelSize}; 
+		Object[] array = {panelLookAndFeel, panelSize}; 
 		JOptionPane jp = new JOptionPane(array, JOptionPane.PLAIN_MESSAGE);		
 		jp.setOptionType(JOptionPane.DEFAULT_OPTION);
 		JDialog jd = jp.createDialog(parent, "preferences");

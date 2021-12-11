@@ -24,7 +24,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Optional;
 import java.util.Properties;
-import java.util.function.Supplier;
 
 import org.mcuosmipcuter.orcc.util.IOUtil;
 
@@ -34,8 +33,6 @@ import org.mcuosmipcuter.orcc.util.IOUtil;
  */
 public class FileConfiguration {
 
-	public static final String SOUNDVIS_PROPERTY_APP_DIR = "appDir";
-	public static final String SOUNDVIS_PROPERTY_ASK_APP_DIR_ON_STARTUP = "askAppDirOnStartup";
 	public static final String SOUNDVIS_PROPERTY_LOOK_AND_FEEL = "lookAndFeel";
 	public static final String SOUNDVIS_PROPERTY_APP_SIZE_MAXIMIZED = "appSizeMaximized";
 	public static final String SOUNDVIS_PROPERTY_APP_SIZE_USER_DEFINED = "appSizeUserDefined";
@@ -48,13 +45,11 @@ public class FileConfiguration {
 	// system settings
 	private static final String userHomeDir = System.getProperty("user.home");
 	private static final String sep = System.getProperty("file.separator");
-	private static final String  tempDir = System.getProperty("java.io.tmpdir");
 
 	// variable names
 	private static String targetConfDir;
 	private static String soundvisConfFile;
 	private static String bootDir;
-	private static String appDir;
 
 	/**
 	 * 
@@ -77,48 +72,6 @@ public class FileConfiguration {
 			targetConfDirFile.mkdirs();
 		}
 
-		Properties cp = getProperties();
-
-		if (!cp.isEmpty()) {
-			boolean ask = "true".equals(cp.getProperty(SOUNDVIS_PROPERTY_ASK_APP_DIR_ON_STARTUP));
-			if (!ask) {
-				appDir = cp.getProperty(SOUNDVIS_PROPERTY_APP_DIR);
-			}
-		}
-
-	}
-
-	public static void ensureAppDir(Supplier<File> appDirUserSupplier) {
-
-		final boolean usrConfigWritable = new File(targetConfDir).canWrite();
-		if (appDir == null && usrConfigWritable) {
-			// write initial
-			File ad = appDirUserSupplier.get();
-			if(ad != null) {
-				appDir = ad.getAbsolutePath();
-				File soundvisConfDir = new File(targetConfDir);
-				boolean dirCreated = soundvisConfDir.mkdir();
-				IOUtil.log("config dir created: " + dirCreated);
-				
-				Properties cp = getProperties();
-				if(cp.isEmpty()){
-					IOUtil.log("creating new config file");
-					cp.put(SOUNDVIS_PROPERTY_ASK_APP_DIR_ON_STARTUP, "false");
-				}
-				cp.put(SOUNDVIS_PROPERTY_APP_DIR, appDir);
-				storeProperties(cp);
-			}
-		}
-		if (appDir == null) { // conf dir not writable or no user selection
-			final boolean bootDirWriteable = bootDir != null && new File(bootDir).canWrite();
-			if(bootDirWriteable) {
-				// 'classic' conf
-				appDir = bootDir;
-			}
-			else {
-				appDir = tempDir;
-			}
-		}
 	}
 
 	public static Properties getProperties() {
@@ -153,9 +106,6 @@ public class FileConfiguration {
 		return bootDir;
 	}
 
-	public static String getAppDir() {
-		return appDir;
-	}
 	public static String getSep() {
 		return sep;
 	}

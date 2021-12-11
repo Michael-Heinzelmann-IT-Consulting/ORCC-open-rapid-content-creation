@@ -108,8 +108,6 @@ public class AboutBox {
 			stringBuilder.append("\n");
 			stringBuilder.append("targetConfDir=" + FileConfiguration.getTargetConfDir());
 			stringBuilder.append("\n");
-			stringBuilder.append("appDir=" + FileConfiguration.getAppDir());
-			stringBuilder.append("\n");
 			stringBuilder.append("\n");
 			Context.memoryReport(stringBuilder);
 			stringBuilder.append("\n");

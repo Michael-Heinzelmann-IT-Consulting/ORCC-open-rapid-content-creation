@@ -35,7 +35,6 @@ import java.util.function.Supplier;
 import javax.sound.sampled.AudioFormat;
 import javax.swing.ImageIcon;
 import javax.swing.JDesktopPane;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.JMenu;
@@ -47,7 +46,6 @@ import javax.swing.Popup;
 import javax.swing.PopupFactory;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.filechooser.FileFilter;
 
 import org.mcuosmipcuter.orcc.gui.menu.ConfigurationMenu;
 import org.mcuosmipcuter.orcc.gui.menu.ExportMenu;
@@ -170,14 +168,14 @@ public class Main {
 		final ExportMenu exportMenu = new ExportMenu(frame, graphicPanel);
 		mb.add(exportMenu);
 		
-		final InfoMenu infoMenu = new InfoMenu(frame, logBox);
-		mb.add(infoMenu);
-		
 		final ConfigurationMenu configMenu = new ConfigurationMenu(frame);
 		mb.add(configMenu);
 		
 		final ViewMenu viewMenu = new ViewMenu(frame, graphicPanel, playBackPanel);
 		mb.add(viewMenu);
+		
+		final InfoMenu infoMenu = new InfoMenu(frame, logBox);
+		mb.add(infoMenu);
 		
 		final HelpMenu helpMenu = new HelpMenu(frame);
 		mb.add(helpMenu);
@@ -311,32 +309,6 @@ public class Main {
 
 		org.mcuosmipcuter.orcc.gui.Configuration.stage2(args);
 
-		FileConfiguration.ensureAppDir(new Supplier<File>() {
-
-			@Override
-			public File get() {
-				JFileChooser chooser = new JFileChooser();
-				chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-				chooser.setDialogType(JFileChooser.CUSTOM_DIALOG);
-				chooser.setFileFilter(new FileFilter() {
-
-					@Override
-					public String getDescription() {
-						return "directories";
-					}
-
-					@Override
-					public boolean accept(File f) {
-						return f != null && f.isDirectory();
-					}
-				});
-				int res = chooser.showDialog(frame, "Appdir for soundvis");
-				if (res == JFileChooser.APPROVE_OPTION) {
-					return chooser.getSelectedFile();
-				}
-				return null;
-			}
-		});
 
 		LoadMessage startUpLoadMessage = new LoadMessage(64, 32);
 		Context.addListener(startUpLoadMessage);
