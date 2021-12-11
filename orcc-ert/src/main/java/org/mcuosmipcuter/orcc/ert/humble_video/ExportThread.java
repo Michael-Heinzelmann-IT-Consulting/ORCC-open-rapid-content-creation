@@ -103,12 +103,12 @@ public class ExportThread extends Thread implements PlayPauseStop {
 			muxer = Muxer.make(Context.getExportFileName(), null, formatName);
 			final Muxer muxerPointer = muxer;
 			
-			System.err.println("my MuxerFormat " + muxer.getFormat());
+			IOUtil.log("using MuxerFormat " + muxer.getFormat());
 			
 			final MuxerFormat videoFormat = muxer.getFormat();
 			
 			//// -------------------------------------------------------------------------------
-			//Decoder audioDecoder = AudiImportHelper.getDecoder(audioInput.getName());
+
 			  Decoder audioDecoder = null;
 			  
 			  // if output should be compressed and input is already compressed do decode instead of encode
@@ -120,7 +120,6 @@ public class ExportThread extends Thread implements PlayPauseStop {
 			     */
 			    demuxer = Demuxer.make();
 			    
-
 			    /*
 			     * Open the demuxer with the filename passed on.
 			     */
@@ -158,26 +157,26 @@ public class ExportThread extends Thread implements PlayPauseStop {
 			  }
 			final AudioExportHelper audioExportHelper;
 			if(audioDecoder == null) {
-				String audioCodecName = compressAudio ? "libmp3lame" : "pcm_s16be";///////// "libmp3lame"; ////"pcm_s16be";//
-				Type sampleFormat = compressAudio ? Type.SAMPLE_FMT_S16P : Type.SAMPLE_FMT_S16;//Type.SAMPLE_FMT_S16P for mp3
+				String audioCodecName = compressAudio ? "libmp3lame" : "pcm_s16be";
+				Type sampleFormat = compressAudio ? Type.SAMPLE_FMT_S16P : Type.SAMPLE_FMT_S16; //Type.SAMPLE_FMT_S16P for mp3
 	
-				for (Codec codec : Codec.getInstalledCodecs()) {
-					if (codec.getSupportedAudioSampleRates().size() >= 0) {
-						try {
+//				for (Codec codec : Codec.getInstalledCodecs()) {
+//					if (codec.getSupportedAudioSampleRates().size() >= 0) {
+//						try {
 	//						 System.err.println(codec.getName() + ":" + codec.getLongName() + ":" +
 	//						 codec.getIDAsInt() + ":" + codec.getSupportedAudioSampleRates()+ " - " +
 	//						 codec.getSupportedAudioFormats());
-						} catch (Throwable t) {
-							System.err.println(t.getMessage());
-						}
-					}
-				}
+//						} catch (Throwable t) {
+//							System.err.println(t.getMessage());
+//						}
+//					}
+//				}
 	
 				Codec audioCodec = Codec.findEncodingCodecByName(audioCodecName);
-				System.err.println("SupportedAudioSampleRates " + audioCodec.getSupportedAudioSampleRates());
-				System.err.println("SupportedVideoFrameRates " + audioCodec.getSupportedVideoFrameRates());
-				System.err.println("getSupportedProfile(0) " + audioCodec.getSupportedProfile(0));
-				System.err.println("SupportedAudioFormats " + audioCodec.getSupportedAudioFormats());
+				IOUtil.log("SupportedAudioSampleRates " + audioCodec.getSupportedAudioSampleRates());
+				IOUtil.log("SupportedVideoFrameRates " + audioCodec.getSupportedVideoFrameRates());
+				IOUtil.log("getSupportedProfile(0) " + audioCodec.getSupportedProfile(0));
+				IOUtil.log("SupportedAudioFormats " + audioCodec.getSupportedAudioFormats());
 				final Encoder audioEncoder = Encoder.make(audioCodec);
 				audioEncoder.setSampleFormat(sampleFormat);
 				if (videoFormat.getFlag(MuxerFormat.Flag.GLOBAL_HEADER)) {
@@ -221,7 +220,7 @@ public class ExportThread extends Thread implements PlayPauseStop {
 			/** Add this stream to the muxer. */
 			muxer.addNewStream(videoEncoder);
 
-			System.err.println("muxer.getNumStreams() " + muxer.getNumStreams());
+			IOUtil.log("muxer.getNumStreams() " + muxer.getNumStreams());
 			/** And open the muxer for business. */
 			muxer.open(null, null);
 
@@ -302,12 +301,6 @@ public class ExportThread extends Thread implements PlayPauseStop {
 				audioExportHelper.flush();
 			}
 			
-//			MediaPacket audioPacket = MediaPacket.make();
-//			do {
-//				audioEncoder.encode(audioPacket, null);
-//				if (audioPacket.isComplete())
-//					muxer.write(audioPacket, false);
-//			} while (audioPacket.isComplete());
 
 		} catch (Throwable e) {
 			e.printStackTrace();
