@@ -33,6 +33,7 @@ public class CanvasClassMenu extends JMenu {
 
 	private static final long serialVersionUID = 1L;
 
+	public final static String CANVAS_PACKAGE = "org.mcuosmipcuter.orcc.soundvis.defaultcanvas";
 
 	/**
 	 * Same constructor as for standard menus
@@ -42,7 +43,7 @@ public class CanvasClassMenu extends JMenu {
 		super(title);
 
 		for(final String className : Context.getCanvasClassNames()) {
-			final JMenuItem item = new JMenuItem(className);
+			final JMenuItem item = new JMenuItem(className.substring(CANVAS_PACKAGE.length() + 1));
 			item.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
 					try {
