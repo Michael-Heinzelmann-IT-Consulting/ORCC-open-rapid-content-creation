@@ -60,7 +60,7 @@ public abstract class Context {
 	 */
 	public enum PropertyName {
 		AudioInputInfo, VideoDimension, SoundCanvasAdded, SoundCanvasRemoved, SoundCanvasList, SoundCanvasListCleared,
-		ExportFileName, CanvasClassNames, AppState, SongPositionPointer, VideoFrameRate, VolumeControl, FullPreRun,
+		ExportFileName, AppState, SongPositionPointer, VideoFrameRate, VolumeControl, FullPreRun,
 		SoundCanvasProperty, BeforeSoundCanvasProperty, SoundCanvasPropertyCancelled, SessionChanged, NewSession, AudioOutputInfo;
 	}
 	/**
@@ -434,12 +434,11 @@ public abstract class Context {
 		return canvasClassNames;
 	}
 	/**
-	 * Adds a canvas class name to the internal set of names and notifies listeners
+	 * Adds a canvas class name to the internal set of names
 	 * @param canvasClassName
 	 */
 	public static synchronized void addCanvasClassName(String canvasClassName) {
 		canvasClassNames.add(canvasClassName);
-		notifyListeners(PropertyName.CanvasClassNames);
 	}
 	/**
 	 * Gets the current {@link SoundCanvas} instance

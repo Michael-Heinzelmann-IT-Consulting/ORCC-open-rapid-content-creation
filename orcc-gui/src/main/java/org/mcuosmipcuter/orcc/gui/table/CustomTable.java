@@ -408,7 +408,7 @@ public class CustomTable extends JPanel implements Context.Listener{
 		
 		SpinnerNumberModel modelTransparency = new SpinnerNumberModel(100, 0, 100, 1);
 		final JSpinner transparency = new JSpinner(modelTransparency);
-		transparency.setToolTipText("repaint transparency");
+		transparency.setToolTipText("paint transparency");
 		transparency.setValue(soundCanvasWrapper.getTransparency());
 		transparency.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent arg0) {
@@ -461,6 +461,7 @@ public class CustomTable extends JPanel implements Context.Listener{
 		final JLabel remove = new JLabel(" x ");
 		remove.setOpaque(true);
 		remove.setBackground(new Color(240, 225, 225));
+		remove.setToolTipText("remove layer");
 		row.add(timeline);
 		
 		row.add(remove, BorderLayout.EAST);

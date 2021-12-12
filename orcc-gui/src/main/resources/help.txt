@@ -34,7 +34,7 @@ Main Menu: Session
    opens a dialog to save the session under a different name and/or location  
   
   Session -> open session
-   saves the current session if has been saved previously, otherwise it foewards 
+   saves the current session if has been saved previously, otherwise it forwards 
    to 'save session as' 
    
   Session -> new
@@ -137,51 +137,56 @@ Layers Menu: canvas
 
 Basic configuration on each canvas layer:
 
- Adjust showing length of canvas
+ Canvas common tool bar:
+ 
+ Change layer order using the move handle
+  Depending on the type of canvas it draws more or less opaque, some canvas 
+  are for background use others for foreground, to change the layer position:
+  drag the canvas row up or down (playback must be READY or PAUSED)
+    
+ View canvas preview in the preview icon
+  shows a simplified preview of the canvas, clicking the icon shows the canvas
+  highlighted in the timeline panel and shows its duration and layer position
+  
+ Change canvas settings using the expand/collapse button
+ 
+  Click on the + button of the canvas to bring up the property editor
+  The editor shows all individual settings for that canvas
+  This is possible in all playback states, on some canvas the desired
+  changes will be obvious only in PLAY state while the audio is playing.
+   
+  opening the canvas will also show canvas time effects in the time line if
+  the canvas has any, each effect group has different colors.
+  this can be explored using the demo sessions.
+
+ Enabling / disabling a canvas using the on/off checkbox
+  To disable a canvas click the checkbox 'on' or 'off'
+  The canvas will keep all settings but will not be part of the animation
+      
+
+ Adjust showing length of canvas using frame from and frame to boxes
 
   Per default the added canvas is showing from start of the audio until the end
   To adjust the showing duration you can either
   
-    type the frame number in the 'from' or 'to' box
-    
-    or
-    
-    on the 'Audio Timeline' audio wave form adjust the yellow bar to the right 
-    position then double click on 'from' or 'to' box of the canvas and the 
-    frame number will automatically be copied from the wave selection.
-    
-    The fit/zoom button will zoom in to the audio so adjustments can be made
-    precisely to the wave form
-    The resolution of the zoom can be set via the menu View -> wave zoom
-      
-  The duration and layer position of the canvas can be checked by clicking on 
-  the canvas name, frame duration and layer position is highlighted in the 
-  audio wave form display.
-  
- Change layer position
-  
-    Depending on the type of canvas it draws more or less opaque, some canvas 
-    are for background use others for foreground, to change the layer position:
-    
-    drag the canvas row up or down (playback must be READY or PAUSED)
- 
- Change canvas settings
- 
-   Click on the + button of the canvas to bring up the property editor
-   The editor shows all individual settings for that canvas
-   This is possible in all playback states, on some canvas the desired
-   changes will be obvious only in PLAY state while the audio is playing.
+  type the frame number in the 'from' or 'to' box
+  or  
+  on the 'Audio Timeline' audio wave form adjust the yellow bar to the right 
+  position then double click on 'from' or 'to' box of the canvas and the 
+  frame number will automatically be copied from the wave selection.
    
-   opening the canvas will also show canvas time effects in the time line if
-   the canvas has any, each effect group has different colors.
-   this can be explored using the demo sessions.
- 
-   
- Disabling or deleting a canvas
- 
-   To disable a canvas click the checkbox 'on' or 'off'
-   The canvas will keep all settings but will not be part of the animation
+  The fit/zoom button will zoom in to the audio so adjustments can be made
+  precisely to the wave form
+  The resolution of the zoom can be set via the menu View -> wave zoom
   
-   To delete a canvas click on the X on the right, all settings of the canvas
-   will be lost.
+ Adjust opaqueness using paint transparency
+  allows to adjust opaqueness from 0-100 percent
   
+ Adjust pixel painting standard or XOR
+  switches from standard painting to XOR mode where the pixel depends on the
+  color from the layer below.
+  XOR works only with paint transparency 100% otherwise this setting is ignored!
+ 
+ Remove canvas with the remove handle
+  To delete a canvas click on the X on the right, all settings of the canvas
+  will be lost.
