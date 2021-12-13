@@ -69,7 +69,7 @@ public class AboutBox {
 			}
 			JTextArea ta = new JTextArea();
 			ta.setEditable(false);
-			Font font = new Font("dialog", Font.PLAIN, 16);
+			Font font = new Font(Font.MONOSPACED, Font.PLAIN, 16);
 			ta.setFont(font);
 			ta.setRows(MAX_ROWS_WO_SCROLLING);
 			
@@ -135,6 +135,8 @@ public class AboutBox {
 				stringBuilder.append("\n");
 			}
 			JTextArea ta = new JTextArea(MAX_ROWS_WO_SCROLLING, MAX_COLS_WO_SCROLLING);
+			Font font = new Font(Font.MONOSPACED, Font.PLAIN, 12);
+			ta.setFont(font);
 			ta.setEditable(false);
 			JScrollPane sp = new JScrollPane(ta);
 			ta.setText(stringBuilder.toString());

@@ -17,15 +17,16 @@
 */
 package org.mcuosmipcuter.orcc.soundvis.gui.widgets;
 
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 
-import org.mcuosmipcuter.orcc.soundvis.PlayPauseStopFactory;
-import org.mcuosmipcuter.orcc.soundvis.PlayPauseStopHolder;
 import org.mcuosmipcuter.orcc.soundvis.PlayPauseStop;
 import org.mcuosmipcuter.orcc.soundvis.PlayPauseStop.Status;
+import org.mcuosmipcuter.orcc.soundvis.PlayPauseStopFactory;
+import org.mcuosmipcuter.orcc.soundvis.PlayPauseStopHolder;
 
 
 /**
@@ -37,6 +38,8 @@ public class PlayPauseButton extends JButton implements PlayPauseStopHolder{
 	private static final long serialVersionUID = 1L;
 	private PlayPauseStop playPauseStop;
 	private final PlayPauseStopFactory ppsFactory;
+	private final Font big = new Font(Font.MONOSPACED, Font.BOLD, 20);
+	private final Font small = new Font(Font.MONOSPACED, Font.BOLD, 12);
 	
 	
 	/**
@@ -73,6 +76,8 @@ public class PlayPauseButton extends JButton implements PlayPauseStopHolder{
 			}
 		});
 		
+		setFont(big);
+		
 		changeVisuals(false);
 	}
 	
@@ -83,10 +88,14 @@ public class PlayPauseButton extends JButton implements PlayPauseStopHolder{
 	protected void changeVisuals(boolean nowPlaying) {
 		// TODO icon
 		if(nowPlaying) {
+			setFont(small);
 			setText("||");
+			setToolTipText("pause");
 		}
 		else {
+			setFont(big);
 			setText(">");
+			setToolTipText("play");
 		}
 	}
 

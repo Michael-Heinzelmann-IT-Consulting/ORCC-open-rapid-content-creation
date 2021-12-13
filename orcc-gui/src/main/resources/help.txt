@@ -1,5 +1,23 @@
 ORCC soundvis help
 
+The soundvis GUI is devided into these main areas:
+
+ ----------------------------------------
+| main menu                              |
+|----------------------------------------|
+|               time line                |
+|                                        |
+|----------------------------------------|
+|    layers    |                         |
+|              |                         |
+|              |                         |
+|              |         video           |
+|              |                         |
+|              |                         |
+|              |                         |
+ ----------------------------------------
+
+
 This are the main menu items:
 
 Main Menu: File

@@ -20,6 +20,7 @@ package org.mcuosmipcuter.orcc.soundvis.gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -120,6 +121,8 @@ public class PlayBackPanel extends JPanel implements Mixin{
 		timeLabel.reset();
 		stateLabel.setText(String.valueOf(Context.getAppState()));
 		final JButton stop = new JButton("[]");
+		stop.setToolTipText("stop");
+		stop.setFont(new Font(Font.MONOSPACED, Font.BOLD, 12));
 
 
 		playPause.setEnabled(false);
