@@ -21,6 +21,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
+import org.mcuosmipcuter.orcc.api.soundvis.ChangesIcon;
 import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.Unit;
@@ -33,11 +34,16 @@ import org.mcuosmipcuter.orcc.api.util.AmplitudeHelper;
  *
  */
 public class ThresholdVerticalLines implements SoundCanvas {
+	@ChangesIcon
 	@UserProperty(description="color of the waves")
 	private Color foreGroundColor = Color.BLUE;
+	@ChangesIcon
 	@LimitedIntProperty(description="threshold must be between 0 and 100", minimum=0, maximum = 100)
 	@UserProperty(description="consider amplitudes above this threshold for drawing, value in percent of maximum amplitude", unit = Unit.PERCENT_OBJECT)
 	private int threshold;
+	@ChangesIcon
+	@UserProperty(description = "draw if below threshold")
+	private boolean invert;
 	protected int leftMargin;
 	protected int height;
 	protected int width;
@@ -94,8 +100,9 @@ public class ThresholdVerticalLines implements SoundCanvas {
 		graphics.setColor(foreGroundColor);
 		int x = 1;
 		for(int amp : amplitudes) {
-			int percent = amplitudeHelper.getSignedPercent(Math.abs(amp));	
-			if(percent > threshold) {
+			int percent = amplitudeHelper.getSignedPercent(Math.abs(amp));
+			boolean draw = invert ? percent < threshold : percent > threshold;
+			if(draw) {
 				graphics.drawLine(leftMargin + x, 0 , leftMargin + x, height);
 			}
 			x++;
@@ -112,7 +119,9 @@ public class ThresholdVerticalLines implements SoundCanvas {
 		graphics.setColor(foreGroundColor);
 
 		for(int x = 0; x < width; x++) {
-			if(Math.random() > t) {
+			double d = Math.random();
+			boolean draw = invert ? d < t : d > t;
+			if(draw) {
 				graphics.drawLine(x, 0, x, height);
 			}
 		}
