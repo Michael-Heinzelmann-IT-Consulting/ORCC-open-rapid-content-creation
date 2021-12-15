@@ -41,7 +41,7 @@ public abstract class Configuration {
 	public final static String[] BUILT_IN_AUDIO = new String[] {"/audio/metronome_pcm_16bit_wav_30s.wav", 
 																"/audio/machine_learning.mp3"};
 	
-	public final static String[] BUILT_IN_SESSIONS = new String[] {"/sessions/demo.xml"};
+	public final static String[] BUILT_IN_SESSIONS = new String[] {"/sessions/demo.xml", "/sessions/image_rotate.xml"};
 	
 	public final static int[] FRAME_RATES = new int[] {12, 24, 25, 30, 60};
 

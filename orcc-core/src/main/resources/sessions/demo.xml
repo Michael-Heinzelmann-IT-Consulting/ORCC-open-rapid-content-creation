@@ -4,6 +4,9 @@
   <void property="audioInputClasspath">
    <string>/audio/machine_learning.mp3</string>
   </void>
+  <void property="audioInputName">
+   <string>file:/Users/user/Development/Eclipse/workspace/ORCC-open-rapid-content-creation/orcc-core/target/classes/audio/machine_learning.mp3</string>
+  </void>
   <void property="audioInputType">
    <object class="java.lang.Enum" method="valueOf">
     <class>org.mcuosmipcuter.orcc.soundvis.AudioInput$Type</class>
@@ -11,7 +14,7 @@
    </object>
   </void>
   <void property="buildNumber">
-   <string>20211128_1928</string>
+   <string>20211214_1919</string>
   </void>
   <void property="soundCanvasList">
    <void method="add">
@@ -238,7 +241,7 @@
       <boolean>true</boolean>
      </void>
      <void property="posX">
-      <int>11</int>
+      <int>5</int>
      </void>
      <void property="scale">
       <int>71</int>
@@ -653,10 +656,10 @@
       <long>1263</long>
      </void>
      <void property="posX">
-      <int>-50</int>
+      <int>-25</int>
      </void>
      <void property="posY">
-      <int>-50</int>
+      <int>-25</int>
      </void>
      <void property="scale">
       <int>50</int>
@@ -733,10 +736,10 @@
       <long>1263</long>
      </void>
      <void property="posX">
-      <int>50</int>
+      <int>25</int>
      </void>
      <void property="posY">
-      <int>-50</int>
+      <int>-25</int>
      </void>
      <void property="scale">
       <int>50</int>
@@ -773,7 +776,7 @@
          </void>
          <void method="put">
           <string>numberHorizontal</string>
-          <int>2</int>
+          <int>5</int>
          </void>
          <void method="put">
           <string>colorVertical</string>
@@ -786,7 +789,7 @@
          </void>
          <void method="put">
           <string>bladeShapeHorizontal</string>
-          <object class="java.lang.Enum" method="valueOf">
+          <object class="java.lang.Enum" id="Blinds$BLADE_SHAPE0" method="valueOf">
            <class>org.mcuosmipcuter.orcc.soundvis.defaultcanvas.Blinds$BLADE_SHAPE</class>
            <string>RECTANGLE</string>
           </object>
@@ -876,9 +879,9 @@
          <void method="put">
           <string>colorHorizontal</string>
           <object class="java.awt.Color">
-           <object idref="Integer0"/>
-           <object idref="Integer0"/>
-           <object idref="Integer0"/>
+           <int>51</int>
+           <int>51</int>
+           <int>255</int>
            <int>255</int>
           </object>
          </void>
@@ -1004,10 +1007,7 @@
          </void>
          <void method="put">
           <string>bladeShapeVertical</string>
-          <object class="java.lang.Enum" method="valueOf">
-           <class>org.mcuosmipcuter.orcc.soundvis.defaultcanvas.Blinds$BLADE_SHAPE</class>
-           <string>ELLIPSE</string>
-          </object>
+          <object idref="Blinds$BLADE_SHAPE0"/>
          </void>
          <void method="put">
           <string>repeater</string>
@@ -1043,9 +1043,6 @@
      <void property="visible">
       <boolean>true</boolean>
      </void>
-     <void property="xor">
-      <boolean>true</boolean>
-     </void>
     </object>
    </void>
    <void method="add">
@@ -1057,10 +1054,10 @@
       <long>1263</long>
      </void>
      <void property="posX">
-      <int>-50</int>
+      <int>-25</int>
      </void>
      <void property="posY">
-      <int>50</int>
+      <int>25</int>
      </void>
      <void property="scale">
       <int>50</int>
@@ -1181,10 +1178,10 @@
       <long>1263</long>
      </void>
      <void property="posX">
-      <int>50</int>
+      <int>25</int>
      </void>
      <void property="posY">
-      <int>50</int>
+      <int>25</int>
      </void>
      <void property="scale">
       <int>50</int>
@@ -1284,7 +1281,7 @@
       <long>1472</long>
      </void>
      <void property="posX">
-      <int>11</int>
+      <int>5</int>
      </void>
      <void property="scale">
       <int>71</int>
@@ -1492,7 +1489,7 @@
       <long>2318</long>
      </void>
      <void property="posX">
-      <int>11</int>
+      <int>5</int>
      </void>
      <void property="scale">
       <int>71</int>
@@ -3540,9 +3537,6 @@ This are the main steps to create a sound video:
      <void property="frameTo">
       <long>4630</long>
      </void>
-     <void property="posY">
-      <int>-7</int>
-     </void>
      <void property="scale">
       <int>51</int>
      </void>
@@ -3564,6 +3558,10 @@ This are the main steps to create a sound video:
            <int>255</int>
            <int>255</int>
           </object>
+         </void>
+         <void method="put">
+          <string>invert</string>
+          <object idref="Boolean0"/>
          </void>
          <void method="put">
           <string>threshold</string>
@@ -3593,7 +3591,7 @@ This are the main steps to create a sound video:
       <boolean>true</boolean>
      </void>
      <void property="posY">
-      <int>-12</int>
+      <int>-6</int>
      </void>
      <void property="scale">
       <int>60</int>
@@ -3676,7 +3674,7 @@ This are the main steps to create a sound video:
             <object class="java.util.HashMap">
              <void method="put">
               <string>centerY</string>
-              <int>73</int>
+              <int>36</int>
              </void>
              <void method="put">
               <string>centerX</string>
@@ -4179,7 +4177,7 @@ Tiles</string>
       <boolean>true</boolean>
      </void>
      <void property="posY">
-      <int>-9</int>
+      <int>-5</int>
      </void>
      <void property="scale">
       <int>60</int>
@@ -5120,10 +5118,10 @@ and media production
       <long>144</long>
      </void>
      <void property="posX">
-      <int>-52</int>
+      <int>-26</int>
      </void>
      <void property="posY">
-      <int>-14</int>
+      <int>-7</int>
      </void>
      <void property="scale">
       <int>25</int>

@@ -47,7 +47,8 @@ public class ImageStore {
 			new Key(0, CLASSPATH_PREFIX + "/images/clouds01.jpg", 0, false, 0, 0),
 			new Key(0, CLASSPATH_PREFIX + "/images/clouds02.jpg", 0, false, 0, 0),
 			new Key(0, CLASSPATH_PREFIX + "/images/clouds03.jpg", 0, false, 0, 0),
-			new Key(0, CLASSPATH_PREFIX + "/images/soundvis.png", 0, false, 0, 0)
+			new Key(0, CLASSPATH_PREFIX + "/images/soundvis.png", 0, false, 0, 0),
+			new Key(0, CLASSPATH_PREFIX + "/images/orccland.png", 0, false, 0, 0)
 	};
 	
 	public static class Key{
