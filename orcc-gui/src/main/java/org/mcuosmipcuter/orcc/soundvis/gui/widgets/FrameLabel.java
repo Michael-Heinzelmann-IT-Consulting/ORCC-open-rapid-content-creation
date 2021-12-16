@@ -40,6 +40,10 @@ public class FrameLabel extends JLabel implements Listener{
 	long startCount = 0;
 	int speed = 0;
 	
+	public FrameLabel() {
+		super();
+		setHorizontalAlignment(CENTER);
+	}
 	/**
 	 * Update the frame count
 	 * @param frameCount
