@@ -118,6 +118,14 @@ public class SessionMenu extends JMenu {
 
 		CallBack saveSessionAsCallback = new CallBack() {
 			public void fileSelected(File file) {
+				if (file.exists()) {
+					int res = JOptionPane.showConfirmDialog(null,
+							file + " exists, are you sure you want to overwrite it ?", "",
+							JOptionPane.OK_CANCEL_OPTION);
+					if (res != JOptionPane.OK_OPTION) {
+						return;
+					}
+				}
 				try {
 					Session.userSaveSession(file);
 				} catch (IllegalArgumentException | IllegalAccessException | IOException e) {
