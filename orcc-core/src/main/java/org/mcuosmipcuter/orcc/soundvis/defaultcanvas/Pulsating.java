@@ -17,23 +17,28 @@
 */
 package org.mcuosmipcuter.orcc.soundvis.defaultcanvas;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
 import org.mcuosmipcuter.orcc.api.soundvis.ChangesIcon;
+import org.mcuosmipcuter.orcc.api.soundvis.ExtendedFrameHistory;
 import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.NestedProperty;
+import org.mcuosmipcuter.orcc.api.soundvis.NumberMeaning;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
+import org.mcuosmipcuter.orcc.api.soundvis.Unit;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.api.util.AmplitudeHelper;
 import org.mcuosmipcuter.orcc.soundvis.effects.MovingAverage;
+import org.mcuosmipcuter.orcc.util.RingMemory;
 
 /**
  * @author Michael Heinzelmann
  */
-public class Pulsating implements SoundCanvas {
+public class Pulsating implements SoundCanvas, ExtendedFrameHistory {
 	
 	public static enum DRAW_MODE {
 		CIRCLE, SQARE, RECTANGLE, ELLIPSE
@@ -50,6 +55,21 @@ public class Pulsating implements SoundCanvas {
 	
 	@NestedProperty(description = "smoothening using moving average")
 	MovingAverage movingAverage = new MovingAverage(1000);
+	
+	@ChangesIcon
+	@UserProperty(description="frame history", unit = Unit.FRAMES)
+	@LimitedIntProperty(minimum = 1, description = "minimum 1")
+	private int history = 1;
+	
+	@ChangesIcon
+	@UserProperty(description="size of line, 0 = draw filled")
+	@NumberMeaning(numbers = 0, meanings = "filled")
+	@LimitedIntProperty(minimum = 0, description = "minimum 0")
+	private int lineSize = 0;
+	private int prevLineSize = 0; // reduce object creation
+	
+	RingMemory<int[]> ringMemory = new RingMemory<>();
+	BasicStroke stroke = new BasicStroke(1);
 	
 	private int centerX;
 	private int centerY;
@@ -75,31 +95,60 @@ public class Pulsating implements SoundCanvas {
 
 	@Override
 	public void newFrame(long frameCount, Graphics2D graphics2D) {
-		
-		int ampH = amplitudeDivisorH > 1 ? (int)(max / amplitudeDivisorH) : (int)(max * amplitudeMultiplicatorH);
-		int ampW = amplitudeDivisorW > 1 ? (int)(max / amplitudeDivisorW) : (int)(max * amplitudeMultiplicatorW);
-		if(reverse) {
+
+		int ampH = amplitudeDivisorH > 1 ? (int) (max / amplitudeDivisorH) : (int) (max * amplitudeMultiplicatorH);
+		int ampW = amplitudeDivisorW > 1 ? (int) (max / amplitudeDivisorW) : (int) (max * amplitudeMultiplicatorW);
+		if (reverse) {
 			ampH = centerY * 2 - ampH;
 			ampW = centerX * 2 - ampW;
 		}
-		graphics2D.setColor(foreGround);	
-		switch(drawMode) {
+		graphics2D.setColor(foreGround);
+		if (prevLineSize != lineSize) {
+			
+		}
+		prevLineSize = lineSize;
+		if (lineSize > 0) {
+			stroke = new BasicStroke(lineSize);
+			graphics2D.setStroke(stroke);
+		}
+
+		ringMemory.setSize(frameCount < history ? (int)frameCount : history );
+		for (int[] wh : ringMemory.update(new int[] { ampW, ampH })) {
+			int w = wh[0];
+			int h = wh[1];
+			switch (drawMode) {
 			case CIRCLE:
-				graphics2D.fillOval(centerX - ampH / 2, centerY - ampH / 2, ampH, ampH);
+				if (lineSize > 0) {
+					graphics2D.drawOval(centerX - h / 2, centerY - h / 2, h, h);
+				} else {
+					graphics2D.fillOval(centerX - h / 2, centerY - h / 2, h, h);
+				}
 				break;
 			case SQARE:
-				graphics2D.fillRect(centerX - ampH / 2, centerY - ampH / 2, ampH, ampH);
+				if (lineSize > 0) {
+					graphics2D.drawRect(centerX - h / 2, centerY - h / 2, h, h);
+				} else {
+					graphics2D.fillRect(centerX - h / 2, centerY - h / 2, h, h);
+				}
 				break;
 			case ELLIPSE:
-				graphics2D.fillOval(centerX - ampW / 2, centerY - ampH / 2, ampW, ampH);
+				if (lineSize > 0) {
+					graphics2D.drawOval(centerX - w / 2, centerY - h / 2, w, h);
+				} else {
+					graphics2D.fillOval(centerX - w / 2, centerY - h / 2, w, h);
+				}
 				break;
 			case RECTANGLE:
-				graphics2D.fillRect(centerX - ampW / 2, centerY - ampH / 2, ampW, ampH);
+				if (lineSize > 0) {
+					graphics2D.drawRect(centerX - w / 2, centerY - h / 2, w, h);
+				} else {
+					graphics2D.fillRect(centerX - w / 2, centerY - h / 2, w, h);
+				}
 				break;
 			default:
 
+			}
 		}
-		
 	}
 	@Override
 	public void prepare(AudioInputInfo audioInputInfo,
@@ -125,25 +174,57 @@ public class Pulsating implements SoundCanvas {
 
 	@Override
 	public void updateUI(int width, int height, Graphics2D graphics) {
-		graphics.setColor(new Color(foreGround.getRed(), foreGround.getGreen(), foreGround.getBlue()));	
-		int amp = Math.min(width, height);
-		
-		switch(drawMode) {
-		case CIRCLE:
-			graphics.fillOval(width / 2 - amp / 2,  height / 2 - amp / 2, amp, amp);
-			break;
-		case SQARE:
-			graphics.fillRect(width / 2 - amp / 2,  height / 2 - amp / 2, amp, amp);
-			break;
-		case ELLIPSE:
-			graphics.fillOval(0,  0, width, height);
-			break;
-		case RECTANGLE:
-			graphics.fillRect((int)(width * 0.1),  (int)(height * 0.1), (int)(width * 0.8), (int)(height * 0.8));
-			break;
-		default:
+		graphics.setColor(new Color(foreGround.getRed(), foreGround.getGreen(), foreGround.getBlue()));
+		int amplitude = Math.min(width, height);
+		if (lineSize > 0) {
+			stroke = new BasicStroke(Math.max(1, lineSize / 5));
+			graphics.setStroke(stroke);
+		}
+		int hist = Math.min(3, history);
+		for (int i = hist; i >= 1; i--) {
+			int amp = amplitude / i;
+			switch (drawMode) {
+			case CIRCLE:
+				if (lineSize > 0) {
+					graphics.drawOval(width / 2 - amp / 2, height / 2 - amp / 2, amp, amp);
+				} else {
+					graphics.fillOval(width / 2 - amp / 2, height / 2 - amp / 2, amp, amp);
+				}
+				break;
+			case SQARE:
+				if (lineSize > 0) {
+					graphics.drawRect(width / 2 - amp / 2, height / 2 - amp / 2, amp, amp);
+				} else {
+					graphics.fillRect(width / 2 - amp / 2, height / 2 - amp / 2, amp, amp);
+				}
+				break;
+			case ELLIPSE:
+				if (lineSize > 0) {
+					graphics.drawOval(width / 2 - width / i / 2, height / 2 - amp / 2, width / i, amp);
+				} else {
+					graphics.fillOval(0, 0, width, height);
+				}
+				break;
+			case RECTANGLE:
+				if (lineSize > 0) {
+					int w = (int) (width * 0.8);
+					int a = (int) (amp * 0.8);
+					graphics.drawRect(width / 2 - w / i / 2, height / 2 - a / 2, w / i, a);
+				} else {
+					graphics.fillRect((int) (width * 0.1), (int) (height * 0.1), (int) (width * 0.8),
+							(int) (height * 0.8));
+				}
+				break;
+			default:
 
+			}
+		}
 	}
+
+	@Override
+	public int getCurrentHistoryFrameSize() {
+		return history;
 	}
+	
 
 }
