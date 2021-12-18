@@ -20,8 +20,9 @@ public class GraphicsJInternalFrame extends JInternalFrame {
 	
 	
 	
-	public GraphicsJInternalFrame(String string, boolean b, boolean c, boolean d, boolean e) {
-		super(string, b, c, d, e);
+	public GraphicsJInternalFrame(String title, boolean resizable, boolean closable,
+            boolean maximizable, boolean iconifiable) {
+		super(title, resizable, closable, maximizable, iconifiable);
 	}
 
 	public String getRealtimeTitle() {
