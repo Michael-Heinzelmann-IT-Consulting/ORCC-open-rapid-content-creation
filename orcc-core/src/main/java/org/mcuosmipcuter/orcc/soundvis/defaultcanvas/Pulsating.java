@@ -104,11 +104,10 @@ public class Pulsating implements SoundCanvas, ExtendedFrameHistory {
 		}
 		graphics2D.setColor(foreGround);
 		if (prevLineSize != lineSize) {
-			
+			stroke = new BasicStroke(lineSize);
 		}
 		prevLineSize = lineSize;
-		if (lineSize > 0) {
-			stroke = new BasicStroke(lineSize);
+		if (lineSize > 0) {		
 			graphics2D.setStroke(stroke);
 		}
 
@@ -177,8 +176,7 @@ public class Pulsating implements SoundCanvas, ExtendedFrameHistory {
 		graphics.setColor(new Color(foreGround.getRed(), foreGround.getGreen(), foreGround.getBlue()));
 		int amplitude = Math.min(width, height);
 		if (lineSize > 0) {
-			stroke = new BasicStroke(Math.max(1, lineSize / 5));
-			graphics.setStroke(stroke);
+			graphics.setStroke(new BasicStroke(Math.max(1, lineSize / 5)));
 		}
 		int hist = Math.min(3, history);
 		for (int i = hist; i >= 1; i--) {
