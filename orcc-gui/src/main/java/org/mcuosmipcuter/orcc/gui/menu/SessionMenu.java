@@ -110,7 +110,7 @@ public class SessionMenu extends JMenu {
 		openSession.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (allowSessionOpenRoutine()) {
+				if (allowSessionOpenRoutine(frame)) {
 					openSessionActionListener.actionPerformed(e);
 				}
 			}
@@ -119,7 +119,7 @@ public class SessionMenu extends JMenu {
 		CallBack saveSessionAsCallback = new CallBack() {
 			public void fileSelected(File file) {
 				if (file.exists()) {
-					int res = JOptionPane.showConfirmDialog(null,
+					int res = JOptionPane.showConfirmDialog(frame,
 							file + " exists, are you sure you want to overwrite it ?", "",
 							JOptionPane.OK_CANCEL_OPTION);
 					if (res != JOptionPane.OK_OPTION) {
@@ -164,7 +164,7 @@ public class SessionMenu extends JMenu {
 		newSession.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (allowSessionOpenRoutine()) {
+				if (allowSessionOpenRoutine(frame)) {
 					Session.newSession();
 				}
 			}
@@ -178,7 +178,7 @@ public class SessionMenu extends JMenu {
 			item.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					if (allowSessionOpenRoutine()) {	
+					if (allowSessionOpenRoutine(frame)) {	
 						URL url = Session.fromClasspath(path);
 						sessionLoader.apply(url, path);
 					}
@@ -219,11 +219,11 @@ public class SessionMenu extends JMenu {
 		});
 	}
 
-	private boolean allowSessionOpenRoutine() {
+	private boolean allowSessionOpenRoutine(final JFrame frame) {
 		SessionToken st = Context.getSessionToken();
 		if (st.isDefault() || st.isChanged()) {
 			String message = (st.isDefault() ? "session is not saved, " : st .getDisplayPath() + "\nhas unsaved changes,") + " do you want to continue ?";
-			int res = JOptionPane.showOptionDialog(null, message, "session not saved!", JOptionPane.YES_NO_OPTION,
+			int res = JOptionPane.showOptionDialog(frame, message, "session not saved!", JOptionPane.YES_NO_OPTION,
 					JOptionPane.QUESTION_MESSAGE, null, new String[] { "yes", "no" }, "no");
 			if (res == JOptionPane.NO_OPTION) {
 				return false;

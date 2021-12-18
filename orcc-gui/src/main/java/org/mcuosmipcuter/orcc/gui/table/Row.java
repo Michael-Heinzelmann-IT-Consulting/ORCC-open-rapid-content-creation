@@ -27,6 +27,7 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.util.Set;
 
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
@@ -67,7 +68,7 @@ public class Row extends JPanel {
 	 * New row containing the given wrapped canvas
 	 * @param soundCanvasWrapper the wrapped canvas that belongs to this layer row
 	 */
-	public Row(SoundCanvasWrapper soundCanvasWrapper, Color defaultColor, int borderSize) {
+	public Row(SoundCanvasWrapper soundCanvasWrapper, Color defaultColor, int borderSize, final JFrame parentFrame) {
 		this.soundCanvasWrapper = soundCanvasWrapper;
 		this.unselectedBorder = new LineBorder(defaultColor, borderSize);
 		this.borderSize = borderSize;
@@ -75,7 +76,7 @@ public class Row extends JPanel {
 		titledBorder.setTitle(soundCanvasWrapper.getDisplayName());
 		titledBorder.setTitlePosition(TitledBorder.TOP);
 		setBorder(titledBorder);
-		props = PropertyPanelFactory.getCanvasPanels(soundCanvasWrapper);
+		props = PropertyPanelFactory.getCanvasPanels(soundCanvasWrapper, parentFrame);
 	}
 
 	/**

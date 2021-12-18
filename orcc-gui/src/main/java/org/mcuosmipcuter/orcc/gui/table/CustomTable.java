@@ -42,6 +42,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
@@ -69,7 +70,8 @@ public class CustomTable extends JPanel implements Context.Listener{
 
 	private static final long serialVersionUID = 1L;
 	
-	private CustomTableListener tableListener;
+	private final CustomTableListener tableListener;
+	private final JFrame parentFrame;
 	private boolean moveEnabled = true;
 	
 	private final Color HIGHLIGHT =  new Color(240, 240, 240);
@@ -245,9 +247,11 @@ public class CustomTable extends JPanel implements Context.Listener{
 	}
 	
 	/**
-	 * Creates a new custom table, no parameters needed
+	 * Creates a new custom table
 	 */
-	public CustomTable() {
+	public CustomTable(JFrame parentFrame, CustomTableListener customTableListener) {
+		this.parentFrame = parentFrame;
+		this.tableListener = customTableListener;
 		setLayout(new GridBagLayout());
 	}
 	private  BufferedImage getImage() {
@@ -265,9 +269,9 @@ public class CustomTable extends JPanel implements Context.Listener{
 	 * Adds a layer containing the given canvas
 	 * @param soundCanvasWrapper the wrapped canvas 
 	 */
-	public void addLayer(final SoundCanvasWrapper soundCanvasWrapper) {
+	public void addLayer(final SoundCanvasWrapper soundCanvasWrapper, final JFrame parentFrame) {
 		
-		final Row row = new Row(soundCanvasWrapper, UNSELECTED, 8);
+		final Row row = new Row(soundCanvasWrapper, UNSELECTED, 8, parentFrame);
 		row.setPreferredSize(new Dimension(630, 78));
 		row.setLayout(new BorderLayout());
 		row.setBackground(Color.WHITE);	
@@ -515,14 +519,6 @@ public class CustomTable extends JPanel implements Context.Listener{
 	 */
 	public void setEnabled(boolean enabled) {
 		this.moveEnabled = enabled;
-	}
-	
-	/**
-	 * Set the listener, only one listener supported
-	 * @param customTableListener the listener
-	 */
-	public void setListener(CustomTableListener customTableListener) {
-		tableListener = customTableListener;
 	}
 	
 	@Override

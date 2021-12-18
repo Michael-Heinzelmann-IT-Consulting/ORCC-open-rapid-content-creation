@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
@@ -55,7 +56,7 @@ public class PropertyPanelFactory {
 	 * @param soundCanvas the canvas to work on
 	 * @return the panel set, can be empty if the canvas has no editable properties
 	 */
-	public static Set<JPanel> getCanvasPanels(SoundCanvasWrapper soundCanvasWrapper)  {
+	public static Set<JPanel> getCanvasPanels(SoundCanvasWrapper soundCanvasWrapper, final JFrame parentFrame)  {
 
 		Set<JPanel> result = new LinkedHashSet<>();
 		Set<String> groupedNames = new HashSet<String>();
@@ -69,7 +70,7 @@ public class PropertyPanelFactory {
 				// if not created for group create top level
 				Object value = getValue(field, soundCanvas);
 				@SuppressWarnings("unchecked")
-				PropertyPanel<Object> c = panelFromFieldType(field, soundCanvasWrapper, soundCanvasWrapper.getSoundCanvas());
+				PropertyPanel<Object> c = panelFromFieldType(field, soundCanvasWrapper, soundCanvasWrapper.getSoundCanvas(), parentFrame);
 				c.setField(field);
 				c.setDefaultValue(value);
 				c.setCurrentValue(value);
@@ -83,13 +84,13 @@ public class PropertyPanelFactory {
 				Object nestedValue = getValue(field, soundCanvas);
 				for(Field nestedField : nestedValue.getClass().getDeclaredFields()) {
 					if(nestedField.isAnnotationPresent(UserProperty.class)) {
-						props.add(getPropertyPanel(nestedField, nestedValue, soundCanvasWrapper, field.getName()));
+						props.add(getPropertyPanel(nestedField, nestedValue, soundCanvasWrapper, field.getName(), parentFrame));
 					}
 					if(nestedField.isAnnotationPresent(NestedProperty.class)) {
 						Object nested2 = getValue(nestedField, nestedValue);
 						for(Field nested2Field : nested2.getClass().getDeclaredFields()) {
 							if(nested2Field.isAnnotationPresent(UserProperty.class)) {
-								props.add(getPropertyPanel(nested2Field, nested2, soundCanvasWrapper, field.getName()));
+								props.add(getPropertyPanel(nested2Field, nested2, soundCanvasWrapper, field.getName(), parentFrame));
 							}
 						}
 					}	
@@ -108,7 +109,7 @@ public class PropertyPanelFactory {
 						}
 						PropertyPanel<?> pp = getAndRemovePanelByName(result, fieldName); // take from top level if already created
 						if(pp == null) {
-							pp = getPropertyPanel(groupField, soundCanvas, soundCanvasWrapper, field.getName());
+							pp = getPropertyPanel(groupField, soundCanvas, soundCanvasWrapper, field.getName(), parentFrame);
 						}
 						groupedNames.add(fieldName);
 						props.add(pp);
@@ -123,11 +124,11 @@ public class PropertyPanelFactory {
 		}
 		return result;
 	}
-	private static PropertyPanel<?> getPropertyPanel(Field field, Object object, SoundCanvasWrapper soundCanvasWrapper, String parentName) {
+	private static PropertyPanel<?> getPropertyPanel(Field field, Object object, SoundCanvasWrapper soundCanvasWrapper, String parentName, final JFrame parentFrame) {
 		field.setAccessible(true);
 		Object value = getValue(field, object);
 		@SuppressWarnings("unchecked")
-		PropertyPanel<Object> c = panelFromFieldType(field, soundCanvasWrapper, object);
+		PropertyPanel<Object> c = panelFromFieldType(field, soundCanvasWrapper, object, parentFrame);
 		c.setField(field);
 		c.setDefaultValue(value);
 		c.setCurrentValue(value);
@@ -138,7 +139,7 @@ public class PropertyPanelFactory {
 		
 	}
 	@SuppressWarnings("rawtypes")
-	private static PropertyPanel panelFromFieldType(Field field, SoundCanvasWrapper soundCanvasWrapper, Object valueOwner) {
+	private static PropertyPanel panelFromFieldType(Field field, SoundCanvasWrapper soundCanvasWrapper, Object valueOwner, final JFrame parentFrame) {
 		Class<?> type = field.getType();
 		final boolean timed = field.isAnnotationPresent(TimedChange.class);
 		if(boolean.class.equals(type)) {
@@ -187,7 +188,7 @@ public class PropertyPanelFactory {
 			return i;
 		}
 		if(String.class.equals(type)) {
-			return new StringPropertyPanel(soundCanvasWrapper, valueOwner);
+			return new StringPropertyPanel(soundCanvasWrapper, valueOwner, parentFrame);
 		}
 		if(Color.class.equals(type)) {
 			return new ColorPropertyPanel(soundCanvasWrapper, valueOwner);
@@ -196,7 +197,7 @@ public class PropertyPanelFactory {
 			return new BufferedImagePropertyPanel(soundCanvasWrapper, valueOwner);
 		}
 		if(Slide[].class.equals(type)) {
-			return new MultiImagePropertyPanel(soundCanvasWrapper, valueOwner);
+			return new MultiImagePropertyPanel(soundCanvasWrapper, valueOwner, parentFrame);
 		}
 		if(type.isEnum()) {
 			Object[] es = type.getEnumConstants();

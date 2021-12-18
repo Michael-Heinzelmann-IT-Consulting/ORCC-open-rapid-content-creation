@@ -38,10 +38,10 @@ public class FileMenu extends JMenu {
 						try {
 							Context.setAudioFromFile(file.getAbsolutePath());
 						} catch (AppLogicException ex) {
-							JOptionPane.showMessageDialog(null, ex.getAllowedMessage(Configuration.FRAME_RATES) , ex.getMessage(), JOptionPane.WARNING_MESSAGE);
+							JOptionPane.showMessageDialog(frame, ex.getAllowedMessage(Configuration.FRAME_RATES) , ex.getMessage(), JOptionPane.WARNING_MESSAGE);
 						}
 						catch(Exception ex) {
-							JOptionPane.showMessageDialog(null, ex.getMessage() , "error openeing audio", JOptionPane.ERROR_MESSAGE);
+							JOptionPane.showMessageDialog(frame, ex.getMessage() , "error openeing audio", JOptionPane.ERROR_MESSAGE);
 						}
 						finally {
 							Context.setAppState(before);
@@ -69,10 +69,10 @@ public class FileMenu extends JMenu {
 							try {
 								Context.setAudioFromClasspath(path);
 							} catch (AppLogicException ex) {
-								JOptionPane.showMessageDialog(null, ex.getAllowedMessage(Configuration.FRAME_RATES) , ex.getMessage(), JOptionPane.WARNING_MESSAGE);
+								JOptionPane.showMessageDialog(frame, ex.getAllowedMessage(Configuration.FRAME_RATES) , ex.getMessage(), JOptionPane.WARNING_MESSAGE);
 							}
 							catch(Exception ex) {
-								JOptionPane.showMessageDialog(null, ex.getMessage() , "error openeing audio", JOptionPane.ERROR_MESSAGE);
+								JOptionPane.showMessageDialog(frame, ex.getMessage() , "error openeing audio", JOptionPane.ERROR_MESSAGE);
 							}
 							finally {
 								Context.setAppState(before);

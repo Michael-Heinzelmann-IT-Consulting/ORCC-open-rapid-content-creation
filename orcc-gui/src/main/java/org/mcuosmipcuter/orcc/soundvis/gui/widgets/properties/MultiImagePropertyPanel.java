@@ -48,6 +48,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -76,6 +77,7 @@ import org.mcuosmipcuter.orcc.util.IOUtil;
  * @author Michael Heinzelmann
  */
 public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
+	final JFrame frame;
 	private final class ClassPathLoadActionListener implements ActionListener {
 		private boolean append = true;
 
@@ -99,7 +101,7 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 				panel.add(p);
 			}
 			
-			int res = JOptionPane.showConfirmDialog(null,panel, "built in images",
+			int res = JOptionPane.showConfirmDialog(frame ,panel, "built in images",
 					JOptionPane.OK_CANCEL_OPTION);
 			if (res == JOptionPane.OK_OPTION) {
 				List<Key> selected = new ArrayList<>();
@@ -147,7 +149,7 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 			IOUtil.log(System.currentTimeMillis() + " chooser return " + e);
 			Context.beforePropertyUpdate(name);
 
-			int returnVal = chooser.showDialog(null, "select files");
+			int returnVal = chooser.showDialog(frame, "select files");
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 
 				File[] selectedFiles = chooser.getSelectedFiles();
@@ -425,8 +427,9 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 	 * 
 	 * @param soundCanvas the canvas to work with
 	 */
-	public MultiImagePropertyPanel(final SoundCanvasWrapper soundCanvasWrapper, Object valueOwner) {
+	public MultiImagePropertyPanel(final SoundCanvasWrapper soundCanvasWrapper, Object valueOwner, final JFrame frame) {
 		super(soundCanvasWrapper, valueOwner);
+		this.frame = frame;
 
 		valueSelect.setLayout(new BorderLayout(2, 2));
 		valueSelect.setBorder(new LineBorder(valueSelect.getBackground(), 6));

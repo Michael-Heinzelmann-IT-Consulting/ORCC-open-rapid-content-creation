@@ -39,7 +39,7 @@ public class ExportMenu extends JMenu {
 		CallBack exportVideo = new CallBack() {
 			public void fileSelected(File file) {
 				if (file.exists()) {
-					int res = JOptionPane.showConfirmDialog(null,
+					int res = JOptionPane.showConfirmDialog(frame,
 							file + " exists, are you sure you want to overwrite it ?", "",
 							JOptionPane.OK_CANCEL_OPTION);
 					if (res != JOptionPane.OK_OPTION) {
@@ -70,7 +70,7 @@ public class ExportMenu extends JMenu {
 		CallBack exportFrameImageCallback = new CallBack() {
 			public void fileSelected(File file) {
 				if (file.exists()) {
-					int res = JOptionPane.showConfirmDialog(null,
+					int res = JOptionPane.showConfirmDialog(frame,
 							file + " exists, are you sure you want to overwrite it ?", "",
 							JOptionPane.OK_CANCEL_OPTION);
 					if (res != JOptionPane.OK_OPTION) {

@@ -96,18 +96,20 @@ public class Main {
 	 */
 	public static void main(String[] args) throws Exception {
 
+		final JFrame frame = new JFrame("soundvis");
+		
 		Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler() {
 			public void uncaughtException(Thread thread, Throwable t) {
 				System.err.println("UNCAUGHT Exception in " + thread);
 				t.printStackTrace();
 				if (!exitCalled) {
 					String msg = t.getClass().getSimpleName() + ": " + t.getMessage();
-					JOptionPane.showConfirmDialog(null, msg, "Error", JOptionPane.DEFAULT_OPTION,
+					JOptionPane.showConfirmDialog(frame, msg, "Error", JOptionPane.DEFAULT_OPTION,
 							JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		});
-		final JFrame frame = new JFrame("soundvis");
+
 		ImageIcon imageIcon = new ImageIcon(Main.class.getResource("/img/icon_64x64.png"));
 		frame.setIconImage(imageIcon.getImage());
 		
@@ -236,8 +238,7 @@ public class Main {
 		CanvasClassMenu classes = new CanvasClassMenu("add canvas");
 		canvas.add(classes);
 		propertiesFrame.setJMenuBar(layersMenuBar);
-		final CustomTable propTable = new CustomTable();
-		propTable.setListener(playBackPanel.getCustomTableListener());
+		final CustomTable propTable = new CustomTable(frame, playBackPanel.getCustomTableListener());
 		Context.addListener(propTable);
 
 		JPanel container = new JPanel();
@@ -255,7 +256,7 @@ public class Main {
 				if (PropertyName.SoundCanvasAdded.equals(propertyName)) {
 					List<SoundCanvasWrapper> list = Context.getSoundCanvasList();
 
-					propTable.addLayer(list.get(list.size() - 1));
+					propTable.addLayer(list.get(list.size() - 1), frame);
 				}
 				if (PropertyName.AppState.equals(propertyName)) {
 					propTable.setEnabled(
