@@ -28,6 +28,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
+import org.mcuosmipcuter.orcc.api.soundvis.PropertyListener;
 import org.mcuosmipcuter.orcc.api.soundvis.TimedChange;
 import org.mcuosmipcuter.orcc.soundvis.Context;
 import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
@@ -90,6 +91,9 @@ public abstract  class PropertyPanel <T> extends JPanel implements EditorLifeCyc
 			field.set(valueOwner, value);
 			//System.err.println(System.currentTimeMillis()  + " after field.set ");
 			setCurrentValue(value);
+			if(valueOwner instanceof PropertyListener) {
+				((PropertyListener)valueOwner).propertyWritten(field);
+			}
 			soundCanvasWrapper.propertyWritten(field, parentName, oldVale, value);
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);

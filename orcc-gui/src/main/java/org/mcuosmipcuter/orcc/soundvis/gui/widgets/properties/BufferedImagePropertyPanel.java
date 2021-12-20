@@ -79,6 +79,10 @@ public class BufferedImagePropertyPanel extends PropertyPanel<BufferedImage> {
 		}
 		this.repaint();
 	}
+	@Override
+	public void enableInput(boolean enabled) {
+		fileButton.setEnabled(enabled);
+	}
 
 }
 

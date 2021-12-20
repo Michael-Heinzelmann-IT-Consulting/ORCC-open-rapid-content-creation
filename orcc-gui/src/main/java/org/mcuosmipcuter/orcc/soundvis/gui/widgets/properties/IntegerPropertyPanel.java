@@ -77,6 +77,11 @@ public class IntegerPropertyPanel extends PropertyPanel<Integer> {
 		};
 		jSpinner.addChangeListener(timed ? new TimedChangeListener(cl) : cl);
 	}
-	
+
+	@Override
+	public void enableInput(boolean enabled) {
+		jSpinner.setEnabled(enabled);
+	}
+
 }
 

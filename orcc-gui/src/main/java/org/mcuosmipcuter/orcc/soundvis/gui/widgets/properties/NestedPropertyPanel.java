@@ -145,5 +145,14 @@ public class NestedPropertyPanel extends JPanel implements EditorLifeCycle{
 		setBackground(originalBackGround);
 		nameLabel.setForeground(Color.BLACK);
 	}
+
+	@Override
+	public void enableInput(boolean enabled) {
+		for(Object c : popUpContentPanel.getComponents()) {
+			if(c instanceof EditorLifeCycle) {
+				((EditorLifeCycle)c).enableInput(enabled);
+			}
+		}
+	}
 	
 }

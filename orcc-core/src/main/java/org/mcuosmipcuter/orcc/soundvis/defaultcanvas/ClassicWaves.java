@@ -19,9 +19,11 @@ package org.mcuosmipcuter.orcc.soundvis.defaultcanvas;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.util.Map;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
 import org.mcuosmipcuter.orcc.api.soundvis.ChangesIcon;
+import org.mcuosmipcuter.orcc.api.soundvis.InputEnabling;
 import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.NestedProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.NumberMeaning;
@@ -32,6 +34,7 @@ import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.api.util.AmplitudeHelper;
 import org.mcuosmipcuter.orcc.api.util.ColorHelper;
+import org.mcuosmipcuter.orcc.soundvis.InputController;
 import org.mcuosmipcuter.orcc.soundvis.effects.MovingAverage;
 
 
@@ -39,7 +42,7 @@ import org.mcuosmipcuter.orcc.soundvis.effects.MovingAverage;
  * Classic audio wave representation
  * @author Michael Heinzelmann
  */
-public class ClassicWaves implements SoundCanvas {
+public class ClassicWaves extends InputController implements SoundCanvas {
 	
 	public static enum FILL {
 		NONE, TOP, BOTTOM
@@ -226,6 +229,12 @@ public class ClassicWaves implements SoundCanvas {
 		case BOTTOM:
 			return bottom;
 		}
+	}
+
+	@Override
+	protected void doFieldEnablings(Map<String, InputEnabling> fieldEnablings) {
+		System.err.println(fieldEnablings.keySet());
+		fieldEnablings.get("beamType").enableInput(beamWidth != 0);
 	}
 
 

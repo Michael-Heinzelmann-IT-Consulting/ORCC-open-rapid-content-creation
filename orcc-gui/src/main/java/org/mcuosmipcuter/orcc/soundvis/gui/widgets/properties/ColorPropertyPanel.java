@@ -110,6 +110,10 @@ public class ColorPropertyPanel extends PropertyPanel<Color> {
 		valueSelect.setBackground(currentValue);
 		this.repaint();
 	}
-
+	@Override
+	public void enableInput(boolean enabled) {
+		colorButton.setEnabled(enabled);
+	}
+	
 }
 

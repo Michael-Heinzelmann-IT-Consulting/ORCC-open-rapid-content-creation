@@ -53,6 +53,11 @@ public class EnumPropertyPanel extends PropertyPanel<Enum<?>>  {
 		add(jComboBox);
 	}
 
-	private static final long serialVersionUID = 1L;	
+	private static final long serialVersionUID = 1L;
+
+	@Override
+	public void enableInput(boolean enabled) {
+		jComboBox.setEnabled(enabled);
+	}
 
 }

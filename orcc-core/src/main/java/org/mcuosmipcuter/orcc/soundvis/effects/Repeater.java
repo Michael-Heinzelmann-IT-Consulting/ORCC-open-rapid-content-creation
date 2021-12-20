@@ -19,21 +19,24 @@ package org.mcuosmipcuter.orcc.soundvis.effects;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.mcuosmipcuter.orcc.api.soundvis.DisplayDuration;
 import org.mcuosmipcuter.orcc.api.soundvis.DisplayObject;
 import org.mcuosmipcuter.orcc.api.soundvis.DisplayUnit;
+import org.mcuosmipcuter.orcc.api.soundvis.InputEnabling;
 import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.NumberMeaning;
 import org.mcuosmipcuter.orcc.api.soundvis.Unit;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 import org.mcuosmipcuter.orcc.api.types.LongSequence;
+import org.mcuosmipcuter.orcc.soundvis.InputController;
 
 /**
  * @author user
  *
  */
-public class Repeater {
+public class Repeater extends InputController {
 	
 	@LimitedIntProperty(minimum=0, description="number cannot be lower than 1")
 	@UserProperty(description="number of repeat", unit=Unit.TIMES)
@@ -148,6 +151,12 @@ public class Repeater {
 		return result;
 	}
 	
+
+	protected void doFieldEnablings(Map<String, InputEnabling> fieldEnablings) {
+		fieldEnablings.get("frames").enableInput(repeat != 0);
+		fieldEnablings.get("fixedTos").enableInput(repeat == 0);
+	}
+
 	private int repeats() {
 		return repeat > 0 ? repeat : fixedTos.validSequence().length;
 	}

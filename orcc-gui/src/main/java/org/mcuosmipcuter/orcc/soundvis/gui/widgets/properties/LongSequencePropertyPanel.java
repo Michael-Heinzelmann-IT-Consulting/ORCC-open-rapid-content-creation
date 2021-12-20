@@ -90,4 +90,11 @@ public class LongSequencePropertyPanel extends PropertyPanel<LongSequence> {
 		valueAt.addChangeListener(valueChanged);
 		indexChanged.stateChanged(null);
 	}
+
+	@Override
+	public void enableInput(boolean enabled) {
+		index.setEnabled(enabled);
+		valueAt.setEnabled(enabled);
+	}
+
 }

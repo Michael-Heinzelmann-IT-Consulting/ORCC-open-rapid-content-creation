@@ -28,6 +28,7 @@ import java.util.Set;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import org.mcuosmipcuter.orcc.api.soundvis.InputEnabling;
 import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.MappedValue;
 import org.mcuosmipcuter.orcc.api.soundvis.NestedProperty;
@@ -77,6 +78,7 @@ public class PropertyPanelFactory {
 				c.setDescription(field.getAnnotation(UserProperty.class).description());
 				result.add(c);
 				c.activate();
+				addToController(soundCanvas, field, c);
 			}
 			if(field.isAnnotationPresent(NestedProperty.class)) {
 				 
@@ -84,19 +86,27 @@ public class PropertyPanelFactory {
 				Object nestedValue = getValue(field, soundCanvas);
 				for(Field nestedField : nestedValue.getClass().getDeclaredFields()) {
 					if(nestedField.isAnnotationPresent(UserProperty.class)) {
-						props.add(getPropertyPanel(nestedField, nestedValue, soundCanvasWrapper, field.getName(), parentFrame));
+						PropertyPanel<?> pn = getPropertyPanel(nestedField, nestedValue, soundCanvasWrapper, field.getName(), parentFrame);
+						props.add(pn);
+						addToController(nestedValue, nestedField, pn);
 					}
+					// only 2 levels, no recursion:
 					if(nestedField.isAnnotationPresent(NestedProperty.class)) {
 						Object nested2 = getValue(nestedField, nestedValue);
 						for(Field nested2Field : nested2.getClass().getDeclaredFields()) {
 							if(nested2Field.isAnnotationPresent(UserProperty.class)) {
-								props.add(getPropertyPanel(nested2Field, nested2, soundCanvasWrapper, field.getName(), parentFrame));
+								PropertyPanel<?> pn2 = getPropertyPanel(nested2Field, nested2, soundCanvasWrapper, field.getName(), parentFrame);
+								props.add(pn2);
+								addToController(nested2, nested2Field, pn2);
 							}
 						}
+						controllerReady(nested2);
 					}	
 				}
-				result.add(new NestedPropertyPanel(props, soundCanvasWrapper.getDisplayName(), field));
-				
+				controllerReady(nestedValue);
+				NestedPropertyPanel npp = new NestedPropertyPanel(props, soundCanvasWrapper.getDisplayName(), field);
+				result.add(npp);
+				addToController(soundCanvas, field, npp);
 			}
 			if(PropertyGroup.class.isAssignableFrom(field.getType())){
 				PropertyGroup pg = (PropertyGroup)getValue(field, soundCanvas);
@@ -110,6 +120,7 @@ public class PropertyPanelFactory {
 						PropertyPanel<?> pp = getAndRemovePanelByName(result, fieldName); // take from top level if already created
 						if(pp == null) {
 							pp = getPropertyPanel(groupField, soundCanvas, soundCanvasWrapper, field.getName(), parentFrame);
+							addToController(soundCanvas, groupField, pp);
 						}
 						groupedNames.add(fieldName);
 						props.add(pp);
@@ -118,10 +129,13 @@ public class PropertyPanelFactory {
 						e.printStackTrace();
 					} 
 				}
-				result.add(new NestedPropertyPanel(props, soundCanvasWrapper.getDisplayName(), field));
+				NestedPropertyPanel gpp = new NestedPropertyPanel(props, soundCanvasWrapper.getDisplayName(), field);
+				addToController(soundCanvas, field, gpp);
+				result.add(gpp);
 			}
 
 		}
+		controllerReady(soundCanvas);
 		return result;
 	}
 	private static PropertyPanel<?> getPropertyPanel(Field field, Object object, SoundCanvasWrapper soundCanvasWrapper, String parentName, final JFrame parentFrame) {
@@ -236,6 +250,17 @@ public class PropertyPanelFactory {
 			}
 		}
 		return null;
+	}
+	
+	private static void addToController(Object fieldOwner, Field field, InputEnabling enabling) {
+		if(fieldOwner instanceof InputEnabling.Controller) {
+			((InputEnabling.Controller)fieldOwner).addEnablingReference(field.getName(), enabling);
+		}
+	}
+	private static void controllerReady(Object fieldOwner) {
+		if(fieldOwner instanceof InputEnabling.Controller) {
+			((InputEnabling.Controller)fieldOwner).enablingsReady();
+		}
 	}
 }
 

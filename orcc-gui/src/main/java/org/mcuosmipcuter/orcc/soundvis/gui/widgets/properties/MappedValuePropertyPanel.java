@@ -57,4 +57,9 @@ public class MappedValuePropertyPanel extends PropertyPanel<MappedValue<?>>  {
 
 	private static final long serialVersionUID = 1L;	
 
+	@Override
+	public void enableInput(boolean enabled) {
+		jComboBox.setEnabled(enabled);
+	}
+	
 }

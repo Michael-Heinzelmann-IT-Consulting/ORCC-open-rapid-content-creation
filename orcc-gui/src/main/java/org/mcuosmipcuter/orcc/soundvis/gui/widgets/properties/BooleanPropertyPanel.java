@@ -58,6 +58,9 @@ public class BooleanPropertyPanel extends PropertyPanel<Boolean> {
 			}
 		});
 	}
-
+	@Override
+	public void enableInput(boolean enabled) {
+		check.setEnabled(enabled);
+	}
 	
 }

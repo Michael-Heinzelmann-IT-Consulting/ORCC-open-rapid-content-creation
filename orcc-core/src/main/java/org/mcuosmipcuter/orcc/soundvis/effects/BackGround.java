@@ -19,17 +19,22 @@ package org.mcuosmipcuter.orcc.soundvis.effects;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.mcuosmipcuter.orcc.api.soundvis.ChangesIcon;
+import org.mcuosmipcuter.orcc.api.soundvis.InputEnabling;
 import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.Unit;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
+import org.mcuosmipcuter.orcc.soundvis.InputController;
 
 /**
  * @author Michael Heinzelmann
  *
  */
-public class BackGround {
+public class BackGround extends InputController{
 	
 	public static enum CLIP_SHAPE {
 		RECTANGLE, ELLIPSE
@@ -45,14 +50,14 @@ public class BackGround {
 	@UserProperty(description = "zoom y", unit = Unit.PERCENT_VIDEO)
 	@LimitedIntProperty(minimum = 0, description = "only positive integers")
 	private int zoomY = 100;
-
-	@ChangesIcon
-	@UserProperty(description = "color background")
-	private Color backGround = Color.GRAY;
-
+	
 	@ChangesIcon
 	@UserProperty(description = "complement foreground")
 	private boolean complement;
+	
+	@ChangesIcon
+	@UserProperty(description = "color background")
+	private Color backGround = Color.GRAY;
 	
 	@UserProperty(description = "shape")
 	private CLIP_SHAPE shape = CLIP_SHAPE.RECTANGLE;
@@ -60,6 +65,8 @@ public class BackGround {
 	@UserProperty(description = "corner rounding")
 	@LimitedIntProperty(minimum = 0, maximum = 100, description = "only positive integers")
 	int cornerRounding = 0;
+	
+	private Map<String, InputEnabling> fieldEnablings = new HashMap<>(3);
 
 	public void draw(Graphics2D graphics2d, int videoWidth, int videoHeight, Color foreGround) {
 		if(!enabled) {
@@ -100,4 +107,19 @@ public class BackGround {
 		return enabled;
 	}
 
+	@Override
+	protected void doFieldEnablings(Map<String, InputEnabling> fieldEnablings) {
+		for (Entry<String, InputEnabling> entry : fieldEnablings.entrySet()) {
+			if (!"enabled".equals(entry.getKey())) {
+				if ("cornerRounding".equals(entry.getKey())) {
+					entry.getValue().enableInput(enabled && shape == CLIP_SHAPE.RECTANGLE);
+				} else if ("backGround".equals(entry.getKey())) {
+					entry.getValue().enableInput(enabled && !complement);
+				} else {
+					entry.getValue().enableInput(enabled);
+				}
+			}
+		}
+	}
+	
 }

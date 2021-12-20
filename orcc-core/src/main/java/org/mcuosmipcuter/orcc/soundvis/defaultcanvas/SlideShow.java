@@ -27,10 +27,12 @@ import java.awt.geom.Area;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
+import java.util.Map;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
 import org.mcuosmipcuter.orcc.api.soundvis.DisplayDuration;
 import org.mcuosmipcuter.orcc.api.soundvis.DisplayUnit;
+import org.mcuosmipcuter.orcc.api.soundvis.InputEnabling;
 import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.NestedProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.NumberMeaning;
@@ -41,6 +43,7 @@ import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.api.types.LongSequence;
 import org.mcuosmipcuter.orcc.api.util.DimensionHelper;
+import org.mcuosmipcuter.orcc.soundvis.InputController;
 import org.mcuosmipcuter.orcc.soundvis.defaultcanvas.model.Slide;
 import org.mcuosmipcuter.orcc.soundvis.effects.AutoFit;
 import org.mcuosmipcuter.orcc.soundvis.effects.Fader;
@@ -56,7 +59,7 @@ import org.mcuosmipcuter.orcc.soundvis.effects.SimpleText;
  * Displays a slide show
  * @author Michael Heinzelmann
  */
-public class SlideShow implements SoundCanvas {
+public class SlideShow extends InputController implements SoundCanvas {
 	@Override
 	public int getEditorColumns() {
 		return 3;
@@ -65,24 +68,6 @@ public class SlideShow implements SoundCanvas {
 	@TimedChange
 	@UserProperty(description="slides to show")
 	private Slide[] slides;
-	
-	@UserProperty(description="number of frames per image", unit = Unit.FRAMES)
-	@LimitedIntProperty(minimum=0, description="cannot be negative")
-	@NumberMeaning(numbers = 0, meanings = "auto")
-	private int numberOfFrames = 0;
-	@UserProperty(description="number of frames per image", unit = Unit.TIMES)
-	@LimitedIntProperty(minimum=-1, description="cannot be negative")
-	@NumberMeaning(numbers = {0, -1}, meanings = {"auto", "fixed tos"})
-	private int repeat = 0;
-	@UserProperty(description="sequence of fixed tos to repeat over", unit=Unit.TIMES)	
-	LongSequence fixedTos = new LongSequence();
-	
-	private DimensionHelper dimensionHelper;
-
-	private java.awt.Image iconImage;
-
-	VideoOutputInfo videoOutputInfo;
-	AudioInputInfo audioInputInfo;
 	
 	@UserProperty(description="cout out")
 	private CLIP_SHAPE cutOut = CLIP_SHAPE.NONE;
@@ -93,6 +78,19 @@ public class SlideShow implements SoundCanvas {
 
 	@UserProperty(description="automatic fit mode")
 	private AutoFit.Mode autoFit = AutoFit.Mode.OFF;
+	
+	@UserProperty(description="number of frames per image", unit = Unit.TIMES)
+	@LimitedIntProperty(minimum=-1, description="cannot be negative")
+	@NumberMeaning(numbers = {0, -1}, meanings = {"auto", "fixed tos"})
+	private int repeat = 0;
+	@UserProperty(description="number of frames per image", unit = Unit.FRAMES)
+	@LimitedIntProperty(minimum=0, description="cannot be negative")
+	@NumberMeaning(numbers = 0, meanings = "auto")
+	private int numberOfFrames = 0;
+	@UserProperty(description="sequence of fixed tos to repeat over", unit=Unit.TIMES)	
+	LongSequence fixedTos = new LongSequence();
+	
+	
 	@NestedProperty(description = "x and y position")
 	private Positioner positioner = new Positioner();
 	@NestedProperty(description = "fading in and out")
@@ -107,6 +105,11 @@ public class SlideShow implements SoundCanvas {
 	SimpleText slideText = new SimpleText();
 	
 	private Repeater repeater = new Repeater(fader, mover, rotator, scaler);
+	
+	private DimensionHelper dimensionHelper;
+	private java.awt.Image iconImage;
+	private AudioInputInfo audioInputInfo;
+	
 
 	private long frameFrom;
 	private long frameTo;
@@ -215,7 +218,6 @@ public class SlideShow implements SoundCanvas {
 	@Override
 	public void prepare(AudioInputInfo audioInputInfo,
 			VideoOutputInfo videoOutputInfo) {
-		this.videoOutputInfo = videoOutputInfo;
 		this.dimensionHelper = new DimensionHelper(videoOutputInfo);
 		this.audioInputInfo = audioInputInfo;
 		updateSlides();
@@ -248,6 +250,12 @@ public class SlideShow implements SoundCanvas {
 	@Override
 	public DisplayDuration<?>[] getFrameFromTos() {
 		return repeater.getFrameFromTos(frameFrom, frameTo);
+	}
+
+	@Override
+	protected void doFieldEnablings(Map<String, InputEnabling> fieldEnablings) {
+		fieldEnablings.get("numberOfFrames").enableInput(repeat > 0);
+		fieldEnablings.get("fixedTos").enableInput(repeat == -1);
 	}
 
 }

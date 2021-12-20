@@ -288,9 +288,7 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 	}
 	@Override
 	public void propertyWritten(Field field, String parentName, Object oldValue, Object newValue) {
-		if(soundCanvas instanceof PropertyListener) {
-			((PropertyListener)soundCanvas).propertyWritten(field);
-		}
+
 		for(PropertyListener pl : propertyListeners) {
 			pl.propertyWritten(field);
 		}

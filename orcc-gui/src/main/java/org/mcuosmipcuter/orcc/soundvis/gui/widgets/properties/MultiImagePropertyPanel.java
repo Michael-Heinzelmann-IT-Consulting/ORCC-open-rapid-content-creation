@@ -736,5 +736,13 @@ public class MultiImagePropertyPanel extends PropertyPanel<Slide[]> {
 			hidePopup();
 		}
 	}
+
+	@Override
+	public void enableInput(boolean enabled) {
+		fileButton.setEnabled(enabled);
+		editButton.setEnabled(enabled);
+		addFileButton.setEnabled(enabled);
+		addResourceButton.setEnabled(enabled);
+	}
 	
 }

@@ -22,24 +22,28 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.Map;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
 import org.mcuosmipcuter.orcc.api.soundvis.ChangesIcon;
 import org.mcuosmipcuter.orcc.api.soundvis.ExtendedFrameHistory;
+import org.mcuosmipcuter.orcc.api.soundvis.InputEnabling;
 import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.NestedProperty;
+import org.mcuosmipcuter.orcc.api.soundvis.PropertyGroup;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.Unit;
 import org.mcuosmipcuter.orcc.api.soundvis.UserProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.VideoOutputInfo;
 import org.mcuosmipcuter.orcc.api.util.AmplitudeHelper;
+import org.mcuosmipcuter.orcc.soundvis.InputController;
 import org.mcuosmipcuter.orcc.soundvis.effects.MovingAverage;
 
 /**
  * @author Michael Heinzelmann
  *
  */
-public class RotatingAmplitudes implements SoundCanvas, ExtendedFrameHistory {
+public class RotatingAmplitudes extends InputController implements SoundCanvas, ExtendedFrameHistory {
 	
 	public static enum DRAW_MODE {
 		LINE, DOT, DOT_LINE, POLY_LINE
@@ -57,6 +61,10 @@ public class RotatingAmplitudes implements SoundCanvas, ExtendedFrameHistory {
 	@LimitedIntProperty(description="size must be greater zero", minimum=1)
 	@UserProperty(description="frames to keep")
 	int size = 360;
+	
+	///// shift
+	@SuppressWarnings("unused") // used by reflection
+	private PropertyGroup shift = new PropertyGroup("shiftX", "shiftY");
 	@UserProperty(description="x distance from center", unit = Unit.PIXEL)
 	int shiftX = 0;
 	@UserProperty(description="y distance from center", unit = Unit.PIXEL)
@@ -66,21 +74,21 @@ public class RotatingAmplitudes implements SoundCanvas, ExtendedFrameHistory {
 	@UserProperty(description="amp zoom in %", unit = Unit.PERCENT_OBJECT)
 	int ampZoom = 100;
 	
-	@ChangesIcon
-	@UserProperty(description="first polygon from center")
-	boolean startFromCenter = false;
-	
+	@UserProperty(description="mode for amplitude calculation")
+	private AMP_MODE ampMode = AMP_MODE.UNSIGNED;
+		
 	@ChangesIcon
 	@UserProperty(description="mode for drawing")
 	private DRAW_MODE drawMode = DRAW_MODE.LINE;
-	
-	@UserProperty(description="mode for amplitude calculation")
-	private AMP_MODE ampMode = AMP_MODE.UNSIGNED;
 	
 	@ChangesIcon
 	@LimitedIntProperty(description="limits for dot size", minimum=2, stepSize= 2)
 	@UserProperty(description="dot size for dot mode for drawing", unit = Unit.PIXEL)
 	private int dotSize = 2;
+	
+	@ChangesIcon
+	@UserProperty(description="first polygon from center")
+	boolean startFromCenter = false;
 	
 	@NestedProperty(description = "smoothening using moving average")
 	MovingAverage movingAverage = new MovingAverage(1000);
@@ -252,6 +260,12 @@ public class RotatingAmplitudes implements SoundCanvas, ExtendedFrameHistory {
 	public int getCurrentHistoryFrameSize() {
 		// depends on the amount of history we are keeping, a big size and a slow degree speed need a big pre-run
 		return degreesPerFrame != 0 ? size / degreesPerFrame : 0;
+	}
+
+	@Override
+	protected void doFieldEnablings(Map<String, InputEnabling> fieldEnablings) {
+		fieldEnablings.get("dotSize").enableInput(drawMode == DRAW_MODE.DOT || drawMode == DRAW_MODE.DOT_LINE);
+		fieldEnablings.get("startFromCenter").enableInput(drawMode == DRAW_MODE.POLY_LINE);
 	}
 
 }

@@ -79,4 +79,9 @@ public class StringPropertyPanel extends PropertyPanel<String> {
 		textLabel.setText(text);
 	}
 
+	@Override
+	public void enableInput(boolean enabled) {
+		button.setEnabled(enabled);
+	}
+
 }
