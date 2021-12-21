@@ -20,6 +20,7 @@ package org.mcuosmipcuter.orcc.soundvis.defaultcanvas;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Stroke;
 
 import org.mcuosmipcuter.orcc.api.soundvis.AudioInputInfo;
 import org.mcuosmipcuter.orcc.api.soundvis.ChangesIcon;
@@ -107,6 +108,7 @@ public class Pulsating implements SoundCanvas, ExtendedFrameHistory {
 			stroke = new BasicStroke(lineSize);
 		}
 		prevLineSize = lineSize;
+		Stroke origStroke = graphics2D.getStroke();
 		if (lineSize > 0) {		
 			graphics2D.setStroke(stroke);
 		}
@@ -148,6 +150,7 @@ public class Pulsating implements SoundCanvas, ExtendedFrameHistory {
 
 			}
 		}
+		graphics2D.setStroke(origStroke);
 	}
 	@Override
 	public void prepare(AudioInputInfo audioInputInfo,
