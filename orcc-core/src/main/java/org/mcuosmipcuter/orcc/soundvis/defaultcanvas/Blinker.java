@@ -20,6 +20,7 @@ package org.mcuosmipcuter.orcc.soundvis.defaultcanvas;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.MultipleGradientPaint.CycleMethod;
+import java.awt.Paint;
 import java.awt.RadialGradientPaint;
 import java.awt.geom.Point2D;
 
@@ -116,11 +117,12 @@ public class Blinker implements SoundCanvas {
 	     float dist = distance / 100f;
 	     float[] distances = {0.0f,  dist, 1.0f};
 	     Color[] colors = {centerColor, midColor , backColor};
+	     Paint original = graphics2D.getPaint();
 	     RadialGradientPaint p =
 	         new RadialGradientPaint(center, radiusPx, focus, distances, colors, cycleMethod);
 	     graphics2D.setPaint(p);
 	     graphics2D.fillRect(0, 0, w, h);
-
+	     graphics2D.setPaint(original);
 	}
 
 	/* (non-Javadoc)
