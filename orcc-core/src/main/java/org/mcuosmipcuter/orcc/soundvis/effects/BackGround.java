@@ -19,7 +19,6 @@ package org.mcuosmipcuter.orcc.soundvis.effects;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -65,8 +64,6 @@ public class BackGround extends InputController{
 	@UserProperty(description = "corner rounding")
 	@LimitedIntProperty(minimum = 0, maximum = 100, description = "only positive integers")
 	int cornerRounding = 0;
-	
-	private Map<String, InputEnabling> fieldEnablings = new HashMap<>(3);
 
 	public void draw(Graphics2D graphics2d, int videoWidth, int videoHeight, Color foreGround) {
 		if(!enabled) {
