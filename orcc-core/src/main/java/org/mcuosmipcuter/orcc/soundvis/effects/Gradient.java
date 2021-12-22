@@ -35,6 +35,8 @@ import org.mcuosmipcuter.orcc.soundvis.InputController;
  */
 public class Gradient extends InputController{
 	
+	private final static Color TRANPARENT = new Color(1.0f, 1.0f, 1.0f, 0.0f);
+	
 
 	@ChangesIcon
 	@UserProperty(description = "limit x", unit = Unit.PERCENT_VIDEO)
@@ -44,6 +46,17 @@ public class Gradient extends InputController{
 	@UserProperty(description = "limit y", unit = Unit.PERCENT_VIDEO)
 	private int limitY = 0;
 	
+	@ChangesIcon
+	@UserProperty(description = "cycle gradient")
+	private boolean cycle;
+	
+	@ChangesIcon
+	@UserProperty(description = "swap color 1 and color 2")
+	private boolean swap;
+	
+	@ChangesIcon
+	@UserProperty(description = "transparent gradient")
+	private boolean transparent;
 	
 	@ChangesIcon
 	@UserProperty(description = "RGB complement color 1")
@@ -53,9 +66,7 @@ public class Gradient extends InputController{
 	@UserProperty(description = "color gradient")
 	private Color color2 = Color.GRAY;
 	
-	@ChangesIcon
-	@UserProperty(description = "cycle gradient")
-	private boolean cycle;
+
 
 	public Paint draw(Graphics2D graphics2D, int x, int y, int width, int height, Color color1) {
 
@@ -72,22 +83,31 @@ public class Gradient extends InputController{
 				ly = limitY > 0 ? minPix : -minPix;
 			}
 			Color color2ToUse = getColorToUse(color1);
-			graphics2D.setPaint(new GradientPaint(x, y, color1, x + lx, y + ly, color2ToUse, cycle));
+			Color c1 = swap ? color2ToUse : color1;
+			Color c2 = swap ? color1 : color2ToUse;
+			graphics2D.setPaint(new GradientPaint(x, y, c1, x + lx, y + ly, c2, cycle));
 		}
 		return original;
 	}
 	
 	public Color getColorToUse(Color color) {
-		Color colorToUse = complement && color != null
-				? new Color(255 - color.getRed(), 255 - color.getGreen(), 255 - color.getBlue())
-				: color2;
-		return colorToUse;
+
+		if(transparent) {
+			return TRANPARENT;
+		}
+		else if(complement && color != null) {
+				return new Color(255 - color.getRed(), 255 - color.getGreen(), 255 - color.getBlue());
+		}
+		else {
+			return color2;
+		}
 	}
 
 
 	@Override
 	protected void doFieldEnablings(Map<String, InputEnabling> fieldEnablings) {
-		fieldEnablings.get("color2").enableInput(!complement);
+		fieldEnablings.get("complement").enableInput(!transparent);
+		fieldEnablings.get("color2").enableInput(!transparent  && !complement);
 	}
 	
 }
