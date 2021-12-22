@@ -56,18 +56,21 @@ public class Fader implements DisplayObject{
 	public Composite fade(Graphics2D graphics2D, DisplayUnit displayUnit) {
 		
 		final Composite saveComposite = graphics2D.getComposite();
-		EffectShape current = effectShaper.getEffectShape();
-		boolean active = current.midValueXPercent != 100 || current.framesIn != 0 || current.framesOut != 0 || current.beginFrames != 0 || current.endFrames != 0;
-		if(active) {
-			effectShaper.currentValues(displayUnit, new Consumer<Float>() {				
-				@Override
-				public void accept(Float transparency) {
-					transparency = transparency < 0 ? 0 : (transparency > 1 ? 1f : transparency);
-					graphics2D.setComposite(AlphaComposite.getInstance(rule.getNumber(), transparency));  
-					
+		
+		effectShaper.currentValues(displayUnit, new Consumer<Float>() {				
+			@Override
+			public void accept(Float transparency) {
+				transparency = transparency < 0 ? 0 : (transparency > 1 ? 1f : transparency);
+				float has = 1.0f;
+				if(saveComposite instanceof AlphaComposite) {
+					has = ((AlphaComposite)saveComposite).getAlpha();
 				}
-			});
-		}
+				if(transparency < 1) {
+					float effective = transparency * has;
+					graphics2D.setComposite(AlphaComposite.getInstance(rule.getNumber(), effective));
+				}
+			}
+		});
 		return saveComposite;
 	}
 
