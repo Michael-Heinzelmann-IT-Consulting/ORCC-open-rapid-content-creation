@@ -17,9 +17,11 @@
 */
 package org.mcuosmipcuter.orcc.soundvis.defaultcanvas;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.Stroke;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Map;
@@ -30,6 +32,7 @@ import org.mcuosmipcuter.orcc.api.soundvis.ExtendedFrameHistory;
 import org.mcuosmipcuter.orcc.api.soundvis.InputEnabling;
 import org.mcuosmipcuter.orcc.api.soundvis.LimitedIntProperty;
 import org.mcuosmipcuter.orcc.api.soundvis.NestedProperty;
+import org.mcuosmipcuter.orcc.api.soundvis.NumberMeaning;
 import org.mcuosmipcuter.orcc.api.soundvis.PropertyGroup;
 import org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas;
 import org.mcuosmipcuter.orcc.api.soundvis.Unit;
@@ -61,6 +64,8 @@ public class RotatingAmplitudes extends InputController implements SoundCanvas, 
 	@LimitedIntProperty(description="size must be greater zero", minimum=1)
 	@UserProperty(description="frames to keep")
 	int size = 360;
+	@UserProperty(description="degrees initial", unit = Unit.DEGREES)
+	private int initialDegrees = 0;
 	
 	///// shift
 	@SuppressWarnings("unused") // used by reflection
@@ -81,6 +86,28 @@ public class RotatingAmplitudes extends InputController implements SoundCanvas, 
 	@UserProperty(description="mode for drawing")
 	private DRAW_MODE drawMode = DRAW_MODE.LINE;
 	
+	///// min / max
+	@SuppressWarnings("unused") // used by reflection
+	private PropertyGroup minMax = new PropertyGroup("minRadius", "drawMin", "maxRadius", "drawMax");
+	@UserProperty(description="minimum radius in pixel", unit = Unit.PIXEL)
+	@LimitedIntProperty(minimum = 0, description = "minimum 0")
+	private int minRadius = 0;
+	@UserProperty(description="draw if below minimum")
+	private boolean drawMin = true;
+	@UserProperty(description="maximum radius in pixel", unit = Unit.PIXEL)
+	@NumberMeaning(numbers = 0, meanings = "off")
+	@LimitedIntProperty(minimum = 0, description = "minimum 0")
+	private int maxRadius = 0;
+	@UserProperty(description="draw if above maximum")
+	private boolean drawMax = true;
+	
+	
+	@ChangesIcon
+	@UserProperty(description="size of line", unit = Unit.PIXEL)
+	@LimitedIntProperty(minimum = 1, description = "minimum 1")
+	private int lineSize = 1;
+	private int prevLineSize = 0; // reduce object creation
+	
 	@ChangesIcon
 	@LimitedIntProperty(description="limits for dot size", minimum=2, stepSize= 2)
 	@UserProperty(description="dot size for dot mode for drawing", unit = Unit.PIXEL)
@@ -88,7 +115,7 @@ public class RotatingAmplitudes extends InputController implements SoundCanvas, 
 	
 	@ChangesIcon
 	@UserProperty(description="first polygon from center")
-	boolean startFromCenter = false;
+	private boolean startFromCenter = false;
 	
 	@NestedProperty(description = "smoothening using moving average")
 	MovingAverage movingAverage = new MovingAverage(1000);
@@ -99,11 +126,12 @@ public class RotatingAmplitudes extends InputController implements SoundCanvas, 
 	private float amplitudeDivisor;
 	private float amplitudeMultiplicator;
 	private AmplitudeHelper amplitude;	
-	long degrees;
-	Deque<Point> deque = new ArrayDeque<Point>();
+	int degrees;
+	Deque<int[]> deque = new ArrayDeque<int[]>();
 	int max;
 	int samplesPerFrame;
 	long sampleCount;
+	BasicStroke stroke = new BasicStroke(1);
 	
 	/* (non-Javadoc)
 	 * @see org.mcuosmipcuter.orcc.api.soundvis.SoundCanvas#nextSample(int[])
@@ -117,20 +145,18 @@ public class RotatingAmplitudes extends InputController implements SoundCanvas, 
 		if(Math.abs(amp) > Math.abs(max)) {
 			max = ampMode == AMP_MODE.UNSIGNED ?  Math.abs(amp) : amp;
 		}
-		if(degreesPerFrame == 0) {
-			return; // do nothing
+		int modul;
+		if(degreesPerFrame != 0) {
+			modul =  samplesPerFrame / degreesPerFrame;
 		}
-		int modul =  samplesPerFrame / degreesPerFrame;
+		else {
+			modul = 0;
+		}
 		
 		if(modul == 0 || sampleCount % modul == 0) {
 			int drawAmp = max;
-			if(ampZoom != 100) {
-				double scale = (double)ampZoom / 100;
-				drawAmp = (int)((double)max * scale);
-			}
-			int x = centerX  + (int)(drawAmp * Math.cos(degrees * (Math.PI / 180)));
-			int y = centerY + (int)(drawAmp * Math.sin(degrees * (Math.PI / 180)));
-			Point latestRemoved = null;
+
+			int[] latestRemoved = null;
 			if(deque.size() == size) {
 				latestRemoved = deque.removeFirst();
 			}
@@ -139,22 +165,25 @@ public class RotatingAmplitudes extends InputController implements SoundCanvas, 
 					latestRemoved = deque.removeFirst();
 				}
 			}
-			Point p;
+			int[] p;
 			if(latestRemoved != null) {
-				latestRemoved.x = x;
-				latestRemoved.y = y;
+				latestRemoved[0] = drawAmp;
+				latestRemoved[1] = degrees;
 				p = latestRemoved;
 			}
 			else {
-				p = new Point(x, y);
+				p = new int[] {drawAmp, degrees};
 			}
 			deque.addLast(p);
 			max = 0;
 			if(degreesPerFrame > 0) {
 				this.degrees++;
 			}
-			else {
+			else if(degreesPerFrame < 0){
 				this.degrees--;
+			}
+			else {
+				this.degrees = initialDegrees;
 			}
 			
 		}
@@ -172,24 +201,50 @@ public class RotatingAmplitudes extends InputController implements SoundCanvas, 
 		int prevX = centerX + shiftX;
 		int prevY = centerY + shiftY;
 		boolean begin = true;
+		Stroke origStroke = graphics2D.getStroke();
+		if (prevLineSize != lineSize) {
+			stroke = new BasicStroke(lineSize);
+		}
+		prevLineSize = lineSize;
+		if (lineSize > 0) {		
+			graphics2D.setStroke(stroke);
+		}
 		
-		for(Point p : deque) {
-			if(drawMode == DRAW_MODE.LINE || drawMode == DRAW_MODE.DOT_LINE) {
-				graphics2D.drawLine(centerX + shiftX, centerY + shiftY, p.x + shiftX, p.y + shiftY);
+		for(int[] arr : deque) {
+			int drawAmp = arr[0];
+			if(ampZoom != 100) {
+				double scale = (double)ampZoom / 100;
+				drawAmp = (int)((double)arr[0] * scale);
 			}
-			if(drawMode == DRAW_MODE.DOT || drawMode == DRAW_MODE.DOT_LINE) {
-				graphics2D.fillOval(p.x + shiftX - dotSize / 2, p.y + shiftY - dotSize / 2, dotSize, dotSize);
+			boolean draw = true;
+			if(drawAmp < minRadius) {
+				drawAmp = minRadius;
+				draw = drawMin;
+			}
+			if(maxRadius != 0 && drawAmp > maxRadius) {
+				drawAmp = maxRadius;
+				draw = drawMax;
+			}
+			
+			int x = centerX  + (int)(drawAmp * Math.cos(arr[1] * (Math.PI / 180)));
+			int y = centerY + (int)(drawAmp * Math.sin(arr[1] * (Math.PI / 180)));
+
+			if(draw && (drawMode == DRAW_MODE.LINE || drawMode == DRAW_MODE.DOT_LINE)) {
+				graphics2D.drawLine(centerX + shiftX, centerY + shiftY, x + shiftX, y + shiftY);
+			}
+			if(draw && (drawMode == DRAW_MODE.DOT || drawMode == DRAW_MODE.DOT_LINE)) {
+				graphics2D.fillOval(x + shiftX - dotSize / 2, y + shiftY - dotSize / 2, dotSize, dotSize);
 			}
 			if(drawMode == DRAW_MODE.POLY_LINE) {
-				if(! begin ||startFromCenter) {
-					graphics2D.drawLine(prevX + shiftX, prevY + shiftY, p.x + shiftX, p.y + shiftY);
+				if(draw &&(! begin ||startFromCenter)) {
+					graphics2D.drawLine(prevX + shiftX, prevY + shiftY, x + shiftX, y + shiftY);
 				}
-				prevX = p.x + shiftX;
-				prevY = p.y + shiftY;
+				prevX = x + shiftX;
+				prevY = y + shiftY;
 			}
 			begin = false;
 		}
-		
+		graphics2D.setStroke(origStroke);
 	}
 
 	/* (non-Javadoc)
@@ -209,7 +264,7 @@ public class RotatingAmplitudes extends InputController implements SoundCanvas, 
 		if(amplitudeDivisor < 1){
 			amplitudeMultiplicator = videoOutputInfo.getHeight() / amplitude.getAmplitudeRange();
 		}
-		degrees = 0;
+		degrees = initialDegrees;
 		deque.clear();
 		max = 0;
 	}
@@ -222,6 +277,9 @@ public class RotatingAmplitudes extends InputController implements SoundCanvas, 
 	@Override
 	public void updateUI(int width, int height, Graphics2D graphics2D) {
 		graphics2D.setColor(foreGround);
+		if (lineSize > 1) {
+			graphics2D.setStroke(new BasicStroke(Math.max(1, lineSize / 5)));
+		}
 
 		boolean begin = true;
 		int localCenterX = width / 2;
@@ -259,13 +317,16 @@ public class RotatingAmplitudes extends InputController implements SoundCanvas, 
 	@Override
 	public int getCurrentHistoryFrameSize() {
 		// depends on the amount of history we are keeping, a big size and a slow degree speed need a big pre-run
-		return degreesPerFrame != 0 ? size / degreesPerFrame : 0;
+		return degreesPerFrame != 0 ? Math.abs(size / degreesPerFrame) : 0;
 	}
 
 	@Override
 	protected void doFieldEnablings(Map<String, InputEnabling> fieldEnablings) {
+		fieldEnablings.get("lineSize").enableInput(drawMode != DRAW_MODE.DOT);
 		fieldEnablings.get("dotSize").enableInput(drawMode == DRAW_MODE.DOT || drawMode == DRAW_MODE.DOT_LINE);
 		fieldEnablings.get("startFromCenter").enableInput(drawMode == DRAW_MODE.POLY_LINE);
+		fieldEnablings.get("drawMin").enableInput(minRadius > 0);
+		fieldEnablings.get("drawMax").enableInput(maxRadius > 0);
 	}
 
 }
