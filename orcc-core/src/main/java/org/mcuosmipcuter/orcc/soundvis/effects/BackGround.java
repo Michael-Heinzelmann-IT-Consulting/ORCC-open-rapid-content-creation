@@ -61,7 +61,7 @@ public class BackGround extends InputController{
 	@UserProperty(description = "shape")
 	private CLIP_SHAPE shape = CLIP_SHAPE.RECTANGLE;
 	
-	@UserProperty(description = "corner rounding")
+	@UserProperty(description = "corner rounding", unit = Unit.PERCENT_OBJECT)
 	@LimitedIntProperty(minimum = 0, maximum = 100, description = "only positive integers")
 	int cornerRounding = 0;
 

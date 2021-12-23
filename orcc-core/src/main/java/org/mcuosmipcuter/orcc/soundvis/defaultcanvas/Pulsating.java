@@ -63,7 +63,7 @@ public class Pulsating implements SoundCanvas, ExtendedFrameHistory {
 	private int history = 1;
 	
 	@ChangesIcon
-	@UserProperty(description="size of line, 0 = draw filled")
+	@UserProperty(description="size of line, 0 = draw filled", unit = Unit.PIXEL)
 	@NumberMeaning(numbers = 0, meanings = "filled")
 	@LimitedIntProperty(minimum = 0, description = "minimum 0")
 	private int lineSize = 0;
