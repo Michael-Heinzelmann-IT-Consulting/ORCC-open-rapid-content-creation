@@ -53,8 +53,8 @@ public class FrameLabel extends JLabel implements Listener{
 			startCount = frameCount;
 			startTime = System.currentTimeMillis();
 		}
-		
-		if(framesOerSecond != 0 && (frameCount - startCount) % framesOerSecond == 0) {
+		long count = frameCount - startCount;
+		if(count != 0 && framesOerSecond != 0 && count % framesOerSecond == 0) {
 			long actualForSecond = System.currentTimeMillis() - startTime;
 			if(actualForSecond != 0) {
 				speed =  (int)(100000f / actualForSecond);
