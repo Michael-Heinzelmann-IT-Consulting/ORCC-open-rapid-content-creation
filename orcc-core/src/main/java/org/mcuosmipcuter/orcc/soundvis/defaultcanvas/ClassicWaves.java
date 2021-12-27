@@ -233,7 +233,6 @@ public class ClassicWaves extends InputController implements SoundCanvas {
 
 	@Override
 	protected void doFieldEnablings(Map<String, InputEnabling> fieldEnablings) {
-		System.err.println(fieldEnablings.keySet());
 		fieldEnablings.get("beamType").enableInput(beamWidth != 0);
 	}
 
