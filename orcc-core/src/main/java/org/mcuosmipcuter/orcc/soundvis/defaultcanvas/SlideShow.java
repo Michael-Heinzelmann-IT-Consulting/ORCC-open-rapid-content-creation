@@ -254,7 +254,7 @@ public class SlideShow extends InputController implements SoundCanvas {
 
 	@Override
 	protected void doFieldEnablings(Map<String, InputEnabling> fieldEnablings) {
-		fieldEnablings.get("numberOfFrames").enableInput(repeat > 0);
+		fieldEnablings.get("numberOfFrames").enableInput(repeat > -1);
 		fieldEnablings.get("fixedTos").enableInput(repeat == -1);
 	}
 

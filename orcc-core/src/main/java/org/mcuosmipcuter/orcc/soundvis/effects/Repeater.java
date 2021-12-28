@@ -138,7 +138,7 @@ public class Repeater extends InputController {
 		int relStart = 0;
 		for(int r = 0; r < repeats() * effects; r += effects) {
 			int repeatDurationFrames = getRepeatDurationFrames(frameFrom, frameTo, c);
-			long end = repeat == 1 ? frameTo : frameFrom + relStart + repeatDurationFrames - 1;
+			long end = (repeat == 1 && frames  == 0) ? frameTo : frameFrom + relStart + repeatDurationFrames - 1;
 			for(int j = 0; j < effects; j++) {
 				DisplayDuration<?> dd = displayObjects[j].getDisplayDuration(frameFrom + relStart, end);
 				dd.setFrom(dd.getFrom() + oLapBef);
@@ -153,7 +153,7 @@ public class Repeater extends InputController {
 	
 
 	protected void doFieldEnablings(Map<String, InputEnabling> fieldEnablings) {
-		fieldEnablings.get("frames").enableInput(repeat != 0);
+		fieldEnablings.get("frames").enableInput(repeat > 0);
 		fieldEnablings.get("fixedTos").enableInput(repeat == 0);
 	}
 
