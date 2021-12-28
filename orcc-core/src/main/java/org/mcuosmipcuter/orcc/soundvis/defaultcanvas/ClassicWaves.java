@@ -55,9 +55,8 @@ public class ClassicWaves extends InputController implements SoundCanvas {
 	@UserProperty(description="color of the waves")
 	private Color foreGroundColor = Color.BLUE;
 	
-	@ChangesIcon
-	@UserProperty(description="whether to draw filled bottom")
-	private FILL fill = FILL.NONE;
+	@NestedProperty(description = "smoothening using moving average")
+	MovingAverage movingAverage = new MovingAverage(1000);
 	
 	@UserProperty(description="whether to draw without margin")
 	private boolean drawMargin = true;
@@ -74,8 +73,23 @@ public class ClassicWaves extends InputController implements SoundCanvas {
 	@UserProperty(description="beam type analyzer")
 	private BEAM_TYPE beamType = BEAM_TYPE.FLAT;
 	
-	@NestedProperty(description = "smoothening using moving average")
-	MovingAverage movingAverage = new MovingAverage(1000);
+	@ChangesIcon
+	@UserProperty(description="whether to draw filled bottom")
+	private FILL fill = FILL.NONE;
+	
+	@SuppressWarnings("unused") // used by reflection
+	private PropertyGroup multiLine = new PropertyGroup("repeat", "distanceX", "distanceY", "symmetric");
+	@UserProperty(description="repeat line in y axis")
+	@NumberMeaning(numbers = 0, meanings = "off")
+	@LimitedIntProperty(minimum = 0, description = "not negative")
+	private int repeat = 0;
+	@UserProperty(description="line distance in x axis")
+	private int distanceX = 0;
+	@UserProperty(description="line distance in y axis")
+	private int distanceY = 0;
+	@UserProperty(description="draw symmetric to original line")
+	private boolean symmetric = false;
+
 	
 	// parameters automatically set
 	private float amplitudeDivisor;
@@ -149,7 +163,7 @@ public class ClassicWaves extends InputController implements SoundCanvas {
 						graphics.fillRect(x  + lm - beamWidth + 1, getY(height / 2 - aMaxamp, 0 , height / 2 - cb), beamWidth, rectHeight);
 					}
 					else {
-						graphics.fill3DRect(x  + lm - beamWidth + 1, getY(height / 2 - aMaxamp, 0 , height / 2 - cb), beamWidth, rectHeight, beamType == BEAM_TYPE.RAISED);
+						graphics.fill3DRect(x  + lm - beamWidth + 1, getY(height / 2 - aMaxamp, 0, height / 2 - cb), beamWidth, rectHeight, beamType == BEAM_TYPE.RAISED);
 					}
 					aMaxamp = 0;
 					aMinAmp = 0;
@@ -157,7 +171,19 @@ public class ClassicWaves extends InputController implements SoundCanvas {
 			}
 			else {
 				int y2 = getY(height / 2 - prevAmplitude, 0,height);
-				graphics.drawLine(lm + x, height / 2 - amp , lm + x, y2);
+				int mx = 0;
+				int my = 0;
+				for(int cy = 0; cy <= repeat; cy++) {
+					if(my != 0 || mx != 0) {
+						graphics.drawLine(lm + x + mx, height / 2 - amp + my, lm + x + mx, y2 + my);
+						if(symmetric) {
+							graphics.drawLine(lm + x + -mx, height / 2 - amp + -my, lm + x + -mx, y2 + -my);
+						}
+					}
+					mx += distanceX;
+					my += distanceY;
+				}
+				graphics.drawLine(lm + x, height / 2 - amp, lm + x, y2);
 				prevAmplitude = amp;
 			}
 			x++;
@@ -234,6 +260,7 @@ public class ClassicWaves extends InputController implements SoundCanvas {
 	@Override
 	protected void doFieldEnablings(Map<String, InputEnabling> fieldEnablings) {
 		fieldEnablings.get("beamType").enableInput(beamWidth != 0);
+		fieldEnablings.get("multiLine").enableInput(beamWidth == 0 && fill == FILL.NONE);
 	}
 
 
