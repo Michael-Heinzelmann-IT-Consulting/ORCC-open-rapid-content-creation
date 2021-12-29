@@ -39,9 +39,11 @@ import org.mcuosmipcuter.orcc.util.IOUtil;
 public abstract class Configuration {
 	
 	public final static String[] BUILT_IN_AUDIO = new String[] {"/audio/metronome_pcm_16bit_wav_30s.wav", 
-																"/audio/machine_learning.mp3"};
+																"/audio/machine_learning.mp3",
+																"/audio/one_minute_statement.mp3"};
 	
-	public final static String[] BUILT_IN_SESSIONS = new String[] {"/sessions/demo.xml", "/sessions/image_rotate.xml"};
+	public final static String[] BUILT_IN_SESSIONS = new String[] {"/sessions/demo.xml", 
+			"/sessions/image_rotate.xml", "/sessions/short_suspense.xml"};
 	
 	public final static int[] FRAME_RATES = new int[] {12, 24, 25, 30, 60};
 

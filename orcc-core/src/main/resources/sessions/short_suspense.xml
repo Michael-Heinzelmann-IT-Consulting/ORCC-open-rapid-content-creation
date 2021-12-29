@@ -1,0 +1,2279 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<java version="14.0.2" class="java.beans.XMLDecoder">
+ <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentSession" id="PersistentSession0">
+  <void property="audioInputClasspath">
+   <string>/audio/one_minute_statement.mp3</string>
+  </void>
+  <void property="audioInputName">
+   <string></string>
+  </void>
+  <void property="audioInputType">
+   <object class="java.lang.Enum" method="valueOf">
+    <class>org.mcuosmipcuter.orcc.soundvis.AudioInput$Type</class>
+    <string>STREAM</string>
+   </object>
+  </void>
+  <void property="buildNumber">
+   <string>20211228_1230</string>
+  </void>
+  <void property="soundCanvasList">
+   <void method="add">
+    <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentSoundCanvasWrapper" id="PersistentSoundCanvasWrapper0">
+     <void property="frameTo">
+      <long>1501</long>
+     </void>
+     <void property="frameToAuto">
+      <boolean>true</boolean>
+     </void>
+     <void property="scale">
+      <int>100</int>
+     </void>
+     <void property="sessionId">
+      <string>SolidColor_c8109fa9-b695-4869-b9aa-9e2e6b91ce60</string>
+     </void>
+     <void id="Integer0" property="posX"/>
+     <void property="soundCanvas">
+      <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentObject">
+       <void property="delegate">
+        <class>org.mcuosmipcuter.orcc.soundvis.defaultcanvas.SolidColor</class>
+       </void>
+       <void property="persistentProperties">
+        <object class="java.util.HashMap">
+         <void method="put">
+          <string>color</string>
+          <object class="java.awt.Color">
+           <object idref="Integer0"/>
+           <int>204</int>
+           <int>204</int>
+           <int>255</int>
+          </object>
+         </void>
+         <void method="put">
+          <string>scaler</string>
+          <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentObject">
+           <void property="delegate">
+            <class>org.mcuosmipcuter.orcc.soundvis.effects.Scaler</class>
+           </void>
+           <void property="persistentProperties">
+            <object class="java.util.HashMap">
+             <void method="put">
+              <string>effectShaper</string>
+              <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentObject">
+               <void property="delegate">
+                <class>org.mcuosmipcuter.orcc.soundvis.effects.EffectShaper</class>
+               </void>
+               <void property="persistentProperties">
+                <object class="java.util.HashMap">
+                 <void method="put">
+                  <string>beginFrames</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>midValueXPercent</string>
+                  <int>100</int>
+                 </void>
+                 <void method="put">
+                  <string>endValueYPercent</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>midValueYPercent</string>
+                  <int>100</int>
+                 </void>
+                 <void method="put">
+                  <string>framesOut</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>begValueYPercent</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>begValueXPercent</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>endFrames</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>framesIn</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>endValueXPercent</string>
+                  <object idref="Integer0"/>
+                 </void>
+                </object>
+               </void>
+              </object>
+             </void>
+            </object>
+           </void>
+          </object>
+         </void>
+         <void method="put">
+          <string>positioner</string>
+          <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentObject">
+           <void property="delegate">
+            <class>org.mcuosmipcuter.orcc.soundvis.effects.Positioner</class>
+           </void>
+           <void property="persistentProperties">
+            <object class="java.util.HashMap">
+             <void method="put">
+              <string>centerY</string>
+              <object idref="Integer0"/>
+             </void>
+             <void method="put">
+              <string>centerX</string>
+              <object idref="Integer0"/>
+             </void>
+            </object>
+           </void>
+          </object>
+         </void>
+         <void method="put">
+          <string>gradient</string>
+          <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentObject">
+           <void property="delegate">
+            <class>org.mcuosmipcuter.orcc.soundvis.effects.Gradient</class>
+           </void>
+           <void property="persistentProperties">
+            <object class="java.util.HashMap">
+             <void method="put">
+              <string>color2</string>
+              <object class="java.awt.Color">
+               <int>255</int>
+               <int>255</int>
+               <int>255</int>
+               <int>255</int>
+              </object>
+             </void>
+             <void method="put">
+              <string>swap</string>
+              <boolean>false</boolean>
+             </void>
+             <void method="put">
+              <string>limitY</string>
+              <int>75</int>
+             </void>
+             <void method="put">
+              <string>limitX</string>
+              <object idref="Integer0"/>
+             </void>
+             <void method="put">
+              <string>complement</string>
+              <boolean>true</boolean>
+             </void>
+             <void method="put">
+              <string>cycle</string>
+              <boolean>false</boolean>
+             </void>
+             <void method="put">
+              <string>transparent</string>
+              <boolean>false</boolean>
+             </void>
+            </object>
+           </void>
+          </object>
+         </void>
+         <void method="put">
+          <string>fader</string>
+          <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentObject">
+           <void property="delegate">
+            <class>org.mcuosmipcuter.orcc.soundvis.effects.Fader</class>
+           </void>
+           <void property="persistentProperties">
+            <object class="java.util.HashMap">
+             <void method="put">
+              <string>rule</string>
+              <object class="java.lang.Enum" id="Fader$RULE0" method="valueOf">
+               <class>org.mcuosmipcuter.orcc.soundvis.effects.Fader$RULE</class>
+               <string>SRC_OVER</string>
+              </object>
+             </void>
+             <void method="put">
+              <string>effectShaper</string>
+              <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentObject">
+               <void property="delegate">
+                <class>org.mcuosmipcuter.orcc.soundvis.effects.EffectShaperSimple</class>
+               </void>
+               <void property="persistentProperties">
+                <object class="java.util.HashMap">
+                 <void method="put">
+                  <string>beginFrames</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>framesOut</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>endValuePercent</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>endFrames</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>framesIn</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>midValuePercent</string>
+                  <int>100</int>
+                 </void>
+                 <void method="put">
+                  <string>begValuePercent</string>
+                  <object idref="Integer0"/>
+                 </void>
+                </object>
+               </void>
+              </object>
+             </void>
+            </object>
+           </void>
+          </object>
+         </void>
+         <void method="put">
+          <string>repeater</string>
+          <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentObject">
+           <void property="delegate">
+            <class>org.mcuosmipcuter.orcc.soundvis.effects.Repeater</class>
+           </void>
+           <void property="persistentProperties">
+            <object class="java.util.HashMap">
+             <void method="put">
+              <string>frames</string>
+              <object idref="Integer0"/>
+             </void>
+             <void method="put">
+              <string>repeat</string>
+              <int>1</int>
+             </void>
+             <void method="put">
+              <string>fixedTos</string>
+              <object class="org.mcuosmipcuter.orcc.api.types.LongSequence"/>
+             </void>
+            </object>
+           </void>
+          </object>
+         </void>
+        </object>
+       </void>
+      </object>
+     </void>
+     <void property="transparency">
+      <int>100</int>
+     </void>
+     <void property="visible">
+      <boolean>true</boolean>
+     </void>
+    </object>
+   </void>
+   <void method="add">
+    <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentSoundCanvasWrapper">
+     <void property="frameFrom">
+      <long>2</long>
+     </void>
+     <void property="frameTo">
+      <long>53</long>
+     </void>
+     <void property="scale">
+      <int>100</int>
+     </void>
+     <void property="sessionId">
+      <string>Text_6a97fce7-1144-4d7a-bc49-01cfd5b43f1d</string>
+     </void>
+     <void property="soundCanvas">
+      <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentObject">
+       <void property="delegate">
+        <class>org.mcuosmipcuter.orcc.soundvis.defaultcanvas.Text</class>
+       </void>
+       <void property="persistentProperties">
+        <object class="java.util.HashMap">
+         <void method="put">
+          <string>textAlign</string>
+          <object class="java.lang.Enum" method="valueOf">
+           <class>org.mcuosmipcuter.orcc.soundvis.defaultcanvas.Text$TextAlign</class>
+           <string>CENTERED</string>
+          </object>
+         </void>
+         <void method="put">
+          <string>positioner</string>
+          <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentObject">
+           <void property="delegate">
+            <class>org.mcuosmipcuter.orcc.soundvis.effects.Positioner</class>
+           </void>
+           <void property="persistentProperties">
+            <object class="java.util.HashMap">
+             <void method="put">
+              <string>centerY</string>
+              <object idref="Integer0"/>
+             </void>
+             <void method="put">
+              <string>centerX</string>
+              <object idref="Integer0"/>
+             </void>
+            </object>
+           </void>
+          </object>
+         </void>
+         <void method="put">
+          <string>textColor</string>
+          <object class="java.awt.Color">
+           <object idref="Integer0"/>
+           <object idref="Integer0"/>
+           <object idref="Integer0"/>
+           <int>255</int>
+          </object>
+         </void>
+         <void method="put">
+          <string>textProgress</string>
+          <object class="java.lang.Enum" id="Text$TextProgress0" method="valueOf">
+           <class>org.mcuosmipcuter.orcc.soundvis.defaultcanvas.Text$TextProgress</class>
+           <string>PAGE</string>
+          </object>
+         </void>
+         <void method="put">
+          <string>modProgress</string>
+          <object idref="Integer0"/>
+         </void>
+         <void method="put">
+          <string>rotator</string>
+          <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentObject">
+           <void property="delegate">
+            <class>org.mcuosmipcuter.orcc.soundvis.effects.Rotator</class>
+           </void>
+           <void property="persistentProperties">
+            <object class="java.util.HashMap">
+             <void method="put">
+              <string>rotateOutFrames</string>
+              <object idref="Integer0"/>
+             </void>
+             <void method="put">
+              <string>permanentRotation</string>
+              <object idref="Integer0"/>
+             </void>
+             <void method="put">
+              <string>rotateInSpeed</string>
+              <object idref="Integer0"/>
+             </void>
+             <void method="put">
+              <string>rotateInFrames</string>
+              <object idref="Integer0"/>
+             </void>
+             <void method="put">
+              <string>rotateOutSpeed</string>
+              <object idref="Integer0"/>
+             </void>
+            </object>
+           </void>
+          </object>
+         </void>
+         <void method="put">
+          <string>leftRightMargin</string>
+          <int>10</int>
+         </void>
+         <void method="put">
+          <string>showMargins</string>
+          <boolean>false</boolean>
+         </void>
+         <void method="put">
+          <string>shearer</string>
+          <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentObject">
+           <void property="delegate">
+            <class>org.mcuosmipcuter.orcc.soundvis.effects.Shearer</class>
+           </void>
+           <void property="persistentProperties">
+            <object class="java.util.HashMap">
+             <void method="put">
+              <string>effectShaper</string>
+              <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentObject">
+               <void property="delegate">
+                <class>org.mcuosmipcuter.orcc.soundvis.effects.EffectShaper</class>
+               </void>
+               <void property="persistentProperties">
+                <object class="java.util.HashMap">
+                 <void method="put">
+                  <string>beginFrames</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>midValueXPercent</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>endValueYPercent</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>midValueYPercent</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>framesOut</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>begValueYPercent</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>begValueXPercent</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>endFrames</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>framesIn</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>endValueXPercent</string>
+                  <object idref="Integer0"/>
+                 </void>
+                </object>
+               </void>
+              </object>
+             </void>
+            </object>
+           </void>
+          </object>
+         </void>
+         <void method="put">
+          <string>iRotator</string>
+          <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentObject">
+           <void property="delegate">
+            <class>org.mcuosmipcuter.orcc.soundvis.effects.Rotator</class>
+           </void>
+           <void property="persistentProperties">
+            <object class="java.util.HashMap">
+             <void method="put">
+              <string>rotateOutFrames</string>
+              <object idref="Integer0"/>
+             </void>
+             <void method="put">
+              <string>permanentRotation</string>
+              <object idref="Integer0"/>
+             </void>
+             <void method="put">
+              <string>rotateInSpeed</string>
+              <object idref="Integer0"/>
+             </void>
+             <void method="put">
+              <string>rotateInFrames</string>
+              <object idref="Integer0"/>
+             </void>
+             <void method="put">
+              <string>rotateOutSpeed</string>
+              <object idref="Integer0"/>
+             </void>
+            </object>
+           </void>
+          </object>
+         </void>
+         <void method="put">
+          <string>bottomAutoMargin</string>
+          <int>20</int>
+         </void>
+         <void method="put">
+          <string>fontName</string>
+          <object class="org.mcuosmipcuter.orcc.soundvis.FontStore" method="getMappedValue">
+           <string>Helvetica</string>
+           <string>Helvetica</string>
+          </object>
+         </void>
+         <void method="put">
+          <string>topMargin</string>
+          <int>36</int>
+         </void>
+         <void method="put">
+          <string>backGround</string>
+          <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentObject">
+           <void property="delegate">
+            <class>org.mcuosmipcuter.orcc.soundvis.effects.BackGround</class>
+           </void>
+           <void property="persistentProperties">
+            <object class="java.util.HashMap">
+             <void method="put">
+              <string>backGround</string>
+              <object class="java.awt.Color" id="Color0">
+               <int>128</int>
+               <int>128</int>
+               <int>128</int>
+               <int>255</int>
+              </object>
+             </void>
+             <void method="put">
+              <string>shape</string>
+              <object class="java.lang.Enum" id="BackGround$CLIP_SHAPE0" method="valueOf">
+               <class>org.mcuosmipcuter.orcc.soundvis.effects.BackGround$CLIP_SHAPE</class>
+               <string>RECTANGLE</string>
+              </object>
+             </void>
+             <void method="put">
+              <string>cornerRounding</string>
+              <object idref="Integer0"/>
+             </void>
+             <void method="put">
+              <string>complement</string>
+              <boolean>false</boolean>
+             </void>
+             <void method="put">
+              <string>zoomY</string>
+              <int>100</int>
+             </void>
+             <void method="put">
+              <string>enabled</string>
+              <boolean>false</boolean>
+             </void>
+             <void method="put">
+              <string>zoomX</string>
+              <int>100</int>
+             </void>
+            </object>
+           </void>
+          </object>
+         </void>
+         <void method="put">
+          <string>linesPerRepeat</string>
+          <int>1</int>
+         </void>
+         <void method="put">
+          <string>mover</string>
+          <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentObject">
+           <void property="delegate">
+            <class>org.mcuosmipcuter.orcc.soundvis.effects.Mover</class>
+           </void>
+           <void property="persistentProperties">
+            <object class="java.util.HashMap">
+             <void method="put">
+              <string>moveOutXFrames</string>
+              <object idref="Integer0"/>
+             </void>
+             <void method="put">
+              <string>moveInYFrames</string>
+              <object idref="Integer0"/>
+             </void>
+             <void method="put">
+              <string>moveOutXSpeed</string>
+              <object idref="Integer0"/>
+             </void>
+             <void method="put">
+              <string>moveOutYFrames</string>
+              <object idref="Integer0"/>
+             </void>
+             <void method="put">
+              <string>moveInYSpeed</string>
+              <object idref="Integer0"/>
+             </void>
+             <void method="put">
+              <string>moveInXFrames</string>
+              <object idref="Integer0"/>
+             </void>
+             <void method="put">
+              <string>moveInXSpeed</string>
+              <object idref="Integer0"/>
+             </void>
+             <void method="put">
+              <string>moveOutYSpeed</string>
+              <object idref="Integer0"/>
+             </void>
+            </object>
+           </void>
+          </object>
+         </void>
+         <void method="put">
+          <string>typing</string>
+          <boolean>false</boolean>
+         </void>
+         <void method="put">
+          <string>ishearer</string>
+          <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentObject">
+           <void property="delegate">
+            <class>org.mcuosmipcuter.orcc.soundvis.effects.Shearer</class>
+           </void>
+           <void property="persistentProperties">
+            <object class="java.util.HashMap">
+             <void method="put">
+              <string>effectShaper</string>
+              <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentObject">
+               <void property="delegate">
+                <class>org.mcuosmipcuter.orcc.soundvis.effects.EffectShaper</class>
+               </void>
+               <void property="persistentProperties">
+                <object class="java.util.HashMap">
+                 <void method="put">
+                  <string>beginFrames</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>midValueXPercent</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>endValueYPercent</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>midValueYPercent</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>framesOut</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>begValueYPercent</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>begValueXPercent</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>endFrames</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>framesIn</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>endValueXPercent</string>
+                  <object idref="Integer0"/>
+                 </void>
+                </object>
+               </void>
+              </object>
+             </void>
+            </object>
+           </void>
+          </object>
+         </void>
+         <void method="put">
+          <string>fontSize</string>
+          <int>180</int>
+         </void>
+         <void method="put">
+          <string>text</string>
+          <string>10
+9
+8
+7
+6
+5
+4
+3
+2
+1</string>
+         </void>
+         <void method="put">
+          <string>fader</string>
+          <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentObject">
+           <void property="delegate">
+            <class>org.mcuosmipcuter.orcc.soundvis.effects.Fader</class>
+           </void>
+           <void property="persistentProperties">
+            <object class="java.util.HashMap">
+             <void method="put">
+              <string>rule</string>
+              <object idref="Fader$RULE0"/>
+             </void>
+             <void method="put">
+              <string>effectShaper</string>
+              <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentObject">
+               <void property="delegate">
+                <class>org.mcuosmipcuter.orcc.soundvis.effects.EffectShaperSimple</class>
+               </void>
+               <void property="persistentProperties">
+                <object class="java.util.HashMap">
+                 <void method="put">
+                  <string>beginFrames</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>framesOut</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>endValuePercent</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>endFrames</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>framesIn</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>midValuePercent</string>
+                  <int>100</int>
+                 </void>
+                 <void method="put">
+                  <string>begValuePercent</string>
+                  <object idref="Integer0"/>
+                 </void>
+                </object>
+               </void>
+              </object>
+             </void>
+            </object>
+           </void>
+          </object>
+         </void>
+         <void method="put">
+          <string>repeater</string>
+          <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentObject">
+           <void property="delegate">
+            <class>org.mcuosmipcuter.orcc.soundvis.effects.Repeater</class>
+           </void>
+           <void property="persistentProperties">
+            <object class="java.util.HashMap">
+             <void method="put">
+              <string>frames</string>
+              <object idref="Integer0"/>
+             </void>
+             <void method="put">
+              <string>repeat</string>
+              <int>10</int>
+             </void>
+             <void method="put">
+              <string>fixedTos</string>
+              <object class="org.mcuosmipcuter.orcc.api.types.LongSequence"/>
+             </void>
+            </object>
+           </void>
+          </object>
+         </void>
+        </object>
+       </void>
+      </object>
+     </void>
+     <void property="transparency">
+      <int>100</int>
+     </void>
+     <void property="visible">
+      <boolean>true</boolean>
+     </void>
+    </object>
+   </void>
+   <void method="add">
+    <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentSoundCanvasWrapper">
+     <void property="frameFrom">
+      <long>52</long>
+     </void>
+     <void property="frameTo">
+      <long>402</long>
+     </void>
+     <void property="scale">
+      <int>100</int>
+     </void>
+     <void property="sessionId">
+      <string>Pulsating_93ab9d5c-7904-4c56-8892-ae8bfd6956d6</string>
+     </void>
+     <void property="soundCanvas">
+      <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentObject">
+       <void property="delegate">
+        <class>org.mcuosmipcuter.orcc.soundvis.defaultcanvas.Pulsating</class>
+       </void>
+       <void property="persistentProperties">
+        <object class="java.util.HashMap">
+         <void method="put">
+          <string>drawMode</string>
+          <object class="java.lang.Enum" method="valueOf">
+           <class>org.mcuosmipcuter.orcc.soundvis.defaultcanvas.Pulsating$DRAW_MODE</class>
+           <string>ELLIPSE</string>
+          </object>
+         </void>
+         <void method="put">
+          <string>history</string>
+          <int>3</int>
+         </void>
+         <void method="put">
+          <string>reverse</string>
+          <boolean>false</boolean>
+         </void>
+         <void method="put">
+          <string>lineSize</string>
+          <int>6</int>
+         </void>
+         <void method="put">
+          <string>foreGround</string>
+          <object class="java.awt.Color">
+           <int>255</int>
+           <int>255</int>
+           <object idref="Integer0"/>
+           <int>255</int>
+          </object>
+         </void>
+         <void method="put">
+          <string>movingAverage</string>
+          <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentObject">
+           <void property="delegate">
+            <class>org.mcuosmipcuter.orcc.soundvis.effects.MovingAverage</class>
+           </void>
+           <void property="persistentProperties">
+            <object class="java.util.HashMap">
+             <void method="put">
+              <string>smooth</string>
+              <int>1</int>
+             </void>
+            </object>
+           </void>
+          </object>
+         </void>
+        </object>
+       </void>
+      </object>
+     </void>
+     <void property="transparency">
+      <int>100</int>
+     </void>
+     <void property="visible">
+      <boolean>true</boolean>
+     </void>
+    </object>
+   </void>
+   <void method="add">
+    <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentSoundCanvasWrapper">
+     <void property="frameFrom">
+      <long>53</long>
+     </void>
+     <void property="frameTo">
+      <long>402</long>
+     </void>
+     <void property="posX">
+      <int>13</int>
+     </void>
+     <void property="scale">
+      <int>100</int>
+     </void>
+     <void property="sessionId">
+      <string>Pulsating_bf86ab05-cafe-418a-b104-595b03f887b7</string>
+     </void>
+     <void property="soundCanvas">
+      <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentObject">
+       <void property="delegate">
+        <class>org.mcuosmipcuter.orcc.soundvis.defaultcanvas.Pulsating</class>
+       </void>
+       <void property="persistentProperties">
+        <object class="java.util.HashMap">
+         <void method="put">
+          <string>drawMode</string>
+          <object class="java.lang.Enum" id="Pulsating$DRAW_MODE0" method="valueOf">
+           <class>org.mcuosmipcuter.orcc.soundvis.defaultcanvas.Pulsating$DRAW_MODE</class>
+           <string>CIRCLE</string>
+          </object>
+         </void>
+         <void method="put">
+          <string>history</string>
+          <int>30</int>
+         </void>
+         <void method="put">
+          <string>reverse</string>
+          <boolean>false</boolean>
+         </void>
+         <void method="put">
+          <string>lineSize</string>
+          <int>4</int>
+         </void>
+         <void method="put">
+          <string>foreGround</string>
+          <object class="java.awt.Color">
+           <int>153</int>
+           <object idref="Integer0"/>
+           <int>51</int>
+           <int>255</int>
+          </object>
+         </void>
+         <void method="put">
+          <string>movingAverage</string>
+          <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentObject">
+           <void property="delegate">
+            <class>org.mcuosmipcuter.orcc.soundvis.effects.MovingAverage</class>
+           </void>
+           <void property="persistentProperties">
+            <object class="java.util.HashMap">
+             <void method="put">
+              <string>smooth</string>
+              <int>1</int>
+             </void>
+            </object>
+           </void>
+          </object>
+         </void>
+        </object>
+       </void>
+      </object>
+     </void>
+     <void property="transparency">
+      <int>100</int>
+     </void>
+     <void property="visible">
+      <boolean>true</boolean>
+     </void>
+    </object>
+   </void>
+   <void method="add">
+    <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentSoundCanvasWrapper">
+     <void property="frameFrom">
+      <long>52</long>
+     </void>
+     <void property="frameTo">
+      <long>402</long>
+     </void>
+     <void property="posX">
+      <int>-13</int>
+     </void>
+     <void property="scale">
+      <int>100</int>
+     </void>
+     <void property="sessionId">
+      <string>Pulsating_c105210a-0f7f-48b0-adfc-b913250190b2</string>
+     </void>
+     <void property="soundCanvas">
+      <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentObject">
+       <void property="delegate">
+        <class>org.mcuosmipcuter.orcc.soundvis.defaultcanvas.Pulsating</class>
+       </void>
+       <void property="persistentProperties">
+        <object class="java.util.HashMap">
+         <void method="put">
+          <string>drawMode</string>
+          <object idref="Pulsating$DRAW_MODE0"/>
+         </void>
+         <void method="put">
+          <string>history</string>
+          <int>10</int>
+         </void>
+         <void method="put">
+          <string>reverse</string>
+          <boolean>false</boolean>
+         </void>
+         <void method="put">
+          <string>lineSize</string>
+          <int>4</int>
+         </void>
+         <void method="put">
+          <string>foreGround</string>
+          <object class="java.awt.Color">
+           <int>51</int>
+           <object idref="Integer0"/>
+           <int>153</int>
+           <int>255</int>
+          </object>
+         </void>
+         <void method="put">
+          <string>movingAverage</string>
+          <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentObject">
+           <void property="delegate">
+            <class>org.mcuosmipcuter.orcc.soundvis.effects.MovingAverage</class>
+           </void>
+           <void property="persistentProperties">
+            <object class="java.util.HashMap">
+             <void method="put">
+              <string>smooth</string>
+              <int>1</int>
+             </void>
+            </object>
+           </void>
+          </object>
+         </void>
+        </object>
+       </void>
+      </object>
+     </void>
+     <void property="transparency">
+      <int>100</int>
+     </void>
+     <void property="visible">
+      <boolean>true</boolean>
+     </void>
+    </object>
+   </void>
+   <void method="add">
+    <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentSoundCanvasWrapper">
+     <void property="frameTo">
+      <long>781</long>
+     </void>
+     <void property="scale">
+      <int>100</int>
+     </void>
+     <void property="sessionId">
+      <string>Pulsating_12955f43-d791-46aa-8463-b667349f3c36</string>
+     </void>
+     <void property="soundCanvas">
+      <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentObject">
+       <void property="delegate">
+        <class>org.mcuosmipcuter.orcc.soundvis.defaultcanvas.Pulsating</class>
+       </void>
+       <void property="persistentProperties">
+        <object class="java.util.HashMap">
+         <void method="put">
+          <string>drawMode</string>
+          <object class="java.lang.Enum" method="valueOf">
+           <class>org.mcuosmipcuter.orcc.soundvis.defaultcanvas.Pulsating$DRAW_MODE</class>
+           <string>RECTANGLE</string>
+          </object>
+         </void>
+         <void method="put">
+          <string>history</string>
+          <int>6</int>
+         </void>
+         <void method="put">
+          <string>reverse</string>
+          <boolean>true</boolean>
+         </void>
+         <void method="put">
+          <string>lineSize</string>
+          <int>4</int>
+         </void>
+         <void method="put">
+          <string>foreGround</string>
+          <object class="java.awt.Color">
+           <object idref="Integer0"/>
+           <object idref="Integer0"/>
+           <object idref="Integer0"/>
+           <int>255</int>
+          </object>
+         </void>
+         <void method="put">
+          <string>movingAverage</string>
+          <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentObject">
+           <void property="delegate">
+            <class>org.mcuosmipcuter.orcc.soundvis.effects.MovingAverage</class>
+           </void>
+           <void property="persistentProperties">
+            <object class="java.util.HashMap">
+             <void method="put">
+              <string>smooth</string>
+              <int>1</int>
+             </void>
+            </object>
+           </void>
+          </object>
+         </void>
+        </object>
+       </void>
+      </object>
+     </void>
+     <void property="transparency">
+      <int>100</int>
+     </void>
+     <void property="visible">
+      <boolean>true</boolean>
+     </void>
+    </object>
+   </void>
+   <void method="add">
+    <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentSoundCanvasWrapper">
+     <void property="frameFrom">
+      <long>357</long>
+     </void>
+     <void property="frameTo">
+      <long>450</long>
+     </void>
+     <void property="scale">
+      <int>100</int>
+     </void>
+     <void property="sessionId">
+      <string>SolidColor_deb2aa48-e897-464b-a234-ef3e00c9dff0</string>
+     </void>
+     <void property="soundCanvas">
+      <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentObject">
+       <void property="delegate">
+        <class>org.mcuosmipcuter.orcc.soundvis.defaultcanvas.SolidColor</class>
+       </void>
+       <void property="persistentProperties">
+        <object class="java.util.HashMap">
+         <void method="put">
+          <string>color</string>
+          <object class="java.awt.Color" id="Color1">
+           <int>255</int>
+           <int>255</int>
+           <int>255</int>
+           <int>255</int>
+          </object>
+         </void>
+         <void method="put">
+          <string>scaler</string>
+          <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentObject">
+           <void property="delegate">
+            <class>org.mcuosmipcuter.orcc.soundvis.effects.Scaler</class>
+           </void>
+           <void property="persistentProperties">
+            <object class="java.util.HashMap">
+             <void method="put">
+              <string>effectShaper</string>
+              <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentObject">
+               <void property="delegate">
+                <class>org.mcuosmipcuter.orcc.soundvis.effects.EffectShaper</class>
+               </void>
+               <void property="persistentProperties">
+                <object class="java.util.HashMap">
+                 <void method="put">
+                  <string>beginFrames</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>midValueXPercent</string>
+                  <int>100</int>
+                 </void>
+                 <void method="put">
+                  <string>endValueYPercent</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>midValueYPercent</string>
+                  <int>100</int>
+                 </void>
+                 <void method="put">
+                  <string>framesOut</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>begValueYPercent</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>begValueXPercent</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>endFrames</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>framesIn</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>endValueXPercent</string>
+                  <object idref="Integer0"/>
+                 </void>
+                </object>
+               </void>
+              </object>
+             </void>
+            </object>
+           </void>
+          </object>
+         </void>
+         <void method="put">
+          <string>positioner</string>
+          <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentObject">
+           <void property="delegate">
+            <class>org.mcuosmipcuter.orcc.soundvis.effects.Positioner</class>
+           </void>
+           <void property="persistentProperties">
+            <object class="java.util.HashMap">
+             <void method="put">
+              <string>centerY</string>
+              <object idref="Integer0"/>
+             </void>
+             <void method="put">
+              <string>centerX</string>
+              <object idref="Integer0"/>
+             </void>
+            </object>
+           </void>
+          </object>
+         </void>
+         <void method="put">
+          <string>gradient</string>
+          <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentObject">
+           <void property="delegate">
+            <class>org.mcuosmipcuter.orcc.soundvis.effects.Gradient</class>
+           </void>
+           <void property="persistentProperties">
+            <object class="java.util.HashMap">
+             <void method="put">
+              <string>color2</string>
+              <object idref="Color0"/>
+             </void>
+             <void method="put">
+              <string>swap</string>
+              <boolean>false</boolean>
+             </void>
+             <void method="put">
+              <string>limitY</string>
+              <object idref="Integer0"/>
+             </void>
+             <void method="put">
+              <string>limitX</string>
+              <int>1</int>
+             </void>
+             <void method="put">
+              <string>complement</string>
+              <boolean>false</boolean>
+             </void>
+             <void method="put">
+              <string>cycle</string>
+              <boolean>true</boolean>
+             </void>
+             <void method="put">
+              <string>transparent</string>
+              <boolean>false</boolean>
+             </void>
+            </object>
+           </void>
+          </object>
+         </void>
+         <void method="put">
+          <string>fader</string>
+          <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentObject">
+           <void property="delegate">
+            <class>org.mcuosmipcuter.orcc.soundvis.effects.Fader</class>
+           </void>
+           <void property="persistentProperties">
+            <object class="java.util.HashMap">
+             <void method="put">
+              <string>rule</string>
+              <object idref="Fader$RULE0"/>
+             </void>
+             <void method="put">
+              <string>effectShaper</string>
+              <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentObject">
+               <void property="delegate">
+                <class>org.mcuosmipcuter.orcc.soundvis.effects.EffectShaperSimple</class>
+               </void>
+               <void property="persistentProperties">
+                <object class="java.util.HashMap">
+                 <void method="put">
+                  <string>beginFrames</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>framesOut</string>
+                  <int>-4</int>
+                 </void>
+                 <void method="put">
+                  <string>endValuePercent</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>endFrames</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>framesIn</string>
+                  <int>34</int>
+                 </void>
+                 <void method="put">
+                  <string>midValuePercent</string>
+                  <int>100</int>
+                 </void>
+                 <void method="put">
+                  <string>begValuePercent</string>
+                  <object idref="Integer0"/>
+                 </void>
+                </object>
+               </void>
+              </object>
+             </void>
+            </object>
+           </void>
+          </object>
+         </void>
+         <void method="put">
+          <string>repeater</string>
+          <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentObject">
+           <void property="delegate">
+            <class>org.mcuosmipcuter.orcc.soundvis.effects.Repeater</class>
+           </void>
+           <void property="persistentProperties">
+            <object class="java.util.HashMap">
+             <void method="put">
+              <string>frames</string>
+              <object idref="Integer0"/>
+             </void>
+             <void method="put">
+              <string>repeat</string>
+              <int>1</int>
+             </void>
+             <void method="put">
+              <string>fixedTos</string>
+              <object class="org.mcuosmipcuter.orcc.api.types.LongSequence"/>
+             </void>
+            </object>
+           </void>
+          </object>
+         </void>
+        </object>
+       </void>
+      </object>
+     </void>
+     <void property="transparency">
+      <int>100</int>
+     </void>
+     <void property="visible">
+      <boolean>true</boolean>
+     </void>
+    </object>
+   </void>
+   <void method="add">
+    <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentSoundCanvasWrapper">
+     <void property="frameFrom">
+      <long>448</long>
+     </void>
+     <void property="frameTo">
+      <long>781</long>
+     </void>
+     <void property="scale">
+      <int>100</int>
+     </void>
+     <void property="sessionId">
+      <string>RotatingAmplitudes_6776b8ed-a091-4f1d-96fb-1a081e834ec1</string>
+     </void>
+     <void property="soundCanvas">
+      <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentObject">
+       <void property="delegate">
+        <class>org.mcuosmipcuter.orcc.soundvis.defaultcanvas.RotatingAmplitudes</class>
+       </void>
+       <void property="persistentProperties">
+        <object class="java.util.HashMap">
+         <void method="put">
+          <string>startFromCenter</string>
+          <boolean>false</boolean>
+         </void>
+         <void method="put">
+          <string>maxRadius</string>
+          <int>99</int>
+         </void>
+         <void method="put">
+          <string>drawMax</string>
+          <boolean>true</boolean>
+         </void>
+         <void method="put">
+          <string>ampZoom</string>
+          <int>200</int>
+         </void>
+         <void method="put">
+          <string>dotSize</string>
+          <int>2</int>
+         </void>
+         <void method="put">
+          <string>drawMin</string>
+          <boolean>true</boolean>
+         </void>
+         <void method="put">
+          <string>ampMode</string>
+          <object class="java.lang.Enum" method="valueOf">
+           <class>org.mcuosmipcuter.orcc.soundvis.defaultcanvas.RotatingAmplitudes$AMP_MODE</class>
+           <string>UNSIGNED</string>
+          </object>
+         </void>
+         <void method="put">
+          <string>lineSize</string>
+          <int>2</int>
+         </void>
+         <void method="put">
+          <string>foreGround</string>
+          <object class="java.awt.Color">
+           <int>255</int>
+           <int>255</int>
+           <int>51</int>
+           <int>255</int>
+          </object>
+         </void>
+         <void method="put">
+          <string>degreesPerFrame</string>
+          <int>360</int>
+         </void>
+         <void method="put">
+          <string>initialDegrees</string>
+          <object idref="Integer0"/>
+         </void>
+         <void method="put">
+          <string>size</string>
+          <int>360</int>
+         </void>
+         <void method="put">
+          <string>drawMode</string>
+          <object class="java.lang.Enum" method="valueOf">
+           <class>org.mcuosmipcuter.orcc.soundvis.defaultcanvas.RotatingAmplitudes$DRAW_MODE</class>
+           <string>POLY_LINE</string>
+          </object>
+         </void>
+         <void method="put">
+          <string>minRadius</string>
+          <int>72</int>
+         </void>
+         <void method="put">
+          <string>shiftX</string>
+          <object idref="Integer0"/>
+         </void>
+         <void method="put">
+          <string>shiftY</string>
+          <object idref="Integer0"/>
+         </void>
+         <void method="put">
+          <string>movingAverage</string>
+          <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentObject">
+           <void property="delegate">
+            <class>org.mcuosmipcuter.orcc.soundvis.effects.MovingAverage</class>
+           </void>
+           <void property="persistentProperties">
+            <object class="java.util.HashMap">
+             <void method="put">
+              <string>smooth</string>
+              <int>1</int>
+             </void>
+            </object>
+           </void>
+          </object>
+         </void>
+        </object>
+       </void>
+      </object>
+     </void>
+     <void property="transparency">
+      <int>100</int>
+     </void>
+     <void property="visible">
+      <boolean>true</boolean>
+     </void>
+    </object>
+   </void>
+   <void method="add">
+    <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentSoundCanvasWrapper">
+     <void property="frameFrom">
+      <long>776</long>
+     </void>
+     <void property="frameTo">
+      <long>852</long>
+     </void>
+     <void property="scale">
+      <int>100</int>
+     </void>
+     <void property="sessionId">
+      <string>SolidColor_a900fe56-58f6-4400-a71f-00f4ffeed72f</string>
+     </void>
+     <void property="soundCanvas">
+      <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentObject">
+       <void property="delegate">
+        <class>org.mcuosmipcuter.orcc.soundvis.defaultcanvas.SolidColor</class>
+       </void>
+       <void property="persistentProperties">
+        <object class="java.util.HashMap">
+         <void method="put">
+          <string>color</string>
+          <object idref="Color1"/>
+         </void>
+         <void method="put">
+          <string>scaler</string>
+          <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentObject">
+           <void property="delegate">
+            <class>org.mcuosmipcuter.orcc.soundvis.effects.Scaler</class>
+           </void>
+           <void property="persistentProperties">
+            <object class="java.util.HashMap">
+             <void method="put">
+              <string>effectShaper</string>
+              <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentObject">
+               <void property="delegate">
+                <class>org.mcuosmipcuter.orcc.soundvis.effects.EffectShaper</class>
+               </void>
+               <void property="persistentProperties">
+                <object class="java.util.HashMap">
+                 <void method="put">
+                  <string>beginFrames</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>midValueXPercent</string>
+                  <int>100</int>
+                 </void>
+                 <void method="put">
+                  <string>endValueYPercent</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>midValueYPercent</string>
+                  <int>100</int>
+                 </void>
+                 <void method="put">
+                  <string>framesOut</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>begValueYPercent</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>begValueXPercent</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>endFrames</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>framesIn</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>endValueXPercent</string>
+                  <object idref="Integer0"/>
+                 </void>
+                </object>
+               </void>
+              </object>
+             </void>
+            </object>
+           </void>
+          </object>
+         </void>
+         <void method="put">
+          <string>positioner</string>
+          <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentObject">
+           <void property="delegate">
+            <class>org.mcuosmipcuter.orcc.soundvis.effects.Positioner</class>
+           </void>
+           <void property="persistentProperties">
+            <object class="java.util.HashMap">
+             <void method="put">
+              <string>centerY</string>
+              <object idref="Integer0"/>
+             </void>
+             <void method="put">
+              <string>centerX</string>
+              <object idref="Integer0"/>
+             </void>
+            </object>
+           </void>
+          </object>
+         </void>
+         <void method="put">
+          <string>gradient</string>
+          <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentObject">
+           <void property="delegate">
+            <class>org.mcuosmipcuter.orcc.soundvis.effects.Gradient</class>
+           </void>
+           <void property="persistentProperties">
+            <object class="java.util.HashMap">
+             <void method="put">
+              <string>color2</string>
+              <object idref="Color0"/>
+             </void>
+             <void method="put">
+              <string>swap</string>
+              <boolean>false</boolean>
+             </void>
+             <void method="put">
+              <string>limitY</string>
+              <int>1</int>
+             </void>
+             <void method="put">
+              <string>limitX</string>
+              <object idref="Integer0"/>
+             </void>
+             <void method="put">
+              <string>complement</string>
+              <boolean>false</boolean>
+             </void>
+             <void method="put">
+              <string>cycle</string>
+              <boolean>true</boolean>
+             </void>
+             <void method="put">
+              <string>transparent</string>
+              <boolean>false</boolean>
+             </void>
+            </object>
+           </void>
+          </object>
+         </void>
+         <void method="put">
+          <string>fader</string>
+          <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentObject">
+           <void property="delegate">
+            <class>org.mcuosmipcuter.orcc.soundvis.effects.Fader</class>
+           </void>
+           <void property="persistentProperties">
+            <object class="java.util.HashMap">
+             <void method="put">
+              <string>rule</string>
+              <object idref="Fader$RULE0"/>
+             </void>
+             <void method="put">
+              <string>effectShaper</string>
+              <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentObject">
+               <void property="delegate">
+                <class>org.mcuosmipcuter.orcc.soundvis.effects.EffectShaperSimple</class>
+               </void>
+               <void property="persistentProperties">
+                <object class="java.util.HashMap">
+                 <void method="put">
+                  <string>beginFrames</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>framesOut</string>
+                  <int>-20</int>
+                 </void>
+                 <void method="put">
+                  <string>endValuePercent</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>endFrames</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>framesIn</string>
+                  <int>19</int>
+                 </void>
+                 <void method="put">
+                  <string>midValuePercent</string>
+                  <int>100</int>
+                 </void>
+                 <void method="put">
+                  <string>begValuePercent</string>
+                  <object idref="Integer0"/>
+                 </void>
+                </object>
+               </void>
+              </object>
+             </void>
+            </object>
+           </void>
+          </object>
+         </void>
+         <void method="put">
+          <string>repeater</string>
+          <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentObject">
+           <void property="delegate">
+            <class>org.mcuosmipcuter.orcc.soundvis.effects.Repeater</class>
+           </void>
+           <void property="persistentProperties">
+            <object class="java.util.HashMap">
+             <void method="put">
+              <string>frames</string>
+              <object idref="Integer0"/>
+             </void>
+             <void method="put">
+              <string>repeat</string>
+              <int>1</int>
+             </void>
+             <void method="put">
+              <string>fixedTos</string>
+              <object class="org.mcuosmipcuter.orcc.api.types.LongSequence"/>
+             </void>
+            </object>
+           </void>
+          </object>
+         </void>
+        </object>
+       </void>
+      </object>
+     </void>
+     <void property="transparency">
+      <int>100</int>
+     </void>
+     <void property="visible">
+      <boolean>true</boolean>
+     </void>
+    </object>
+   </void>
+   <void method="add">
+    <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentSoundCanvasWrapper">
+     <void property="frameFrom">
+      <long>849</long>
+     </void>
+     <void property="frameTo">
+      <long>1278</long>
+     </void>
+     <void property="scale">
+      <int>200</int>
+     </void>
+     <void property="sessionId">
+      <string>ClassicWaves_74f11119-990d-416f-8f4e-b7177875eb3f</string>
+     </void>
+     <void property="soundCanvas">
+      <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentObject">
+       <void property="delegate">
+        <class>org.mcuosmipcuter.orcc.soundvis.defaultcanvas.ClassicWaves</class>
+       </void>
+       <void property="persistentProperties">
+        <object class="java.util.HashMap">
+         <void method="put">
+          <string>drawMargin</string>
+          <boolean>true</boolean>
+         </void>
+         <void method="put">
+          <string>foreGroundColor</string>
+          <object class="java.awt.Color">
+           <int>204</int>
+           <int>255</int>
+           <int>204</int>
+           <int>255</int>
+          </object>
+         </void>
+         <void method="put">
+          <string>beamWidth</string>
+          <object idref="Integer0"/>
+         </void>
+         <void method="put">
+          <string>repeat</string>
+          <int>30</int>
+         </void>
+         <void method="put">
+          <string>distanceY</string>
+          <int>1</int>
+         </void>
+         <void method="put">
+          <string>fill</string>
+          <object class="java.lang.Enum" method="valueOf">
+           <class>org.mcuosmipcuter.orcc.soundvis.defaultcanvas.ClassicWaves$FILL</class>
+           <string>NONE</string>
+          </object>
+         </void>
+         <void method="put">
+          <string>distanceX</string>
+          <int>5</int>
+         </void>
+         <void method="put">
+          <string>symmetric</string>
+          <boolean>true</boolean>
+         </void>
+         <void method="put">
+          <string>movingAverage</string>
+          <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentObject">
+           <void property="delegate">
+            <class>org.mcuosmipcuter.orcc.soundvis.effects.MovingAverage</class>
+           </void>
+           <void property="persistentProperties">
+            <object class="java.util.HashMap">
+             <void method="put">
+              <string>smooth</string>
+              <int>72</int>
+             </void>
+            </object>
+           </void>
+          </object>
+         </void>
+         <void method="put">
+          <string>beamType</string>
+          <object class="java.lang.Enum" method="valueOf">
+           <class>org.mcuosmipcuter.orcc.soundvis.defaultcanvas.ClassicWaves$BEAM_TYPE</class>
+           <string>RAISED</string>
+          </object>
+         </void>
+        </object>
+       </void>
+      </object>
+     </void>
+     <void property="transparency">
+      <int>100</int>
+     </void>
+     <void property="visible">
+      <boolean>true</boolean>
+     </void>
+    </object>
+   </void>
+   <void method="add">
+    <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentSoundCanvasWrapper">
+     <void property="frameFrom">
+      <long>1274</long>
+     </void>
+     <void property="frameTo">
+      <long>1501</long>
+     </void>
+     <void property="frameToAuto">
+      <boolean>true</boolean>
+     </void>
+     <void property="scale">
+      <int>100</int>
+     </void>
+     <void property="sessionId">
+      <string>Text_e1997aff-8cf6-4186-a9fa-f46c58cb0797</string>
+     </void>
+     <void property="soundCanvas">
+      <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentObject">
+       <void property="delegate">
+        <class>org.mcuosmipcuter.orcc.soundvis.defaultcanvas.Text</class>
+       </void>
+       <void property="persistentProperties">
+        <object class="java.util.HashMap">
+         <void method="put">
+          <string>textAlign</string>
+          <object class="java.lang.Enum" method="valueOf">
+           <class>org.mcuosmipcuter.orcc.soundvis.defaultcanvas.Text$TextAlign</class>
+           <string>LEFT</string>
+          </object>
+         </void>
+         <void method="put">
+          <string>positioner</string>
+          <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentObject">
+           <void property="delegate">
+            <class>org.mcuosmipcuter.orcc.soundvis.effects.Positioner</class>
+           </void>
+           <void property="persistentProperties">
+            <object class="java.util.HashMap">
+             <void method="put">
+              <string>centerY</string>
+              <object idref="Integer0"/>
+             </void>
+             <void method="put">
+              <string>centerX</string>
+              <object idref="Integer0"/>
+             </void>
+            </object>
+           </void>
+          </object>
+         </void>
+         <void method="put">
+          <string>textColor</string>
+          <object class="java.awt.Color">
+           <object idref="Integer0"/>
+           <object idref="Integer0"/>
+           <object idref="Integer0"/>
+           <int>255</int>
+          </object>
+         </void>
+         <void method="put">
+          <string>textProgress</string>
+          <object idref="Text$TextProgress0"/>
+         </void>
+         <void method="put">
+          <string>modProgress</string>
+          <object idref="Integer0"/>
+         </void>
+         <void method="put">
+          <string>rotator</string>
+          <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentObject">
+           <void property="delegate">
+            <class>org.mcuosmipcuter.orcc.soundvis.effects.Rotator</class>
+           </void>
+           <void property="persistentProperties">
+            <object class="java.util.HashMap">
+             <void method="put">
+              <string>rotateOutFrames</string>
+              <object idref="Integer0"/>
+             </void>
+             <void method="put">
+              <string>permanentRotation</string>
+              <object idref="Integer0"/>
+             </void>
+             <void method="put">
+              <string>rotateInSpeed</string>
+              <object idref="Integer0"/>
+             </void>
+             <void method="put">
+              <string>rotateInFrames</string>
+              <object idref="Integer0"/>
+             </void>
+             <void method="put">
+              <string>rotateOutSpeed</string>
+              <object idref="Integer0"/>
+             </void>
+            </object>
+           </void>
+          </object>
+         </void>
+         <void method="put">
+          <string>leftRightMargin</string>
+          <int>10</int>
+         </void>
+         <void method="put">
+          <string>showMargins</string>
+          <boolean>false</boolean>
+         </void>
+         <void method="put">
+          <string>shearer</string>
+          <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentObject">
+           <void property="delegate">
+            <class>org.mcuosmipcuter.orcc.soundvis.effects.Shearer</class>
+           </void>
+           <void property="persistentProperties">
+            <object class="java.util.HashMap">
+             <void method="put">
+              <string>effectShaper</string>
+              <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentObject">
+               <void property="delegate">
+                <class>org.mcuosmipcuter.orcc.soundvis.effects.EffectShaper</class>
+               </void>
+               <void property="persistentProperties">
+                <object class="java.util.HashMap">
+                 <void method="put">
+                  <string>beginFrames</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>midValueXPercent</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>endValueYPercent</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>midValueYPercent</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>framesOut</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>begValueYPercent</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>begValueXPercent</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>endFrames</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>framesIn</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>endValueXPercent</string>
+                  <object idref="Integer0"/>
+                 </void>
+                </object>
+               </void>
+              </object>
+             </void>
+            </object>
+           </void>
+          </object>
+         </void>
+         <void method="put">
+          <string>iRotator</string>
+          <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentObject">
+           <void property="delegate">
+            <class>org.mcuosmipcuter.orcc.soundvis.effects.Rotator</class>
+           </void>
+           <void property="persistentProperties">
+            <object class="java.util.HashMap">
+             <void method="put">
+              <string>rotateOutFrames</string>
+              <object idref="Integer0"/>
+             </void>
+             <void method="put">
+              <string>permanentRotation</string>
+              <object idref="Integer0"/>
+             </void>
+             <void method="put">
+              <string>rotateInSpeed</string>
+              <object idref="Integer0"/>
+             </void>
+             <void method="put">
+              <string>rotateInFrames</string>
+              <object idref="Integer0"/>
+             </void>
+             <void method="put">
+              <string>rotateOutSpeed</string>
+              <object idref="Integer0"/>
+             </void>
+            </object>
+           </void>
+          </object>
+         </void>
+         <void method="put">
+          <string>bottomAutoMargin</string>
+          <int>20</int>
+         </void>
+         <void method="put">
+          <string>fontName</string>
+          <object class="org.mcuosmipcuter.orcc.soundvis.FontStore" method="getMappedValue">
+           <string>Helvetica</string>
+           <string>Helvetica</string>
+          </object>
+         </void>
+         <void method="put">
+          <string>topMargin</string>
+          <int>20</int>
+         </void>
+         <void method="put">
+          <string>backGround</string>
+          <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentObject">
+           <void property="delegate">
+            <class>org.mcuosmipcuter.orcc.soundvis.effects.BackGround</class>
+           </void>
+           <void property="persistentProperties">
+            <object class="java.util.HashMap">
+             <void method="put">
+              <string>backGround</string>
+              <object class="java.awt.Color">
+               <int>128</int>
+               <int>128</int>
+               <int>128</int>
+               <int>255</int>
+              </object>
+             </void>
+             <void method="put">
+              <string>shape</string>
+              <object idref="BackGround$CLIP_SHAPE0"/>
+             </void>
+             <void method="put">
+              <string>cornerRounding</string>
+              <object idref="Integer0"/>
+             </void>
+             <void method="put">
+              <string>complement</string>
+              <boolean>true</boolean>
+             </void>
+             <void method="put">
+              <string>zoomY</string>
+              <int>100</int>
+             </void>
+             <void method="put">
+              <string>enabled</string>
+              <boolean>false</boolean>
+             </void>
+             <void method="put">
+              <string>zoomX</string>
+              <int>100</int>
+             </void>
+            </object>
+           </void>
+          </object>
+         </void>
+         <void method="put">
+          <string>linesPerRepeat</string>
+          <object idref="Integer0"/>
+         </void>
+         <void method="put">
+          <string>mover</string>
+          <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentObject">
+           <void property="delegate">
+            <class>org.mcuosmipcuter.orcc.soundvis.effects.Mover</class>
+           </void>
+           <void property="persistentProperties">
+            <object class="java.util.HashMap">
+             <void method="put">
+              <string>moveOutXFrames</string>
+              <object idref="Integer0"/>
+             </void>
+             <void method="put">
+              <string>moveInYFrames</string>
+              <object idref="Integer0"/>
+             </void>
+             <void method="put">
+              <string>moveOutXSpeed</string>
+              <object idref="Integer0"/>
+             </void>
+             <void method="put">
+              <string>moveOutYFrames</string>
+              <object idref="Integer0"/>
+             </void>
+             <void method="put">
+              <string>moveInYSpeed</string>
+              <object idref="Integer0"/>
+             </void>
+             <void method="put">
+              <string>moveInXFrames</string>
+              <object idref="Integer0"/>
+             </void>
+             <void method="put">
+              <string>moveInXSpeed</string>
+              <object idref="Integer0"/>
+             </void>
+             <void method="put">
+              <string>moveOutYSpeed</string>
+              <object idref="Integer0"/>
+             </void>
+            </object>
+           </void>
+          </object>
+         </void>
+         <void method="put">
+          <string>typing</string>
+          <boolean>false</boolean>
+         </void>
+         <void method="put">
+          <string>ishearer</string>
+          <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentObject">
+           <void property="delegate">
+            <class>org.mcuosmipcuter.orcc.soundvis.effects.Shearer</class>
+           </void>
+           <void property="persistentProperties">
+            <object class="java.util.HashMap">
+             <void method="put">
+              <string>effectShaper</string>
+              <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentObject">
+               <void property="delegate">
+                <class>org.mcuosmipcuter.orcc.soundvis.effects.EffectShaper</class>
+               </void>
+               <void property="persistentProperties">
+                <object class="java.util.HashMap">
+                 <void method="put">
+                  <string>beginFrames</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>midValueXPercent</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>endValueYPercent</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>midValueYPercent</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>framesOut</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>begValueYPercent</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>begValueXPercent</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>endFrames</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>framesIn</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>endValueXPercent</string>
+                  <object idref="Integer0"/>
+                 </void>
+                </object>
+               </void>
+              </object>
+             </void>
+            </object>
+           </void>
+          </object>
+         </void>
+         <void method="put">
+          <string>fontSize</string>
+          <object idref="Integer0"/>
+         </void>
+         <void method="put">
+          <string>text</string>
+          <string>ORCC rapid content creation
+for entertainment, education
+and media production
+2021 user graphics by soundvis</string>
+         </void>
+         <void method="put">
+          <string>fader</string>
+          <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentObject">
+           <void property="delegate">
+            <class>org.mcuosmipcuter.orcc.soundvis.effects.Fader</class>
+           </void>
+           <void property="persistentProperties">
+            <object class="java.util.HashMap">
+             <void method="put">
+              <string>rule</string>
+              <object idref="Fader$RULE0"/>
+             </void>
+             <void method="put">
+              <string>effectShaper</string>
+              <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentObject">
+               <void property="delegate">
+                <class>org.mcuosmipcuter.orcc.soundvis.effects.EffectShaperSimple</class>
+               </void>
+               <void property="persistentProperties">
+                <object class="java.util.HashMap">
+                 <void method="put">
+                  <string>beginFrames</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>framesOut</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>endValuePercent</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>endFrames</string>
+                  <object idref="Integer0"/>
+                 </void>
+                 <void method="put">
+                  <string>framesIn</string>
+                  <int>62</int>
+                 </void>
+                 <void method="put">
+                  <string>midValuePercent</string>
+                  <int>100</int>
+                 </void>
+                 <void method="put">
+                  <string>begValuePercent</string>
+                  <object idref="Integer0"/>
+                 </void>
+                </object>
+               </void>
+              </object>
+             </void>
+            </object>
+           </void>
+          </object>
+         </void>
+         <void method="put">
+          <string>repeater</string>
+          <object class="org.mcuosmipcuter.orcc.soundvis.persistence.PersistentObject">
+           <void property="delegate">
+            <class>org.mcuosmipcuter.orcc.soundvis.effects.Repeater</class>
+           </void>
+           <void property="persistentProperties">
+            <object class="java.util.HashMap">
+             <void method="put">
+              <string>frames</string>
+              <object idref="Integer0"/>
+             </void>
+             <void method="put">
+              <string>repeat</string>
+              <int>1</int>
+             </void>
+             <void method="put">
+              <string>fixedTos</string>
+              <object class="org.mcuosmipcuter.orcc.api.types.LongSequence"/>
+             </void>
+            </object>
+           </void>
+          </object>
+         </void>
+        </object>
+       </void>
+      </object>
+     </void>
+     <void property="transparency">
+      <int>100</int>
+     </void>
+     <void property="visible">
+      <boolean>true</boolean>
+     </void>
+    </object>
+   </void>
+  </void>
+  <void property="version">
+   <string>1.2.2-SNAPSHOT</string>
+  </void>
+  <void property="videoOutPutFrames">
+   <int>25</int>
+  </void>
+  <void property="videoOutPutHeight">
+   <int>540</int>
+  </void>
+  <void property="videoOutPutWidth">
+   <int>960</int>
+  </void>
+ </object>
+</java>

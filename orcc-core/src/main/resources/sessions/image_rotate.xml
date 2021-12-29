@@ -5,7 +5,7 @@
    <string>/audio/metronome_pcm_16bit_wav_30s.wav</string>
   </void>
   <void property="audioInputName">
-   <string>file:/Users/user/Development/Eclipse/workspace/ORCC-open-rapid-content-creation/orcc-core/target/classes/audio/metronome_pcm_16bit_wav_30s.wav</string>
+   <string></string>
   </void>
   <void property="audioInputType">
    <object class="java.lang.Enum" method="valueOf">
