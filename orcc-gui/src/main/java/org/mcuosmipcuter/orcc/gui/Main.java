@@ -124,7 +124,7 @@ public class Main {
 		frame.setMinimumSize(new Dimension(infoW, infoH + playBackH));
 		frame.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
-				exitRoutine(frame.getSize(), logBox.getSize());
+				exitRoutine(frame.getSize(), logBox.getSize(), frame);
 			}
 		});
 
@@ -152,7 +152,7 @@ public class Main {
 		FileMenu fileMenu = new FileMenu(frame, new Function<Void, Void>() {	
 			@Override
 			public Void apply(Void t) {
-				exitRoutine(frame.getSize(), logBox.getSize());
+				exitRoutine(frame.getSize(), logBox.getSize(), frame);
 				return null;
 			}
 		});
@@ -344,9 +344,9 @@ public class Main {
 		}
 	}
 
-	private static void exitRoutine(Dimension frameSize, int logSize) {
+	private static void exitRoutine(Dimension frameSize, int logSize, JFrame frame) {
 		if (Context.getAppState() != AppState.READY) {
-			int res = JOptionPane.showOptionDialog(null, "Confirm exit in state " + Context.getAppState(),
+			int res = JOptionPane.showOptionDialog(frame, "Confirm exit in state " + Context.getAppState(),
 					"Do you want to exit in state " + Context.getAppState() + " ?", JOptionPane.OK_CANCEL_OPTION,
 					JOptionPane.QUESTION_MESSAGE, null, new String[] { "ok", "cancel" }, "cancel");
 			if (res != JOptionPane.OK_OPTION) {
@@ -361,15 +361,22 @@ public class Main {
 			SessionToken st = Context.getSessionToken();
 
 			if (st.isChanged() && st.isNamed()) {
-				int res = JOptionPane.showOptionDialog(null, "save session " + Context.getSessionToken().getFullPath(),
+				int res = JOptionPane.showOptionDialog(frame, "save session " + Context.getSessionToken().getFullPath(),
 						"Do you want to save ?", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null,
 						new String[] { "yes", "no", "cancel" }, "cancel");
 				if (res == JOptionPane.OK_OPTION) {
-					File file = new File(Context.getSessionToken().getFullPath());
-					try {
-						Session.userSaveSession(file);
-					} catch (IllegalArgumentException | IllegalAccessException | IOException e) {
-						e.printStackTrace();
+					if(st.getClassPath() != null) {
+						// can't save to classpath
+						JOptionPane.showMessageDialog(frame, "this is a built in session, please use 'save as' menu option!");
+						return;
+					}
+					else {
+						File file = new File(Context.getSessionToken().getFullPath());
+						try {
+							Session.userSaveSession(file);
+						} catch (IllegalArgumentException | IllegalAccessException | IOException e) {
+							e.printStackTrace();
+						}
 					}
 				}
 				if (res == JOptionPane.NO_OPTION) {
