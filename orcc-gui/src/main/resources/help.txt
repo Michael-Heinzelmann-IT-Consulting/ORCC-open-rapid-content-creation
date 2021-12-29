@@ -1,6 +1,6 @@
 ORCC soundvis help
 
-The soundvis GUI is devided into these main areas:
+The soundvis GUI is devided into these main sections:
 
  ----------------------------------------
 | main menu                              |
@@ -18,7 +18,7 @@ The soundvis GUI is devided into these main areas:
  ----------------------------------------
 
 
-This are the main menu items:
+*** Main menu section ***
 
 Main Menu: File
 
@@ -60,7 +60,7 @@ Main Menu: Session
    is displayed.
    
   Session -> demos
-   opens built demo sessions to get a quick start
+   opens built in demo sessions to get a quick start
    
   Session -> show changes
    opens a change log with all changes since the last save, can be used for
@@ -141,7 +141,87 @@ Main Menu: Help
    
   Help -> about
    shows information about soundvis
-  
+
+
+*** Timeline section ***
+
+ ----------------------------------------
+|                                        |
+|----------------------------------------|
+|               time line                |
+|                                        |
+|----------------------------------------|
+|              |                         |
+|              |                         |
+|              |                         |
+|              |                         |
+|              |                         |
+|              |                         |
+|              |                         |
+ ----------------------------------------
+   
+The timeline contains playback controls:
+
+Stop button []
+stops playing and resets the position to the video position pointer, next play
+will start from there
+
+Play / Pause button > ||
+ starts playing video and audio, if canvas with history are used playing video
+ will need pre - run and not start immediately.
+ Pressing during playback will pause the video and audio.
+
+State display READY, PLAYING, PAUSED, EXPORTING, LOADING
+ The READY state allows all editing and configuration changes, this is the only
+ state where video size, frame rate can be changed, canvas can be added or 
+ removed and the audio input or whole sessions can be loaded. 
+ The PLAYING state allows canvas property edit while the video and audio is 
+ playing.
+ The PAUSED state allows the same as PLAYING plus canvas list to be re-ordered.
+ The EXPORTING, LOADING states do not allow any editing.
+
+Volume control
+ allows to set the playback audio volume (not enabled on some pro audio formats)
+
+Zoom wave button
+ allows to zoom the audio wave for precise audio - video synchronization
+
+Frame and speed display
+ shows the current frame number and playback speed, if speed is too low or not 
+ steady it will be difficult to edit the video - this is due to the real time 
+ nature of the playback - nevertheless the exported video will very likely have 
+ no problem since all calculations are done during export.
+ 
+Length display 00:00:00
+ shows the length of the loaded audio
+
+Progress bar
+ shows progress in % during PLAYING or EXPORTING
+
+Directly on the sound wave timeline is the video position pointer
+Each canvas is also displayed according to the layer ordering, an expanded 
+canvas is also shown expanded on the timeline showing any effect curves.
+
+
+*** Layers section ***
+
+ ----------------------------------------
+|                                        |
+|----------------------------------------|
+|                                        |
+|                                        |
+|----------------------------------------|
+|    layers    |                         |
+|              |                         |
+|              |                         |
+|              |                         |
+|              |                         |
+|              |                         |
+|              |                         |
+ ----------------------------------------
+
+The layers section has all canvas that produce video, the canvas layers are
+rendered in order
 
 Layers Menu: canvas
 
@@ -208,3 +288,36 @@ Basic configuration on each canvas layer:
  Remove canvas with the remove handle
   To delete a canvas click on the X on the right, all settings of the canvas
   will be lost.
+
+
+*** Video section ***
+
+ ----------------------------------------
+|                                        |
+|----------------------------------------|
+|                                        |
+|                                        |
+|----------------------------------------|
+|              |                         |
+|              |                         |
+|              |                         |
+|              |         video           |
+|              |                         |
+|              |                         |
+|              |                         |
+ ----------------------------------------
+ 
+ shows depending on state 
+ 
+ READY and PAUSED 
+  the current frame as snapshot 
+ PLAYING 
+  the video is displayed in realtime the speed is ideally 100%
+  depending on the canvas animation demand and system graphics capabilities
+  playback might get slower and video display might flicker,
+  main reasons for playback performance problems are large video size and high
+  number of gradients, XOR or history use on the canvas.
+ EXPORTING 
+  the video is displayed faster or slower than realtime depending on calculation 
+  work needed for video and audio conversions.
+ 
