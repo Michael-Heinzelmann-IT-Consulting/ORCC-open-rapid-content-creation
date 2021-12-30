@@ -17,7 +17,7 @@
 	<parent>
 		<groupId>org.mcuosmipcuter.orcc</groupId>
 		<artifactId>orcc</artifactId>
-		<version>1.2.2-SNAPSHOT</version>
+		<version>1.2.3</version>
 	</parent>
 	<groupId>org.mcuosmipcuter.orcc.dist</groupId>
 	<artifactId>orcc-dist</artifactId>
@@ -29,7 +29,7 @@
 		<dependency>
 			<groupId>org.mcuosmipcuter.orcc.gui</groupId>
 			<artifactId>orcc-gui</artifactId>
-			<version>1.2.2-SNAPSHOT</version>
+			<version>1.2.3</version>
 		</dependency>
 	</dependencies>
 	
@@ -81,7 +81,7 @@
 									<mainjar>orcc-gui-${project.version}.jar</mainjar>
 									<mainclass>org.mcuosmipcuter.orcc.gui.Main</mainclass>
 									<name>soundvis</name>
-									<appversion>1.2.2</appversion>
+									<appversion>1.2.3</appversion>
 									<copyright>GNU General Public License v3.0</copyright>
 									<licensefile>${project.build.directory}/orcc-dist-${project.version}-distribution-${osName}/orcc-dist-${project.version}/LICENSE.txt</licensefile>
 									<icon>${project.build.directory}/orcc-dist-${project.version}-distribution-${osName}/orcc-dist-${project.version}/${jpackageIcon}</icon>
@@ -141,7 +141,7 @@
 									<mainjar>orcc-gui-${project.version}.jar</mainjar>
 									<mainclass>org.mcuosmipcuter.orcc.gui.Main</mainclass>
 									<name>soundvis</name>
-									<appversion>1.2.2</appversion>
+									<appversion>1.2.3</appversion>
 									<copyright>GNU General Public License v3.0</copyright>
 									<licensefile>${project.build.directory}/orcc-dist-${project.version}-distribution-${osName}/orcc-dist-${project.version}/LICENSE.txt</licensefile>
 									<icon>${project.build.directory}/orcc-dist-${project.version}-distribution-${osName}/orcc-dist-${project.version}/${jpackageIcon}</icon>
@@ -201,7 +201,7 @@
 									<mainjar>orcc-gui-${project.version}.jar</mainjar>
 									<mainclass>org.mcuosmipcuter.orcc.gui.Main</mainclass>
 									<name>soundvis</name>
-									<appversion>1.2.2</appversion>
+									<appversion>1.2.3</appversion>
 									<copyright>GNU General Public License v3.0</copyright>
 									<licensefile>${project.build.directory}/orcc-dist-${project.version}-distribution-${osName}/orcc-dist-${project.version}/LICENSE.txt</licensefile>
 									<icon>${project.build.directory}/orcc-dist-${project.version}-distribution-${osName}/orcc-dist-${project.version}/${jpackageIcon}</icon>
