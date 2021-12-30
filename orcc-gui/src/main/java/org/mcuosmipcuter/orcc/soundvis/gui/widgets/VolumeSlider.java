@@ -145,12 +145,12 @@ public class VolumeSlider extends JPanel {
 		g.setColor(isEnabled() ? Color.GRAY : Color.LIGHT_GRAY);
 		int w = getWidth();
 		int h = getHeight();
-		g.fillPolygon(new int[] {margin, w - margin, w - margin, 0}, new int[] {h / 2, h / 2, 0, h / 2}, 4);
+		g.fillPolygon(new int[] {margin, w - margin, w - margin,  w - margin - 7,  margin}, new int[] { h/2, h/2, 3, 3, h / 2}, 5);
 		g.setColor(Color.BLACK);
-		g.drawLine(selectPoint, 0, selectPoint, h / 2);
-		g.drawLine(selectPoint + 1, 0, selectPoint + 1, h / 2);
+		g.drawLine(selectPoint, 2, selectPoint, h / 2);
+		g.drawLine(selectPoint + 1, 2, selectPoint + 1, h / 2);
 		String str = value > 0 ? "+" + (int)value : String.valueOf((int)value);
-		g.drawString(str, selectPoint - g.getFontMetrics().stringWidth(str) / 2, h);
+		g.drawString(str, selectPoint - g.getFontMetrics().stringWidth(str) / 2, h - 1);
 	}
 
 	/**
