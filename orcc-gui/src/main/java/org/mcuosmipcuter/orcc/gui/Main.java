@@ -103,6 +103,7 @@ public class Main {
 				System.err.println("UNCAUGHT Exception in " + thread);
 				t.printStackTrace();
 				if (!exitCalled) {
+					IOUtil.logWithStack(t);
 					String msg = t.getClass().getSimpleName() + ": " + t.getMessage();
 					JOptionPane.showConfirmDialog(frame, msg, "Error", JOptionPane.DEFAULT_OPTION,
 							JOptionPane.ERROR_MESSAGE);

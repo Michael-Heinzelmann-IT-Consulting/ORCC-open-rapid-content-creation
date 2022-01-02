@@ -17,12 +17,9 @@
 */
 package org.mcuosmipcuter.orcc.soundvis.threads;
 
-import java.io.IOException;
-
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 
 import org.mcuosmipcuter.orcc.soundvis.AudioInput;
@@ -120,10 +117,8 @@ public class PlayThread extends Thread implements PlayPauseStop {
 			});
 			IOUtil.log("done play.");
 		}
-		catch(IOException ex) {
-			ex.printStackTrace();
-			throw new RuntimeException(ex);
-		} catch (LineUnavailableException ex) {
+		catch(Exception ex) {
+			IOUtil.logWithStack(ex);
 			throw new RuntimeException(ex);
 		}
 		finally {

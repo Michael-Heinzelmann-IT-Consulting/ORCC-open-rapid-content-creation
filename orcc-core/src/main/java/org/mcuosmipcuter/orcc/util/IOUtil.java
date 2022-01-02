@@ -61,6 +61,20 @@ public class IOUtil {
 			listener.apply(Thread.currentThread().getName() + ": "+ msg);
 		}
 	}
+	
+	public static void logWithStack(Throwable ex) {
+		if(ex == null) {
+			log("programming error logWithStack Exception argument is null");
+		}
+		else {
+			StringBuilder str = new StringBuilder(ex.getClass().getName());
+			str.append("\nmessage: " +  ex.getMessage());
+			for(StackTraceElement ste : ex.getStackTrace()) {
+				str.append("\n" + ste.toString());
+			}
+			log(str.toString());
+		}
+	}
 
 	public static void setListener(Function<String, Void> listener) {
 		IOUtil.listener = listener;

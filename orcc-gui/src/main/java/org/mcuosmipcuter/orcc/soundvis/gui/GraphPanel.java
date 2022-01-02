@@ -187,7 +187,7 @@ public class GraphPanel extends JPanel implements Renderer, RealtimeSettings, Li
 					}
 				});
 			} catch (Exception ex) {
-				IOUtil.log("" + ex);
+				IOUtil.logWithStack(ex);
 			}
 		}
 		repaint();
