@@ -31,6 +31,11 @@
       <filtered>true</filtered>
     </file>
     <file>
+    <source>src/main/icons/soundvis_icon_512px.png</source>
+      <outputDirectory>/</outputDirectory>
+      <filtered>false</filtered>
+    </file>
+    <file>
       <source>src/main/scripts/linux/run.sh</source>
       <outputDirectory>/</outputDirectory>
       <filtered>true</filtered>
@@ -44,6 +49,7 @@
       <source>src/main/icons/soundvis_icon_512px.png</source>
       <outputDirectory>/</outputDirectory>
       <filtered>false</filtered>
+      <destName>soundvis.png</destName>
     </file>
   </files>
   <moduleSets>
