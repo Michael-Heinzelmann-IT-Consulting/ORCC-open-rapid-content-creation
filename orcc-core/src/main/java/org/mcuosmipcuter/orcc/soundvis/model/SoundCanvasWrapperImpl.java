@@ -42,6 +42,7 @@ import org.mcuosmipcuter.orcc.api.util.DimensionHelper;
 import org.mcuosmipcuter.orcc.soundvis.Context;
 import org.mcuosmipcuter.orcc.soundvis.SoundCanvasWrapper;
 import org.mcuosmipcuter.orcc.soundvis.effects.Positioner;
+import org.mcuosmipcuter.orcc.util.IOUtil;
 
 /**
  * Implementation of a sound canvas wrapper
@@ -85,11 +86,26 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 		this.soundCanvas = soundCanvas;
 		this.sessionId = sessionId != null ? sessionId : soundCanvas.getClass().getSimpleName() + "_"+ UUID.randomUUID().toString();
 	}
+
 	@Override
-	public void nextSample(int[] amplitudes) {
-		soundCanvas.nextSample(amplitudes);
+	public void nextSample(int[] amplitudes) {	
+		try {
+			soundCanvas.nextSample(amplitudes);
+		}
+		catch(Exception ex) {
+			IOUtil.log(soundCanvas + ".nextSample " + ex);
+		}
 	}
 
+	private void wrappedNewFrame(long frameCount, Graphics2D graphics2d) {
+		try {
+			soundCanvas.newFrame(frameCount, graphics2d);
+		}
+		catch(Exception ex) {
+			IOUtil.logWithStack(ex);
+		}
+	}
+	
 	@Override
 	public void newFrame(long frameCount, Graphics2D graphics2d) {
 
@@ -123,7 +139,7 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 			}
 
 			// draws to the real graphics
-			soundCanvas.newFrame(frameCount, graphics2d);
+			wrappedNewFrame(frameCount, graphics2d);
 			if(scale != 100 || posX != 0 || posY != 0) {
 				graphics2d.setTransform(new AffineTransform());
 			}
@@ -137,7 +153,7 @@ public class SoundCanvasWrapperImpl implements SoundCanvasWrapper {
 		else {
 			// it's not reasonable to proxy graphics or make a wrapper with 
 			//limited number of methods, use a dummy graphics object 
-			soundCanvas.newFrame(frameCount, devNullGraphics);
+			wrappedNewFrame(frameCount, devNullGraphics);
 		}
 	}
 	@Override
