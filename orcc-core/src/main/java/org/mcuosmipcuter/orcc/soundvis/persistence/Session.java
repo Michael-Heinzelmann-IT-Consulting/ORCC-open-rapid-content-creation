@@ -201,7 +201,7 @@ public class Session implements Serializable {
 		saveSessionImpl(file, null, null, null);
 		Context.setSessionToken(new SessionToken(file.getAbsolutePath(), null, new ArrayList<>()));
 	}
-	private static PersistentSession saveSessionImpl(File file, String persitentSessionPath, String classPath, Map<String, ValueChanges> changes) throws IllegalArgumentException, IllegalAccessException, IOException {
+	private static PersistentSession saveSessionImpl(File file, String persistentSessionPath, String classPath, Map<String, ValueChanges> changes) throws IllegalArgumentException, IllegalAccessException, IOException {
 
 		List<SoundCanvasWrapper> appObjects = Context.getSoundCanvasList();
 		
@@ -217,7 +217,7 @@ public class Session implements Serializable {
 		persistentSession.setVersion(vp.getProperty("version"));
 		persistentSession.setBuildNumber(vp.getProperty("buildNumber"));
 		persistentSession.setChanges(changes);
-		persistentSession.setSessionPath(persitentSessionPath);
+		persistentSession.setSessionPath(persistentSessionPath);
 		persistentSession.setClassPath(classPath);
 		persistentSession.setSoundCanvasList(persistentWrappers);
 		persistentSession.setAudioInputType(Context.getAudioInput().getType());
@@ -233,7 +233,7 @@ public class Session implements Serializable {
 			encoder.setPersistenceDelegate(Key.class, new KeyPersistenceDelegate());
 			encoder.writeObject(persistentSession);
 			encoder.flush();
-			IOUtil.log("saved: " + file.getAbsolutePath() + " persitentSessionPath: " + persitentSessionPath);
+			IOUtil.log("saved: " + file.getAbsolutePath() + " persistentSessionPath: " + persistentSessionPath);
 			return persistentSession;
 		} catch (IOException e) {
 			IOUtil.log(e.getMessage());
