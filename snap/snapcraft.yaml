@@ -1,10 +1,10 @@
 name: soundvis
 base: core18 
-version: 1.2.1-SNAPSHOT
-summary: sound visualizer
+version: 1.2.3
+summary: wave, mp3, midi sound visualizer video creator
 description: |
  open rapid content creation sound visualization
-grade: devel # must be 'stable' to release into candidate/stable channels
+grade: stable # must be 'stable' to release into candidate/stable channels
 confinement: strict
 license: GPL-3.0-or-later
 icon: snap/gui/soundvis.png
@@ -27,7 +27,7 @@ parts:
     # See 'snapcraft plugins'
     plugin: maven
     source: https://github.com/Michael-Heinzelmann-IT-Consulting/ORCC-open-rapid-content-creation.git
-    source-tag: master
+    source-tag: release-1.2.3
     maven-targets: 
        - orcc-dist
     override-build: |
